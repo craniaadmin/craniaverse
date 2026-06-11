@@ -38,7 +38,9 @@
       "PowerShell(Get-Process -Name ngrok -ErrorAction SilentlyContinue)",
       "PowerShell(try { \\(Invoke-RestMethod http://localhost:4040/api/tunnels\\).tunnels | ConvertTo-Json } catch { \"ngrok web UI not reachable: $_\" })",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(gh pr *)"
     ]
   }
 }
