@@ -26,8 +26,10 @@ module.exports = {
     {
       name: 'craniaverse-tunnel',
       // PM2 doesn't resolve via PATH, so use the absolute path to ngrok.exe.
-      // ngrok was installed at C:\Windows\System32\ngrok.exe on the spare host.
-      script: 'C:\\Windows\\System32\\ngrok.exe',
+      // Standalone ngrok.exe was downloaded from ngrok.com and dropped in the
+      // spare host's user folder. Avoid the Microsoft Store / WindowsApps copy:
+      // that's an execution alias, not a real binary, and PM2 can't launch it.
+      script: 'C:\\Users\\CraniaVerse\\ngrok.exe',
       args: 'http 4000 --domain=uncork-silent-unengaged.ngrok-free.dev',
       autorestart: true,
       // Throttle restarts if ngrok keeps dying (e.g. account auth issue)
