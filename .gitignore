@@ -7,14 +7,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local data — kept out of git so personal info never lands in commit history.
-# These live on the spare's disk and are backed up separately.
-server/data.json
-server/comments.json
-server/staff.json
-server/staff-board.json
-server/programs.json
-server/rules.json
+# Note: Data files (data.json, programs.json, etc.) are now committed to git
+# so they're available when accessing the app from any device via craniaverse.ngrok.app
 
 # Local environment overrides
 .env

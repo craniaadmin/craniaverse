@@ -1,0 +1,19 @@
+{
+  "lists": [
+    {
+      "id": "l1",
+      "title": "To Do",
+      "cards": []
+    },
+    {
+      "id": "l2",
+      "title": "In Progress",
+      "cards": []
+    },
+    {
+      "id": "l3",
+      "title": "Done",
+      "cards": []
+    }
+  ]
+}

@@ -1,0 +1,3151 @@
+[
+  {
+    "id": "seed",
+    "displayName": "Hobo Karim",
+    "createdAt": "Seed record",
+    "student": {
+      "firstName": "Hobo",
+      "lastName": "Karimo",
+      "gender": "Female",
+      "dob": "Dec 1, 2013",
+      "age": "12.25",
+      "email": "student@school.ca",
+      "grade": "7",
+      "school": "Cranius",
+      "medical": "Overly cute",
+      "notes": [
+        "Excellent student",
+        "Sometimes a little chatty",
+        "Eager to learn",
+        "Very smart",
+        "Generally works well on her own",
+        "Ensure she doesn’t fall asleep!",
+        "DOES NOT TAKE HOMEWORK!"
+      ],
+      "assessments": [
+        {
+          "name": "MATH — YELLOW",
+          "date": "Aug 1, 2026",
+          "score": "55%"
+        },
+        {
+          "name": "ENGLISH — BLUE",
+          "date": "Jul 3, 2026",
+          "score": "32%"
+        }
+      ],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 55
+    },
+    "customer": {
+      "student": {
+        "First Name": "Hobobob",
+        "Last Name": "Karim",
+        "Gender": "Female",
+        "DOB": "Dec 1, 2013",
+        "Current Age": "12.25",
+        "Email": "student@school.ca",
+        "Current Grade": "7",
+        "School": "Cranius",
+        "Report Card": "link",
+        "Medical Conditions": "Overly cute"
+      },
+      "guardian1": {
+        "First Name": "Dadders",
+        "Last Name": "Karim",
+        "Relationship": "Dadders",
+        "Phone (Home)": "(123) 456-7890",
+        "Phone (Mobile)": "(123) 456-7890",
+        "Email": "father@kuber.com",
+        "Street Address": "7 Fun Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "Ontario",
+        "Postal Code": "A1B 2C3",
+        "Occupation": "Cool guy"
+      },
+      "guardian2": {
+        "First Name": "Mother",
+        "Last Name": "Karim",
+        "Relationship": "Mummers",
+        "Phone (Home)": "(123) 456-7890",
+        "Phone (Mobile)": "(123) 456-7890",
+        "Email": "mother@kuber.com",
+        "Street Address": "7 Fun Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "Ontario",
+        "Postal Code": "A1B 2C3",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Chicken",
+        "Last Name": "Licken",
+        "Relationship": "Neighbour",
+        "Phone (Mobile)": "(123) 456-7890",
+        "Email": "chickens@next.ca"
+      }
+    },
+    "programs": [
+      {
+        "active": false,
+        "status": "Completed",
+        "year": "22_23",
+        "program": "MATH ENRICHMENT LEVEL 3",
+        "rate": "$270",
+        "rateUnit": "/month",
+        "fees": {
+          "reg": "paid",
+          "mat": "paid",
+          "aug": "paid",
+          "sep": "paid",
+          "oct": "paid",
+          "nov": "paid",
+          "dec": "paid",
+          "jan": "paid",
+          "feb": "paid",
+          "mar": "paid",
+          "apr": "paid",
+          "may": "paid",
+          "jun": "overdue",
+          "jul": ""
+        },
+        "payment": "Paid"
+      },
+      {
+        "active": true,
+        "status": "Completed",
+        "year": "22_23",
+        "program": "SUMMER CAMP WEEK 1",
+        "rate": "$385",
+        "rateUnit": "/week",
+        "fees": {
+          "reg": "paid",
+          "mat": "paid",
+          "aug": "paid",
+          "sep": "",
+          "oct": "",
+          "nov": "",
+          "dec": "",
+          "jan": "",
+          "feb": "empty",
+          "mar": "",
+          "apr": "paid",
+          "may": "overdue",
+          "jun": "",
+          "jul": ""
+        },
+        "payment": "Overdue"
+      },
+      {
+        "active": true,
+        "status": "Late Start",
+        "year": "25_26",
+        "program": "MATH ENRICHMENT LEVEL 4",
+        "rate": "$279",
+        "rateUnit": "/month",
+        "fees": {
+          "reg": "paid",
+          "mat": "paid",
+          "aug": "",
+          "sep": "paid",
+          "oct": "paid",
+          "nov": "pending",
+          "dec": "pending",
+          "jan": "empty",
+          "feb": "paid",
+          "mar": "overdue",
+          "apr": "paid",
+          "may": "paid",
+          "jun": "paid",
+          "jul": ""
+        },
+        "payment": "Paid"
+      },
+      {
+        "active": true,
+        "status": "On-Hold",
+        "year": "25_26",
+        "program": "MATH CONTEST CLUB",
+        "rate": "$279",
+        "rateUnit": "/month",
+        "fees": {
+          "reg": "paid",
+          "mat": "paid",
+          "aug": "",
+          "sep": "paid",
+          "oct": "paid",
+          "nov": "paid",
+          "dec": "paid",
+          "jan": "paid",
+          "feb": "paid",
+          "mar": "paid",
+          "apr": "paid",
+          "may": "paid",
+          "jun": "",
+          "jul": ""
+        },
+        "payment": "Paid"
+      },
+      {
+        "active": false,
+        "status": "Cancelled",
+        "year": "25_26",
+        "program": "CROCHET CLUB",
+        "rate": "$10",
+        "rateUnit": "/lesson",
+        "fees": {
+          "reg": "pending",
+          "mat": "paid",
+          "aug": "",
+          "sep": "",
+          "oct": "",
+          "nov": "",
+          "dec": "",
+          "jan": "",
+          "feb": "",
+          "mar": "",
+          "apr": "",
+          "may": "",
+          "jun": "",
+          "jul": ""
+        },
+        "payment": "Pending"
+      }
+    ],
+    "cashLog": []
+  },
+  {
+    "id": "reg-1780511692752-1",
+    "displayName": "H K",
+    "createdAt": "Jun 3, 2026, 2:34 p.m.",
+    "registration": {
+      "studentFirstName": "H",
+      "studentLastName": "K",
+      "studentEmail": "anah.mirak@gmail.com",
+      "gender": "as",
+      "dob": "2000-01-22",
+      "grade": "JK",
+      "school": "1",
+      "medical": "1",
+      "reportCard": false,
+      "g1FirstName": "1",
+      "g1LastName": "1",
+      "g1Relationship": "1",
+      "g1PhoneMobile": "1",
+      "g1PhoneHome": "",
+      "g1Address1": "",
+      "g1Address2": "",
+      "g1City": "",
+      "g1Province": "",
+      "g1Postal": "",
+      "g1Country": "Canada",
+      "g1Email": "1",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "1",
+      "emLastName": "1",
+      "emRelationship": "",
+      "emPhone": "1",
+      "emEmail": "1",
+      "program": "Teknokids Coding: HTML/CSS",
+      "day": "Friday",
+      "time": "5:30 pm",
+      "platform": "Waterloo East (In-Person)",
+      "courseCost": "$299 / mo",
+      "methodOfPayment": "Credit Card",
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "additionalNotes": "",
+      "hearAbout": [
+        "Crania Vehicle"
+      ],
+      "enrollReasons": [
+        "Coding Help"
+      ],
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "student": {
+      "firstName": "H",
+      "lastName": "K",
+      "gender": "as",
+      "dob": "Jan 21, 2000",
+      "age": "26.36",
+      "email": "anah.mirak@gmail.com",
+      "grade": "JK",
+      "school": "1",
+      "medical": "1",
+      "notes": [
+        "Enrolled in: Teknokids Coding: HTML/CSS",
+        "Schedule: Friday 5:30 pm",
+        "Platform: Waterloo East (In-Person)",
+        "Reason for enrolling: Coding Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 7
+    },
+    "customer": {
+      "student": {
+        "First Name": "H",
+        "Last Name": "K",
+        "Gender": "as",
+        "DOB": "Jan 21, 2000",
+        "Current Age": "26.36",
+        "Email": "anah.mirak@gmail.com",
+        "Current Grade": "JK",
+        "School": "1",
+        "Report Card": "",
+        "Medical Conditions": "1"
+      },
+      "guardian1": {
+        "First Name": "1",
+        "Last Name": "1",
+        "Relationship": "1",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "1",
+        "Email": "1",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "1",
+        "Last Name": "1",
+        "Relationship": "Emergency Contact",
+        "Phone (Mobile)": "1",
+        "Email": "1"
+      }
+    },
+    "programs": [
+      {
+        "year": "25_26",
+        "program": "Teknokids Coding: HTML/CSS",
+        "fees": {
+          "mar": "pending",
+          "apr": "paid",
+          "nov": "overdue",
+          "dec": "overdue",
+          "mat": "paid",
+          "reg": "paid"
+        }
+      }
+    ],
+    "cashLog": [
+      {
+        "ts": "2026-06-10T19:08:11.885Z",
+        "delta": 1,
+        "reason": "Present (auto · lesson 3)"
+      },
+      {
+        "ts": "2026-06-10T19:08:11.892Z",
+        "delta": 1,
+        "reason": "Present (auto · lesson 3)"
+      },
+      {
+        "ts": "2026-06-10T19:08:12.844Z",
+        "delta": 1,
+        "reason": "Present (auto · lesson 4)"
+      },
+      {
+        "ts": "2026-06-10T19:08:12.853Z",
+        "delta": 1,
+        "reason": "Present (auto · lesson 4)"
+      }
+    ]
+  },
+  {
+    "id": "reg-1780521979813-1",
+    "displayName": "Hana Karim",
+    "createdAt": "Jun 3, 2026, 5:26 p.m.",
+    "registration": {
+      "studentFirstName": "Hana",
+      "studentLastName": "Karim",
+      "studentEmail": "hana.karim.waterloo@gmail.com",
+      "gender": "1234",
+      "dob": "2000-01-11",
+      "grade": "2",
+      "school": "asdf",
+      "medical": "asdf",
+      "reportCard": false,
+      "g1FirstName": "Hana",
+      "g1LastName": "Karim",
+      "g1Relationship": "asdf",
+      "g1PhoneMobile": "asdf",
+      "g1PhoneHome": "",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo, Ontario, Canada",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "hana.karim.waterloo@gmail.com",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "asdf",
+      "emLastName": "asdf",
+      "emRelationship": "",
+      "emPhone": "asdf",
+      "emEmail": "asdf",
+      "program": "Teknokids Coding: JavaScript",
+      "day": "Monday",
+      "time": "5:00 pm",
+      "platform": "Waterloo East (In-Person)",
+      "courseCost": "$279 / mo",
+      "methodOfPayment": "E-Transfer",
+      "extraShirt": false,
+      "additionalNotes": "",
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true,
+      "hearAbout": [
+        "Online Directory"
+      ],
+      "enrollReasons": [
+        "English Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "submittedAt": "2026-06-03T21:26:19.738Z"
+    },
+    "programs": [
+      {
+        "year": "25_26",
+        "program": "Teknokids Coding: JavaScript"
+      }
+    ],
+    "student": {
+      "firstName": "Hana",
+      "lastName": "Karim",
+      "gender": "1234",
+      "dob": "Jan 10, 2000",
+      "age": "26.40",
+      "email": "hana.karim.waterloo@gmail.com",
+      "grade": "2",
+      "school": "asdf",
+      "medical": "asdf",
+      "notes": [
+        "Enrolled in: Teknokids Coding: JavaScript",
+        "Schedule: Monday 5:00 pm",
+        "Platform: Waterloo East (In-Person)",
+        "Reason for enrolling: English Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 16
+    },
+    "customer": {
+      "student": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Gender": "1234",
+        "DOB": "Jan 10, 2000",
+        "Current Age": "26.40",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Current Grade": "2",
+        "School": "asdf",
+        "Report Card": "",
+        "Medical Conditions": "asdf"
+      },
+      "guardian1": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "asdf",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "asdf",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo, Ontario, Canada",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "asdf",
+        "Last Name": "asdf",
+        "Relationship": "Emergency Contact",
+        "Phone (Mobile)": "asdf",
+        "Email": "asdf"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1780523299047-2",
+    "displayName": "Hazel A",
+    "createdAt": "Jun 3, 2026, 5:48 p.m.",
+    "registration": {
+      "studentFirstName": "Hazel",
+      "studentLastName": "A",
+      "studentEmail": "123",
+      "gender": "123",
+      "dob": "2002-01-31",
+      "grade": "2",
+      "school": "123",
+      "medical": "123",
+      "reportCard": true,
+      "g1FirstName": "123",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "",
+      "g1Address2": "",
+      "g1City": "",
+      "g1Province": "",
+      "g1Postal": "",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "123",
+      "emPhone": "123",
+      "emEmail": "123",
+      "program": "Flex Math — Grades 3-4",
+      "day": "Monday",
+      "time": "4:00 pm",
+      "platform": "Boardwalk (In-Person)",
+      "courseCost": "$279 / mo",
+      "methodOfPayment": "Cash",
+      "extraShirt": false,
+      "additionalNotes": "",
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true,
+      "hearAbout": [
+        "Online Directory"
+      ],
+      "enrollReasons": [
+        "English Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "submittedAt": "2026-06-03T21:48:18.984Z"
+    },
+    "programs": [
+      {
+        "year": "25_26",
+        "program": "Flex Math — Grades 3-4",
+        "active": false,
+        "fees": {
+          "mar": "paid",
+          "jan": "paid",
+          "apr": "empty",
+          "feb": "paid",
+          "dec": "paid"
+        }
+      }
+    ],
+    "student": {
+      "firstName": "Hazel",
+      "lastName": "A",
+      "gender": "123",
+      "dob": "Jan 30, 2002",
+      "age": "24.34",
+      "email": "123",
+      "grade": "2",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "Enrolled in: Flex Math — Grades 3-4",
+        "Schedule: Monday 4:00 pm",
+        "Platform: Boardwalk (In-Person)",
+        "Reason for enrolling: English Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 22
+    },
+    "customer": {
+      "student": {
+        "First Name": "Hazel",
+        "Last Name": "A",
+        "Gender": "123",
+        "DOB": "Jan 30, 2002",
+        "Current Age": "24.34",
+        "Email": "123",
+        "Current Grade": "2",
+        "School": "123",
+        "Report Card": "link",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": [
+      {
+        "ts": "2026-06-10T19:11:33.326Z",
+        "delta": 1,
+        "reason": "Present (auto · lesson 2)"
+      },
+      {
+        "ts": "2026-06-10T19:11:34.482Z",
+        "delta": 1,
+        "reason": "Present (auto · lesson 3)"
+      },
+      {
+        "ts": "2026-06-10T19:11:35.975Z",
+        "delta": -5,
+        "reason": "No Shirt (auto · lesson 5)"
+      },
+      {
+        "ts": "2026-06-10T21:25:44.953Z",
+        "delta": 1,
+        "reason": "present (auto · lesson 8)"
+      },
+      {
+        "ts": "2026-06-10T21:25:47.568Z",
+        "delta": -5,
+        "reason": "no-shirt (auto · lesson 8)"
+      }
+    ]
+  },
+  {
+    "id": "reg-1780523348689-3",
+    "displayName": "test test",
+    "createdAt": "Jun 3, 2026, 5:49 p.m.",
+    "registration": {
+      "studentFirstName": "test",
+      "studentLastName": "test",
+      "studentEmail": "tests",
+      "gender": "tests",
+      "dob": "2006-02-28",
+      "grade": "SK",
+      "school": "123",
+      "medical": "123",
+      "reportCard": false,
+      "g1FirstName": "123",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "",
+      "g1Address1": "",
+      "g1Address2": "",
+      "g1City": "",
+      "g1Province": "",
+      "g1Postal": "",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "",
+      "emPhone": "123",
+      "emEmail": "123",
+      "program": "Gauss Contest Club",
+      "day": "Tuesday",
+      "time": "4:30 pm",
+      "platform": "Boardwalk (In-Person)",
+      "courseCost": "$279 / mo",
+      "methodOfPayment": "Cheque",
+      "extraShirt": false,
+      "additionalNotes": "",
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true,
+      "hearAbout": [
+        "TikTok"
+      ],
+      "enrollReasons": [
+        "Math Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "submittedAt": "2026-06-03T21:49:08.633Z"
+    },
+    "programs": [
+      {
+        "year": "25_26",
+        "program": "Gauss Contest Club",
+        "fees": {
+          "nov": "paid",
+          "dec": "pending",
+          "feb": "empty",
+          "jan": "paid"
+        }
+      }
+    ],
+    "student": {
+      "firstName": "test",
+      "lastName": "test",
+      "gender": "tests",
+      "dob": "Feb 27, 2006",
+      "age": "20.26",
+      "email": "tests",
+      "grade": "SK",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "Enrolled in: Gauss Contest Club",
+        "Schedule: Tuesday 4:30 pm",
+        "Platform: Boardwalk (In-Person)",
+        "Reason for enrolling: Math Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": -85
+    },
+    "customer": {
+      "student": {
+        "First Name": "test",
+        "Last Name": "test",
+        "Gender": "tests",
+        "DOB": "Feb 27, 2006",
+        "Current Age": "20.26",
+        "Email": "tests",
+        "Current Grade": "SK",
+        "School": "123",
+        "Report Card": "",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "Emergency Contact",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": [
+      {
+        "ts": "2026-06-10T21:30:38.405Z",
+        "delta": 7,
+        "reason": "asg"
+      },
+      {
+        "ts": "2026-06-10T21:31:00.132Z",
+        "delta": 99,
+        "reason": "asdf"
+      },
+      {
+        "ts": "2026-06-10T21:31:07.665Z",
+        "delta": -199,
+        "reason": "zxcv"
+      }
+    ]
+  },
+  {
+    "id": "reg-1780588427542-1",
+    "displayName": "Hana Karim",
+    "createdAt": "Jun 4, 2026, 11:53 a.m.",
+    "registration": {
+      "studentFirstName": "Hana",
+      "studentLastName": "Karim",
+      "studentEmail": "hana.karim.waterloo@gmail.com",
+      "gender": "asd",
+      "dob": "200222-02-02",
+      "grade": "JK",
+      "school": "123",
+      "medical": "123",
+      "reportCard": true,
+      "g1FirstName": "123",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "123",
+      "g1City": "123",
+      "g1Province": "",
+      "g1Postal": "123",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "123",
+      "g2FirstName": "123",
+      "g2LastName": "123",
+      "g2Relationship": "123",
+      "g2PhoneMobile": "123",
+      "g2PhoneHome": "123",
+      "g2Address1": "123",
+      "g2Address2": "123",
+      "g2City": "123",
+      "g2Province": "",
+      "g2Postal": "123",
+      "g2Country": "Canada",
+      "g2Email": "123",
+      "g2Occupation": "123",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "123",
+      "emPhone": "123",
+      "emEmail": "123",
+      "programs": [
+        {
+          "program": "Teknokids Coding: HTML/CSS",
+          "day": "Tuesday",
+          "time": "4:00 pm",
+          "platform": "Online",
+          "courseCost": "$149 / mo",
+          "methodOfPayment": "E-Transfer"
+        },
+        {
+          "program": "Summer Camp — Full Day",
+          "day": "Monday",
+          "time": "5:00 pm",
+          "platform": "Waterloo East (In-Person)",
+          "courseCost": "$279 / mo",
+          "methodOfPayment": "Debit"
+        }
+      ],
+      "additionalNotes": "123",
+      "hearAbout": [
+        "Web Search"
+      ],
+      "enrollReasons": [
+        "English Enrichment"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: HTML/CSS",
+        "schedule": "Tuesday 4:00 pm",
+        "platform": "Online",
+        "methodOfPayment": "E-Transfer",
+        "rate": "$149",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Summer Camp — Full Day",
+        "schedule": "Monday 5:00 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "Debit",
+        "rate": "$279",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Hana",
+      "lastName": "Karim",
+      "gender": "asd",
+      "dob": "Feb 2, 200222",
+      "age": "",
+      "email": "hana.karim.waterloo@gmail.com",
+      "grade": "JK",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "123",
+        "Reason for enrolling: English Enrichment"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Gender": "asd",
+        "DOB": "Feb 2, 200222",
+        "Current Age": "",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Current Grade": "JK",
+        "School": "123",
+        "Report Card": "link",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "guardian2": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1780588427621-2",
+    "displayName": "123 123",
+    "createdAt": "Jun 4, 2026, 11:53 a.m.",
+    "registration": {
+      "studentFirstName": "123",
+      "studentLastName": "123",
+      "studentEmail": "123",
+      "gender": "123",
+      "dob": "200222-02-02",
+      "grade": "3",
+      "school": "123",
+      "medical": "123",
+      "reportCard": true,
+      "g1FirstName": "123",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "123",
+      "g1City": "123",
+      "g1Province": "",
+      "g1Postal": "123",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "123",
+      "g2FirstName": "123",
+      "g2LastName": "123",
+      "g2Relationship": "123",
+      "g2PhoneMobile": "123",
+      "g2PhoneHome": "123",
+      "g2Address1": "123",
+      "g2Address2": "123",
+      "g2City": "123",
+      "g2Province": "",
+      "g2Postal": "123",
+      "g2Country": "Canada",
+      "g2Email": "123",
+      "g2Occupation": "123",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "123",
+      "emPhone": "123",
+      "emEmail": "123",
+      "programs": [
+        {
+          "program": "Teknokids Coding: JavaScript",
+          "day": "Monday",
+          "time": "4:00 pm",
+          "platform": "Online",
+          "courseCost": "$299 / mo",
+          "methodOfPayment": "E-Transfer"
+        },
+        {
+          "program": "Private Piano — 30 min",
+          "day": "Tuesday",
+          "time": "5:30 pm",
+          "platform": "Online",
+          "courseCost": "$279 / mo",
+          "methodOfPayment": "Monthly Pre-Authorized"
+        }
+      ],
+      "additionalNotes": "123",
+      "hearAbout": [
+        "Web Search"
+      ],
+      "enrollReasons": [
+        "English Enrichment"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: JavaScript",
+        "schedule": "Monday 4:00 pm",
+        "platform": "Online",
+        "methodOfPayment": "E-Transfer",
+        "rate": "$299",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Private Piano — 30 min",
+        "schedule": "Tuesday 5:30 pm",
+        "platform": "Online",
+        "methodOfPayment": "Monthly Pre-Authorized",
+        "rate": "$279",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "FLEX MATH - DOUBLE",
+        "schedule": "Thu 4:30 pm, Sat 9:30 am",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "123",
+      "lastName": "123",
+      "gender": "123",
+      "dob": "Feb 2, 200222",
+      "age": "",
+      "email": "123",
+      "grade": "3",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "123",
+        "Reason for enrolling: English Enrichment"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 18
+    },
+    "customer": {
+      "student": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Gender": "123",
+        "DOB": "Feb 2, 200222",
+        "Current Age": "",
+        "Email": "123",
+        "Current Grade": "3",
+        "School": "123",
+        "Report Card": "link",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "guardian2": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": [
+      {
+        "ts": "2026-06-10T19:04:45.763Z",
+        "delta": 1,
+        "reason": "Present"
+      },
+      {
+        "ts": "2026-06-10T19:04:57.050Z",
+        "delta": 8,
+        "reason": "Smart kid"
+      }
+    ]
+  },
+  {
+    "id": "reg-1780588994921-3",
+    "displayName": "taschild 123",
+    "createdAt": "Jun 4, 2026, 12:03 p.m.",
+    "registration": {
+      "studentFirstName": "taschild",
+      "studentLastName": "123",
+      "studentEmail": "123",
+      "gender": "123",
+      "dob": "2002-02-02",
+      "grade": "6",
+      "school": "123",
+      "medical": "123",
+      "reportCard": true,
+      "g1FirstName": "123",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "123",
+      "g1City": "123",
+      "g1Province": "British Columbia",
+      "g1Postal": "123",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "123",
+      "g2FirstName": "123",
+      "g2LastName": "123",
+      "g2Relationship": "123",
+      "g2PhoneMobile": "123",
+      "g2PhoneHome": "123",
+      "g2Address1": "123",
+      "g2Address2": "123",
+      "g2City": "123",
+      "g2Province": "Saskatchewan",
+      "g2Postal": "123",
+      "g2Country": "Canada",
+      "g2Email": "123",
+      "g2Occupation": "123",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "123",
+      "emPhone": "123",
+      "emEmail": "123",
+      "programs": [
+        {
+          "courseCost": "$279 / mo",
+          "program": "Teknokids Coding: JavaScript",
+          "day": "Thursday",
+          "time": "6:00 pm",
+          "platform": "Waterloo East (In-Person)",
+          "methodOfPayment": "Cheque"
+        },
+        {
+          "program": "Gauss Contest Club",
+          "day": "Tuesday",
+          "time": "4:00 pm",
+          "platform": "Boardwalk (In-Person)",
+          "courseCost": "$279 / mo",
+          "methodOfPayment": "Cheque"
+        }
+      ],
+      "additionalNotes": "asdf",
+      "hearAbout": [
+        "Crania Vehicle",
+        "TikTok",
+        "Passed by Location",
+        "School Flyer"
+      ],
+      "enrollReasons": [
+        "English Help",
+        "Keeping Up with Technology",
+        "Coding Help",
+        "Math Help",
+        "Other"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: JavaScript",
+        "schedule": "Thursday 6:00 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "Cheque",
+        "rate": "$279",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Gauss Contest Club",
+        "schedule": "Tuesday 4:00 pm",
+        "platform": "Boardwalk (In-Person)",
+        "methodOfPayment": "Cheque",
+        "rate": "$279",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "taschild",
+      "lastName": "123",
+      "gender": "123",
+      "dob": "Feb 1, 2002",
+      "age": "24.34",
+      "email": "123",
+      "grade": "6",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "asdf",
+        "Reason for enrolling: English Help, Keeping Up with Technology, Coding Help, Math Help, Other"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "taschild",
+        "Last Name": "123",
+        "Gender": "123",
+        "DOB": "Feb 1, 2002",
+        "Current Age": "24.34",
+        "Email": "123",
+        "Current Grade": "6",
+        "School": "123",
+        "Report Card": "link",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "parentmom",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "British Columbia",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "guardian2": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "Saskatchewan",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1780588995000-4",
+    "displayName": "taschilds2 123",
+    "createdAt": "Jun 4, 2026, 12:03 p.m.",
+    "registration": {
+      "studentFirstName": "taschilds2",
+      "studentLastName": "123",
+      "studentEmail": "123",
+      "gender": "123",
+      "dob": "2002-02-02",
+      "grade": "3",
+      "school": "123",
+      "medical": "123",
+      "reportCard": false,
+      "g1FirstName": "123",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "123",
+      "g1City": "123",
+      "g1Province": "British Columbia",
+      "g1Postal": "123",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "123",
+      "g2FirstName": "123",
+      "g2LastName": "123",
+      "g2Relationship": "123",
+      "g2PhoneMobile": "123",
+      "g2PhoneHome": "123",
+      "g2Address1": "123",
+      "g2Address2": "123",
+      "g2City": "123",
+      "g2Province": "Saskatchewan",
+      "g2Postal": "123",
+      "g2Country": "Canada",
+      "g2Email": "123",
+      "g2Occupation": "123",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "123",
+      "emPhone": "123",
+      "emEmail": "123",
+      "programs": [
+        {
+          "courseCost": "$279 / mo",
+          "program": "Summer Camp — Full Day",
+          "day": "Tuesday",
+          "time": "4:00 pm",
+          "platform": "Boardwalk (In-Person)",
+          "methodOfPayment": "Credit Card"
+        },
+        {
+          "program": "Private Piano — 30 min",
+          "day": "Friday",
+          "time": "5:00 pm",
+          "platform": "Online",
+          "courseCost": "$279 / mo",
+          "methodOfPayment": "Cash"
+        }
+      ],
+      "additionalNotes": "asdf",
+      "hearAbout": [
+        "Crania Vehicle",
+        "TikTok",
+        "Passed by Location",
+        "School Flyer"
+      ],
+      "enrollReasons": [
+        "English Help",
+        "Keeping Up with Technology",
+        "Coding Help",
+        "Math Help",
+        "Other"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": true,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Summer Camp — Full Day",
+        "schedule": "Tuesday 4:00 pm",
+        "platform": "Boardwalk (In-Person)",
+        "methodOfPayment": "Credit Card",
+        "rate": "$279",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Private Piano — 30 min",
+        "schedule": "Friday 5:00 pm",
+        "platform": "Online",
+        "methodOfPayment": "Cash",
+        "rate": "$279",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "taschilds2",
+      "lastName": "123",
+      "gender": "123",
+      "dob": "Feb 1, 2002",
+      "age": "24.34",
+      "email": "123",
+      "grade": "3",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "asdf",
+        "Reason for enrolling: English Help, Keeping Up with Technology, Coding Help, Math Help, Other"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 13
+    },
+    "customer": {
+      "student": {
+        "First Name": "taschilds2",
+        "Last Name": "123",
+        "Gender": "123",
+        "DOB": "Feb 1, 2002",
+        "Current Age": "24.34",
+        "Email": "123",
+        "Current Grade": "3",
+        "School": "123",
+        "Report Card": "",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "British Columbia",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "guardian2": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "Saskatchewan",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781112943396-1",
+    "displayName": "taschilds2 123",
+    "createdAt": "Jun 10, 2026, 1:35 p.m.",
+    "registration": {
+      "studentFirstName": "taschilds2",
+      "studentLastName": "123",
+      "studentEmail": "123",
+      "gender": "123",
+      "dob": "2002-02-02",
+      "grade": "4",
+      "school": "123",
+      "medical": "123",
+      "reportCard": false,
+      "g1FirstName": "taschilds2",
+      "g1LastName": "123",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "123",
+      "g1City": "123",
+      "g1Province": "Quebec",
+      "g1Postal": "123",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "123",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "",
+      "emPhone": "123",
+      "emEmail": "hana.karim.waterloo@gmail.com",
+      "programs": [
+        {
+          "courseCost": "$149 / mo",
+          "program": "Teknokids Coding: JavaScript",
+          "day": "Tuesday",
+          "time": "4:00 pm",
+          "platform": "Waterloo East (In-Person)",
+          "methodOfPayment": "Cash"
+        }
+      ],
+      "additionalNotes": "",
+      "hearAbout": [
+        "Transit Bench"
+      ],
+      "enrollReasons": [
+        "English Enrichment"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: JavaScript",
+        "schedule": "Tuesday 4:00 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "Cash",
+        "rate": "$149",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "taschilds2",
+      "lastName": "123",
+      "gender": "123",
+      "dob": "Feb 1, 2002",
+      "age": "24.35",
+      "email": "123",
+      "grade": "4",
+      "school": "123",
+      "medical": "123",
+      "notes": [
+        "Reason for enrolling: English Enrichment"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 8
+    },
+    "customer": {
+      "student": {
+        "First Name": "taschilds2",
+        "Last Name": "123",
+        "Gender": "123",
+        "DOB": "Feb 1, 2002",
+        "Current Age": "24.35",
+        "Email": "123",
+        "Current Grade": "4",
+        "School": "123",
+        "Report Card": "",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "taschilds2",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "Quebec",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "Emergency Contact",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781113803917-1",
+    "displayName": "Banaapa Karim",
+    "createdAt": "Jun 10, 2026, 1:50 p.m.",
+    "registration": {
+      "studentFirstName": "Banaapa",
+      "studentLastName": "Karim",
+      "studentEmail": "h2karim@uwaterloo.ca",
+      "gender": "F",
+      "dob": "2020-02-02",
+      "grade": "SK",
+      "school": "2134",
+      "medical": "1234",
+      "reportCard": false,
+      "g1FirstName": "Hana",
+      "g1LastName": "Karim",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "123",
+      "g1City": "123",
+      "g1Province": "Quebec",
+      "g1Postal": "123",
+      "g1Country": "Canada",
+      "g1Email": "hana.karim.waterloo@gmail.com",
+      "g1Occupation": "123",
+      "g2FirstName": "Hana",
+      "g2LastName": "Karim",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "511 Chancery Lane",
+      "g2Address2": "",
+      "g2City": "Waterloo",
+      "g2Province": "",
+      "g2Postal": "N2T2N4",
+      "g2Country": "Canada",
+      "g2Email": "anah.mirak@gmail.com",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "Uncle",
+      "emPhone": "123",
+      "emEmail": "hana.karim.waterloo@gmail.com",
+      "programs": [
+        {
+          "notes": "1234",
+          "program": "Teknokids Coding: HTML/CSS",
+          "day": "Wednesday",
+          "time": "4:00 pm",
+          "platform": "Boardwalk (In-Person)",
+          "courseCost": "$149 / mo",
+          "methodOfPayment": "Cash"
+        },
+        {
+          "program": "Teknokids Coding: JavaScript",
+          "day": "Tuesday",
+          "time": "4:30 pm",
+          "platform": "Online",
+          "courseCost": "$149 / mo",
+          "methodOfPayment": "Cash",
+          "notes": "234243"
+        }
+      ],
+      "additionalNotes": "D",
+      "hearAbout": [
+        "LinkedIn"
+      ],
+      "enrollReasons": [
+        "Keeping Up with Technology"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: HTML/CSS",
+        "schedule": "Wednesday 4:00 pm",
+        "platform": "Boardwalk (In-Person)",
+        "methodOfPayment": "Cash",
+        "rate": "$149",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: JavaScript",
+        "schedule": "Tuesday 4:30 pm",
+        "platform": "Online",
+        "methodOfPayment": "Cash",
+        "rate": "$149",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Banaapa",
+      "lastName": "Karim",
+      "gender": "F",
+      "dob": "Feb 1, 2020",
+      "age": "6.35",
+      "email": "h2karim@uwaterloo.ca",
+      "grade": "SK",
+      "school": "2134",
+      "medical": "1234",
+      "notes": [
+        "D",
+        "Reason for enrolling: Keeping Up with Technology"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Banaapa",
+        "Last Name": "Karim",
+        "Gender": "F",
+        "DOB": "Feb 1, 2020",
+        "Current Age": "6.35",
+        "Email": "h2karim@uwaterloo.ca",
+        "Current Grade": "SK",
+        "School": "2134",
+        "Report Card": "",
+        "Medical Conditions": "1234"
+      },
+      "guardian1": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Street Address": "123",
+        "Unit": "123",
+        "City": "123",
+        "Province": "Quebec",
+        "Postal Code": "123",
+        "Occupation": "123"
+      },
+      "guardian2": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "anah.mirak@gmail.com",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "Uncle",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781115676913-2",
+    "displayName": "Banaapa Karim",
+    "createdAt": "Jun 10, 2026, 2:21 p.m.",
+    "registration": {
+      "studentFirstName": "Banaapa",
+      "studentLastName": "Karim",
+      "studentEmail": "h2karim@uwaterloo.ca",
+      "gender": "F",
+      "dob": "2020-02-02",
+      "grade": "3",
+      "school": "2134",
+      "medical": "1234",
+      "reportCard": false,
+      "g1FirstName": "123",
+      "g1LastName": "1234",
+      "g1Relationship": "`123",
+      "g1PhoneMobile": "12323452345",
+      "g1PhoneHome": "123",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "1234",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "asdf",
+      "emPhone": "asdf",
+      "emEmail": "anah.mirak@gmail.com",
+      "programs": [
+        {
+          "courseCost": "$149 / mo",
+          "notes": "asdf",
+          "program": "Private Piano — 30 min",
+          "day": "Wednesday",
+          "time": "6:00 pm",
+          "platform": "Hybrid",
+          "methodOfPayment": "E-Transfer"
+        }
+      ],
+      "additionalNotes": "asdf",
+      "hearAbout": [
+        "Facebook"
+      ],
+      "enrollReasons": [
+        "English Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Private Piano — 30 min",
+        "schedule": "Wednesday 6:00 pm",
+        "platform": "Hybrid",
+        "methodOfPayment": "E-Transfer",
+        "rate": "$149",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Banaapa",
+      "lastName": "Karim",
+      "gender": "F",
+      "dob": "Feb 1, 2020",
+      "age": "6.35",
+      "email": "h2karim@uwaterloo.ca",
+      "grade": "3",
+      "school": "2134",
+      "medical": "1234",
+      "notes": [
+        "asdf",
+        "Reason for enrolling: English Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Banaapa",
+        "Last Name": "Karim",
+        "Gender": "F",
+        "DOB": "Feb 1, 2020",
+        "Current Age": "6.35",
+        "Email": "h2karim@uwaterloo.ca",
+        "Current Grade": "3",
+        "School": "2134",
+        "Report Card": "",
+        "Medical Conditions": "1234"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "1234",
+        "Relationship": "`123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "12323452345",
+        "Email": "1234",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "asdf",
+        "Phone (Mobile)": "asdf",
+        "Email": "anah.mirak@gmail.com"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781116396826-3",
+    "displayName": "Banaapa Karim",
+    "createdAt": "Jun 10, 2026, 2:33 p.m.",
+    "registration": {
+      "studentFirstName": "Banaapa",
+      "studentLastName": "Karim",
+      "studentEmail": "h2karim@uwaterloo.ca",
+      "gender": "F",
+      "dob": "2020-02-02",
+      "grade": "2",
+      "school": "2134",
+      "medical": "1234",
+      "reportCard": false,
+      "g1FirstName": "123",
+      "g1LastName": "1234",
+      "g1Relationship": "`123",
+      "g1PhoneMobile": "asdf",
+      "g1PhoneHome": "123",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "1234",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "Aunt",
+      "emPhone": "123",
+      "emEmail": "hana.karim.waterloo@gmail.com",
+      "programs": [
+        {
+          "courseCost": "$149 / mo",
+          "notes": "",
+          "program": "Teknokids Coding: JavaScript",
+          "day": "Tuesday",
+          "time": "5:00 pm",
+          "platform": "Boardwalk (In-Person)",
+          "methodOfPayment": "Cheque"
+        }
+      ],
+      "additionalNotes": "asdf",
+      "hearAbout": [
+        "LinkedIn"
+      ],
+      "enrollReasons": [
+        "Coding Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "Teknokids Coding: JavaScript",
+        "schedule": "Tuesday 5:00 pm",
+        "platform": "Boardwalk (In-Person)",
+        "methodOfPayment": "Cheque",
+        "rate": "$149",
+        "rateUnit": "/mo",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Banaapa",
+      "lastName": "Karim",
+      "gender": "F",
+      "dob": "Feb 1, 2020",
+      "age": "6.35",
+      "email": "h2karim@uwaterloo.ca",
+      "grade": "2",
+      "school": "2134",
+      "medical": "1234",
+      "notes": [
+        "asdf",
+        "Reason for enrolling: Coding Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Banaapa",
+        "Last Name": "Karim",
+        "Gender": "F",
+        "DOB": "Feb 1, 2020",
+        "Current Age": "6.35",
+        "Email": "h2karim@uwaterloo.ca",
+        "Current Grade": "2",
+        "School": "2134",
+        "Report Card": "",
+        "Medical Conditions": "1234"
+      },
+      "guardian1": {
+        "First Name": "123",
+        "Last Name": "1234",
+        "Relationship": "`123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "asdf",
+        "Email": "1234",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "Aunt",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781123499506-1",
+    "displayName": "Banaapa Karim",
+    "createdAt": "Jun 10, 2026, 4:31 p.m.",
+    "registration": {
+      "studentFirstName": "Banaapa",
+      "studentLastName": "Karim",
+      "studentEmail": "h2karim@uwaterloo.ca",
+      "gender": "F",
+      "dob": "2020-02-02",
+      "grade": "2",
+      "school": "2134",
+      "medical": "1234",
+      "reportCard": false,
+      "g1FirstName": "Banaapa",
+      "g1LastName": "Karim",
+      "g1Relationship": "SDF",
+      "g1PhoneMobile": "ASDF",
+      "g1PhoneHome": "ASDF",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "h2karim@uwaterloo.ca",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "Aunt",
+      "emPhone": "123",
+      "emEmail": "hana.karim.waterloo@gmail.com",
+      "programs": [
+        {
+          "program": "MATH ENRICHMENT - LEVEL 1",
+          "day": "Mon",
+          "time": "5:30 pm",
+          "platform": "Boardwalk (In-Person\nOnline)",
+          "courseCost": "$289 /wk",
+          "methodOfPayment": "E-Transfer",
+          "notes": ""
+        }
+      ],
+      "additionalNotes": "",
+      "hearAbout": [
+        "LinkedIn"
+      ],
+      "enrollReasons": [
+        "Keeping Up with Technology"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "MATH ENRICHMENT - LEVEL 1",
+        "schedule": "Mon 5:30 pm",
+        "platform": "Boardwalk (In-Person\nOnline)",
+        "methodOfPayment": "E-Transfer",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Banaapa",
+      "lastName": "Karim",
+      "gender": "F",
+      "dob": "Feb 1, 2020",
+      "age": "6.35",
+      "email": "h2karim@uwaterloo.ca",
+      "grade": "2",
+      "school": "2134",
+      "medical": "1234",
+      "notes": [
+        "Reason for enrolling: Keeping Up with Technology"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Banaapa",
+        "Last Name": "Karim",
+        "Gender": "F",
+        "DOB": "Feb 1, 2020",
+        "Current Age": "6.35",
+        "Email": "h2karim@uwaterloo.ca",
+        "Current Grade": "2",
+        "School": "2134",
+        "Report Card": "",
+        "Medical Conditions": "1234"
+      },
+      "guardian1": {
+        "First Name": "Banaapa",
+        "Last Name": "Karim",
+        "Relationship": "SDF",
+        "Phone (Home)": "ASDF",
+        "Phone (Mobile)": "ASDF",
+        "Email": "h2karim@uwaterloo.ca",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "Aunt",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781126073462-1",
+    "displayName": "Hana Karim",
+    "createdAt": "Jun 10, 2026, 5:14 p.m.",
+    "registration": {
+      "studentFirstName": "Hana",
+      "studentLastName": "Karim",
+      "studentEmail": "hana.karim.waterloo@gmail.com",
+      "gender": "asdf",
+      "dob": "202020-02-02",
+      "grade": "3",
+      "school": "asdf",
+      "medical": "123",
+      "reportCard": false,
+      "g1FirstName": "Hana",
+      "g1LastName": "Karim",
+      "g1Relationship": "SDF",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "ASDF",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "hana.karim.waterloo@gmail.com",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "Aunt",
+      "emPhone": "123",
+      "emEmail": "hana.karim.waterloo@gmail.com",
+      "programs": [
+        {
+          "program": "FLEX MATH - DOUBLE",
+          "day": "Wed",
+          "time": "4:30 pm",
+          "platform": "Waterloo East (In-Person)",
+          "courseCost": "$289 /wk",
+          "notes": ""
+        },
+        {
+          "program": "FLEX MATH - DOUBLE",
+          "day": "Wed",
+          "time": "6:30 pm",
+          "platform": "Waterloo East (In-Person)",
+          "courseCost": "$289 /wk",
+          "notes": ""
+        }
+      ],
+      "additionalNotes": "",
+      "hearAbout": [
+        "TikTok"
+      ],
+      "enrollReasons": [
+        "English Enrichment"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "FLEX MATH - DOUBLE",
+        "schedule": "Wed 4:30 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "FLEX MATH - DOUBLE",
+        "schedule": "Wed 6:30 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Hana",
+      "lastName": "Karim",
+      "gender": "asdf",
+      "dob": "Feb 2, 202020",
+      "age": "",
+      "email": "hana.karim.waterloo@gmail.com",
+      "grade": "3",
+      "school": "asdf",
+      "medical": "123",
+      "notes": [
+        "Reason for enrolling: English Enrichment"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Gender": "asdf",
+        "DOB": "Feb 2, 202020",
+        "Current Age": "",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Current Grade": "3",
+        "School": "asdf",
+        "Report Card": "",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "SDF",
+        "Phone (Home)": "ASDF",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "Aunt",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781126543596-1",
+    "displayName": "Tests Karim",
+    "createdAt": "Jun 10, 2026, 5:22 p.m.",
+    "registration": {
+      "studentFirstName": "Tests",
+      "studentLastName": "Karim",
+      "studentEmail": "hana.karim.waterloo@gmail.com",
+      "gender": "asdf",
+      "dob": "202020-02-02",
+      "grade": "1",
+      "school": "asdf",
+      "medical": "123",
+      "reportCard": false,
+      "g1FirstName": "Hana",
+      "g1LastName": "Karim",
+      "g1Relationship": "SDF",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "ASDF",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "hana.karim.waterloo@gmail.com",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "1234",
+      "emLastName": "1234",
+      "emRelationship": "1234",
+      "emPhone": "12323452345",
+      "emEmail": "1234",
+      "programs": [
+        {
+          "program": "FLEX MATH - DOUBLE",
+          "day": "Tue",
+          "time": "5:30 pm",
+          "platform": "Waterloo East (In-Person)",
+          "courseCost": "$289 /wk",
+          "notes": ""
+        },
+        {
+          "program": "FLEX MATH - DOUBLE",
+          "day": "Mon",
+          "time": "5:30 pm",
+          "platform": "Waterloo East (In-Person)",
+          "courseCost": "$289 /wk",
+          "notes": ""
+        }
+      ],
+      "additionalNotes": "",
+      "hearAbout": [
+        "Facebook"
+      ],
+      "enrollReasons": [
+        "Coding Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "FLEX MATH - DOUBLE",
+        "schedule": "Tue 5:30 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "FLEX MATH - DOUBLE",
+        "schedule": "Mon 5:30 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Tests",
+      "lastName": "Karim",
+      "gender": "asdf",
+      "dob": "Feb 2, 202020",
+      "age": "",
+      "email": "hana.karim.waterloo@gmail.com",
+      "grade": "1",
+      "school": "asdf",
+      "medical": "123",
+      "notes": [
+        "Reason for enrolling: Coding Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Tests",
+        "Last Name": "Karim",
+        "Gender": "asdf",
+        "DOB": "Feb 2, 202020",
+        "Current Age": "",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Current Grade": "1",
+        "School": "asdf",
+        "Report Card": "",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "SDF",
+        "Phone (Home)": "ASDF",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "1234",
+        "Last Name": "1234",
+        "Relationship": "1234",
+        "Phone (Mobile)": "12323452345",
+        "Email": "1234"
+      }
+    },
+    "cashLog": []
+  },
+  {
+    "id": "reg-1781127250425-1",
+    "displayName": "Tests 1234",
+    "createdAt": "Jun 10, 2026, 5:34 p.m.",
+    "registration": {
+      "studentFirstName": "Tests",
+      "studentLastName": "1234",
+      "studentEmail": "1234",
+      "gender": "asdf",
+      "dob": "202020-02-02",
+      "grade": "8",
+      "school": "asdf",
+      "medical": "123",
+      "reportCard": false,
+      "g1FirstName": "Tests",
+      "g1LastName": "1234",
+      "g1Relationship": "SDF",
+      "g1PhoneMobile": "12323452345",
+      "g1PhoneHome": "ASDF",
+      "g1Address1": "511 Chancery Lane",
+      "g1Address2": "",
+      "g1City": "Waterloo",
+      "g1Province": "",
+      "g1Postal": "N2T2N4",
+      "g1Country": "Canada",
+      "g1Email": "1234",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "Hana",
+      "emLastName": "Karim",
+      "emRelationship": "Aunt",
+      "emPhone": "123",
+      "emEmail": "hana.karim.waterloo@gmail.com",
+      "programs": [
+        {
+          "program": "FLEX MATH - DOUBLE",
+          "day": "Mon, Thu",
+          "time": "6:30 pm, 6:30 pm",
+          "schedule": "Mon 6:30 pm, Thu 6:30 pm",
+          "platform": "Waterloo East (In-Person)",
+          "courseCost": "$289 /wk",
+          "notes": ""
+        }
+      ],
+      "additionalNotes": "",
+      "hearAbout": [
+        "Facebook"
+      ],
+      "enrollReasons": [
+        "Coding Help"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "FLEX MATH - DOUBLE",
+        "schedule": "Mon 6:30 pm, Thu 6:30 pm",
+        "platform": "Waterloo East (In-Person)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Tests",
+      "lastName": "1234",
+      "gender": "asdf",
+      "dob": "Feb 2, 202020",
+      "age": "",
+      "email": "132445645ufgbdfb",
+      "grade": "8",
+      "school": "asdf",
+      "medical": "123",
+      "notes": [
+        "Reason for enrolling: Coding Help"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 10
+    },
+    "customer": {
+      "student": {
+        "First Name": "Tests",
+        "Last Name": "1234",
+        "Gender": "asdf",
+        "DOB": "Feb 2, 202020",
+        "Current Age": "",
+        "Email": "1234",
+        "Current Grade": "8",
+        "School": "asdf",
+        "Report Card": "",
+        "Medical Conditions": "123"
+      },
+      "guardian1": {
+        "First Name": "Tests",
+        "Last Name": "1234",
+        "Relationship": "SDF",
+        "Phone (Home)": "ASDF",
+        "Phone (Mobile)": "12323452345",
+        "Email": "1234",
+        "Street Address": "511 Chancery Lane",
+        "Unit": "",
+        "City": "Waterloo",
+        "Province": "",
+        "Postal Code": "N2T2N4",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "Hana",
+        "Last Name": "Karim",
+        "Relationship": "Aunt",
+        "Phone (Mobile)": "123",
+        "Email": "hana.karim.waterloo@gmail.com"
+      }
+    },
+    "cashLog": [
+      {
+        "ts": "2026-06-11T17:09:43.632Z",
+        "delta": 1,
+        "reason": "present (auto · lesson 1)"
+      },
+      {
+        "ts": "2026-06-11T17:09:56.701Z",
+        "delta": 1,
+        "reason": "present (auto · lesson 2)"
+      },
+      {
+        "ts": "2026-06-11T17:11:23.818Z",
+        "delta": 1,
+        "reason": "present (auto · lesson 5)"
+      },
+      {
+        "ts": "2026-06-11T17:11:25.267Z",
+        "delta": 1,
+        "reason": "present (auto · lesson 6)"
+      },
+      {
+        "ts": "2026-06-11T17:12:05.159Z",
+        "delta": 6,
+        "reason": "hjgkfh"
+      }
+    ]
+  },
+  {
+    "id": "reg-1781187297737-1",
+    "displayName": "Testing Testing",
+    "createdAt": "Jun 11, 2026, 10:14 a.m.",
+    "registration": {
+      "studentFirstName": "Testing",
+      "studentLastName": "Testing",
+      "studentEmail": "123123",
+      "gender": "123",
+      "dob": "123213-12-31",
+      "grade": "1",
+      "school": "123",
+      "medical": "",
+      "reportCard": false,
+      "g1FirstName": "Test",
+      "g1LastName": "Test",
+      "g1Relationship": "123",
+      "g1PhoneMobile": "123",
+      "g1PhoneHome": "123",
+      "g1Address1": "123",
+      "g1Address2": "",
+      "g1City": "",
+      "g1Province": "",
+      "g1Postal": "",
+      "g1Country": "Canada",
+      "g1Email": "123",
+      "g1Occupation": "",
+      "g2FirstName": "",
+      "g2LastName": "",
+      "g2Relationship": "",
+      "g2PhoneMobile": "",
+      "g2PhoneHome": "",
+      "g2Address1": "",
+      "g2Address2": "",
+      "g2City": "",
+      "g2Province": "",
+      "g2Postal": "",
+      "g2Country": "Canada",
+      "g2Email": "",
+      "g2Occupation": "",
+      "emFirstName": "123",
+      "emLastName": "123",
+      "emRelationship": "123",
+      "emPhone": "123",
+      "emEmail": "123",
+      "programs": [
+        {
+          "program": "MATH ENRICHMENT - LEVEL 1",
+          "day": "Mon",
+          "time": "5:30 pm",
+          "schedule": "Mon 5:30 pm",
+          "platform": "Boardwalk (In-Person\nOnline)",
+          "courseCost": "$289 /wk",
+          "notes": ""
+        },
+        {
+          "program": "TEKNOKIDS CODING: SCRATCH",
+          "day": "Sat",
+          "time": "9:30 am",
+          "schedule": "Sat 9:30 am",
+          "platform": "Boardwalk (Online)",
+          "courseCost": "$189 /wk",
+          "notes": ""
+        }
+      ],
+      "additionalNotes": "",
+      "hearAbout": [
+        "Instagram"
+      ],
+      "enrollReasons": [
+        "Other"
+      ],
+      "registeredJune": "",
+      "usePrevMaterials": "",
+      "extraShirt": false,
+      "receiveNews": false,
+      "agreeToS": true,
+      "agreePhoto": true
+    },
+    "programs": [
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "MATH ENRICHMENT - LEVEL 1",
+        "schedule": "Mon 5:30 pm",
+        "platform": "Boardwalk (In-Person\nOnline)",
+        "methodOfPayment": "",
+        "rate": "$289",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      },
+      {
+        "active": true,
+        "status": "Active",
+        "year": "25_26",
+        "program": "TEKNOKIDS CODING: SCRATCH",
+        "schedule": "Sat 9:30 am",
+        "platform": "Boardwalk (Online)",
+        "methodOfPayment": "",
+        "rate": "$189",
+        "rateUnit": "/wk",
+        "fees": {},
+        "payment": ""
+      }
+    ],
+    "student": {
+      "firstName": "Testing",
+      "lastName": "Testing",
+      "gender": "123",
+      "dob": "Dec 31, 123213",
+      "age": "",
+      "email": "123123",
+      "grade": "1",
+      "school": "123",
+      "medical": "",
+      "notes": [
+        "Reason for enrolling: Other"
+      ],
+      "assessments": [],
+      "login": {
+        "username": "— generate —",
+        "password": "— generate —"
+      },
+      "craniaCash": 0
+    },
+    "customer": {
+      "student": {
+        "First Name": "Testing",
+        "Last Name": "Testing",
+        "Gender": "123",
+        "DOB": "Dec 31, 123213",
+        "Current Age": "",
+        "Email": "123123",
+        "Current Grade": "1",
+        "School": "123",
+        "Report Card": "",
+        "Medical Conditions": ""
+      },
+      "guardian1": {
+        "First Name": "Test",
+        "Last Name": "Test",
+        "Relationship": "123",
+        "Phone (Home)": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123",
+        "Street Address": "123",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "guardian2": {
+        "First Name": "",
+        "Last Name": "",
+        "Relationship": "",
+        "Phone (Home)": "",
+        "Phone (Mobile)": "",
+        "Email": "",
+        "Street Address": "",
+        "Unit": "",
+        "City": "",
+        "Province": "",
+        "Postal Code": "",
+        "Occupation": ""
+      },
+      "emergency": {
+        "First Name": "123",
+        "Last Name": "123",
+        "Relationship": "123",
+        "Phone (Mobile)": "123",
+        "Email": "123"
+      }
+    },
+    "cashLog": []
+  }
+]

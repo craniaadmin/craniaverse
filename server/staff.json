@@ -1,0 +1,107 @@
+[
+  {
+    "id": "staff-tas",
+    "firstName": "Tas",
+    "lastName": "Karim",
+    "gender": "",
+    "dob": "",
+    "age": "",
+    "email": "tas@craniaverse.ca",
+    "phone": "",
+    "role": "Teacher",
+    "startDate": "",
+    "address": "",
+    "city": "",
+    "province": "Ontario",
+    "postalCode": "",
+    "emergencyName": "",
+    "emergencyPhone": "",
+    "notes": [
+      "Lead math instructor",
+      "Available Mon–Wed"
+    ],
+    "active": true
+  },
+  {
+    "id": "staff-rob",
+    "firstName": "Maya",
+    "lastName": "Karms",
+    "gender": "",
+    "dob": "",
+    "age": "",
+    "email": "maya@crania-schools.co",
+    "phone": "",
+    "role": "Teacher",
+    "startDate": "",
+    "address": "",
+    "city": "",
+    "province": "Ontario",
+    "postalCode": "",
+    "emergencyName": "",
+    "emergencyPhone": "",
+    "notes": [],
+    "active": true
+  },
+  {
+    "id": "staff-mq9q996d",
+    "firstName": "Hana",
+    "lastName": "Karim",
+    "gender": "Female",
+    "dob": "2006-02-28",
+    "age": "",
+    "email": "",
+    "phone": "",
+    "role": "Teacher",
+    "startDate": "2026-05-12",
+    "address": "",
+    "city": "",
+    "province": "",
+    "postalCode": "",
+    "emergencyName": "",
+    "emergencyPhone": "",
+    "notes": [],
+    "active": true,
+    "currentAddress": {
+      "country": "Canada",
+      "street": "275 Larch Street Building H",
+      "city": "Waterloo",
+      "province": "ON",
+      "postalCode": "N2L0J5",
+      "unit": "Unit 402"
+    },
+    "permanentAddress": {
+      "country": "Canada",
+      "street": "511 Chancery Lane",
+      "city": "Waterloo",
+      "province": "ON",
+      "postalCode": "N2T2N4"
+    },
+    "availability": {},
+    "documents": {
+      "Current Resume": true,
+      "Vulnerable Sector Check": true,
+      "First Aid Certificate (if certified/requested)": true,
+      "Transcript (if in school within the past year)": true,
+      "Sample of Work (if requested)": true,
+      "Tax Forms (Federal & Provincial)": true,
+      "Direct Deposit Form": true,
+      "Signed Contract": true
+    },
+    "education": [
+      {
+        "degree": "Biomedical Engineering",
+        "institution": "University of Waterloo",
+        "from": "2023-09-11",
+        "to": "2028-06-11"
+      }
+    ],
+    "workExperience": [],
+    "teachables": [],
+    "keys": [],
+    "references": [],
+    "healthConcerns": "-",
+    "otherConcerns": "-",
+    "phoneMobile": "226-606-3512",
+    "ratePerHour": "19"
+  }
+]

@@ -1,0 +1,3800 @@
+[
+  {
+    "number": "11110",
+    "code": "BW-FLEX-MATH-SINGLE",
+    "category": "FLEX",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX MATH - SINGLE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": "Maya Karms"
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": "Hana Karim"
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": "Hana Karim"
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": "Tas Karim"
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX MATH - DOUBLE",
+    "duration": "55",
+    "sessions": 2,
+    "period": "/week",
+    "rateHr": 45.04,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": false,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX MATH - UNLIMITED",
+    "duration": "55",
+    "sessions": 5,
+    "period": "/week",
+    "rateHr": 21.76,
+    "fees": 349,
+    "location": "Boardwalk",
+    "active": false,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "ENGLISH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX ENGLISH - SINGLE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "ENGLISH",
+    "gradeFrom": "1",
+    "gradeTo": "3",
+    "title": "FLEX ENGLISH - DOUBLE",
+    "duration": "55",
+    "sessions": 2,
+    "period": "/week",
+    "rateHr": 45.04,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "ENGLISH",
+    "gradeFrom": "1",
+    "gradeTo": "3",
+    "title": "FLEX ENGLISH - UNLIMITED",
+    "duration": "55",
+    "sessions": 5,
+    "period": "/week",
+    "rateHr": 21.76,
+    "fees": 349,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH/ENGLISH",
+    "gradeFrom": "JK",
+    "gradeTo": "SK",
+    "title": "FLEX KINDERGARTEN - SINGLE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH/ENGLISH",
+    "gradeFrom": "JK",
+    "gradeTo": "SK",
+    "title": "FLEX KINDERGARTEN - DOUBLE",
+    "duration": "55",
+    "sessions": 2,
+    "period": "/week",
+    "rateHr": 45.04,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "2",
+    "title": "MATH ENRICHMENT - LEVEL 1",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 10,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "3",
+    "gradeTo": "4",
+    "title": "MATH ENRICHMENT - LEVEL 2",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "5",
+    "gradeTo": "6",
+    "title": "MATH ENRICHMENT - LEVEL 3",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "7",
+    "gradeTo": "8",
+    "title": "MATH ENRICHMENT - LEVEL 4",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "PRIVATE LESSONS",
+    "subject": "ALL",
+    "gradeFrom": "JK",
+    "gradeTo": "12",
+    "title": "PRIVATE LESSONS - 55 MIN",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 93.19,
+    "fees": 299,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "TEKNOKIDS CODING",
+    "subject": "CODING",
+    "gradeFrom": "3",
+    "gradeTo": "4",
+    "title": "TEKNOKIDS CODING: SCRATCH",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 6,
+        "platform": "Online",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "5",
+    "gradeTo": "6",
+    "title": "TEKNOKIDS CODING: HTML/CSS",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "Online",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "7",
+    "gradeTo": "10",
+    "title": "TEKNOKIDS CODING: JAVASCRIPT/AI",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "Online",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "7",
+    "gradeTo": "10",
+    "title": "TEKNOKIDS CODING: PYTHON",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "12:30:00",
+        "end": "13:25:00",
+        "spots": 7,
+        "platform": "Online",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "TEKNOKIDS ROBOTICS",
+    "subject": "ROBOTICS",
+    "gradeFrom": "JK",
+    "gradeTo": "2",
+    "title": "TEKNOKIDS EARLY",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 5,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "3",
+    "gradeTo": "4",
+    "title": "TEKNOKIDS JUNIOR",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 5,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "5",
+    "gradeTo": "6",
+    "title": "TEKNOKIDS INTERMEDIATE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 5,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "7",
+    "gradeTo": "8",
+    "title": "TEKNOKIDS SENIOR",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "12:30:00",
+        "end": "13:25:00",
+        "spots": 5,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "PRIVATE PIANO LESSONS",
+    "subject": "PIANO",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "PIANO PRIVATE 30MIN - SR",
+    "duration": "30",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 71.43,
+    "fees": 125,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "15:30:00",
+        "end": "16:00:00",
+        "spots": 1,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "PRIVATE PIANO LESSONS",
+    "subject": "PIANO",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "PIANO PRIVATE 30MIN - JR",
+    "duration": "30",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 60,
+    "fees": 105,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "15:30:00",
+        "end": "16:00:00",
+        "spots": 1,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "CONTESTS",
+    "subject": "MATH",
+    "gradeFrom": "7",
+    "gradeTo": "12",
+    "title": "CONTEST - CMS CLMC",
+    "duration": "90",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 36.67,
+    "fees": 55,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "5",
+    "gradeTo": "8",
+    "title": "CONTEST - CMS CJMC",
+    "duration": "90",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 36.67,
+    "fees": 55,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "9",
+    "gradeTo": "12",
+    "title": "CONTEST - CMS COMC",
+    "duration": "150",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 26,
+    "fees": 65,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "8",
+    "title": "CONTEST - MAA AMC 8",
+    "duration": "40",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 90,
+    "fees": 60,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "10",
+    "title": "CONTEST - MAA AMC 10A",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 48,
+    "fees": 60,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "12",
+    "title": "CONTEST - MAA AMC 12A",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 48,
+    "fees": 60,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "10",
+    "title": "CONTEST - MAA AMC 10B",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 48,
+    "fees": 60,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "12",
+    "title": "CONTEST - MAA AMC 12B",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 48,
+    "fees": 60,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "12",
+    "title": "CONTEST - MAA AIME",
+    "duration": "180",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 40,
+    "fees": 120,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "12",
+    "title": "CONTEST - MAA US(J)MO",
+    "duration": "540",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 22.22,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "CONTEST - CEMC BCC",
+    "duration": "45",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 46.67,
+    "fees": 35,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "8",
+    "title": "CONTEST - CEMC GAUSS",
+    "duration": "60",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 35,
+    "fees": 35,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "9",
+    "title": "CONTEST - CEMC PASCAL",
+    "duration": "60",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 35,
+    "fees": 35,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "10",
+    "title": "CONTEST - CEMC CAYLEY",
+    "duration": "60",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 35,
+    "fees": 35,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "11",
+    "title": "CONTEST - CEMC FERMAT",
+    "duration": "60",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 35,
+    "fees": 35,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "9",
+    "title": "CONTEST - CEMC FRYER",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 36,
+    "fees": 45,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "10",
+    "title": "CONTEST - CEMC GALOIS",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 36,
+    "fees": 45,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "11",
+    "title": "CONTEST - CEMC HYPATIA",
+    "duration": "75",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 36,
+    "fees": 45,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "",
+    "gradeTo": "12",
+    "title": "CONTEST - CEMC CIMC",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 27.5,
+    "fees": 55,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "See Calendar",
+        "start": "See Calendar",
+        "end": "See Calendar",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "SUMMER CAMP",
+    "subject": "MATH",
+    "gradeFrom": "3",
+    "gradeTo": "10",
+    "title": "FLEX MATH - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "MATH",
+    "gradeFrom": "3",
+    "gradeTo": "10",
+    "title": "FLEX MATH - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ENGLISH",
+    "gradeFrom": "3",
+    "gradeTo": "5",
+    "title": "FLEX TYPING - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ENGLISH",
+    "gradeFrom": "3",
+    "gradeTo": "5",
+    "title": "FLEX TYPING - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ENGLISH",
+    "gradeFrom": "3",
+    "gradeTo": "5",
+    "title": "FLEX HANDWRITING - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ENGLISH",
+    "gradeFrom": "3",
+    "gradeTo": "5",
+    "title": "FLEX HANDWRITING - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ENGLISH",
+    "gradeFrom": "3",
+    "gradeTo": "6",
+    "title": "FLEX SPELLING - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ENGLISH",
+    "gradeFrom": "3",
+    "gradeTo": "6",
+    "title": "FLEX SPELLING - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "SCIENCE",
+    "gradeFrom": "5",
+    "gradeTo": "8",
+    "title": "SCIENCEKIDS BRAIN - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ROBOTICS",
+    "gradeFrom": "3",
+    "gradeTo": "8",
+    "title": "TEKNOKIDS ROBOTICS - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ROBOTICS",
+    "gradeFrom": "3",
+    "gradeTo": "8",
+    "title": "TEKNOKIDS ROBOTICS - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ARTS",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "ARTSKIDS SEWING - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ARTS",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "ARTSKIDS SEWING - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ARTS",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "ARTSKIDS KNITTING - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ARTS",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "ARTSKIDS KNITTING - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ARTS",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "ARTSKIDS CROCHET - HALF DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "12:30:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "ARTS",
+    "gradeFrom": "5",
+    "gradeTo": "10",
+    "title": "ARTSKIDS CROCHET - FULL DAY",
+    "duration": "900",
+    "sessions": 1,
+    "period": "/year",
+    "rateHr": 13.33,
+    "fees": 200,
+    "location": "Boardwalk",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Week 1",
+        "start": "09:00:00",
+        "end": "16:00:00",
+        "spots": 20,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX MATH - SINGLE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX MATH - DOUBLE",
+    "duration": "55",
+    "sessions": 2,
+    "period": "/week",
+    "rateHr": 45.04,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 6,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 6,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 6,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 6,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 6,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 6,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX MATH - UNLIMITED",
+    "duration": "55",
+    "sessions": 5,
+    "period": "/week",
+    "rateHr": 21.76,
+    "fees": 349,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "ENGLISH",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "FLEX ENGLISH - SINGLE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "ENGLISH",
+    "gradeFrom": "1",
+    "gradeTo": "3",
+    "title": "FLEX ENGLISH - DOUBLE",
+    "duration": "55",
+    "sessions": 2,
+    "period": "/week",
+    "rateHr": 45.04,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "ENGLISH",
+    "gradeFrom": "1",
+    "gradeTo": "3",
+    "title": "FLEX ENGLISH - UNLIMITED",
+    "duration": "55",
+    "sessions": 5,
+    "period": "/week",
+    "rateHr": 21.76,
+    "fees": 349,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "18:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "18:30:00",
+        "end": "19:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH/ENGLISH",
+    "gradeFrom": "JK",
+    "gradeTo": "SK",
+    "title": "FLEX KINDERGARTEN - SINGLE",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "FLEX",
+    "subject": "MATH/ENGLISH",
+    "gradeFrom": "JK",
+    "gradeTo": "SK",
+    "title": "FLEX KINDERGARTEN - DOUBLE",
+    "duration": "55",
+    "sessions": 2,
+    "period": "/week",
+    "rateHr": 45.04,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "16:30:00",
+        "end": "17:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 3,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "1",
+    "gradeTo": "2",
+    "title": "MATH ENRICHMENT - LEVEL 4",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "3",
+    "gradeTo": "4",
+    "title": "MATH ENRICHMENT - LEVEL 3",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "5",
+    "gradeTo": "6",
+    "title": "MATH ENRICHMENT - LEVEL 2",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "ENRICHMENT",
+    "subject": "MATH",
+    "gradeFrom": "7",
+    "gradeTo": "8",
+    "title": "MATH ENRICHMENT - LEVEL 1",
+    "duration": "120",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 41.29,
+    "fees": 289,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "17:30:00",
+        "end": "19:30:00",
+        "spots": 12,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "PRIVATE LESSONS",
+    "subject": "ALL",
+    "gradeFrom": "JK",
+    "gradeTo": "12",
+    "title": "PRIVATE LESSONS - 55 MIN",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 93.19,
+    "fees": 299,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Mon",
+        "start": "15:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Tue",
+        "start": "15:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "15:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "15:30:00",
+        "end": "17:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      },
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 1,
+        "platform": "In-Person\nOnline",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "TEKNOKIDS CODING",
+    "subject": "CODING",
+    "gradeFrom": "3",
+    "gradeTo": "4",
+    "title": "TEKNOKIDS CODING: SCRATCH",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "09:30:00",
+        "end": "10:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "5",
+    "gradeTo": "6",
+    "title": "TEKNOKIDS CODING: HTML/CSS",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "10:30:00",
+        "end": "11:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "7",
+    "gradeTo": "10",
+    "title": "TEKNOKIDS CODING: JAVASCRIPT/AI",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "11:30:00",
+        "end": "12:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "",
+    "subject": "",
+    "gradeFrom": "7",
+    "gradeTo": "10",
+    "title": "TEKNOKIDS CODING: PYTHON",
+    "duration": "55",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 58.91,
+    "fees": 189,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Sat",
+        "start": "12:30:00",
+        "end": "13:25:00",
+        "spots": 7,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "PRIVATE PIANO LESSONS",
+    "subject": "PIANO",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "PIANO PRIVATE 30MIN - SR",
+    "duration": "30",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 71.43,
+    "fees": 125,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Wed",
+        "start": "15:30:00",
+        "end": "16:00:00",
+        "spots": 1,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  },
+  {
+    "number": "",
+    "code": "",
+    "category": "PRIVATE PIANO LESSONS",
+    "subject": "PIANO",
+    "gradeFrom": "1",
+    "gradeTo": "12",
+    "title": "PIANO PRIVATE 30MIN - JR",
+    "duration": "30",
+    "sessions": 1,
+    "period": "/week",
+    "rateHr": 60,
+    "fees": 105,
+    "location": "Waterloo East",
+    "active": true,
+    "offerings": [
+      {
+        "active": true,
+        "day": "Thu",
+        "start": "15:30:00",
+        "end": "16:00:00",
+        "spots": 1,
+        "platform": "In-Person",
+        "teacher": ""
+      }
+    ]
+  }
+]
