@@ -30,7 +30,10 @@ module.exports = {
       // reparse point — not a real PE binary, so PM2 can't CreateProcess it
       // directly. Wrap with cmd.exe, which knows how to resolve execution aliases.
       script: 'cmd.exe',
-      args: '/c ngrok http 4000 --domain=uncork-silent-unengaged.ngrok-free.dev',
+      // --log=stdout switches ngrok off the interactive TUI dashboard and into
+      // a daemon mode that writes structured logs to stdout. Without it, ngrok
+      // tries to render the dashboard, fails (no TTY under PM2), and exits.
+      args: '/c ngrok http 4000 --domain=uncork-silent-unengaged.ngrok-free.dev --log=stdout --log-format=logfmt --log-level=info',
       autorestart: true,
       // Throttle restarts if ngrok keeps dying (e.g. account auth issue)
       min_uptime: 10000,
