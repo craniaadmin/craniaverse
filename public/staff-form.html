@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crania Schools — Staff Information Form</title>
+<style>
+  :root{
+    --panel:#c2e7f8; --ink:#1f2733; --ink-soft:#2a3744;
+    --line:#cfd6da; --btn-teal:#2c7a7b; --btn-teal-hover:#246364; --danger:#d92020;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:var(--sans); color:var(--ink); background:#f4f8fa; padding:24px 16px;}
+  .reg-wrap{max-width:760px; margin:0 auto;}
+  .reg-title{font-family:var(--serif); font-weight:700; font-size:30px; color:#26303a; text-align:center; margin:0 0 6px;}
+  .reg-sub{text-align:center; font-size:13px; color:#5d6975; margin:0 0 18px;}
+  .reg-form{background:var(--panel); border-radius:14px; padding:26px 30px 30px; box-shadow:0 6px 18px rgba(20,30,45,.08);}
+  .reg-section{font-size:14px; font-weight:800; letter-spacing:.4px; color:var(--ink-soft);
+    text-transform:uppercase; margin:20px 0 10px; padding-bottom:6px;
+    border-bottom:1px solid rgba(42,55,68,.18);}
+  .reg-section:first-child{margin-top:0;}
+  .reg-row{display:grid; grid-template-columns:200px 1fr; gap:14px; align-items:start; margin-bottom:10px;}
+  .reg-label{font-size:13px; font-weight:600; color:var(--ink-soft); padding-top:9px;}
+  .reg-req{color:var(--danger);}
+  .reg-input{width:100%; background:#fff; border:1px solid var(--line); border-radius:6px;
+    padding:8px 10px; font-size:13px; color:var(--ink); font-family:inherit;}
+  .reg-input:focus{outline:none; border-color:var(--btn-teal); box-shadow:0 0 0 3px rgba(44,122,123,.15);}
+  textarea.reg-input{resize:vertical; min-height:60px;}
+  .reg-two{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .reg-three{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;}
+  .reg-cols{display:grid; grid-template-columns:1fr; gap:0;}
+  .panel{background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .row-grid{display:grid; gap:6px; align-items:center; font-size:12px;}
+  .row-header{font-weight:700; font-size:11px; color:var(--ink-soft); text-transform:uppercase; text-decoration:underline;}
+  .small-input{border:1px solid var(--line); border-radius:4px; padding:5px 6px; font-size:12px; font-family:inherit; width:100%;}
+  .btn{border:none; border-radius:8px; padding:10px 20px; font-weight:700; font-size:14px;
+    background:var(--btn-teal); color:#fff; cursor:pointer; font-family:inherit;}
+  .btn:hover{background:var(--btn-teal-hover);}
+  .btn.small{padding:4px 10px; font-size:11px; border-radius:5px;}
+  .btn.ghost{background:#eef1f2; color:var(--ink);}
+  .submit-row{display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:24px; padding-top:18px; border-top:1px solid rgba(42,55,68,.2);}
+  .status{font-size:12px; color:var(--btn-teal); font-weight:600;}
+  .success{background:#e3f1f1; color:var(--btn-teal); padding:14px 18px; border-radius:8px; margin-top:14px; font-weight:600; text-align:center; display:none;}
+  .check{display:flex; align-items:center; gap:6px; font-size:12px;}
+  .check input{accent-color:var(--btn-teal); width:15px; height:15px;}
+  .day-row{display:grid; grid-template-columns:90px 1fr 1fr; gap:6px; align-items:center; margin-bottom:5px;}
+  .docs-row{display:grid; grid-template-columns:1fr 90px; gap:6px; align-items:center; margin-bottom:4px; font-size:12px;}
+  .docs-row label{display:flex; justify-content:center;}
+  @media (max-width:900px){
+    .reg-cols{grid-template-columns:1fr;}
+    .reg-row{grid-template-columns:1fr; gap:4px;}
+    .reg-label{padding-top:0;}
+  }
+</style>
+</head>
+<body>
+<div class="reg-wrap">
+  <h1 class="reg-title">Staff Information Form</h1>
+  <p class="reg-sub">Please complete this form so we can set up your records. All fields are saved as you type.</p>
+
+  <div class="reg-form" id="form-container">
+
+    <div class="reg-cols">
+      <!-- LEFT COLUMN -->
+      <div>
+        <h3 class="reg-section">Staff Name</h3>
+        <div class="reg-row"><label class="reg-label">First Name <span class="reg-req">*</span></label>
+          <input class="reg-input" data-field="firstName"></div>
+        <div class="reg-row"><label class="reg-label">Middle Name</label>
+          <input class="reg-input" data-field="middleName"></div>
+        <div class="reg-row"><label class="reg-label">Last Name <span class="reg-req">*</span></label>
+          <input class="reg-input" data-field="lastName"></div>
+
+        <h3 class="reg-section">Date of Birth</h3>
+        <div class="reg-row"><label class="reg-label">DOB</label>
+          <input type="date" class="reg-input" data-field="dob"></div>
+
+        <h3 class="reg-section">Gender</h3>
+        <div class="reg-row"><label class="reg-label">Gender</label>
+          <input class="reg-input" data-field="gender"></div>
+
+        <h3 class="reg-section">Concerns (optional)</h3>
+        <div class="reg-row"><label class="reg-label">Health</label>
+          <input class="reg-input" data-field="healthConcerns"></div>
+        <div class="reg-row"><label class="reg-label">Other</label>
+          <input class="reg-input" data-field="otherConcerns"></div>
+
+        <h3 class="reg-section">Phone Number</h3>
+        <div class="reg-row"><label class="reg-label">Home</label>
+          <input class="reg-input" data-field="phoneHome"></div>
+        <div class="reg-row"><label class="reg-label">Mobile <span class="reg-req">*</span></label>
+          <input class="reg-input" data-field="phoneMobile"></div>
+
+        <h3 class="reg-section">Current Address</h3>
+        <div class="reg-row"><label class="reg-label"># Street</label>
+          <input class="reg-input" data-field="currentAddress.street"></div>
+        <div class="reg-row"><label class="reg-label">Unit</label>
+          <input class="reg-input" data-field="currentAddress.unit"></div>
+        <div class="reg-row"><label class="reg-label">City</label>
+          <input class="reg-input" data-field="currentAddress.city"></div>
+        <div class="reg-row"><label class="reg-label">Province</label>
+          <input class="reg-input" data-field="currentAddress.province"></div>
+        <div class="reg-row"><label class="reg-label">Postal Code</label>
+          <input class="reg-input" data-field="currentAddress.postalCode"></div>
+        <div class="reg-row"><label class="reg-label">Country</label>
+          <input class="reg-input" data-field="currentAddress.country" value="Canada"></div>
+
+        <h3 class="reg-section">Permanent Address</h3>
+        <div class="reg-row"><label class="reg-label"># Street</label>
+          <input class="reg-input" data-field="permanentAddress.street"></div>
+        <div class="reg-row"><label class="reg-label">Unit</label>
+          <input class="reg-input" data-field="permanentAddress.unit"></div>
+        <div class="reg-row"><label class="reg-label">City</label>
+          <input class="reg-input" data-field="permanentAddress.city"></div>
+        <div class="reg-row"><label class="reg-label">Province</label>
+          <input class="reg-input" data-field="permanentAddress.province"></div>
+        <div class="reg-row"><label class="reg-label">Postal Code</label>
+          <input class="reg-input" data-field="permanentAddress.postalCode"></div>
+        <div class="reg-row"><label class="reg-label">Country</label>
+          <input class="reg-input" data-field="permanentAddress.country" value="Canada"></div>
+      </div>
+
+      <!-- MIDDLE COLUMN -->
+      <div>
+        <h3 class="reg-section">Availability / Preferences</h3>
+        <div class="panel" id="availability-panel">
+          <div class="day-row"><div></div>
+            <div class="row-header">From</div>
+            <div class="row-header">To</div>
+          </div>
+          <div id="availability-rows"></div>
+        </div>
+
+        <h3 class="reg-section">Education</h3>
+        <div class="panel">
+          <div id="education-rows"></div>
+          <button class="btn small ghost" type="button" onclick="addRow('education')">+ Add row</button>
+        </div>
+
+        <h3 class="reg-section">Work Experience</h3>
+        <div class="panel">
+          <div id="workExperience-rows"></div>
+          <button class="btn small ghost" type="button" onclick="addRow('workExperience')">+ Add row</button>
+        </div>
+
+        <h3 class="reg-section">Teachables</h3>
+        <div class="panel">
+          <div id="teachables-rows"></div>
+          <button class="btn small ghost" type="button" onclick="addRow('teachables')">+ Add row</button>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+        <h3 class="reg-section">Start Date</h3>
+        <div class="reg-row"><label class="reg-label">Start Date</label>
+          <input type="date" class="reg-input" data-field="startDate"></div>
+
+        <h3 class="reg-section">SIN Number</h3>
+        <div class="reg-row"><label class="reg-label">SIN</label>
+          <input class="reg-input" data-field="sin"></div>
+
+        <h3 class="reg-section">Emergency Contact</h3>
+        <div class="reg-row"><label class="reg-label">First Name</label>
+          <input class="reg-input" data-field="emergencyFirstName"></div>
+        <div class="reg-row"><label class="reg-label">Last Name</label>
+          <input class="reg-input" data-field="emergencyLastName"></div>
+        <div class="reg-row"><label class="reg-label">Phone (Mobile)</label>
+          <input class="reg-input" data-field="emergencyPhone"></div>
+        <div class="reg-row"><label class="reg-label">Email</label>
+          <input type="email" class="reg-input" data-field="emergencyEmail"></div>
+
+        <h3 class="reg-section">Documents Required</h3>
+        <div class="panel">
+          <div class="docs-row"><div></div><div class="row-header" style="text-align:center;">In Dropbox</div></div>
+          <div id="documents-rows"></div>
+        </div>
+
+        <h3 class="reg-section">Keys</h3>
+        <div class="panel">
+          <div id="keys-rows"></div>
+          <button class="btn small ghost" type="button" onclick="addRow('keys')">+ Add row</button>
+        </div>
+
+        <h3 class="reg-section">References (Minimum Two)</h3>
+        <div class="panel">
+          <div id="references-rows"></div>
+          <button class="btn small ghost" type="button" onclick="addRow('references')">+ Add row</button>
+        </div>
+
+        <h3 class="reg-section">Rate per Hour</h3>
+        <div class="reg-row"><label class="reg-label">Rate</label>
+          <input class="reg-input" data-field="ratePerHour" placeholder="$ /hr"></div>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <div class="status" id="status"></div>
+      <button class="btn" id="submit-btn" onclick="submitForm()">Submit</button>
+    </div>
+    <div class="success" id="success-banner"></div>
+  </div>
+</div>
+
+<script>
+var API_BASE = window.location.origin;
+var state = {
+  staffId: null,
+  fields: { currentAddress: {}, permanentAddress: {}, availability: {}, documents: {} },
+  education: [],
+  workExperience: [],
+  teachables: [],
+  keys: [],
+  references: [],
+};
+var saveTimer = null;
+
+var DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+var DOCUMENTS = [
+  'Current Resume',
+  'Vulnerable Sector Check',
+  'First Aid Certificate (if certified/requested)',
+  'Transcript (if in school within the past year)',
+  'Sample of Work (if requested)',
+  'Tax Forms (Federal & Provincial)',
+  'Direct Deposit Form',
+  'Signed Contract',
+];
+
+function escapeHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setStatus(msg){ document.getElementById('status').textContent = msg || ''; }
+
+// ── Repeating-row builders ────────────────────────────────────────────────
+var ROW_SCHEMAS = {
+  education: [
+    { key: 'degree', label: 'Degree(s)' },
+    { key: 'institution', label: 'Institution(s)' },
+    { key: 'from', label: 'From', type: 'date', width: '90px' },
+    { key: 'to', label: 'To', type: 'date', width: '90px' },
+  ],
+  workExperience: [
+    { key: 'title', label: 'Title' },
+    { key: 'organization', label: 'Organization' },
+    { key: 'from', label: 'From', type: 'date', width: '90px' },
+    { key: 'to', label: 'To', type: 'date', width: '90px' },
+  ],
+  teachables: [
+    { key: 'subject', label: 'Subject' },
+    { key: 'comfort', label: 'Comfort (1-5)', width: '90px' },
+    { key: 'gradeRange', label: 'Grade Range', width: '90px' },
+    { key: 'years', label: 'Years', width: '60px' },
+  ],
+  keys: [
+    { key: 'description', label: 'Description' },
+    { key: 'dateOut', label: 'Date Out', type: 'date', width: '110px' },
+    { key: 'dateIn', label: 'Date In', type: 'date', width: '110px' },
+    { key: 'formSigned', label: 'Signed', type: 'check', width: '60px' },
+  ],
+  references: [
+    { key: 'name', label: 'Name' },
+    { key: 'title', label: 'Title' },
+    { key: 'organization', label: 'Organization' },
+    { key: 'email', label: 'Email' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'relationship', label: 'Relationship' },
+  ],
+};
+
+function renderRows(group){
+  var cols = ROW_SCHEMAS[group];
+  var rows = state[group];
+  var widths = cols.map(c => c.width || '1fr').join(' ') + ' 24px';
+  var html = '';
+  // header
+  html += '<div class="row-grid" style="grid-template-columns:'+widths+'; margin-bottom:4px;">';
+  cols.forEach(c => html += '<div class="row-header">'+escapeHtml(c.label)+'</div>');
+  html += '<div></div></div>';
+  // rows
+  rows.forEach((row, i) => {
+    html += '<div class="row-grid" style="grid-template-columns:'+widths+'; margin-bottom:4px;">';
+    cols.forEach(c => {
+      var v = row[c.key] != null ? row[c.key] : (c.type === 'check' ? false : '');
+      if (c.type === 'check') {
+        html += '<div style="text-align:center;"><input type="checkbox" '+(v?'checked':'')+' onchange="setRow(\''+group+'\','+i+',\''+c.key+'\',this.checked)"></div>';
+      } else {
+        html += '<input class="small-input" type="'+(c.type==='date'?'date':'text')+'" value="'+escapeHtml(v)+'" oninput="setRow(\''+group+'\','+i+',\''+c.key+'\',this.value)">';
+      }
+    });
+    html += '<button style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:14px;" onclick="removeRow(\''+group+'\','+i+')">×</button>';
+    html += '</div>';
+  });
+  document.getElementById(group + '-rows').innerHTML = html;
+}
+
+function addRow(group){
+  var cols = ROW_SCHEMAS[group];
+  var blank = {};
+  cols.forEach(c => blank[c.key] = c.type === 'check' ? false : '');
+  state[group].push(blank);
+  renderRows(group);
+  scheduleSave();
+}
+function removeRow(group, i){
+  state[group].splice(i, 1);
+  renderRows(group);
+  scheduleSave();
+}
+function setRow(group, i, key, val){
+  state[group][i][key] = val;
+  scheduleSave();
+}
+
+function renderAvailability(){
+  var av = state.fields.availability || {};
+  var html = '';
+  DAYS.forEach(d => {
+    var dv = av[d] || {};
+    html += '<div class="day-row">';
+    html += '<div>'+d+'</div>';
+    html += '<input type="time" class="small-input" value="'+escapeHtml(dv.from||'')+'" onchange="setAvail(\''+d+'\',\'from\',this.value)">';
+    html += '<input type="time" class="small-input" value="'+escapeHtml(dv.to||'')+'" onchange="setAvail(\''+d+'\',\'to\',this.value)">';
+    html += '</div>';
+  });
+  document.getElementById('availability-rows').innerHTML = html;
+}
+function setAvail(day, key, val){
+  if (!state.fields.availability) state.fields.availability = {};
+  if (!state.fields.availability[day]) state.fields.availability[day] = {};
+  state.fields.availability[day][key] = val;
+  scheduleSave();
+}
+
+function renderDocuments(){
+  var docs = state.fields.documents || {};
+  var html = '';
+  DOCUMENTS.forEach(d => {
+    html += '<div class="docs-row">';
+    html += '<div>'+escapeHtml(d)+'</div>';
+    html += '<label><input type="checkbox" '+(docs[d]?'checked':'')+' onchange="setDoc(\''+d.replace(/'/g,"\\'")+'\',this.checked)"></label>';
+    html += '</div>';
+  });
+  document.getElementById('documents-rows').innerHTML = html;
+}
+function setDoc(d, val){
+  if (!state.fields.documents) state.fields.documents = {};
+  state.fields.documents[d] = val;
+  scheduleSave();
+}
+
+// ── Top-level field bindings ──────────────────────────────────────────────
+function setNested(obj, path, val){
+  var parts = path.split('.');
+  for (var i = 0; i < parts.length - 1; i++) {
+    if (!obj[parts[i]]) obj[parts[i]] = {};
+    obj = obj[parts[i]];
+  }
+  obj[parts[parts.length - 1]] = val;
+}
+
+function attachFieldListeners(){
+  document.querySelectorAll('[data-field]').forEach(el => {
+    el.addEventListener('input', () => {
+      var path = el.getAttribute('data-field');
+      var val = el.type === 'checkbox' ? el.checked : el.value;
+      setNested(state.fields, path, val);
+      scheduleSave();
+    });
+    el.addEventListener('change', () => {
+      var path = el.getAttribute('data-field');
+      var val = el.type === 'checkbox' ? el.checked : el.value;
+      setNested(state.fields, path, val);
+      scheduleSave();
+    });
+  });
+}
+
+// ── Save (debounced) ──────────────────────────────────────────────────────
+function buildPayload(){
+  return Object.assign({}, state.fields, {
+    education: state.education,
+    workExperience: state.workExperience,
+    teachables: state.teachables,
+    keys: state.keys,
+    references: state.references,
+  });
+}
+
+function scheduleSave(){
+  setStatus('Saving…');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDraft, 500);
+}
+
+function saveDraft(){
+  var payload = buildPayload();
+  if (!payload.firstName || !payload.lastName) {
+    setStatus('Add a first and last name to start auto-save.');
+    return;
+  }
+  if (state.staffId) {
+    fetch(API_BASE + '/api/staff/' + encodeURIComponent(state.staffId), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+      body: JSON.stringify(payload),
+    }).then(r => r.ok ? setStatus('Saved') : setStatus('Save failed')).catch(() => setStatus('Save failed'));
+  } else {
+    fetch(API_BASE + '/api/staff', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+      body: JSON.stringify(payload),
+    }).then(r => r.json()).then(rec => {
+      if (rec && rec.id) { state.staffId = rec.id; setStatus('Saved'); }
+      else setStatus('Save failed');
+    }).catch(() => setStatus('Save failed'));
+  }
+}
+
+function submitForm(){
+  saveDraft();
+  document.getElementById('success-banner').textContent = 'Thanks! Your staff record has been submitted.';
+  document.getElementById('success-banner').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Iframe auto-resize ────────────────────────────────────────────────────
+function reportHeight(){
+  if (window.parent === window) return;
+  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+  window.parent.postMessage({ type: 'crania-iframe-height', height: h }, '*');
+}
+new MutationObserver(reportHeight).observe(document.documentElement, { subtree: true, childList: true, attributes: true });
+window.addEventListener('load', reportHeight);
+setInterval(reportHeight, 500);
+
+// ── Initialize ────────────────────────────────────────────────────────────
+function init(){
+  // Pre-fill country defaults into state
+  state.fields.currentAddress.country = 'Canada';
+  state.fields.permanentAddress.country = 'Canada';
+  attachFieldListeners();
+  renderAvailability();
+  renderDocuments();
+  ['education','workExperience','teachables','keys','references'].forEach(renderRows);
+}
+init();
+</script>
+</body>
+</html>

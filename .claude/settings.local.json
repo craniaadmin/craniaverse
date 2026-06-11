@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ngrok version *)",
+      "WebFetch(domain:crania-schools.com)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebFetch(domain:forms.zoho.com)",
+      "PowerShell(Get-ChildItem \"$env:USERPROFILE\\\\Downloads\" | Sort-Object LastWriteTime -Descending | Select-Object -First 10 | Select-Object Name, LastWriteTime)",
+      "PowerShell(python -c \"from PIL import Image; print\\('ok'\\)\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\hanak\\\\OneDrive\\\\Documents\\\\UW Biomedical Engineering 2023-2028\\\\3A\\\\Co-op\\\\Crania\\\\craniaverse-updated\" -Directory)",
+      "Bash(New-Item -ItemType File -Path \"C:\\\\Users\\\\hanak\\\\OneDrive\\\\Documents\\\\UW Biomedical Engineering 2023-2028\\\\3A\\\\Co-op\\\\Crania\\\\craniaverse-updated\\\\craniaverse\\\\README.md\")",
+      "Bash(python -c \"import pandas as pd; sheets = pd.read_excel\\(r'C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx', sheet_name=None\\); [print\\(f'=== {n} ===\\\\n', s.to_string\\(\\)[:3000], '\\\\n'\\) for n, s in sheets.items\\(\\)]\")",
+      "Bash(pip install *)",
+      "Bash(python -c ' *)",
+      "Bash(python)",
+      "Bash(2>&1)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s http://localhost:4000/api/programs)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);console.log\\('count:',a.length\\);console.log\\('actives:',a.filter\\(p=>p.active\\).length\\);console.log\\('first 3 titles:',a.slice\\(0,3\\).map\\(p=>p.title\\)\\);}\\)\")",
+      "Bash(curl -s http://localhost:4000/register)",
+      "Bash(node -e \"const fs=require\\('fs'\\);const html=fs.readFileSync\\('C:/Users/hanak/OneDrive/Documents/UW Biomedical Engineering 2023-2028/3A/Co-op/Crania/craniaverse-updated/craniaverse/__test_html.txt','utf8'\\);const m=html.match\\(/<script>\\([\\\\s\\\\S]*?\\)<\\\\/script>/\\);if\\(!m\\){console.log\\('no script'\\);process.exit\\(\\);}try{new Function\\(m[1]\\);console.log\\('script parses ok'\\);}catch\\(e\\){console.log\\('parse error:',e.message\\);}\")",
+      "Bash(del \"C:\\\\Users\\\\hanak\\\\OneDrive\\\\Documents\\\\UW Biomedical Engineering 2023-2028\\\\3A\\\\Co-op\\\\Crania\\\\craniaverse-updated\\\\craniaverse\\\\__test_html.txt\")",
+      "Bash(npm ls *)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);const nums=a.map\\(p=>p.number\\);console.log\\('all numeric strings:',nums.every\\(n=>/^\\\\d+$/.test\\(n\\)\\)\\);console.log\\('uniq:',new Set\\(nums\\).size,'vs total:',nums.length\\);}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);const c={};a.forEach\\(p=>{c[p.number]=\\(c[p.number]||0\\)+1}\\);console.log\\('counts:',c\\);console.log\\('sample dups:',a.filter\\(p=>p.number==='90000'\\).slice\\(0,3\\).map\\(p=>p.title\\)\\);}\\)\")",
+      "Bash(node -e \"const a=require\\('C:/Users/hanak/OneDrive/Documents/UW Biomedical Engineering 2023-2028/3A/Co-op/Crania/craniaverse-updated/craniaverse/src/data/programsData.json'\\);const c={};a.forEach\\(p=>{c[p.number]=\\(c[p.number]||0\\)+1}\\);console.log\\('seed counts:',Object.keys\\(c\\).length,'distinct numbers; total programs:',a.length\\);console.log\\('first 5 numbers:',a.slice\\(0,5\\).map\\(p=>p.number\\)\\);\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);const byTitle={};a.forEach\\(\\(p,i\\)=>{\\(byTitle[p.title]=byTitle[p.title]||[]\\).push\\({i,location:p.location,fees:p.fees,offerings:p.offerings.length}\\)}\\);const dups=Object.entries\\(byTitle\\).filter\\(\\([t,v]\\)=>v.length>1\\);console.log\\('Programs with >1 row:',dups.length,'/',Object.keys\\(byTitle\\).length\\);console.log\\('First 4 dup groups:'\\);dups.slice\\(0,4\\).forEach\\(\\([t,v]\\)=>{console.log\\('  ',t,'->',v.map\\(x=>x.location+'\\(fees='+x.fees+', off='+x.offerings+'\\)'\\).join\\(' | '\\)\\)}\\);}\\)\")",
+      "Bash(curl -s http://localhost:4000/api/registrations)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const arr=JSON.parse\\(d\\);console.log\\('total records:',arr.length\\);console.log\\('last 4:'\\);arr.slice\\(-4\\).forEach\\(r=>console.log\\(' ',r.id,'|',r.displayName,'| programs:',\\(r.programs||[]\\).length,'| createdAt:',r.createdAt\\)\\);}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const arr=JSON.parse\\(d\\);console.log\\('all records:'\\);arr.forEach\\(r=>console.log\\(' ',r.id,'|',r.displayName,'| programs:',\\(r.programs||[]\\).length,'| createdAt:',r.createdAt\\)\\);}\\)\")",
+      "Bash(curl -s -X POST http://localhost:4000/api/registrations -H \"Content-Type: application/json\" -d '{\"studentFirstName\":\"TestDup\",\"studentLastName\":\"Multi\",\"studentEmail\":\"x@x.com\",\"gender\":\"F\",\"dob\":\"2015-01-01\",\"grade\":\"5\",\"school\":\"Test\",\"g1FirstName\":\"P\",\"g1LastName\":\"K\",\"g1Relationship\":\"M\",\"g1PhoneMobile\":\"123\",\"g1Email\":\"p@x.com\",\"emFirstName\":\"E\",\"emPhone\":\"456\",\"emEmail\":\"e@x.com\",\"programs\":[{\"program\":\"FLEX MATH - DOUBLE\",\"day\":\"Mon\",\"time\":\"4:30 pm\",\"platform\":\"Boardwalk \\(In-Person\\)\",\"courseCost\":\"$289 /mo\",\"notes\":\"\"},{\"program\":\"FLEX MATH - DOUBLE\",\"day\":\"Wed\",\"time\":\"5:30 pm\",\"platform\":\"Boardwalk \\(In-Person\\)\",\"courseCost\":\"$289 /mo\",\"notes\":\"\"}],\"hearAbout\":[],\"enrollReasons\":[],\"agreeToS\":true,\"agreePhoto\":true}')",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const arr=JSON.parse\\(d\\);const dupes=arr.filter\\(r=>r.displayName==='TestDup Multi'\\);console.log\\('TestDup Multi records:',dupes.length,'| programs:',dupes.map\\(r=>r.programs.length\\)\\);}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const arr=JSON.parse\\(d\\);console.log\\('all records \\(latest 8\\):'\\);arr.slice\\(-8\\).forEach\\(r=>console.log\\(' ',r.id,'|',r.displayName,'| programs:',\\(r.programs||[]\\).length,'| createdAt:',r.createdAt\\)\\);}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const arr=JSON.parse\\(d\\);const r=arr[arr.length-1];console.log\\('Latest record:',r.displayName\\);console.log\\('Programs:'\\);r.programs.forEach\\(p=>console.log\\('  -',JSON.stringify\\({program:p.program,schedule:p.schedule,platform:p.platform}\\)\\)\\);}\\)\")",
+      "Bash(ls \"C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx\" 2>&1)",
+      "Read(//c/Users/hanak/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/442bee74-fcf2-4d10-ba29-04d56ae08892/1e553eb4-f349-4180-b976-40172745097a/skills/xlsx/**)",
+      "Bash(python -c \"import pandas as pd; df=pd.read_excel\\(r'C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx'\\); print\\(df.columns.tolist\\(\\)\\); print\\(df.head\\(8\\).to_string\\(\\)\\)\")"
+    ]
+  }
+}

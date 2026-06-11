@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "cwd": "server",
+      "port": 4000
+    }
+  ]
+}
