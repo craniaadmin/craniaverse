@@ -17,8 +17,7 @@ module.exports = {
       script: 'server/server.js',
       env: {
         NODE_ENV: 'production',
-        // Override frame-ancestors here if you change the school site domain.
-        // ALLOWED_FRAME_ANCESTORS: "'self' https://crania-schools.com https://www.crania-schools.com",
+        ALLOWED_FRAME_ANCESTORS: "'self' https://crania-schools.com https://www.crania-schools.com",
       },
       autorestart: true,
       max_memory_restart: '512M',
@@ -33,7 +32,7 @@ module.exports = {
       // --log=stdout switches ngrok off the interactive TUI dashboard and into
       // a daemon mode that writes structured logs to stdout. Without it, ngrok
       // tries to render the dashboard, fails (no TTY under PM2), and exits.
-      args: '/c ngrok http 4000 --domain=uncork-silent-unengaged.ngrok-free.dev --log=stdout --log-format=logfmt --log-level=info',
+      args: '/c ngrok http 4000 --url=craniaverse.ngrok.app --log=stdout --log-format=logfmt --log-level=info',
       autorestart: true,
       // Throttle restarts if ngrok keeps dying (e.g. account auth issue)
       min_uptime: 10000,

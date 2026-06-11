@@ -34,7 +34,11 @@
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const arr=JSON.parse\\(d\\);const r=arr[arr.length-1];console.log\\('Latest record:',r.displayName\\);console.log\\('Programs:'\\);r.programs.forEach\\(p=>console.log\\('  -',JSON.stringify\\({program:p.program,schedule:p.schedule,platform:p.platform}\\)\\)\\);}\\)\")",
       "Bash(ls \"C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx\" 2>&1)",
       "Read(//c/Users/hanak/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/442bee74-fcf2-4d10-ba29-04d56ae08892/1e553eb4-f349-4180-b976-40172745097a/skills/xlsx/**)",
-      "Bash(python -c \"import pandas as pd; df=pd.read_excel\\(r'C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx'\\); print\\(df.columns.tolist\\(\\)\\); print\\(df.head\\(8\\).to_string\\(\\)\\)\")"
+      "Bash(python -c \"import pandas as pd; df=pd.read_excel\\(r'C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx'\\); print\\(df.columns.tolist\\(\\)\\); print\\(df.head\\(8\\).to_string\\(\\)\\)\")",
+      "PowerShell(Get-Process -Name ngrok -ErrorAction SilentlyContinue)",
+      "PowerShell(try { \\(Invoke-RestMethod http://localhost:4040/api/tunnels\\).tunnels | ConvertTo-Json } catch { \"ngrok web UI not reachable: $_\" })",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
