@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crania Schools — Registration</title>
+<style>
+  :root{
+    --header-blue:#c2e7f8; --panel:#c2e7f8; --ink:#1f2733; --ink-soft:#2a3744;
+    --line:#cfd6da; --btn-teal:#2c7a7b; --btn-teal-hover:#246364; --danger:#d92020;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--sans); color:var(--ink);
+    background:#f4f8fa; -webkit-font-smoothing:antialiased; padding:24px 16px;
+  }
+  .reg-wrap{max-width:860px; margin:0 auto;}
+  .reg-title{
+    font-family:var(--serif); font-weight:700; font-size:30px; color:#26303a;
+    text-align:center; margin:0 0 18px;
+  }
+  .reg-form{
+    position:relative;
+    background:var(--panel); border-radius:14px; padding:26px 30px 30px;
+    box-shadow:0 6px 18px rgba(20,30,45,.08);
+  }
+  .reg-step-indicator{
+    position:absolute; top:14px; right:18px;
+    font-size:12.5px; font-weight:700; color:var(--ink-soft); letter-spacing:.3px;
+    background:rgba(255,255,255,.7); padding:5px 11px; border-radius:999px;
+  }
+  .page-footer-left{display:none;}
+  .reg-section{
+    font-size:16px; font-weight:800; letter-spacing:.4px; color:var(--ink-soft);
+    text-transform:uppercase; margin:26px 0 14px; padding-bottom:8px;
+    border-bottom:1px solid rgba(42,55,68,.18);
+  }
+  .reg-section:first-child{margin-top:4px;}
+  .reg-row{display:grid; grid-template-columns:260px 1fr; gap:16px; align-items:start; margin-bottom:14px;}
+  .reg-label{font-size:13.5px; font-weight:700; color:var(--ink-soft); line-height:1.3; padding-top:9px;}
+  .reg-req{color:var(--danger); font-weight:700;}
+  .reg-control{min-width:0;}
+  .reg-input{
+    width:100%; background:#fff; border:1px solid var(--line); border-radius:6px;
+    padding:9px 11px; font-size:14px; color:var(--ink); font-family:inherit;
+  }
+  .reg-input:focus{outline:none; border-color:var(--btn-teal); box-shadow:0 0 0 3px rgba(44,122,123,.15);}
+  textarea.reg-input{resize:vertical; min-height:96px;}
+  .reg-two{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .reg-stack{display:grid; gap:10px;}
+  .reg-radios,.reg-checks{display:flex; flex-direction:column; gap:8px; padding-top:4px;}
+  .reg-checks{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));}
+  .reg-radio,.reg-check{display:flex; align-items:flex-start; gap:8px; font-size:13.5px; color:var(--ink-soft); line-height:1.35; cursor:pointer;}
+  .reg-radio input,.reg-check input{margin-top:2px; accent-color:var(--btn-teal); width:16px; height:16px;}
+  .reg-error{color:#b02020; font-size:12px; font-weight:600; margin-top:5px;}
+  .reg-consent{display:flex; flex-direction:column; gap:12px; margin-top:22px; padding-top:18px; border-top:1px solid rgba(42,55,68,.18);}
+  .btn{border:none; border-radius:8px; padding:11px 22px; font-weight:700; font-size:14px; background:var(--btn-teal); color:#fff; cursor:pointer; font-family:inherit;}
+  .btn:hover{background:var(--btn-teal-hover);}
+  .btn:disabled{opacity:.6; cursor:default;}
+  .btn.ghost{background:#eef1f2; color:var(--ink);}
+  .btn.ghost:hover{background:#e2e6e8;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-footer{display:flex; gap:12px; justify-content:space-between; align-items:center; margin-top:26px; padding-top:20px; border-top:1px solid rgba(42,55,68,.18);}
+  .page-footer-left{font-size:13px; color:#666;}
+  .page-footer-right{display:flex; gap:12px;}
+  .add-more-page{padding:60px 40px; text-align:center;}
+  .add-more-page p{font-size:16px; color:#555; margin-bottom:32px;}
+  .success{background:#fff; border:1px solid var(--line); border-radius:14px; padding:48px 40px; text-align:center; box-shadow:0 6px 18px rgba(20,30,45,.08); display:grid; gap:12px; justify-items:center;}
+  .success-check{width:64px; height:64px; border-radius:50%; background:#e3f1f1; display:grid; place-items:center; color:var(--btn-teal); font-size:34px; font-weight:800;}
+  .success h3{margin:4px 0 0; font-family:var(--serif); font-weight:400; font-size:26px;}
+  .success p{color:var(--ink-soft); font-size:15px; max-width:460px; margin:0; line-height:1.6;}
+  .student-info-box{border:1px solid rgba(42,55,68,.18); border-radius:8px; padding:16px; margin-bottom:16px; background:var(--panel);}
+  .program-item{border:1px solid rgba(42,55,68,.18); border-radius:8px; padding:16px; margin-bottom:12px; background:var(--panel);}
+  .payment-instructions{background:#fff; border:1px solid var(--line); border-radius:10px; padding:22px 26px; margin-bottom:20px; line-height:1.7;}
+  .payment-instructions h4{margin:18px 0 6px; font-size:14px; font-weight:700; color:var(--ink-soft);}
+  .payment-instructions h4:first-child{margin-top:0;}
+  .payment-instructions p,.payment-instructions li{font-size:14px; color:#444; margin:0 0 4px;}
+  .payment-instructions ul{margin:4px 0 0 18px; padding:0;}
+  .program-item-header{display:flex; gap:12px; align-items:center; margin-bottom:12px;}
+  .program-item-title{flex:1; font-weight:700;}
+  .program-remove{background:none; border:1px solid var(--line); border-radius:6px; padding:6px 12px; font-size:12px; cursor:pointer; color:var(--danger); font-weight:600;}
+  .program-remove:hover{background:#ffe6e6;}
+  .pp-search{width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; font-family:inherit; margin-bottom:12px;}
+  .pp-card{background:#fff; border:1px solid rgba(42,55,68,.18); border-radius:8px; margin-bottom:10px; overflow:hidden;}
+  .pp-head{display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; background:#eaf3f5;}
+  .pp-head:hover{background:#dfecef;}
+  .pp-title{flex:1; font-weight:700; font-size:14px; color:var(--ink-soft);}
+  .pp-meta{font-size:11.5px; color:#566; font-weight:600;}
+  .pp-cap{font-size:11px; background:#2c7a7b; color:#fff; padding:2px 8px; border-radius:999px; font-weight:700;}
+  .pp-body{padding:8px 14px 12px; display:none;}
+  .pp-body.open{display:block;}
+  .pp-off{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:center; padding:6px 4px; border-bottom:1px dashed #e4e8ea; font-size:13px;}
+  .pp-off:last-child{border-bottom:none;}
+  .pp-off input{accent-color:var(--btn-teal); width:16px; height:16px;}
+  .pp-off-spots{font-size:11.5px; color:#777;}
+  .pp-empty{padding:18px; text-align:center; color:#777; font-size:13px; font-style:italic;}
+  .sc-item{background:#fff; border:1px solid rgba(42,55,68,.18); border-radius:8px; padding:12px 14px; margin-bottom:10px;}
+  .sc-head{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .sc-title{flex:1; font-weight:700; font-size:14px;}
+  .sc-sub{font-size:12.5px; color:#566; margin-bottom:8px;}
+  @media (max-width:760px){
+    .reg-row{grid-template-columns:1fr; gap:6px;}
+    .reg-label{padding-top:0;}
+    .reg-form{padding:20px 16px 24px;}
+    .reg-title{font-size:24px;}
+    .page-footer{flex-direction:column; gap:16px;}
+    .page-footer-right{width:100%; flex-direction:column;}
+    .page-footer-right button{width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="reg-wrap">
+  <h1 class="reg-title">Registration</h1>
+
+  <div class="reg-form" id="form-container">
+    <div class="reg-step-indicator" id="step-indicator"></div>
+    <!-- PAGE 1: PARENT 1 -->
+    <div class="page active" id="page-parent1">
+      <h3 class="reg-section">Guardian 1</h3>
+      <div class="reg-row">
+        <label class="reg-label">Name <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <div class="reg-two">
+            <input type="text" class="reg-input" data-field="g1FirstName" placeholder="First Name">
+            <input type="text" class="reg-input" data-field="g1LastName" placeholder="Last Name">
+          </div>
+          <div class="reg-error" id="err-g1FirstName" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Relationship <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <input type="text" class="reg-input" data-field="g1Relationship" placeholder="e.g., Mother, Father">
+          <div class="reg-error" id="err-g1Relationship" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Phone (Mobile) <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <input type="tel" class="reg-input" data-field="g1PhoneMobile" placeholder="(506) 234-5678">
+          <div class="reg-error" id="err-g1PhoneMobile" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Phone (Home)</label>
+        <div class="reg-control">
+          <input type="tel" class="reg-input" data-field="g1PhoneHome" placeholder="(506) 234-5678">
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Address</label>
+        <div class="reg-control">
+          <div class="reg-stack">
+            <input type="text" class="reg-input" data-field="g1Address1" placeholder="Address Line 1">
+            <input type="text" class="reg-input" data-field="g1Address2" placeholder="Address Line 2 (Unit)">
+            <div class="reg-two">
+              <input type="text" class="reg-input" data-field="g1City" placeholder="City / District">
+              <select class="reg-input" data-field="g1Province">
+                <option value="">State / Province</option>
+                <option>Ontario</option><option>Quebec</option><option>British Columbia</option>
+                <option>Alberta</option><option>Manitoba</option><option>Saskatchewan</option>
+                <option>Nova Scotia</option><option>New Brunswick</option>
+                <option>Newfoundland and Labrador</option><option>PEI</option><option>Other</option>
+              </select>
+            </div>
+            <div class="reg-two">
+              <input type="text" class="reg-input" data-field="g1Postal" placeholder="Postal / Zip Code">
+              <select class="reg-input" data-field="g1Country">
+                <option>Canada</option><option>United States</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Email <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <input type="email" class="reg-input" data-field="g1Email">
+          <div class="reg-error" id="err-g1Email" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Occupation (optional)</label>
+        <div class="reg-control">
+          <input type="text" class="reg-input" data-field="g1Occupation">
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <div class="page-footer-left" id="step-text-p1"></div>
+        <div class="page-footer-right">
+          <button class="btn" onclick="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: PARENT 2 -->
+    <div class="page" id="page-parent2">
+      <h3 class="reg-section">Guardian 2 (optional)</h3>
+      <div class="reg-row">
+        <label class="reg-label">Name</label>
+        <div class="reg-control">
+          <div class="reg-two">
+            <input type="text" class="reg-input" data-field="g2FirstName" placeholder="First Name">
+            <input type="text" class="reg-input" data-field="g2LastName" placeholder="Last Name">
+          </div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Relationship</label>
+        <div class="reg-control">
+          <input type="text" class="reg-input" data-field="g2Relationship" placeholder="e.g., Mother, Father">
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Phone (Mobile)</label>
+        <div class="reg-control">
+          <input type="tel" class="reg-input" data-field="g2PhoneMobile" placeholder="(506) 234-5678">
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Phone (Home)</label>
+        <div class="reg-control">
+          <input type="tel" class="reg-input" data-field="g2PhoneHome" placeholder="(506) 234-5678">
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Address</label>
+        <div class="reg-control">
+          <div class="reg-stack">
+            <input type="text" class="reg-input" data-field="g2Address1" placeholder="Address Line 1">
+            <input type="text" class="reg-input" data-field="g2Address2" placeholder="Address Line 2 (Unit)">
+            <div class="reg-two">
+              <input type="text" class="reg-input" data-field="g2City" placeholder="City / District">
+              <select class="reg-input" data-field="g2Province">
+                <option value="">State / Province</option>
+                <option>Ontario</option><option>Quebec</option><option>British Columbia</option>
+                <option>Alberta</option><option>Manitoba</option><option>Saskatchewan</option>
+                <option>Nova Scotia</option><option>New Brunswick</option>
+                <option>Newfoundland and Labrador</option><option>PEI</option><option>Other</option>
+              </select>
+            </div>
+            <div class="reg-two">
+              <input type="text" class="reg-input" data-field="g2Postal" placeholder="Postal / Zip Code">
+              <select class="reg-input" data-field="g2Country">
+                <option>Canada</option><option>United States</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Email</label>
+        <div class="reg-control">
+          <input type="email" class="reg-input" data-field="g2Email">
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Occupation (optional)</label>
+        <div class="reg-control">
+          <input type="text" class="reg-input" data-field="g2Occupation">
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <div class="page-footer-left" id="step-text-p2"></div>
+        <div class="page-footer-right">
+          <button class="btn ghost" onclick="goBackPage()">Back</button>
+          <button class="btn" onclick="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGES 2+: STUDENTS (generated dynamically) -->
+    <div id="student-pages-container"></div>
+
+    <!-- PAGE: ADD MORE STUDENTS -->
+    <div class="page" id="page-add-more">
+      <div class="add-more-page">
+        <p>Currently registered: <strong id="student-count">1</strong> student(s)</p>
+        <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn" onclick="addStudent()">Add Another Student</button>
+          <button class="btn ghost" onclick="nextPage()">Continue</button>
+        </div>
+      </div>
+      <div class="page-footer">
+        <div class="page-footer-left" id="step-text"></div>
+        <div class="page-footer-right">
+          <button class="btn ghost" onclick="goBackPage()">Back</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: EMERGENCY CONTACT -->
+    <div class="page" id="page-emergency">
+      <h3 class="reg-section">Emergency Contact</h3>
+      <div class="reg-row">
+        <label class="reg-label">Name <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <div class="reg-two">
+            <input type="text" class="reg-input" data-field="emFirstName" placeholder="First Name">
+            <input type="text" class="reg-input" data-field="emLastName" placeholder="Last Name">
+          </div>
+          <div class="reg-error" id="err-emFirstName" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Relationship</label>
+        <div class="reg-control">
+          <input type="text" class="reg-input" data-field="emRelationship" placeholder="e.g., Aunt, Uncle, Friend">
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Phone <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <input type="tel" class="reg-input" data-field="emPhone" placeholder="(506) 234-5678">
+          <div class="reg-error" id="err-emPhone" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Email <span class="reg-req">*</span></label>
+        <div class="reg-control">
+          <input type="email" class="reg-input" data-field="emEmail">
+          <div class="reg-error" id="err-emEmail" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="page-footer">
+        <div class="page-footer-left" id="step-text-em"></div>
+        <div class="page-footer-right">
+          <button class="btn ghost" onclick="goBackPage()">Back</button>
+          <button class="btn" onclick="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ADDITIONAL INFO & SUBMIT -->
+    <div class="page" id="page-additional">
+      <h3 class="reg-section">Additional Information</h3>
+      <div class="reg-row">
+        <label class="reg-label">Additional Notes</label>
+        <div class="reg-control">
+          <textarea class="reg-input" data-field="additionalNotes"></textarea>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">How Did You Hear About Us? <span class="reg-req">*</span></label>
+        <div class="reg-control" id="hearAbout-group">
+          <div class="reg-error" id="err-hearAbout" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="reg-row">
+        <label class="reg-label">Why Did You Enroll Your Child? <span class="reg-req">*</span></label>
+        <div class="reg-control" id="enrollReasons-group">
+          <div class="reg-error" id="err-enrollReasons" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="reg-consent">
+        <label class="reg-check">
+          <input type="checkbox" data-field="receiveNews">
+          I would like to receive news and updates from Crania Schools
+        </label>
+        <label class="reg-check">
+          <input type="checkbox" data-field="agreeToS">
+          I agree to the Crania Schools Terms of Service, Privacy Policy, & Parent Consent, Release & Waiver of Liability <span class="reg-req">*</span>
+        </label>
+        <div class="reg-error" id="err-agreeToS" style="display:none;"></div>
+        <label class="reg-check">
+          <input type="checkbox" data-field="agreePhoto">
+          I confirm I agree with the Photo and Video Policy within the Privacy Policy <span class="reg-req">*</span>
+        </label>
+        <div class="reg-error" id="err-agreePhoto" style="display:none;"></div>
+      </div>
+
+      <div class="page-footer">
+        <div class="page-footer-left" id="step-text-additional"></div>
+        <div class="page-footer-right">
+          <button class="btn ghost" onclick="goBackPage()">Back</button>
+          <button class="btn" id="submit-btn" onclick="submitForm()">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: PAYMENT INSTRUCTIONS -->
+    <div class="page" id="page-payment">
+      <h3 class="reg-section">Payment Instructions</h3>
+      <p style="font-size:14px;color:#444;margin:0 0 18px;">Please review the payment information below. Payment is due before or on the first day of class.</p>
+      <div class="payment-instructions">
+        <h4>One-Time Payment</h4>
+        <p>Send an e-transfer to <strong>payments@crania-schools.com</strong>.</p>
+        <p>In the message, include your child's <strong>full name and program</strong> (e.g. "Jane Smith — Flex Math").</p>
+        <p>Send the security question question and answer to <strong>payments@crania-schools.com</strong></p>
+
+        <h4>Monthly Program</h4>
+        <p>The <strong>first payment is the last month's fee, paid upfront</strong> by e-transfer to <strong>payments@crania-schools.com</strong>.</p>
+        <p>In the message, include your child's <strong>full name and program</strong> (e.g. "Jane Smith — Flex Math").</p>
+        <p>Send the security question question and answer to <strong>payments@crania-schools.com</strong></p>
+        <br>
+        <p>After that, drop off the <strong>cheque for the entire year</strong> at your designated location.</p>
+      </div>
+      <div class="page-footer">
+        <div class="page-footer-left" id="step-text-payment"></div>
+        <div class="page-footer-right">
+          <button class="btn ghost" onclick="goBackPage()">Back</button>
+          <button class="btn" onclick="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS PAGE -->
+    <div class="page" id="page-success">
+      <div class="success">
+        <div class="success-check">✓</div>
+        <h3>Registration submitted</h3>
+        <p id="success-message"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var CONFIG = {
+  ENDPOINT: "/api/registrations",
+  THANK_YOU_TITLE: "Thank you for registering!",
+};
+
+var HEAR = ["Web Search","Friend/Relative","Crania Vehicle","Transit Bench","LinkedIn","Facebook","Twitter","Instagram","TikTok","Educator","School Flyer","Newsletter","Online Directory","Passed by Location","Other"];
+var ENROLL = ["Math Help","Math Enrichment","Keeping Up with Technology","English Enrichment","English Help","Coding Enrichment","Coding Help","Camp Special Programs","Other"];
+var PAYMENTS = ["Cash","Cheque","E-Transfer","Credit Card","Debit","Monthly Pre-Authorized"];
+var PROGRAMS_DATA = [];   // raw rows from /api/programs
+var MERGED_PROGRAMS = []; // [{ title, variants: [{ programIdx, location, platform, fees, period, offerings }] }]
+var GRADES = ["JK","SK","1","2","3","4","5","6","7","8","9","10","11","12"];
+
+var state = {
+  parents: {},
+  students: [{ programs: [{}] }],
+  emergency: {},
+  additional: {},
+  currentPage: 0
+};
+
+function escapeHtml(str){
+  if(str==null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function buildSelectHtml(key, list, placeholder, value){
+  var html = '<select class="reg-input" data-field="'+key+'">';
+  if(placeholder!=null) html += '<option value="">'+escapeHtml(placeholder)+'</option>';
+  list.forEach(function(v){
+    var selected = (v===value) ? ' selected' : '';
+    html += '<option value="'+escapeHtml(v)+'"'+selected+'>'+escapeHtml(v)+'</option>';
+  });
+  html += '</select>';
+  return html;
+}
+
+function inputHtml(type, key, placeholder, value){
+  var v = value==null ? '' : escapeHtml(value);
+  var p = placeholder ? ' placeholder="'+escapeHtml(placeholder)+'"' : '';
+  return '<input type="'+type+'" class="reg-input" data-field="'+key+'"'+p+' value="'+v+'">';
+}
+
+function checkboxHtml(key, checked, labelText){
+  var c = checked ? ' checked' : '';
+  return '<label class="reg-check"><input type="checkbox" data-field="'+key+'"'+c+'> '+escapeHtml(labelText)+'</label>';
+}
+
+var allPages = ["parent1","parent2","add-more","emergency","payment","additional"];
+
+function el(tag, attrs, kids){
+  var n = document.createElement(tag);
+  attrs = attrs || {};
+  for(var k in attrs){
+    if(k==="class") n.className = attrs[k];
+    else if(k==="html") n.innerHTML = attrs[k];
+    else if(k.slice(0,2)==="on") n.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+    else if(attrs[k]!=null) n.setAttribute(k, attrs[k]);
+  }
+  (kids||[]).forEach(function(c){ if(c==null) return; n.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+  return n;
+}
+
+function opt(v,label){ var o=el("option",{value:v}); o.textContent=label==null?v:label; return o; }
+
+function select(key, list, placeholder){
+  var s=el("select",{class:"reg-input","data-field":key});
+  if(placeholder!=null) s.appendChild(opt("",placeholder));
+  list.forEach(function(v){ s.appendChild(opt(v)); });
+  return s;
+}
+
+function buildStudentPage(idx){
+  var s = state.students[idx] || {};
+  var html = '<div class="page" id="page-student-'+idx+'">';
+  html += '<h3 class="reg-section">Student '+(idx+1)+'</h3>';
+  html += '<div class="student-info-box">';
+  html += '<div class="reg-row"><label class="reg-label">Name <span class="reg-req">*</span></label><div class="reg-control"><div class="reg-two">';
+  html += inputHtml("text","s"+idx+"_firstName","First Name",s.firstName);
+  html += inputHtml("text","s"+idx+"_lastName","Last Name",s.lastName);
+  html += '</div><div class="reg-error" id="err-s'+idx+'_firstName" style="display:none;"></div></div></div>';
+  html += '<div class="reg-row"><label class="reg-label">Email <span class="reg-req">*</span></label><div class="reg-control">'+inputHtml("email","s"+idx+"_email","",s.email)+'<div class="reg-error" id="err-s'+idx+'_email" style="display:none;"></div></div></div>';
+  html += '<div class="reg-row"><label class="reg-label">Gender <span class="reg-req">*</span></label><div class="reg-control">'+inputHtml("text","s"+idx+"_gender","",s.gender)+'<div class="reg-error" id="err-s'+idx+'_gender" style="display:none;"></div></div></div>';
+  html += '<div class="reg-row"><label class="reg-label">Date of Birth <span class="reg-req">*</span></label><div class="reg-control">'+inputHtml("date","s"+idx+"_dob","",s.dob)+'<div class="reg-error" id="err-s'+idx+'_dob" style="display:none;"></div></div></div>';
+  html += '<div class="reg-row"><label class="reg-label">Grade <span class="reg-req">*</span></label><div class="reg-control">'+buildSelectHtml("s"+idx+"_grade",GRADES,"-Select-",s.grade)+'<div class="reg-error" id="err-s'+idx+'_grade" style="display:none;"></div></div></div>';
+  html += '<div class="reg-row"><label class="reg-label">School <span class="reg-req">*</span></label><div class="reg-control">'+inputHtml("text","s"+idx+"_school","",s.school)+'<div class="reg-error" id="err-s'+idx+'_school" style="display:none;"></div></div></div>';
+  html += '<div class="reg-row"><label class="reg-label">Medical Conditions</label><div class="reg-control">'+inputHtml("text","s"+idx+"_medical","",s.medical)+'</div></div>';
+  html += '<div class="reg-row"><label class="reg-label"></label><div class="reg-control">'+checkboxHtml("s"+idx+"_reportCard",s.reportCard,"I have a report card on file / will send by email")+'</div></div>';
+  html += '</div>'; // close student-info-box
+  html += '<h3 class="reg-section">Program Selection</h3>';
+  html += '<div id="programs-'+idx+'"></div>';
+  html += '<button type="button" class="btn" style="margin-top:12px;" onclick="addProgram('+idx+')">+ Add Another Class</button>';
+  html += '<div class="reg-error" id="err-s'+idx+'_program" style="display:none; margin-top:8px;"></div>';
+  html += '<div class="page-footer"><div class="page-footer-left" id="step-text-s'+idx+'"></div><div class="page-footer-right"><button class="btn ghost" onclick="goBackPage()">Back</button><button class="btn" onclick="nextPage()">Next</button></div></div></div>';
+  return html;
+}
+
+function fmtTime(t){
+  if(!t) return '';
+  var m = String(t).match(/^(\d{1,2}):(\d{2})/);
+  if(!m) return t;
+  var h = parseInt(m[1],10);
+  var min = m[2];
+  var ampm = h>=12 ? 'pm' : 'am';
+  if(h===0) h=12; else if(h>12) h-=12;
+  return h+':'+min+' '+ampm;
+}
+
+function flexCap(title){
+  var t = String(title||'').toUpperCase();
+  if(t.indexOf('UNLIMITED') !== -1) return 5;
+  if(t.indexOf('DOUBLE') !== -1) return 2;
+  if(t.indexOf('SINGLE') !== -1) return 1;
+  return Infinity;
+}
+
+function deriveCost(p){
+  if(p.fees == null || p.fees === '') return '';
+  var per = String(p.period || '').toLowerCase();
+  var suffix = '/mo';
+  if(per.indexOf('week') !== -1) suffix = '/wk';
+  else if(per.indexOf('lesson') !== -1) suffix = '/lesson';
+  return '$' + p.fees + ' ' + suffix;
+}
+
+function buildMergedPrograms(){
+  // Always include ALL programs (active or not) so indices never shift.
+  // active=false programs are hidden from the dropdown but stay in the array.
+  var groups = {};
+  var order = [];
+  PROGRAMS_DATA.forEach(function(p, idx){
+    var key = p.title || '';
+    if(!groups[key]){
+      groups[key] = { title: p.title, variants: [] };
+      order.push(key);
+    }
+    groups[key].variants.push({
+      programIdx: idx,
+      location: p.location || '',
+      platform: (p.offerings && p.offerings[0] && p.offerings[0].platform) || '',
+      fees: p.fees, period: p.period,
+      active: !!p.active,
+      // only keep active offerings
+      offerings: (p.offerings || []).map(function(o, oIdx){ return Object.assign({ offeringIdx: oIdx }, o); }).filter(function(o){ return o.active; }),
+    });
+  });
+  MERGED_PROGRAMS = order.map(function(k){ return groups[k]; });
+}
+
+function variantLabel(v){
+  var loc = v.location || '';
+  var plat = v.platform || '';
+  if(loc && plat) return loc + ' (' + plat + ')';
+  return loc || plat || 'Default';
+}
+
+function usedMergedIndices(studentIdx, exceptCardIdx){
+  var progs = (state.students[studentIdx] && state.students[studentIdx].programs) || [];
+  var used = {};
+  progs.forEach(function(c, i){
+    if(i === exceptCardIdx) return;
+    if(c && c.mergedIdx != null) used[c.mergedIdx] = true;
+  });
+  return used;
+}
+
+function addProgram(studentIdx){
+  if(!state.students[studentIdx]) state.students[studentIdx] = { programs: [] };
+  if(!state.students[studentIdx].programs) state.students[studentIdx].programs = [];
+  state.students[studentIdx].programs.push({});
+  renderPrograms(studentIdx);
+}
+
+function removeProgram(studentIdx, cardIdx){
+  state.students[studentIdx].programs.splice(cardIdx, 1);
+  if(state.students[studentIdx].programs.length === 0){
+    state.students[studentIdx].programs.push({});
+  }
+  renderPrograms(studentIdx);
+}
+
+function setCardProgram(studentIdx, cardIdx, mergedIdxStr){
+  var card = state.students[studentIdx].programs[cardIdx];
+  if(!card) return;
+  if(mergedIdxStr === '' || mergedIdxStr == null){
+    state.students[studentIdx].programs[cardIdx] = {};
+    renderPrograms(studentIdx);
+    return;
+  }
+  var mergedIdx = parseInt(mergedIdxStr, 10);
+  var merged = MERGED_PROGRAMS[mergedIdx];
+  if(!merged) return;
+  var newCard = {
+    mergedIdx: mergedIdx,
+    program: merged.title,
+    offerings: [],
+    methodOfPayment: card.methodOfPayment || '',
+    notes: card.notes || '',
+  };
+  // Auto-pick the only ACTIVE variant if there's just one available
+  var activeVariantEntries = merged.variants
+    .map(function(v, idx){ return { v: v, idx: idx }; })
+    .filter(function(x){ return x.v.active; });
+  if(activeVariantEntries.length === 1){
+    newCard.variantIdx = activeVariantEntries[0].idx;
+    newCard.programIdx = activeVariantEntries[0].v.programIdx;
+  }
+  state.students[studentIdx].programs[cardIdx] = newCard;
+  renderPrograms(studentIdx);
+}
+
+function setCardVariant(studentIdx, cardIdx, variantIdxStr){
+  var card = state.students[studentIdx].programs[cardIdx];
+  if(!card || card.mergedIdx == null) return;
+  if(variantIdxStr === '' || variantIdxStr == null){
+    delete card.variantIdx;
+    delete card.programIdx;
+    card.offerings = [];
+    renderPrograms(studentIdx);
+    return;
+  }
+  var vIdx = parseInt(variantIdxStr, 10);
+  var merged = MERGED_PROGRAMS[card.mergedIdx];
+  var variant = merged && merged.variants[vIdx];
+  if(!variant) return;
+  card.variantIdx = vIdx;
+  card.programIdx = variant.programIdx;
+  card.offerings = [];
+  renderPrograms(studentIdx);
+}
+
+function toggleCardOffering(studentIdx, cardIdx, offeringIdx, checkboxEl){
+  var card = state.students[studentIdx].programs[cardIdx];
+  if(!card || card.mergedIdx == null || card.variantIdx == null){ return; }
+  var merged = MERGED_PROGRAMS[card.mergedIdx];
+  var variant = merged && merged.variants[card.variantIdx];
+  if(!variant) return;
+  var offering = variant.offerings.find(function(o){ return o.offeringIdx === offeringIdx; });
+  if(!offering){ return; }
+  if(!card.offerings) card.offerings = [];
+  var existing = card.offerings.findIndex(function(o){ return o.offeringIdx === offeringIdx; });
+  if(existing >= 0){
+    card.offerings.splice(existing, 1);
+  } else {
+    var cap = flexCap(merged.title);
+    if(card.offerings.length >= cap){
+      if(checkboxEl) checkboxEl.checked = false;
+      alert(merged.title + ' allows a maximum of ' + cap + ' time slot' + (cap===1?'':'s') + '. Uncheck one first.');
+      return;
+    }
+    card.offerings.push({
+      offeringIdx: offeringIdx,
+      day: offering.day || '',
+      time: fmtTime(offering.start),
+      platform: variantLabel(variant),
+    });
+  }
+  renderPrograms(studentIdx);
+}
+
+function setCardField(studentIdx, cardIdx, key, val){
+  if(!state.students[studentIdx] || !state.students[studentIdx].programs[cardIdx]) return;
+  state.students[studentIdx].programs[cardIdx][key] = val;
+}
+
+function renderPrograms(studentIdx){
+  var container = document.getElementById('programs-'+studentIdx);
+  if(!container) return;
+  if(!state.students[studentIdx]) state.students[studentIdx] = { programs: [{}] };
+  if(!state.students[studentIdx].programs || !state.students[studentIdx].programs.length){
+    state.students[studentIdx].programs = [{}];
+  }
+  var cards = state.students[studentIdx].programs;
+  if(!MERGED_PROGRAMS.length){
+    container.innerHTML = '<div class="pp-empty">Loading programs…</div>';
+    return;
+  }
+  var html = '';
+  cards.forEach(function(card, i){
+    var used = usedMergedIndices(studentIdx, i);
+    var merged = (card.mergedIdx != null) ? MERGED_PROGRAMS[card.mergedIdx] : null;
+    var variant = (merged && card.variantIdx != null) ? merged.variants[card.variantIdx] : null;
+    var cap = merged ? flexCap(merged.title) : 0;
+    html += '<div class="program-item" data-prog-idx="'+i+'">';
+    html += '<div class="program-item-header">';
+    html += '<div class="program-item-title">Class '+(i+1)+'</div>';
+    if(cards.length>1) html += '<button type="button" class="program-remove" onclick="removeProgram('+studentIdx+','+i+')">Remove</button>';
+    html += '</div>';
+
+    // Program select (merged; no repeats within this student; inactive programs hidden)
+    html += '<div class="reg-row"><label class="reg-label">Program <span class="reg-req">*</span></label><div class="reg-control">';
+    html += '<select class="reg-input" onchange="setCardProgram('+studentIdx+','+i+',this.value)">';
+    html += '<option value="">-Select-</option>';
+    MERGED_PROGRAMS.forEach(function(m, mIdx){
+      // A merged group is "active" if at least one variant is active
+      var anyActive = m.variants.some(function(v){ return v.active; });
+      if(!anyActive && card.mergedIdx !== mIdx) return; // hide unless already selected
+      var disabled = (used[mIdx] || !anyActive) ? ' disabled' : '';
+      var selected = (card.mergedIdx === mIdx) ? ' selected' : '';
+      var suffix = !anyActive ? ' (unavailable)' : used[mIdx] ? ' (already chosen)' : '';
+      html += '<option value="'+mIdx+'"'+disabled+selected+'>'+escapeHtml(m.title)+suffix+'</option>';
+    });
+    html += '</select></div></div>';
+
+    if(merged){
+      // Platform / location select if multiple variants
+      var activeVariants = merged.variants.filter(function(v){ return v.active; });
+      if(activeVariants.length > 1){
+        html += '<div class="reg-row"><label class="reg-label">Platform <span class="reg-req">*</span></label><div class="reg-control">';
+        html += '<select class="reg-input" onchange="setCardVariant('+studentIdx+','+i+',this.value)">';
+        html += '<option value="">-Select-</option>';
+        merged.variants.forEach(function(v, vIdx){
+          if(!v.active) return; // hide inactive variants
+          var selected = (card.variantIdx === vIdx) ? ' selected' : '';
+          html += '<option value="'+vIdx+'"'+selected+'>'+escapeHtml(variantLabel(v))+'</option>';
+        });
+        html += '</select></div></div>';
+      } else if(activeVariants.length === 1){
+        // Sole active variant — show as read-only (auto-picked in setCardProgram)
+        html += '<div class="reg-row"><label class="reg-label">Platform</label><div class="reg-control"><input type="text" class="reg-input" readonly value="'+escapeHtml(variantLabel(activeVariants[0]))+'" style="background:#f0f4f5;"></div></div>';
+      }
+
+      if(variant){
+        // Day & Time as checkboxes
+        var capLabel = cap === Infinity ? '' :
+          cap === 1 ? ' (pick 1)' :
+          cap === 5 ? ' (pick up to 5)' :
+          ' (pick up to '+cap+')';
+        html += '<div class="reg-row"><label class="reg-label">Day &amp; Time <span class="reg-req">*</span>'+capLabel+'</label><div class="reg-control">';
+        if(!variant.offerings.length){
+          html += '<div class="pp-empty">No active time slots.</div>';
+        } else {
+          html += '<div class="reg-checks" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">';
+          variant.offerings.forEach(function(o){
+            var oIdx = o.offeringIdx;
+            var checked = (card.offerings || []).some(function(s){ return s.offeringIdx === oIdx; });
+            var teacher = o.teacher ? ' · '+escapeHtml(o.teacher) : '';
+            var spots = o.spots!=null ? ' · '+o.spots+' spots' : '';
+            html += '<label class="reg-check"><input type="checkbox"'+(checked?' checked':'')+' onchange="toggleCardOffering('+studentIdx+','+i+','+oIdx+',this)"> ';
+            html += escapeHtml(o.day || '')+' · '+escapeHtml(fmtTime(o.start))+teacher+spots+'</label>';
+          });
+          html += '</div>';
+        }
+        html += '</div></div>';
+
+        // Course Cost (autopopulated, read-only)
+        var program = PROGRAMS_DATA[variant.programIdx];
+        html += '<div class="reg-row"><label class="reg-label">Course Cost</label><div class="reg-control"><input type="text" class="reg-input" readonly value="'+escapeHtml(deriveCost(program))+'" style="background:#f0f4f5;"></div></div>';
+
+        // Notes
+        html += '<div class="reg-row"><label class="reg-label">Notes</label><div class="reg-control"><textarea class="reg-input" placeholder="Any additional notes about this class…" style="min-height:64px;" oninput="setCardField('+studentIdx+','+i+',\'notes\',this.value)">'+escapeHtml(card.notes||'')+'</textarea></div></div>';
+      }
+    }
+
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function addStudent(){
+  state.students.push({ programs: [] });
+  rebuildPages();
+  // Navigate to the newly added student's page
+  var newStudentIdx = state.students.length - 1;
+  state.currentPage = allPages.indexOf("student-"+newStudentIdx);
+  renderPage();
+}
+
+function rebuildPages(){
+  // Remember which page we were on by NAME, since allPages will change
+  var oldPageName = allPages[state.currentPage];
+
+  allPages = ["parent1","parent2"];
+  for(var i=0; i<state.students.length; i++) allPages.push("student-"+i);
+  allPages.push("add-more","emergency","payment","additional");
+
+  // Update currentPage index to point to the same page (by name) in the new allPages
+  var newIdx = allPages.indexOf(oldPageName);
+  if(newIdx >= 0) state.currentPage = newIdx;
+
+  var container = document.getElementById("student-pages-container");
+  container.innerHTML = "";
+  for(var i=0; i<state.students.length; i++){
+    var div = el("div");
+    div.innerHTML = buildStudentPage(i);
+    container.appendChild(div.firstChild);
+  }
+
+  for(var i=0; i<state.students.length; i++){
+    renderPrograms(i);
+  }
+
+  updateStepText();
+  attachFieldListeners();
+}
+
+function updateStepText(){
+  var total = allPages.length;
+  var p1 = document.getElementById("step-text-p1");
+  if(p1) p1.textContent = "Step 1 of "+total;
+  var p2 = document.getElementById("step-text-p2");
+  if(p2) p2.textContent = "Step 2 of "+total;
+  for(var i=0; i<state.students.length; i++){
+    var el = document.getElementById("step-text-s"+i);
+    if(el) el.textContent = "Step "+(allPages.indexOf("student-"+i)+1)+" of "+total;
+  }
+  var em = document.getElementById("step-text-em");
+  if(em) em.textContent = "Step "+(allPages.indexOf("emergency")+1)+" of "+total;
+  var addMore = document.getElementById("step-text");
+  if(addMore) addMore.textContent = "Step "+(allPages.indexOf("add-more")+1)+" of "+total;
+  var payment = document.getElementById("step-text-payment");
+  if(payment) payment.textContent = "Step "+(allPages.indexOf("payment")+1)+" of "+total;
+  var addtl = document.getElementById("step-text-additional");
+  if(addtl) addtl.textContent = "Step "+(allPages.indexOf("additional")+1)+" of "+total;
+  var addEl = document.getElementById("student-count");
+  if(addEl) addEl.textContent = state.students.length;
+  var indicator = document.getElementById("step-indicator");
+  if(indicator) indicator.textContent = "Step "+(state.currentPage+1)+" of "+total;
+}
+
+function attachFieldListeners(){
+  var inputs = document.querySelectorAll("[data-field]");
+  inputs.forEach(function(inp){
+    inp.removeEventListener("input", fieldChangeListener);
+    inp.removeEventListener("change", fieldChangeListener);
+    inp.addEventListener("input", fieldChangeListener);
+    inp.addEventListener("change", fieldChangeListener);
+  });
+}
+
+function fieldChangeListener(e){
+  var field = e.target.getAttribute("data-field");
+  var val = e.target.type==="checkbox" ? e.target.checked : e.target.value;
+
+  if(field.startsWith("s") && field.includes("_") && /^s\d+_/.test(field)){
+    var parts = field.split("_");
+    var idx = parseInt(parts[0].slice(1));
+    var key = parts.slice(1).join("_");
+    if(!state.students[idx]) state.students[idx] = {};
+    if(key.startsWith("p") && /^p\d+_/.test(key)){
+      var pparts = key.split("_");
+      var pidx = parseInt(pparts[0].slice(1));
+      var pkey = pparts.slice(1).join("_");
+      if(!state.students[idx].programs) state.students[idx].programs = [];
+      if(!state.students[idx].programs[pidx]) state.students[idx].programs[pidx] = {};
+      state.students[idx].programs[pidx][pkey] = val;
+    } else {
+      state.students[idx][key] = val;
+    }
+  } else if(field.startsWith("g")){
+    state.parents[field] = val;
+  } else if(field.startsWith("em")){
+    state.emergency[field] = val;
+  } else {
+    state.additional[field] = val;
+  }
+}
+
+function goToPage(pageNum){
+  if(typeof pageNum==="string"){
+    pageNum = allPages.indexOf(pageNum);
+  }
+
+  if(validateCurrentPage()) {
+    state.currentPage = pageNum;
+    renderPage();
+  }
+}
+
+function nextPage(){
+  if(!validateCurrentPage()) return;
+  state.currentPage = Math.min(allPages.length - 1, state.currentPage + 1);
+  renderPage();
+}
+
+function goBackPage(){
+  state.currentPage = Math.max(0, state.currentPage - 1);
+  renderPage();
+}
+
+function validateCurrentPage(){
+  var pageName = allPages[state.currentPage];
+  if(pageName==="parent1") return validateParent1();
+  if(pageName==="parent2") return validateParent2();
+  if(pageName.startsWith("student-")){
+    var idx = parseInt(pageName.split("-")[1]);
+    return validateStudentPage(idx);
+  }
+  if(pageName==="add-more") return true;
+  if(pageName==="emergency") return validateEmergency();
+  if(pageName==="payment") return true;
+  if(pageName==="additional") return validateAdditional();
+  return true;
+}
+
+function validateParent1(){
+  var errs = {};
+  if(!state.parents.g1FirstName) errs.g1FirstName = "Required";
+  if(!state.parents.g1LastName) errs.g1LastName = "Required";
+  if(!state.parents.g1Relationship) errs.g1Relationship = "Required";
+  if(!state.parents.g1PhoneMobile) errs.g1PhoneMobile = "Required";
+  if(!state.parents.g1Email) errs.g1Email = "Required";
+
+  showErrors(errs, "page-parent1");
+  return Object.keys(errs).length===0;
+}
+
+function validateParent2(){
+  // Parent 2 is optional — no validation required
+  showErrors({}, "page-parent2");
+  return true;
+}
+
+function validateStudentPage(idx){
+  var errs = {};
+  var s = state.students[idx];
+  if(!s.firstName) errs["s"+idx+"_firstName"] = "Required";
+  if(!s.lastName) errs["s"+idx+"_lastName"] = "Required";
+  if(!s.email) errs["s"+idx+"_email"] = "Required";
+  if(!s.gender) errs["s"+idx+"_gender"] = "Required";
+  if(!s.dob) errs["s"+idx+"_dob"] = "Required";
+  if(!s.grade) errs["s"+idx+"_grade"] = "Required";
+  if(!s.school) errs["s"+idx+"_school"] = "Required";
+  var validCards = (s.programs || []).filter(function(c){
+    return c && c.mergedIdx != null && c.variantIdx != null && c.offerings && c.offerings.length;
+  });
+  if(!validCards.length){
+    errs["s"+idx+"_program"] = "Each class needs a program and at least one day & time";
+  }
+
+  showErrors(errs, "page-student-"+idx);
+  return Object.keys(errs).length===0;
+}
+
+function validateEmergency(){
+  var errs = {};
+  if(!state.emergency.emFirstName) errs.emFirstName = "Required";
+  if(!state.emergency.emPhone) errs.emPhone = "Required";
+  if(!state.emergency.emEmail) errs.emEmail = "Required";
+  showErrors(errs, "page-emergency");
+  return Object.keys(errs).length===0;
+}
+
+function validateAdditional(){
+  var errs = {};
+  if(!state.additional.agreeToS) errs.agreeToS = "Required";
+  if(!state.additional.agreePhoto) errs.agreePhoto = "Required";
+  if(!state.additional.hearAbout || state.additional.hearAbout.length===0) errs.hearAbout = "Pick at least one";
+  if(!state.additional.enrollReasons || state.additional.enrollReasons.length===0) errs.enrollReasons = "Pick at least one";
+  showErrors(errs, "page-additional");
+  return Object.keys(errs).length===0;
+}
+
+function showErrors(errs, pageId){
+  var page = document.getElementById(pageId);
+  var errEls = page.querySelectorAll(".reg-error");
+  errEls.forEach(function(e){ e.style.display="none"; });
+
+  var missing = [];
+  for(var key in errs){
+    var el = document.getElementById("err-"+key);
+    if(el){ el.textContent = errs[key]; el.style.display="block"; }
+    var label = key.replace(/^s\d+_/, '').replace(/^g\d/, 'Guardian ').replace(/^em/, 'Emergency ');
+    missing.push(label);
+  }
+
+  var summaryId = "err-summary-"+pageId;
+  var summary = document.getElementById(summaryId);
+  if(!summary){
+    summary = document.createElement("div");
+    summary.id = summaryId;
+    summary.className = "reg-error";
+    summary.style.cssText = "margin-top:16px; padding:12px; background:#ffe6e6; border:1px solid #d92020; border-radius:6px; font-size:14px;";
+    var footer = page.querySelector(".page-footer");
+    if(footer) footer.parentNode.insertBefore(summary, footer);
+    else page.appendChild(summary);
+  }
+  if(missing.length){
+    summary.textContent = "Please fill in all required fields before continuing. Missing: " + missing.join(", ");
+    summary.style.display = "block";
+    summary.scrollIntoView({behavior:"smooth", block:"center"});
+  } else {
+    summary.style.display = "none";
+  }
+}
+
+function renderPage(){
+  var pages = document.querySelectorAll(".page");
+  pages.forEach(function(p){ p.classList.remove("active"); });
+
+  var pageName = allPages[state.currentPage];
+  if(pageName==="parent1") document.getElementById("page-parent1").classList.add("active");
+  else if(pageName==="parent2") document.getElementById("page-parent2").classList.add("active");
+  else if(pageName.startsWith("student-")){
+    var idx = parseInt(pageName.split("-")[1]);
+    document.getElementById("page-student-"+idx).classList.add("active");
+  } else if(pageName==="add-more") document.getElementById("page-add-more").classList.add("active");
+  else if(pageName==="emergency") document.getElementById("page-emergency").classList.add("active");
+  else if(pageName==="payment") document.getElementById("page-payment").classList.add("active");
+  else if(pageName==="additional") document.getElementById("page-additional").classList.add("active");
+  else if(pageName==="success") document.getElementById("page-success").classList.add("active");
+
+  var indicator = document.getElementById("step-indicator");
+  if(indicator){
+    if(pageName==="success") indicator.style.display = "none";
+    else {
+      indicator.style.display = "";
+      indicator.textContent = "Step "+(state.currentPage+1)+" of "+allPages.length;
+    }
+  }
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function collectOfferingDecrements(students){
+  var decrements = [];
+  (students || []).forEach(function(student){
+    (student.programs || []).forEach(function(card){
+      if(card.mergedIdx != null && card.variantIdx != null){
+        var merged = MERGED_PROGRAMS[card.mergedIdx];
+        var variant = merged && merged.variants[card.variantIdx];
+        if(variant){
+          (card.offerings || []).forEach(function(o){
+            decrements.push({ programIdx: variant.programIdx, offeringIdx: o.offeringIdx });
+          });
+        }
+      }
+    });
+  });
+  return decrements;
+}
+
+function flattenPrograms(cards){
+  // ONE entry per program card. Multiple time slots within one card get
+  // combined into the day / time / schedule fields, so the admin views
+  // see "FLEX MATH - UNLIMITED" once with a full schedule rather than 5x.
+  var out = [];
+  (cards || []).forEach(function(c){
+    if(!c || c.mergedIdx == null || c.variantIdx == null || !c.offerings || !c.offerings.length) return;
+    var merged = MERGED_PROGRAMS[c.mergedIdx];
+    var variant = merged && merged.variants[c.variantIdx];
+    var program = variant ? PROGRAMS_DATA[variant.programIdx] : null;
+    var courseCost = program ? deriveCost(program) : '';
+    var days = c.offerings.map(function(o){ return o.day; }).filter(Boolean);
+    var times = c.offerings.map(function(o){ return o.time; }).filter(Boolean);
+    var slots = c.offerings.map(function(o){ return [o.day, o.time].filter(Boolean).join(' '); }).filter(Boolean).join(', ');
+    out.push({
+      program: c.program,
+      day: days.join(', '),
+      time: times.join(', '),
+      schedule: slots,
+      platform: c.offerings[0].platform || '',
+      courseCost: courseCost,
+      notes: c.notes || '',
+    });
+  });
+  return out;
+}
+
+function submitForm(){
+  if(!validateAdditional()) return;
+
+  document.getElementById("submit-btn").disabled = true;
+  var promises = [];
+
+  state.students.forEach(function(student, idx){
+    var form = {
+      studentFirstName: student.firstName,
+      studentLastName: student.lastName,
+      studentEmail: student.email,
+      gender: student.gender,
+      dob: student.dob,
+      grade: student.grade,
+      school: student.school,
+      medical: student.medical || "",
+      reportCard: student.reportCard || false,
+      g1FirstName: state.parents.g1FirstName,
+      g1LastName: state.parents.g1LastName,
+      g1Relationship: state.parents.g1Relationship,
+      g1PhoneMobile: state.parents.g1PhoneMobile,
+      g1PhoneHome: state.parents.g1PhoneHome || "",
+      g1Address1: state.parents.g1Address1 || "",
+      g1Address2: state.parents.g1Address2 || "",
+      g1City: state.parents.g1City || "",
+      g1Province: state.parents.g1Province || "",
+      g1Postal: state.parents.g1Postal || "",
+      g1Country: state.parents.g1Country || "Canada",
+      g1Email: state.parents.g1Email,
+      g1Occupation: state.parents.g1Occupation || "",
+      g2FirstName: state.parents.g2FirstName || "",
+      g2LastName: state.parents.g2LastName || "",
+      g2Relationship: state.parents.g2Relationship || "",
+      g2PhoneMobile: state.parents.g2PhoneMobile || "",
+      g2PhoneHome: state.parents.g2PhoneHome || "",
+      g2Address1: state.parents.g2Address1 || "",
+      g2Address2: state.parents.g2Address2 || "",
+      g2City: state.parents.g2City || "",
+      g2Province: state.parents.g2Province || "",
+      g2Postal: state.parents.g2Postal || "",
+      g2Country: state.parents.g2Country || "Canada",
+      g2Email: state.parents.g2Email || "",
+      g2Occupation: state.parents.g2Occupation || "",
+      emFirstName: state.emergency.emFirstName,
+      emLastName: state.emergency.emLastName || "",
+      emRelationship: state.emergency.emRelationship || "",
+      emPhone: state.emergency.emPhone,
+      emEmail: state.emergency.emEmail,
+      programs: flattenPrograms(student.programs || []),
+      additionalNotes: state.additional.additionalNotes || "",
+      hearAbout: state.additional.hearAbout || [],
+      enrollReasons: state.additional.enrollReasons || [],
+      registeredJune: "",
+      usePrevMaterials: "",
+      extraShirt: false,
+      receiveNews: state.additional.receiveNews || false,
+      agreeToS: state.additional.agreeToS,
+      agreePhoto: state.additional.agreePhoto
+    };
+
+    promises.push(fetch(CONFIG.ENDPOINT, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(form)
+    }).then(r=>r.json()));
+  });
+
+  Promise.all(promises).then(function(results){
+    // Decrement spots for registered offerings
+    var decrements = collectOfferingDecrements(state.students);
+    var decrementPromise = decrements.length ? fetch('/api/programs/decrement-spots', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(decrements)
+    }).catch(function(){ /* silent fail */ }) : Promise.resolve();
+
+    return decrementPromise.then(function(){
+      var names = state.students.map(s=>s.firstName+" "+s.lastName).join(", ");
+      document.getElementById("success-message").textContent = names + " has been registered. A Crania Schools team member will be in touch shortly.";
+      allPages.push("success");
+      state.currentPage = allPages.indexOf("success");
+      renderPage();
+      document.getElementById("submit-btn").disabled = false;
+    });
+  }).catch(function(err){
+    alert("Error submitting registration: "+err.message);
+    document.getElementById("submit-btn").disabled = false;
+  });
+}
+
+// ── Iframe auto-resize ────────────────────────────────────────────────────
+// When this form is embedded in an iframe on the school website, report our
+// content height so the parent page can resize the iframe and avoid a scrollbar.
+function reportHeight(){
+  if (window.parent === window) return; // not embedded
+  var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+  window.parent.postMessage({ type: 'crania-iframe-height', height: h }, '*');
+}
+new MutationObserver(reportHeight).observe(document.documentElement, { subtree: true, childList: true, attributes: true });
+window.addEventListener('load', reportHeight);
+setInterval(reportHeight, 500);
+
+// Initialize
+function init(){
+  // Build checkboxes for hear and enroll
+  var hearHtml = "";
+  HEAR.forEach(function(v){
+    hearHtml += '<label class="reg-check"><input type="checkbox" value="'+v+'" onchange="toggleArray(\'hearAbout\',this.value)"> '+v+'</label>';
+  });
+  document.getElementById("hearAbout-group").innerHTML = hearHtml + '<div class="reg-error" id="err-hearAbout" style="display:none;"></div>';
+
+  var enrollHtml = "";
+  ENROLL.forEach(function(v){
+    enrollHtml += '<label class="reg-check"><input type="checkbox" value="'+v+'" onchange="toggleArray(\'enrollReasons\',this.value)"> '+v+'</label>';
+  });
+  document.getElementById("enrollReasons-group").innerHTML = enrollHtml + '<div class="reg-error" id="err-enrollReasons" style="display:none;"></div>';
+
+  rebuildPages();
+  attachFieldListeners();
+  loadPrograms();
+}
+
+function loadPrograms(){
+  fetch('/api/programs', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(data){
+      PROGRAMS_DATA = Array.isArray(data) ? data : [];
+      buildMergedPrograms();
+      for(var i=0; i<state.students.length; i++){
+        renderPrograms(i);
+      }
+    })
+    .catch(function(){ PROGRAMS_DATA = []; });
+}
+
+// Re-fetch when the tab regains focus so admin changes (active toggles) appear immediately
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible') loadPrograms();
+});
+
+function toggleArray(key, value){
+  if(!state.additional[key]) state.additional[key] = [];
+  var idx = state.additional[key].indexOf(value);
+  if(idx>=0) state.additional[key].splice(idx,1);
+  else state.additional[key].push(value);
+}
+
+init();
+</script>
+</body>
+</html>
