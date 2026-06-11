@@ -40,7 +40,9 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "PowerShell($response = Invoke-WebRequest -Uri http://localhost:4000/api/programs -UseBasicParsing; \\($response.Content | ConvertFrom-Json\\)[0..2] | ForEach-Object { $_.title })",
+      "PowerShell($response = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app/assets/index-BG0EqLzf.js\" -UseBasicParsing -Method Head; $response.Headers | Format-Table -AutoSize | Out-String)"
     ]
   }
 }

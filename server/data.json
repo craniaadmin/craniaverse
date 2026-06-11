@@ -2735,7 +2735,7 @@
         "username": "— generate —",
         "password": "— generate —"
       },
-      "craniaCash": 0
+      "craniaCash": 3
     },
     "customer": {
       "student": {
@@ -2786,7 +2786,13 @@
         "Email": "1234"
       }
     },
-    "cashLog": []
+    "cashLog": [
+      {
+        "ts": "2026-06-11T17:40:09.826Z",
+        "delta": 3,
+        "reason": "Brings completed Funwork"
+      }
+    ]
   },
   {
     "id": "reg-1781127250425-1",
