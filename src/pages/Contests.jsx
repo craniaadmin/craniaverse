@@ -64,8 +64,10 @@ export default function Contests({ onNavigate }) {
     const key = String(p.id != null ? p.id : p.title ?? i)
     const words = (p.title || '').split(/\s+/)
     const ci = words.findIndex(w => w.toUpperCase() === 'CONTEST')
-    const defaultOrg     = ci >= 0 ? (words[ci + 1] ?? '') : ''
-    const defaultContest = ci >= 0 ? (words[ci + 2] ?? '') : p.title
+    // Skip separator tokens (e.g. "-") after CONTEST to find real words
+    const rest = ci >= 0 ? words.slice(ci + 1).filter(w => w !== '-') : []
+    const defaultOrg     = rest[0] ?? ''
+    const defaultContest = rest[1] ?? (ci >= 0 ? '' : p.title)
     return {
       id: key,
       fromProgram: true,
