@@ -11,6 +11,8 @@ import Programs from './pages/Programs'
 import FeeSchedule from './pages/FeeSchedule'
 import Surveys from './pages/Surveys'
 import CraniaCash from './pages/CraniaCash'
+import Inventory from './pages/Inventory'
+import Contests from './pages/Contests'
 import StaffHub from './pages/StaffHub'
 import StaffInformation from './pages/StaffInformation'
 import Placeholder from './pages/Placeholder'
@@ -34,6 +36,8 @@ export default function App() {
       case 'Fee Schedules': return <FeeSchedule />
       case 'Surveys': return <Surveys />
       case 'Crania Cash': return <CraniaCash />
+      case 'Inventory': return <Inventory />
+      case 'Contests': return <Contests onNavigate={setPage} />
       case 'Staff Hub': return <StaffHub />
       case 'Staff Information': return <StaffInformation />
       default: return <Placeholder title={page} />
