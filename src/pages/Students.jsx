@@ -145,7 +145,8 @@ function CommentsSection({ studentId, initialPrograms }) {
   const programsRef = useRef(programs)
   const rowsRef = useRef(rows)
   const studentIdRef = useRef(studentId)
-  const API_BASE = (import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:4000'
+  const RAW_API_URL = import.meta.env && import.meta.env.VITE_API_URL
+  const API_BASE = RAW_API_URL !== undefined ? RAW_API_URL : 'http://localhost:4000'
   const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
 
   useEffect(() => { programsRef.current = programs }, [programs])
@@ -509,7 +510,8 @@ function generatePassword(firstName, lastName) {
 
 function StudentDetail({ recordId, onBack, onNavigate }) {
   const { records, updateStudentField } = useStore()
-  const API_BASE = (import.meta.env && import.meta.env.VITE_API_URL) || 'http://localhost:4000'
+  const RAW_API_URL = import.meta.env && import.meta.env.VITE_API_URL
+  const API_BASE = RAW_API_URL !== undefined ? RAW_API_URL : 'http://localhost:4000'
   const record = records.find(r => r.id === recordId) || records[0]
   const s = record.student
   const [studentFields, setStudentFields] = useState(s)
