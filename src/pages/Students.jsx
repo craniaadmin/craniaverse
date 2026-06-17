@@ -443,11 +443,11 @@ function StudentList({ onSelect }) {
       <div style={{ border: '2px solid var(--logo-teal)', borderTop: 'none', borderRadius: '0 0 10px 10px', overflow: 'hidden', background: '#fff' }}>
         {/* Header */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2.4fr 0.5fr',
+          display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2.4fr',
           background: '#3d8e90', padding: '11px 20px',
           borderBottom: '1px solid rgba(255,255,255,.15)',
         }}>
-          {['Name', 'Login', 'Grade', 'Medical', 'Crania Cash', 'Classes', 'More'].map(h => (
+          {['Name', 'Login', 'Grade', 'Medical', 'Crania Cash', 'Classes'].map(h => (
             <div key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 13, letterSpacing: '.2px' }}>{h}</div>
           ))}
         </div>
@@ -459,11 +459,12 @@ function StudentList({ onSelect }) {
           </div>
         ) : (
           filtered.map((r, i) => (
-            <div key={r.id} style={{
-              display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2.4fr 0.5fr',
+            <div key={r.id} onClick={() => onSelect(r.id)} style={{
+              display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2.4fr',
               padding: '13px 20px', alignItems: 'center',
               borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
               background: i % 2 === 0 ? '#fff' : '#fafbfb',
+              cursor: 'pointer',
             }}>
               <div style={{ fontWeight: 600, fontSize: 14 }}>{r.student.firstName} {r.student.lastName}</div>
               <div style={{ fontSize: 13, color: 'var(--logo-teal)' }}>{getLogin(r)}</div>
@@ -474,16 +475,6 @@ function StudentList({ onSelect }) {
               <div style={{ fontSize: 13 }}>{r.student.craniaCash ?? '—'}</div>
               <div style={{ fontSize: 13, color: 'var(--ink-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {getClasses(r)}
-              </div>
-              <div>
-                <button onClick={() => onSelect(r.id)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--logo-teal)', padding: 4 }}
-                  title="View details">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                    <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </button>
               </div>
             </div>
           ))

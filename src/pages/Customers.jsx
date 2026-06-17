@@ -75,11 +75,11 @@ function CustomerList({ onSelect }) {
 
         {/* Header */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '140px 140px 180px 60px 1fr 40px',
+          display: 'grid', gridTemplateColumns: '140px 140px 180px 60px 1fr',
           background: '#3d8e90', padding: '10px 20px',
           borderBottom: '1px solid rgba(255,255,255,.15)',
         }}>
-          {['Guardian 1', 'Guardian 2', 'Student Names', 'Grade', 'Classes', ''].map((h, idx) => (
+          {['Guardian 1', 'Guardian 2', 'Student Names', 'Grade', 'Classes'].map((h, idx) => (
             <div key={idx} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.6px', textTransform: 'uppercase' }}>{h}</div>
           ))}
         </div>
@@ -95,14 +95,16 @@ function CustomerList({ onSelect }) {
             return (
               <div
                 key={`${unit.g1Name}-${unit.g1Email}-${i}`}
+                onClick={() => onSelect(unit.students[0].id)}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '140px 140px 180px 60px 1fr 40px',
+                  gridTemplateColumns: '140px 140px 180px 60px 1fr',
                   padding: '10px 20px',
                   alignItems: 'start',
                   borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
                   background: i % 2 === 0 ? '#fff' : '#fafbfb',
                   minHeight: unit.students.length * ROW_H + 20,
+                  cursor: 'pointer',
                 }}
               >
                 {/* Guardian 1 — vertically centred in the row */}
@@ -146,19 +148,6 @@ function CustomerList({ onSelect }) {
                   ))}
                 </div>
 
-                {/* Single More button for the whole family */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <button
-                    onClick={() => onSelect(unit.students[0].id)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--logo-teal)', padding: 0, display: 'flex', alignItems: 'center' }}
-                    title="View family details"
-                  >
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                      <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </button>
-                </div>
               </div>
             )
           })

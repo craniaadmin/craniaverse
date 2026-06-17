@@ -15,6 +15,7 @@ import Inventory from './pages/Inventory'
 import Contests from './pages/Contests'
 import StaffHub from './pages/StaffHub'
 import StaffInformation from './pages/StaffInformation'
+import Payroll from './pages/Payroll'
 import Placeholder from './pages/Placeholder'
 import { StoreProvider } from './data/store'
 
@@ -40,6 +41,7 @@ export default function App() {
       case 'Contests': return <Contests onNavigate={setPage} />
       case 'Staff Hub': return <StaffHub />
       case 'Staff Information': return <StaffInformation />
+      case 'Payroll': return <Payroll />
       default: return <Placeholder title={page} />
     }
   }
