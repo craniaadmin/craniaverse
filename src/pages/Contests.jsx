@@ -59,16 +59,20 @@ export default function Contests({ onNavigate }) {
   }
 
   // Build rows from contest programs + manual additions
-  const programRows = programs.filter(isContest).map(p => ({
-    id: p.id,
-    fromProgram: true,
-    contest: p.title,
-    org:          extras[p.id]?.org          ?? '',
-    regDeadline:  extras[p.id]?.regDeadline  ?? '',
-    contestDate:  extras[p.id]?.contestDate  ?? '',
-    numOrdered:   extras[p.id]?.numOrdered   ?? '',
-    status:       extras[p.id]?.status       ?? 'Waiting',
-  }))
+  // Use title as fallback key since program IDs may be undefined from the API
+  const programRows = programs.filter(isContest).map((p, i) => {
+    const key = String(p.id != null ? p.id : p.title ?? i)
+    return {
+      id: key,
+      fromProgram: true,
+      contest: p.title,
+      org:          extras[key]?.org          ?? '',
+      regDeadline:  extras[key]?.regDeadline  ?? '',
+      contestDate:  extras[key]?.contestDate  ?? '',
+      numOrdered:   extras[key]?.numOrdered   ?? '',
+      status:       extras[key]?.status       ?? 'Waiting',
+    }
+  })
 
   const allRows = [...programRows, ...manual]
 
