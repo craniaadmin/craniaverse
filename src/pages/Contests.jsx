@@ -92,7 +92,7 @@ export default function Contests({ onNavigate }) {
     row.fromProgram ? updateExtra(row.id, key, val) : updateManual(row.id, key, val)
 
   const COLS = [
-    { key: 'org',          label: 'Org.',             width: 70  },
+    { key: 'org',          label: 'Organization',     width: 70  },
     { key: 'contest',      label: 'Contest',          width: 140 },
     { key: 'regDeadline',  label: 'Reg. Deadline',    width: 130 },
     { key: 'contestDate',  label: 'Contest Date',     width: 120 },
@@ -154,14 +154,14 @@ export default function Contests({ onNavigate }) {
                   <td style={{ padding: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       {r.fromProgram ? (
-                        <span style={{ ...cellInput, color: '#1a5c7a', textDecoration: 'underline', display: 'block', flex: 1 }}>
+                        <span style={{ ...cellInput, color: '#1a5c7a', fontWeight: 700, display: 'block', flex: 1 }}>
                           {r.contest}
                         </span>
                       ) : (
                         <input
                           value={r.contest}
                           onChange={e => update(r, 'contest', e.target.value)}
-                          style={{ ...cellInput, color: '#1a5c7a', textDecoration: r.contest ? 'underline' : 'none', flex: 1 }}
+                          style={{ ...cellInput, color: '#1a5c7a', fontWeight: 700, flex: 1 }}
                           placeholder="—"
                         />
                       )}
