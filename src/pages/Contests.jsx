@@ -62,11 +62,15 @@ export default function Contests({ onNavigate }) {
   // Use title as fallback key since program IDs may be undefined from the API
   const programRows = programs.filter(isContest).map((p, i) => {
     const key = String(p.id != null ? p.id : p.title ?? i)
+    const words = (p.title || '').split(/\s+/)
+    const ci = words.findIndex(w => w.toUpperCase() === 'CONTEST')
+    const defaultOrg     = ci >= 0 ? (words[ci + 1] ?? '') : ''
+    const defaultContest = ci >= 0 ? (words[ci + 2] ?? '') : p.title
     return {
       id: key,
       fromProgram: true,
-      contest: p.title,
-      org:          extras[key]?.org          ?? '',
+      contest: extras[key]?.contest ?? defaultContest,
+      org:          extras[key]?.org          ?? defaultOrg,
       regDeadline:  extras[key]?.regDeadline  ?? '',
       contestDate:  extras[key]?.contestDate  ?? '',
       numOrdered:   extras[key]?.numOrdered   ?? '',
