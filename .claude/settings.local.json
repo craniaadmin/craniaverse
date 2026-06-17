@@ -37,9 +37,16 @@
       "Bash(python -c \"import pandas as pd; df=pd.read_excel\\(r'C:\\\\Users\\\\hanak\\\\Downloads\\\\Programs v2.xlsx'\\); print\\(df.columns.tolist\\(\\)\\); print\\(df.head\\(8\\).to_string\\(\\)\\)\")",
       "PowerShell(Get-Process -Name ngrok -ErrorAction SilentlyContinue)",
       "PowerShell(try { \\(Invoke-RestMethod http://localhost:4040/api/tunnels\\).tunnels | ConvertTo-Json } catch { \"ngrok web UI not reachable: $_\" })",
+      "Bash(gh --version)",
+      "PowerShell(Get-Command gh -ErrorAction SilentlyContinue)",
+      "Bash(git checkout *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git fetch *)",
       "Bash(gh pr *)"
     ]
   }

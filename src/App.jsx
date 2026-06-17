@@ -26,8 +26,8 @@ export default function App() {
     switch (page) {
       case 'Dashboard': return <Dashboard onNavigate={setPage} />
       case 'To Do': return <ToDo />
-      case 'Calendar': return <CalendarView />
-      case 'Schedules': return <Schedules />
+      case 'Calendar': return <Schedules />
+      case 'Schedules': return <Placeholder title="Schedules" />
       case 'Customers': return <Customers onNavigate={setPage} />
       case 'Students': return <Students onNavigate={setPage} />
       case 'Programs': return <Programs />
