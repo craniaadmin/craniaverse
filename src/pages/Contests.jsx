@@ -45,6 +45,7 @@ export default function Contests({ onNavigate }) {
   const { programs } = useStore()
   const [extras, setExtras] = useState(() => load('contests-extras', {}))
   const [manual, setManual] = useState(() => load('contests-manual', []))
+  const [hidden, setHidden] = useState(() => load('contests-hidden', []))
   const [search, setSearch] = useState('')
 
   const updateExtra = (id, key, val) =>
@@ -53,6 +54,14 @@ export default function Contests({ onNavigate }) {
   const updateManual = (id, key, val) =>
     setManual(prev => { const next = prev.map(r => r.id === id ? { ...r, [key]: val } : r); save('contests-manual', next); return next })
 
+  const deleteRow = (row) => {
+    if (row.fromProgram) {
+      setHidden(prev => { const next = [...prev, row.id]; save('contests-hidden', next); return next })
+    } else {
+      setManual(prev => { const next = prev.filter(r => r.id !== row.id); save('contests-manual', next); return next })
+    }
+  }
+
   const addRow = () => {
     const id = 'manual-' + Date.now()
     setManual(prev => { const next = [...prev, { id, org: '', contest: '', regDeadline: '', contestDate: '', numOrdered: '', status: 'Waiting' }]; save('contests-manual', next); return next })
@@ -60,7 +69,10 @@ export default function Contests({ onNavigate }) {
 
   // Build rows from contest programs + manual additions
   // Use title as fallback key since program IDs may be undefined from the API
-  const programRows = programs.filter(isContest).map((p, i) => {
+  const programRows = programs.filter(isContest).filter(p => {
+    const key = String(p.id != null ? p.id : p.title ?? '')
+    return !hidden.includes(key)
+  }).map((p, i) => {
     const key = String(p.id != null ? p.id : p.title ?? i)
     const words = (p.title || '').split(/\s+/)
     const ci = words.findIndex(w => w.toUpperCase() === 'CONTEST')
@@ -98,6 +110,7 @@ export default function Contests({ onNavigate }) {
     { key: 'contestDate',  label: 'Contest Date',     width: 120 },
     { key: 'numOrdered',   label: 'No. Ordered',      width: 110 },
     { key: 'status',       label: 'Status',           width: 120 },
+    { key: '_del',         label: '',                 width: 36  },
   ]
 
   return (
@@ -225,6 +238,14 @@ export default function Contests({ onNavigate }) {
                     >
                       {STATUSES.map(s => <option key={s}>{s}</option>)}
                     </select>
+                  </td>
+
+                  {/* Delete */}
+                  <td style={{ padding: '0 4px', textAlign: 'center' }}>
+                    <button onClick={() => deleteRow(r)} title="Delete row" style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      color: '#bbb', fontSize: 16, lineHeight: 1, padding: '4px 2px',
+                    }}>×</button>
                   </td>
                 </tr>
               ))}
