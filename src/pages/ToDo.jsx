@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, Filter, Plus, X } from 'lucide-react'
+import { Check, Filter, Plus, X, Trash2 } from 'lucide-react'
 import { todos as seed } from '../data/mockData'
 
 const PRI = {
@@ -34,6 +34,7 @@ export default function ToDo() {
   const [filterPriority, setFilterPriority] = useState(null)
 
   const toggle = (id) => setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
+  const deleteTask = (id) => setRows(rows.filter(r => r.id !== id))
 
   const openAdd = () => { setForm(BLANK); setModal(true) }
   const closeModal = () => setModal(false)
@@ -45,13 +46,24 @@ export default function ToDo() {
     setModal(false)
   }
 
-  let visible = showDone ? rows : rows.filter(r => !r.done)
-  if (filterCategory) visible = visible.filter(r => r.category === filterCategory)
-  if (filterPriority) visible = visible.filter(r => r.priority === filterPriority)
+  const active = rows.filter(r => !r.done)
+  const archived = rows.filter(r => r.done)
+
+  let visibleActive = showDone ? active : active
+  if (filterCategory) visibleActive = visibleActive.filter(r => r.category === filterCategory)
+  if (filterPriority) visibleActive = visibleActive.filter(r => r.priority === filterPriority)
+
+  let visibleArchived = archived
+  if (filterCategory) visibleArchived = visibleArchived.filter(r => r.category === filterCategory)
+  if (filterPriority) visibleArchived = visibleArchived.filter(r => r.priority === filterPriority)
 
   // Group by category in the defined order
   const groups = CATEGORIES
-    .map(cat => ({ cat, items: visible.filter(r => r.category === cat) }))
+    .map(cat => ({ cat, items: visibleActive.filter(r => r.category === cat) }))
+    .filter(g => g.items.length > 0)
+
+  const archivedGroups = CATEGORIES
+    .map(cat => ({ cat, items: visibleArchived.filter(r => r.category === cat) }))
     .filter(g => g.items.length > 0)
 
   return (
@@ -76,13 +88,14 @@ export default function ToDo() {
             </select>
           </div>
           <button className="icon-btn" title="Show / hide completed" onClick={() => setShowDone(s => !s)}>
-            <Filter size={22} fill={showDone ? 'none' : '#111418'} />
+            <Filter size={22} />
           </button>
           <button className="icon-btn solid" title="Add task" onClick={openAdd}><Plus size={22} /></button>
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* Active tasks */}
         {groups.map(({ cat, items }) => {
           return (
             <div key={cat} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
@@ -110,35 +123,38 @@ export default function ToDo() {
                   <col style={{ width: 130 }} />
                   <col />
                   <col style={{ width: 130 }} />
-                  <col style={{ width: 70 }} />
+                  <col style={{ width: 90 }} />
                 </colgroup>
                 <thead>
                   <tr>
                     <th style={{ paddingLeft: 18 }}>PRIORITY</th>
                     <th style={{ paddingLeft: 18 }}>TASK</th>
                     <th>DUE DATE</th>
-                    <th>DONE</th>
+                    <th>ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map(r => (
                     <tr key={r.id} style={{ opacity: r.done ? 0.5 : 1 }}>
                       <td>
-                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 10, marginLeft: 18 }}>
+                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 9, marginLeft: 18 }}>
                           {PRI[r.priority].label}
                         </div>
                       </td>
                       <td>
-                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none', fontSize: 12, marginLeft: 18 }}>
+                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none', fontSize: 11, marginLeft: 18 }}>
                           {r.task}
                         </div>
                       </td>
                       <td><div className="due-chip">{r.due || '—'}</div></td>
                       <td>
-                        <div style={{ display: 'grid', placeItems: 'center', height: 42 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42 }}>
                           <div className={'cbx' + (r.done ? ' checked' : '')} onClick={() => toggle(r.id)}>
                             {r.done && <Check size={18} strokeWidth={3} />}
                           </div>
+                          <button onClick={() => deleteTask(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', display: 'grid', placeItems: 'center', padding: 0 }}>
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -148,6 +164,72 @@ export default function ToDo() {
             </div>
           )
         })}
+
+        {/* Archived tasks */}
+        {archivedGroups.length > 0 && (
+          <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
+            <div style={{
+              background: '#f5f5f5',
+              borderBottom: '1px solid var(--line)',
+              padding: '10px 18px',
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+              <span style={{
+                fontWeight: 800, fontSize: 13, letterSpacing: '.6px',
+                textTransform: 'uppercase', color: 'var(--ink)',
+              }}>Archived</span>
+              <span style={{
+                background: '#e0e0e0', color: 'var(--ink-soft)',
+                borderRadius: 999, fontSize: 11, fontWeight: 700,
+                padding: '2px 8px',
+              }}>{visibleArchived.length}</span>
+            </div>
+
+            {/* Archived items grouped by original category */}
+            <div style={{ padding: '12px' }}>
+              {archivedGroups.map(({ cat, items }) => (
+                <div key={cat} style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: 8, paddingLeft: 6 }}>from {cat}</div>
+                  <table className="grid" style={{ margin: 0 }}>
+                    <colgroup>
+                      <col style={{ width: 130 }} />
+                      <col />
+                      <col style={{ width: 130 }} />
+                      <col style={{ width: 90 }} />
+                    </colgroup>
+                    <tbody>
+                      {items.map(r => (
+                        <tr key={r.id} style={{ opacity: 0.5 }}>
+                          <td>
+                            <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 9, marginLeft: 18 }}>
+                              {PRI[r.priority].label}
+                            </div>
+                          </td>
+                          <td>
+                            <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: 'line-through', fontSize: 11, marginLeft: 18 }}>
+                              {r.task}
+                            </div>
+                          </td>
+                          <td><div className="due-chip">{r.due || '—'}</div></td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42 }}>
+                              <div className='cbx checked' onClick={() => toggle(r.id)} style={{ cursor: 'pointer' }}>
+                                <Check size={18} strokeWidth={3} />
+                              </div>
+                              <button onClick={() => deleteTask(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', display: 'grid', placeItems: 'center', padding: 0 }}>
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Task Modal */}
