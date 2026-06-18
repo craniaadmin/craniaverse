@@ -1087,70 +1087,77 @@ function submitForm(){
   if(!validateAdditional()) return;
 
   document.getElementById("submit-btn").disabled = true;
-  var promises = [];
 
-  state.students.forEach(function(student, idx){
-    var form = {
-      studentFirstName: student.firstName,
-      studentLastName: student.lastName,
-      studentEmail: student.email,
-      gender: student.gender,
-      dob: student.dob,
-      grade: student.grade,
-      school: student.school,
-      medical: student.medical || "",
-      reportCard: student.reportCard || false,
-      g1FirstName: state.parents.g1FirstName,
-      g1LastName: state.parents.g1LastName,
-      g1Relationship: state.parents.g1Relationship,
-      g1PhoneMobile: state.parents.g1PhoneMobile,
-      g1PhoneHome: state.parents.g1PhoneHome || "",
-      g1Address1: state.parents.g1Address1 || "",
-      g1Address2: state.parents.g1Address2 || "",
-      g1City: state.parents.g1City || "",
-      g1Province: state.parents.g1Province || "",
-      g1Postal: state.parents.g1Postal || "",
-      g1Country: state.parents.g1Country || "Canada",
-      g1Email: state.parents.g1Email,
-      g1Occupation: state.parents.g1Occupation || "",
-      g2FirstName: state.parents.g2FirstName || "",
-      g2LastName: state.parents.g2LastName || "",
-      g2Relationship: state.parents.g2Relationship || "",
-      g2PhoneMobile: state.parents.g2PhoneMobile || "",
-      g2PhoneHome: state.parents.g2PhoneHome || "",
-      g2Address1: state.parents.g2Address1 || "",
-      g2Address2: state.parents.g2Address2 || "",
-      g2City: state.parents.g2City || "",
-      g2Province: state.parents.g2Province || "",
-      g2Postal: state.parents.g2Postal || "",
-      g2Country: state.parents.g2Country || "Canada",
-      g2Email: state.parents.g2Email || "",
-      g2Occupation: state.parents.g2Occupation || "",
-      emFirstName: state.emergency.emFirstName,
-      emLastName: state.emergency.emLastName || "",
-      emRelationship: state.emergency.emRelationship || "",
-      emPhone: state.emergency.emPhone,
-      emEmail: state.emergency.emEmail,
-      programs: flattenPrograms(student.programs || []),
-      additionalNotes: state.additional.additionalNotes || "",
-      hearAbout: state.additional.hearAbout || [],
-      enrollReasons: state.additional.enrollReasons || [],
-      registeredJune: "",
-      usePrevMaterials: "",
-      extraShirt: false,
-      receiveNews: state.additional.receiveNews || false,
-      agreeToS: state.additional.agreeToS,
-      agreePhoto: state.additional.agreePhoto
-    };
+  // One submission per form fill — guardians/emergency/additional info at
+  // the top level, all children in a `students` array. The server creates
+  // one record per child but only fires one batched email.
+  var payload = {
+    g1FirstName: state.parents.g1FirstName,
+    g1LastName: state.parents.g1LastName,
+    g1Relationship: state.parents.g1Relationship,
+    g1PhoneMobile: state.parents.g1PhoneMobile,
+    g1PhoneHome: state.parents.g1PhoneHome || "",
+    g1Address1: state.parents.g1Address1 || "",
+    g1Address2: state.parents.g1Address2 || "",
+    g1City: state.parents.g1City || "",
+    g1Province: state.parents.g1Province || "",
+    g1Postal: state.parents.g1Postal || "",
+    g1Country: state.parents.g1Country || "Canada",
+    g1Email: state.parents.g1Email,
+    g1Occupation: state.parents.g1Occupation || "",
+    g2FirstName: state.parents.g2FirstName || "",
+    g2LastName: state.parents.g2LastName || "",
+    g2Relationship: state.parents.g2Relationship || "",
+    g2PhoneMobile: state.parents.g2PhoneMobile || "",
+    g2PhoneHome: state.parents.g2PhoneHome || "",
+    g2Address1: state.parents.g2Address1 || "",
+    g2Address2: state.parents.g2Address2 || "",
+    g2City: state.parents.g2City || "",
+    g2Province: state.parents.g2Province || "",
+    g2Postal: state.parents.g2Postal || "",
+    g2Country: state.parents.g2Country || "Canada",
+    g2Email: state.parents.g2Email || "",
+    g2Occupation: state.parents.g2Occupation || "",
+    emFirstName: state.emergency.emFirstName,
+    emLastName: state.emergency.emLastName || "",
+    emRelationship: state.emergency.emRelationship || "",
+    emPhone: state.emergency.emPhone,
+    emEmail: state.emergency.emEmail,
+    students: state.students.map(function(student){
+      return {
+        studentFirstName: student.firstName,
+        studentLastName: student.lastName,
+        studentEmail: student.email,
+        gender: student.gender,
+        dob: student.dob,
+        grade: student.grade,
+        school: student.school,
+        medical: student.medical || "",
+        reportCard: student.reportCard || false,
+        programs: flattenPrograms(student.programs || [])
+      };
+    }),
+    additionalNotes: state.additional.additionalNotes || "",
+    hearAbout: state.additional.hearAbout || [],
+    enrollReasons: state.additional.enrollReasons || [],
+    registeredJune: "",
+    usePrevMaterials: "",
+    extraShirt: false,
+    receiveNews: state.additional.receiveNews || false,
+    agreeToS: state.additional.agreeToS,
+    agreePhoto: state.additional.agreePhoto
+  };
 
-    promises.push(fetch(CONFIG.ENDPOINT, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(form)
-    }).then(r=>r.json()));
+  var registrationPromise = fetch(CONFIG.ENDPOINT, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(payload)
+  }).then(function(r){
+    if(!r.ok) return r.json().then(function(j){ throw new Error(j.error || ('HTTP ' + r.status)); });
+    return r.json();
   });
 
-  Promise.all(promises).then(function(results){
+  registrationPromise.then(function(){
     // Decrement spots for registered offerings
     var decrements = collectOfferingDecrements(state.students);
     var decrementPromise = decrements.length ? fetch('/api/programs/decrement-spots', {
@@ -1160,7 +1167,7 @@ function submitForm(){
     }).catch(function(){ /* silent fail */ }) : Promise.resolve();
 
     return decrementPromise.then(function(){
-      var names = state.students.map(s=>s.firstName+" "+s.lastName).join(", ");
+      var names = state.students.map(function(s){ return s.firstName + " " + s.lastName; }).join(", ");
       document.getElementById("success-message").textContent = names + " has been registered. A Crania Schools team member will be in touch shortly.";
       allPages.push("success");
       state.currentPage = allPages.indexOf("success");

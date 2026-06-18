@@ -1,10 +1,25 @@
 // ============================================================
 // CraniaVerse — email notifications via SendGrid
 // ------------------------------------------------------------
-// Sends two emails on a successful registration:
-//   1) Guardian receipt (to g1 + g2) from registrations@crania-schools.com
-//   2) Internal copy to registrations@crania-schools.com with the
-//      entire submission as a readable table.
+// Sends two emails per submission (regardless of how many kids are
+// being registered):
+//   1) Guardian receipt (to g1 + g2, cc registrations@) — lists every
+//      child and every program selected for them.
+//   2) Internal full-submission copy to registrations@ — guardian +
+//      emergency sections, then one section per child with their
+//      programs nested.
+//
+// The submission shape from the public form is now:
+//   {
+//     g1...,  g2...,  em...,  additional fields,
+//     students: [
+//       { studentFirstName, ..., programs: [{...}, ...] },
+//       ...
+//     ]
+//   }
+// The single-student shape (student fields at the top level, no
+// `students` array) is still accepted and normalized internally for
+// backward compat.
 // ============================================================
 import sgMail from '@sendgrid/mail'
 
@@ -44,21 +59,53 @@ function academicYearDisplay(date) {
   return `${start}/${String(start + 1).slice(2)}` // e.g. "2025/26"
 }
 
-function primaryLocation(form) {
-  const programs = Array.isArray(form.programs) ? form.programs : []
-  for (const p of programs) {
-    if (p?.location) return p.location
+function primaryLocation(payload) {
+  for (const s of (payload.students || [])) {
+    for (const p of (s.programs || [])) {
+      if (p?.location) return p.location
+    }
   }
-  return form.location || ''
+  return payload.location || ''
 }
 
-function guardianRecipients(form) {
+function guardianRecipients(payload) {
   const out = []
-  if (form.g1Email) out.push({ email: form.g1Email, name: `${form.g1FirstName || ''} ${form.g1LastName || ''}`.trim() })
-  if (form.g2Email && form.g2Email.toLowerCase() !== (form.g1Email || '').toLowerCase()) {
-    out.push({ email: form.g2Email, name: `${form.g2FirstName || ''} ${form.g2LastName || ''}`.trim() })
+  if (payload.g1Email) out.push({ email: payload.g1Email, name: `${payload.g1FirstName || ''} ${payload.g1LastName || ''}`.trim() })
+  if (payload.g2Email && payload.g2Email.toLowerCase() !== (payload.g1Email || '').toLowerCase()) {
+    out.push({ email: payload.g2Email, name: `${payload.g2FirstName || ''} ${payload.g2LastName || ''}`.trim() })
   }
   return out
+}
+
+function studentDisplayName(student) {
+  return `${student.studentFirstName || ''} ${student.studentLastName || ''}`.trim() || 'Student'
+}
+
+function studentFirstNamesPhrase(students) {
+  const names = (students || []).map(s => s.studentFirstName || '').filter(Boolean)
+  if (names.length === 0) return 'your child'
+  if (names.length === 1) return names[0]
+  if (names.length === 2) return `${names[0]} and ${names[1]}`
+  return `${names.slice(0, -1).join(', ')}, and ${names[names.length - 1]}`
+}
+
+// Accept either the new batch shape or the legacy single-student shape.
+// Returns a normalized payload with a `students` array.
+function normalizeToBatch(payload) {
+  if (Array.isArray(payload.students) && payload.students.length > 0) return payload
+
+  // Legacy shape: pull student fields and programs out into a synthetic
+  // students[0]. The guardian/emergency/additional fields stay at the top
+  // level where they belong.
+  const STUDENT_KEYS = ['studentFirstName', 'studentLastName', 'studentEmail', 'gender', 'dob', 'grade', 'school', 'medical', 'reportCard']
+  const student = { programs: Array.isArray(payload.programs) ? payload.programs : [] }
+  for (const k of STUDENT_KEYS) {
+    if (k in payload) student[k] = payload[k]
+  }
+  const top = { ...payload }
+  for (const k of STUDENT_KEYS) delete top[k]
+  delete top.programs
+  return { ...top, students: [student] }
 }
 
 function escapeHtml(s) {
@@ -71,43 +118,45 @@ function escapeHtml(s) {
 }
 
 // ---- guardian email ----------------------------------------
-function programDetailsBlock(form, studentName, fallbackLocation) {
-  const programs = Array.isArray(form.programs) ? form.programs : []
-  const rows = programs.length
-    ? programs
-    : [{ program: form.program || '', day: form.day || '', time: form.time || '', platform: form.platform || '', location: form.location || '' }]
+function programDetailsBlocks(students, fallbackLocation) {
+  return (students || []).map(student => {
+    const name = studentDisplayName(student)
+    const programs = Array.isArray(student.programs) ? student.programs : []
 
-  return rows.map(p => `
-    <p style="margin:0 0 12px;">
-      Student Name: <strong>${escapeHtml(studentName)}</strong><br/>
-      Program: <strong>${escapeHtml(p.program || '')}</strong><br/>
-      Day: <strong>${escapeHtml(p.day || '')}</strong><br/>
-      Time: <strong>${escapeHtml(p.time || '')}</strong><br/>
-      Learning Platform: <strong>${escapeHtml(p.platform || 'In-Person')}</strong><br/>
-      Location: <strong>${escapeHtml(p.location || fallbackLocation || '')}</strong>
-    </p>
-  `).join('')
+    if (programs.length === 0) {
+      return `<p style="margin:0 0 12px;">Student Name: <strong>${escapeHtml(name)}</strong> — (no program selected)</p>`
+    }
+
+    return programs.map(p => `
+      <p style="margin:0 0 12px;">
+        Student Name: <strong>${escapeHtml(name)}</strong><br/>
+        Program: <strong>${escapeHtml(p.program || '')}</strong><br/>
+        Day: <strong>${escapeHtml(p.day || '')}</strong><br/>
+        Time: <strong>${escapeHtml(p.time || '')}</strong><br/>
+        Learning Platform: <strong>${escapeHtml(p.platform || 'In-Person')}</strong><br/>
+        Location: <strong>${escapeHtml(p.location || fallbackLocation || '')}</strong>
+      </p>
+    `).join('')
+  }).join('')
 }
 
-function buildGuardianEmail(form) {
-  const studentFirst = form.studentFirstName || ''
-  const studentLast = form.studentLastName || ''
-  const studentName = `${studentFirst} ${studentLast}`.trim() || 'your child'
-  const guardianFirst = form.g1FirstName || 'Guardian'
-  const location = primaryLocation(form) || 'Crania Schools'
+function buildGuardianEmail(payload) {
+  const guardianFirst = payload.g1FirstName || 'Guardian'
+  const namesPhrase = studentFirstNamesPhrase(payload.students)
+  const location = primaryLocation(payload) || 'Crania Schools'
   const year = academicYearDisplay()
 
   const html = `
     <div style="font-family: Arial, Helvetica, sans-serif; color: #1f2733; max-width: 640px;">
       <p>Dear ${escapeHtml(guardianFirst)},</p>
 
-      <p>Thank you for registering ${escapeHtml(studentFirst || studentName)}. Your registration was successful and we have received your information.</p>
+      <p>Thank you for registering ${escapeHtml(namesPhrase)}. Your registration was successful and we have received your information.</p>
 
       <p>Please see our <a href="${escapeHtml(INFO_PAGE_URL)}">Information for Registered Students</a> page for useful information including payment options.</p>
 
       <p>Your registration details are below:</p>
 
-      ${programDetailsBlock(form, studentName, location)}
+      ${programDetailsBlocks(payload.students, location)}
 
       <hr style="border:none;border-top:1px solid #d0d4d8;margin:24px 0;" />
 
@@ -286,60 +335,92 @@ function hasAnyValue(fields, source) {
   return fields.some(([key]) => hasValue(source[key]))
 }
 
-function buildInternalEmail(form, record) {
-  const studentName = record?.displayName || `${form.studentFirstName || ''} ${form.studentLastName || ''}`.trim() || 'New Student'
-  const location = primaryLocation(form) || '—'
+function buildInternalEmail(payload, records) {
+  const students = payload.students || []
+  const studentNames = students.map(studentDisplayName).filter(Boolean)
+  const headerName =
+    studentNames.length === 0 ? 'New Student'
+    : studentNames.length === 1 ? studentNames[0]
+    : studentNames.join(', ')
+  const location = primaryLocation(payload) || '—'
   const year = academicYearDisplay()
 
-  const sections = []
-  sections.push(renderSection('Guardian 1', GUARDIAN1_FIELDS, form))
-  if (hasAnyValue(GUARDIAN2_FIELDS, form)) sections.push(renderSection('Guardian 2', GUARDIAN2_FIELDS, form))
-  if (hasAnyValue(EMERGENCY_FIELDS, form)) sections.push(renderSection('Emergency Contact', EMERGENCY_FIELDS, form))
-  sections.push(renderSection('Student', STUDENT_FIELDS, form))
-  sections.push(renderProgramsBlock(form.programs))
-  if (hasAnyValue(ADDITIONAL_FIELDS, form)) sections.push(renderSection('Additional Information', ADDITIONAL_FIELDS, form))
+  const recordIds = (records || []).map(r => r?.id).filter(Boolean).join(', ') || '(unknown)'
 
+  const sections = []
+
+  // Guardians and emergency contact — shared across all students
+  sections.push(renderSection('Guardian 1', GUARDIAN1_FIELDS, payload))
+  if (hasAnyValue(GUARDIAN2_FIELDS, payload)) sections.push(renderSection('Guardian 2', GUARDIAN2_FIELDS, payload))
+  if (hasAnyValue(EMERGENCY_FIELDS, payload)) sections.push(renderSection('Emergency Contact', EMERGENCY_FIELDS, payload))
+
+  // One section per student with their programs nested
+  students.forEach((student, idx) => {
+    const sectionTitle = students.length === 1
+      ? 'Student'
+      : `Student ${idx + 1}: ${studentDisplayName(student)}`
+    sections.push(renderSection(sectionTitle, STUDENT_FIELDS, student))
+    sections.push(renderProgramsBlock(student.programs))
+  })
+
+  if (hasAnyValue(ADDITIONAL_FIELDS, payload)) sections.push(renderSection('Additional Information', ADDITIONAL_FIELDS, payload))
+
+  const idsLabel = (records || []).length > 1 ? 'Record IDs' : 'Record ID'
   const html = `
     <div style="font-family: Arial, Helvetica, sans-serif; color: #1f2733; max-width: 720px;">
-      <h2 style="color: #2c7a7b; font-family: Georgia, serif; margin-bottom: 6px;">New Registration — ${escapeHtml(studentName)}</h2>
+      <h2 style="color: #2c7a7b; font-family: Georgia, serif; margin-bottom: 6px;">New Registration — ${escapeHtml(headerName)}</h2>
       <p style="color:#5b6573;margin-top:0;">
-        ${escapeHtml(location)} &middot; Academic Year ${escapeHtml(year)} &middot; Record ID: ${escapeHtml(record?.id || '(unknown)')}
+        ${escapeHtml(location)} &middot; Academic Year ${escapeHtml(year)} &middot; ${idsLabel}: ${escapeHtml(recordIds)}
       </p>
 
       ${sections.filter(Boolean).join('')}
     </div>
   `
 
+  // Keep subject short when there are lots of kids — show count instead of all names.
+  const subjectName = students.length > 2 ? `${students.length} students` : headerName
+
   return {
     from: SENDER,
     to: INTERNAL_RECIPIENT,
-    subject: `New registration — ${studentName} (${location} ${year})`,
+    subject: `New registration — ${subjectName} (${location} ${year})`,
     html,
   }
 }
 
 // ---- entry point -------------------------------------------
-export async function sendRegistrationEmails(form, record) {
+export async function sendRegistrationEmails(payloadOrForm, recordsOrRecord) {
   if (!ensureSgConfigured()) {
     console.warn('[email] SENDGRID_API_KEY not set — skipping emails')
     return { skipped: true }
   }
 
-  const guardians = guardianRecipients(form)
+  // Accept either the new batch shape (`{ students: [...] }`, records is an
+  // array) or the legacy single-student shape (student fields at top level,
+  // record is a single object). Normalize to the batch shape.
+  const payload = normalizeToBatch(payloadOrForm || {})
+  const records = Array.isArray(recordsOrRecord)
+    ? recordsOrRecord
+    : (recordsOrRecord ? [recordsOrRecord] : [])
+
+  const guardians = guardianRecipients(payload)
   const messages = []
 
   if (guardians.length > 0) {
-    const base = buildGuardianEmail(form)
+    const base = buildGuardianEmail(payload)
     messages.push({ ...base, to: guardians, cc: INTERNAL_RECIPIENT })
   } else {
     console.warn('[email] no guardian email on submission — skipping guardian email')
   }
 
-  messages.push(buildInternalEmail(form, record))
+  messages.push(buildInternalEmail(payload, records))
 
   try {
     await Promise.all(messages.map(m => sgMail.send(m)))
-    console.log(`[email] sent ${messages.length} message(s) for ${record?.id || form.studentFirstName}`)
+    const idTag = records.map(r => r?.id).filter(Boolean).join(',')
+      || payload.g1FirstName
+      || (payload.students?.[0]?.studentFirstName ?? '?')
+    console.log(`[email] sent ${messages.length} message(s) for ${idTag}`)
     return { ok: true, sent: messages.length }
   } catch (err) {
     console.error('[email] send failed:', err?.response?.body || err.message || err)

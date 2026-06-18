@@ -180,56 +180,84 @@ app.get('/api/registrations', (_req, res) => {
   res.json(load())
 })
 
-app.post('/api/registrations', (req, res) => {
-  const form = req.body || {}
-  // Minimal server-side guard so junk doesn't create blank records.
-  if (!String(form.studentFirstName || '').trim() || !String(form.studentLastName || '').trim()) {
-    return res.status(400).json({ error: 'studentFirstName and studentLastName are required' })
-  }
-  if (form.website) {
-    // honeypot field was filled -> almost certainly a bot. Pretend success, store nothing.
-    return res.status(201).json({ ok: true })
-  }
-  const record = registrationToRecord(form)
-  const records = load()
+// Shared helper: take a per-student form, save it (creating or merging into
+// an existing record) and return the resulting record. Mutates `records`.
+function processStudentForm(records, perStudentForm) {
+  const record = registrationToRecord(perStudentForm)
 
-  // Dedupe: if a student with the same first/last name (+ email when present)
-  // already exists, merge incoming programs into the existing record instead
-  // of creating a duplicate.
   const norm = (s) => String(s || '').trim().toLowerCase()
-  const incomingKey = {
-    fn: norm(form.studentFirstName),
-    ln: norm(form.studentLastName),
-    em: norm(form.studentEmail),
+  const key = {
+    fn: norm(perStudentForm.studentFirstName),
+    ln: norm(perStudentForm.studentLastName),
+    em: norm(perStudentForm.studentEmail),
   }
   const existing = records.find((r) => {
     const rfn = norm(r.student?.firstName)
     const rln = norm(r.student?.lastName)
     const rem = norm(r.student?.email)
-    if (rfn !== incomingKey.fn || rln !== incomingKey.ln) return false
-    // If both sides have an email, require match; otherwise name match is enough.
-    if (incomingKey.em && rem) return incomingKey.em === rem
+    if (rfn !== key.fn || rln !== key.ln) return false
+    if (key.em && rem) return key.em === rem
     return true
   })
 
   if (existing) {
-    // Append only new programs (same program+schedule+platform is treated as already-on-file)
     const sigOf = (p) => `${p.program || ''}|${p.schedule || ''}|${p.platform || ''}`.toLowerCase()
     const existingSigs = new Set((existing.programs || []).map(sigOf))
     const newPrograms = (record.programs || []).filter((p) => !existingSigs.has(sigOf(p)))
     existing.programs = [...(existing.programs || []), ...newPrograms]
-    save(records)
     console.log(`[registration] ~ merged ${newPrograms.length} program(s) into ${existing.displayName} (${existing.id})`)
-    // Fire-and-forget email so the response isn't blocked by SendGrid latency
-    sendRegistrationEmails(form, existing).catch(() => {})
-    return res.status(200).json(existing)
+    return existing
   }
 
   records.push(record)
-  save(records)
   console.log(`[registration] + ${record.displayName} (${record.id})`)
+  return record
+}
+
+app.post('/api/registrations', (req, res) => {
+  const body = req.body || {}
+
+  if (body.website) {
+    // honeypot field was filled -> almost certainly a bot. Pretend success, store nothing.
+    return res.status(201).json({ ok: true })
+  }
+
+  // New batch shape: body has a `students` array. Process each child as its
+  // own record (with the same dedupe rules), then fire ONE batched email.
+  if (Array.isArray(body.students)) {
+    if (body.students.length === 0) {
+      return res.status(400).json({ error: 'students array is empty' })
+    }
+    for (const s of body.students) {
+      if (!String(s.studentFirstName || '').trim() || !String(s.studentLastName || '').trim()) {
+        return res.status(400).json({ error: 'studentFirstName and studentLastName are required for each student' })
+      }
+    }
+
+    const records = load()
+    const created = body.students.map((s) => {
+      const perStudentForm = { ...body, ...s }
+      delete perStudentForm.students
+      return processStudentForm(records, perStudentForm)
+    })
+    save(records)
+
+    // Fire-and-forget so SendGrid latency doesn't block the response
+    sendRegistrationEmails(body, created).catch(() => {})
+    return res.status(201).json(created)
+  }
+
+  // Legacy single-student shape: student fields at top level. Kept so any
+  // existing client (or curl test) continues to work.
+  const form = body
+  if (!String(form.studentFirstName || '').trim() || !String(form.studentLastName || '').trim()) {
+    return res.status(400).json({ error: 'studentFirstName and studentLastName are required' })
+  }
+  const records = load()
+  const record = processStudentForm(records, form)
+  save(records)
   sendRegistrationEmails(form, record).catch(() => {})
-  res.status(201).json(record)
+  res.status(record === records[records.length - 1] ? 201 : 200).json(record)
 })
 
 app.delete('/api/registrations/:id', (req, res) => {
