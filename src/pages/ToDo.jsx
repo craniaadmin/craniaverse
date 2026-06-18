@@ -30,6 +30,8 @@ export default function ToDo() {
   const [showDone, setShowDone] = useState(true)
   const [modal, setModal] = useState(false)
   const [form, setForm] = useState(BLANK)
+  const [filterCategory, setFilterCategory] = useState(null)
+  const [filterPriority, setFilterPriority] = useState(null)
 
   const toggle = (id) => setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
 
@@ -43,7 +45,9 @@ export default function ToDo() {
     setModal(false)
   }
 
-  const visible = showDone ? rows : rows.filter(r => !r.done)
+  let visible = showDone ? rows : rows.filter(r => !r.done)
+  if (filterCategory) visible = visible.filter(r => r.category === filterCategory)
+  if (filterPriority) visible = visible.filter(r => r.priority === filterPriority)
 
   // Group by category in the defined order
   const groups = CATEGORIES
@@ -55,6 +59,22 @@ export default function ToDo() {
       <div className="page-head">
         <h2 className="page-title">To Do</h2>
         <div className="head-actions">
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <select value={filterCategory || ''} onChange={e => setFilterCategory(e.target.value || null)} style={{
+              padding: '8px 12px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6,
+              background: '#fff', cursor: 'pointer', color: 'var(--ink-soft)'
+            }}>
+              <option value="">All categories</option>
+              {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
+            <select value={filterPriority || ''} onChange={e => setFilterPriority(e.target.value ? parseInt(e.target.value) : null)} style={{
+              padding: '8px 12px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6,
+              background: '#fff', cursor: 'pointer', color: 'var(--ink-soft)'
+            }}>
+              <option value="">All urgencies</option>
+              {[1, 2, 3, 4].map(p => <option key={p} value={p}>{PRI[p].label}</option>)}
+            </select>
+          </div>
           <button className="icon-btn" title="Show / hide completed" onClick={() => setShowDone(s => !s)}>
             <Filter size={22} fill={showDone ? 'none' : '#111418'} />
           </button>
@@ -64,23 +84,21 @@ export default function ToDo() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {groups.map(({ cat, items }) => {
-          const c = CAT_COLORS[cat] ?? CAT_COLORS.Other
           return (
             <div key={cat} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
               {/* Category header */}
               <div style={{
-                background: '#fafbfc',
-                borderLeft: `5px solid ${c.border}`,
+                background: 'var(--header-blue)',
                 borderBottom: '1px solid var(--line)',
                 padding: '10px 18px',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
                 <span style={{
                   fontWeight: 800, fontSize: 13, letterSpacing: '.6px',
-                  textTransform: 'uppercase', color: c.text,
+                  textTransform: 'uppercase', color: 'var(--ink)',
                 }}>{cat}</span>
                 <span style={{
-                  background: c.border, color: c.text,
+                  background: 'var(--header-blue-soft)', color: 'var(--ink-soft)',
                   borderRadius: 999, fontSize: 11, fontWeight: 700,
                   padding: '2px 8px',
                 }}>{items.length}</span>
@@ -89,15 +107,15 @@ export default function ToDo() {
               {/* Tasks table */}
               <table className="grid" style={{ margin: 0 }}>
                 <colgroup>
-                  <col style={{ width: 110 }} />
+                  <col style={{ width: 130 }} />
                   <col />
-                  <col style={{ width: 120 }} />
+                  <col style={{ width: 130 }} />
                   <col style={{ width: 70 }} />
                 </colgroup>
                 <thead>
                   <tr>
-                    <th>PRIORITY</th>
-                    <th>TASK</th>
+                    <th style={{ paddingLeft: 18 }}>PRIORITY</th>
+                    <th style={{ paddingLeft: 18 }}>TASK</th>
                     <th>DUE DATE</th>
                     <th>DONE</th>
                   </tr>
@@ -106,12 +124,12 @@ export default function ToDo() {
                   {items.map(r => (
                     <tr key={r.id} style={{ opacity: r.done ? 0.5 : 1 }}>
                       <td>
-                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 12 }}>
+                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 10, marginLeft: 18 }}>
                           {PRI[r.priority].label}
                         </div>
                       </td>
                       <td>
-                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none' }}>
+                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none', fontSize: 12, marginLeft: 18 }}>
                           {r.task}
                         </div>
                       </td>
@@ -212,11 +230,10 @@ export default function ToDo() {
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Due Date</label>
                 <input
+                  type="date"
                   className="reg-input"
-                  placeholder="e.g. Jun 30"
                   value={form.due}
                   onChange={e => setForm(f => ({ ...f, due: e.target.value }))}
-                  onKeyDown={e => e.key === 'Enter' && save()}
                 />
               </div>
             </div>
