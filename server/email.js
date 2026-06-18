@@ -133,37 +133,180 @@ function buildGuardianEmail(form) {
 }
 
 // ---- internal email ----------------------------------------
+// Field-to-label mapping, grouped into sections that mirror the public
+// registration form. Each section is rendered as its own card-style
+// block; empty sections / empty fields are dropped.
+const GUARDIAN1_FIELDS = [
+  ['g1FirstName', 'First Name'],
+  ['g1LastName', 'Last Name'],
+  ['g1Relationship', 'Relationship'],
+  ['g1PhoneMobile', 'Phone (Mobile)'],
+  ['g1PhoneHome', 'Phone (Home)'],
+  ['g1Email', 'Email'],
+  ['g1Address1', 'Street Address'],
+  ['g1Address2', 'Unit / Apt'],
+  ['g1City', 'City'],
+  ['g1Province', 'Province'],
+  ['g1Postal', 'Postal Code'],
+  ['g1Country', 'Country'],
+  ['g1Occupation', 'Occupation'],
+]
+const GUARDIAN2_FIELDS = [
+  ['g2FirstName', 'First Name'],
+  ['g2LastName', 'Last Name'],
+  ['g2Relationship', 'Relationship'],
+  ['g2PhoneMobile', 'Phone (Mobile)'],
+  ['g2PhoneHome', 'Phone (Home)'],
+  ['g2Email', 'Email'],
+  ['g2Address1', 'Street Address'],
+  ['g2Address2', 'Unit / Apt'],
+  ['g2City', 'City'],
+  ['g2Province', 'Province'],
+  ['g2Postal', 'Postal Code'],
+  ['g2Country', 'Country'],
+  ['g2Occupation', 'Occupation'],
+]
+const EMERGENCY_FIELDS = [
+  ['emFirstName', 'First Name'],
+  ['emLastName', 'Last Name'],
+  ['emRelationship', 'Relationship'],
+  ['emPhone', 'Phone'],
+  ['emEmail', 'Email'],
+]
+const STUDENT_FIELDS = [
+  ['studentFirstName', 'First Name'],
+  ['studentLastName', 'Last Name'],
+  ['gender', 'Gender'],
+  ['dob', 'Date of Birth'],
+  ['grade', 'Current Grade'],
+  ['school', 'School'],
+  ['studentEmail', 'Email'],
+  ['medical', 'Medical Conditions'],
+  ['reportCard', 'Report Card Provided'],
+]
+const PROGRAM_FIELDS = [
+  ['program', 'Program'],
+  ['day', 'Day'],
+  ['time', 'Time'],
+  ['schedule', 'Schedule'],
+  ['location', 'Location'],
+  ['platform', 'Learning Platform'],
+  ['courseCost', 'Course Cost'],
+  ['methodOfPayment', 'Method of Payment'],
+  ['notes', 'Notes'],
+]
+const ADDITIONAL_FIELDS = [
+  ['additionalNotes', 'Additional Notes'],
+  ['hearAbout', 'How did you hear about us?'],
+  ['enrollReasons', 'Reasons for Enrolling'],
+  ['registeredJune', 'Registered in June'],
+  ['usePrevMaterials', 'Use Previous Materials'],
+  ['extraShirt', 'Extra Shirt'],
+  ['receiveNews', 'Receive Newsletter'],
+  ['agreeToS', 'Agreed to Terms of Service'],
+  ['agreePhoto', 'Agreed to Photo Policy'],
+]
+
+function formatValue(v) {
+  if (v === true) return 'Yes'
+  if (v === false) return 'No'
+  if (Array.isArray(v)) return v.length === 0 ? '' : v.join(', ')
+  return String(v)
+}
+
+function hasValue(v) {
+  if (v == null) return false
+  if (typeof v === 'string') return v.trim() !== ''
+  if (Array.isArray(v)) return v.length > 0
+  if (typeof v === 'boolean') return v === true // skip "No" booleans to keep emails uncluttered
+  return true
+}
+
+function renderSection(title, fields, source) {
+  const rows = fields
+    .filter(([key]) => hasValue(source[key]))
+    .map(([key, label]) => {
+      const display = escapeHtml(formatValue(source[key]))
+      return `<tr>
+        <td style="padding:8px 12px;border:1px solid #e3e8ec;font-weight:600;vertical-align:top;width:220px;background:#fafbfc;">${escapeHtml(label)}</td>
+        <td style="padding:8px 12px;border:1px solid #e3e8ec;">${display}</td>
+      </tr>`
+    })
+    .join('')
+
+  if (!rows) return ''
+
+  return `
+    <div style="margin: 0 0 24px;">
+      <div style="background:#2c7a7b;color:#ffffff;padding:8px 14px;font-weight:700;font-size:14px;letter-spacing:.4px;text-transform:uppercase;border-radius:6px 6px 0 0;">${escapeHtml(title)}</div>
+      <table style="border-collapse:collapse;font-size:13px;width:100%;">
+        ${rows}
+      </table>
+    </div>
+  `
+}
+
+function renderProgramsBlock(programs) {
+  if (!Array.isArray(programs) || programs.length === 0) return ''
+
+  const programBlocks = programs.map((p, i) => {
+    const rows = PROGRAM_FIELDS
+      .filter(([key]) => hasValue(p[key]))
+      .map(([key, label]) => `<tr>
+        <td style="padding:8px 12px;border:1px solid #e3e8ec;font-weight:600;vertical-align:top;width:200px;background:#fafbfc;">${escapeHtml(label)}</td>
+        <td style="padding:8px 12px;border:1px solid #e3e8ec;">${escapeHtml(formatValue(p[key]))}</td>
+      </tr>`)
+      .join('')
+
+    if (!rows) return ''
+
+    return `
+      <div style="margin: 0 0 16px; border:1px solid #d0e3e3; border-radius:6px; overflow:hidden;">
+        <div style="background:#e7f2f2;color:#2c7a7b;padding:6px 12px;font-weight:700;font-size:13px;">Program ${i + 1}</div>
+        <table style="border-collapse:collapse;font-size:13px;width:100%;">
+          ${rows}
+        </table>
+      </div>
+    `
+  }).join('')
+
+  if (!programBlocks) return ''
+
+  return `
+    <div style="margin: 0 0 24px;">
+      <div style="background:#2c7a7b;color:#ffffff;padding:8px 14px;font-weight:700;font-size:14px;letter-spacing:.4px;text-transform:uppercase;border-radius:6px 6px 0 0;">Programs (${programs.length})</div>
+      <div style="padding: 14px 0 0;">
+        ${programBlocks}
+      </div>
+    </div>
+  `
+}
+
+function hasAnyValue(fields, source) {
+  return fields.some(([key]) => hasValue(source[key]))
+}
+
 function buildInternalEmail(form, record) {
   const studentName = record?.displayName || `${form.studentFirstName || ''} ${form.studentLastName || ''}`.trim() || 'New Student'
   const location = primaryLocation(form) || '—'
   const year = academicYearDisplay()
 
-  // Render the full form as a readable HTML table.
-  const skip = new Set(['website']) // honeypot
-  const rows = Object.entries(form)
-    .filter(([k, v]) => !skip.has(k) && v != null && v !== '')
-    .map(([k, v]) => {
-      const val =
-        typeof v === 'object'
-          ? `<pre style="margin:0;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;">${escapeHtml(JSON.stringify(v, null, 2))}</pre>`
-          : escapeHtml(String(v))
-      return `<tr><td style="padding:6px 10px;border:1px solid #e3e8ec;font-weight:600;vertical-align:top;width:220px;background:#fafbfc;">${escapeHtml(k)}</td><td style="padding:6px 10px;border:1px solid #e3e8ec;">${val}</td></tr>`
-    })
-    .join('')
+  const sections = []
+  sections.push(renderSection('Guardian 1', GUARDIAN1_FIELDS, form))
+  if (hasAnyValue(GUARDIAN2_FIELDS, form)) sections.push(renderSection('Guardian 2', GUARDIAN2_FIELDS, form))
+  if (hasAnyValue(EMERGENCY_FIELDS, form)) sections.push(renderSection('Emergency Contact', EMERGENCY_FIELDS, form))
+  sections.push(renderSection('Student', STUDENT_FIELDS, form))
+  sections.push(renderProgramsBlock(form.programs))
+  if (hasAnyValue(ADDITIONAL_FIELDS, form)) sections.push(renderSection('Additional Information', ADDITIONAL_FIELDS, form))
 
   const html = `
-    <div style="font-family: Arial, Helvetica, sans-serif; color: #1f2733;">
-      <h2 style="color: #2c7a7b; font-family: Georgia, serif;">New Registration — ${escapeHtml(studentName)}</h2>
-      <p>
-        <strong>Location:</strong> ${escapeHtml(location)}<br/>
-        <strong>Academic Year:</strong> ${escapeHtml(year)}<br/>
-        <strong>Record ID:</strong> ${escapeHtml(record?.id || '(unknown)')}
+    <div style="font-family: Arial, Helvetica, sans-serif; color: #1f2733; max-width: 720px;">
+      <h2 style="color: #2c7a7b; font-family: Georgia, serif; margin-bottom: 6px;">New Registration — ${escapeHtml(studentName)}</h2>
+      <p style="color:#5b6573;margin-top:0;">
+        ${escapeHtml(location)} &middot; Academic Year ${escapeHtml(year)} &middot; Record ID: ${escapeHtml(record?.id || '(unknown)')}
       </p>
 
-      <h3 style="color: #2c7a7b; margin-top: 24px;">Full Submission</h3>
-      <table style="border-collapse:collapse;font-size:13px;">
-        ${rows}
-      </table>
+      ${sections.filter(Boolean).join('')}
     </div>
   `
 
@@ -187,7 +330,7 @@ export async function sendRegistrationEmails(form, record) {
 
   if (guardians.length > 0) {
     const base = buildGuardianEmail(form)
-    messages.push({ ...base, to: guardians })
+    messages.push({ ...base, to: guardians, cc: INTERNAL_RECIPIENT })
   } else {
     console.warn('[email] no guardian email on submission — skipping guardian email')
   }
