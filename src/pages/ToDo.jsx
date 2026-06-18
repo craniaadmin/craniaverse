@@ -127,26 +127,33 @@ export default function ToDo() {
                 </colgroup>
                 <thead>
                   <tr>
-                    <th style={{ paddingLeft: 18 }}>PRIORITY</th>
-                    <th style={{ paddingLeft: 18 }}>TASK</th>
-                    <th>DUE DATE</th>
-                    <th>ACTIONS</th>
+                    <th style={{ paddingLeft: 18, fontSize: 11 }}>PRIORITY</th>
+                    <th style={{ paddingLeft: 18, fontSize: 11 }}>TASK</th>
+                    <th style={{ fontSize: 11 }}>DUE DATE</th>
+                    <th style={{ fontSize: 11 }}>ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map(r => (
                     <tr key={r.id} style={{ opacity: r.done ? 0.5 : 1 }}>
                       <td>
-                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 9, marginLeft: 18 }}>
+                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 12, marginLeft: 18 }}>
                           {PRI[r.priority].label}
                         </div>
                       </td>
                       <td>
-                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none', fontSize: 11, marginLeft: 18 }}>
+                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none', fontSize: 14, marginLeft: 18 }}>
                           {r.task}
                         </div>
                       </td>
-                      <td><div className="due-chip">{r.due || '—'}</div></td>
+                      <td>
+                        <input
+                          type="date"
+                          value={r.due}
+                          onChange={e => setRows(rows.map(row => row.id === r.id ? { ...row, due: e.target.value } : row))}
+                          style={{ padding: '6px 8px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6, cursor: 'pointer' }}
+                        />
+                      </td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42 }}>
                           <div className={'cbx' + (r.done ? ' checked' : '')} onClick={() => toggle(r.id)}>
@@ -201,16 +208,23 @@ export default function ToDo() {
                       {items.map(r => (
                         <tr key={r.id} style={{ opacity: 0.5 }}>
                           <td>
-                            <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 9, marginLeft: 18 }}>
+                            <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 12, marginLeft: 18 }}>
                               {PRI[r.priority].label}
                             </div>
                           </td>
                           <td>
-                            <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: 'line-through', fontSize: 11, marginLeft: 18 }}>
+                            <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: 'line-through', fontSize: 14, marginLeft: 18 }}>
                               {r.task}
                             </div>
                           </td>
-                          <td><div className="due-chip">{r.due || '—'}</div></td>
+                          <td>
+                            <input
+                              type="date"
+                              value={r.due}
+                              onChange={e => setRows(rows.map(row => row.id === r.id ? { ...row, due: e.target.value } : row))}
+                              style={{ padding: '6px 8px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6, cursor: 'pointer' }}
+                            />
+                          </td>
                           <td>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42 }}>
                               <div className='cbx checked' onClick={() => toggle(r.id)} style={{ cursor: 'pointer' }}>
