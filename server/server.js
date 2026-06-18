@@ -11,16 +11,20 @@
 //
 // Run:  npm install  &&  npm start     (listens on http://localhost:4000)
 // ============================================================
-import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import dotenv from 'dotenv'
 import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { sendRegistrationEmails } from './email.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// Load .env from next to this file, not the process CWD. This way PM2,
+// `node server/server.js` from the repo root, and `cd server && npm start`
+// all find the same key file.
+dotenv.config({ path: path.join(__dirname, '.env') })
 const DATA_FILE = path.join(__dirname, 'data.json')
 const COMMENTS_FILE = path.join(__dirname, 'comments.json')
 const RULES_FILE = path.join(__dirname, 'rules.json')
