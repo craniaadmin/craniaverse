@@ -8,8 +8,19 @@
 // ============================================================
 import sgMail from '@sendgrid/mail'
 
-const API_KEY = process.env.SENDGRID_API_KEY
-if (API_KEY) sgMail.setApiKey(API_KEY)
+// Read SENDGRID_API_KEY lazily (at send time, not import time). ES module
+// imports evaluate before server.js's dotenv.config() call runs, so reading
+// process.env at the top of this file would capture an empty value.
+let sgConfigured = false
+function ensureSgConfigured() {
+  const key = process.env.SENDGRID_API_KEY
+  if (!key) return false
+  if (!sgConfigured) {
+    sgMail.setApiKey(key)
+    sgConfigured = true
+  }
+  return true
+}
 
 // ---- Single sender / internal recipient --------------------
 const SENDER = {
@@ -166,7 +177,7 @@ function buildInternalEmail(form, record) {
 
 // ---- entry point -------------------------------------------
 export async function sendRegistrationEmails(form, record) {
-  if (!API_KEY) {
+  if (!ensureSgConfigured()) {
     console.warn('[email] SENDGRID_API_KEY not set — skipping emails')
     return { skipped: true }
   }
