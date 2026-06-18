@@ -4,8 +4,7 @@ import { Plus, X, GripVertical, Trash2 } from 'lucide-react'
 // Trello-style board: lists (columns) of cards (tasks).
 // Persisted on the API as a single JSON document at /api/staff-board.
 
-const RAW_API_URL = import.meta.env && import.meta.env.VITE_API_URL
-const API_BASE = RAW_API_URL !== undefined ? RAW_API_URL : 'http://localhost:4000'
+const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
 
 const DEFAULT_BOARD = {

@@ -14,10 +14,7 @@ import { student as seedStudent, customer as seedCustomer } from './mockData'
 // Where the API lives. In dev (when this file is served by Vite on :5173) the
 // backend is at localhost:4000. In production the React build is served BY the
 // backend on the same origin, so an empty VITE_API_URL means "same origin".
-const RAW_API_URL = import.meta.env && import.meta.env.VITE_API_URL
-const API_BASE = RAW_API_URL !== undefined
-  ? RAW_API_URL                          // explicit override (including empty string for same-origin)
-  : 'http://localhost:4000'              // dev default
+const API_BASE = import.meta.env?.VITE_API_URL ?? ''
 const ENDPOINT = `${API_BASE}/api/registrations`
 const POLL_MS = 15000
 
