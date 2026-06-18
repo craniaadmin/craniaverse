@@ -33,8 +33,30 @@ export default function ToDo() {
   const [filterCategory, setFilterCategory] = useState(null)
   const [filterPriority, setFilterPriority] = useState(null)
 
-  const toggle = (id) => setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
-  const deleteTask = (id) => setRows(rows.filter(r => r.id !== id))
+  const toggle = (id) => {
+    setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
+    setTimeout(() => {
+      fetch(`http://localhost:4000/api/todos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ done: !rows.find(r => r.id === id).done })
+      }).catch(err => console.error('Failed to save:', err))
+    }, 300)
+  }
+
+  const deleteTask = (id) => {
+    setRows(rows.filter(r => r.id !== id))
+    fetch(`http://localhost:4000/api/todos/${id}`, { method: 'DELETE' }).catch(err => console.error('Failed to delete:', err))
+  }
+
+  const updateDueDate = (id, due) => {
+    setRows(rows.map(r => r.id === id ? { ...r, due } : r))
+    fetch(`http://localhost:4000/api/todos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ due })
+    }).catch(err => console.error('Failed to save:', err))
+  }
 
   const openAdd = () => { setForm(BLANK); setModal(true) }
   const closeModal = () => setModal(false)
@@ -42,7 +64,13 @@ export default function ToDo() {
   const save = () => {
     if (!form.task.trim()) return
     const id = Math.max(0, ...rows.map(r => r.id)) + 1
-    setRows([...rows, { ...form, id, task: form.task.trim() }])
+    const newTask = { ...form, id, task: form.task.trim() }
+    setRows([...rows, newTask])
+    fetch('http://localhost:4000/api/todos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTask)
+    }).catch(err => console.error('Failed to save:', err))
     setModal(false)
   }
 
@@ -127,10 +155,10 @@ export default function ToDo() {
                 </colgroup>
                 <thead>
                   <tr>
-                    <th style={{ paddingLeft: 18, fontSize: 11 }}>PRIORITY</th>
-                    <th style={{ paddingLeft: 18, fontSize: 11 }}>TASK</th>
+                    <th style={{ paddingLeft: 18, fontSize: 12 }}>PRIORITY</th>
+                    <th style={{ paddingLeft: 18, fontSize: 14 }}>TASK</th>
                     <th style={{ fontSize: 11 }}>DUE DATE</th>
-                    <th style={{ fontSize: 11 }}>ACTIONS</th>
+                    <th style={{ fontSize: 11 }}>COMPLETE</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -150,7 +178,7 @@ export default function ToDo() {
                         <input
                           type="date"
                           value={r.due}
-                          onChange={e => setRows(rows.map(row => row.id === r.id ? { ...row, due: e.target.value } : row))}
+                          onChange={e => updateDueDate(r.id, e.target.value)}
                           style={{ padding: '6px 8px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6, cursor: 'pointer' }}
                         />
                       </td>
@@ -221,7 +249,7 @@ export default function ToDo() {
                             <input
                               type="date"
                               value={r.due}
-                              onChange={e => setRows(rows.map(row => row.id === r.id ? { ...row, due: e.target.value } : row))}
+                              onChange={e => updateDueDate(r.id, e.target.value)}
                               style={{ padding: '6px 8px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6, cursor: 'pointer' }}
                             />
                           </td>
