@@ -14,9 +14,8 @@ export default function TopNav({ current, onNavigate, onLogout }) {
   }, [])
 
   // Build the public form URL from whichever origin the admin is on; in dev
-  // (Vite on :5173) we override via VITE_API_URL.
-  const RAW = import.meta.env && import.meta.env.VITE_API_URL
-  const API_BASE = RAW !== undefined ? RAW : 'http://localhost:4000'
+  // (Vite on :5173) we override via VITE_API_URL. Defaults to same origin.
+  const API_BASE = import.meta.env?.VITE_API_URL ?? ''
 
   // A few nav items open public-facing pages in a new tab instead of routing in-app.
   const EXTERNAL_PAGES = {

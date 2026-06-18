@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { Check, Filter, Plus, X, Trash2 } from 'lucide-react'
 import { todos as seed } from '../data/mockData'
 
+// API base URL - uses env var in dev/prod, or relative path as fallback
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 const PRI = {
   1: { label: 'Urgent',   pill: 'var(--pri-red)',    bar: 'var(--pri-red-soft)' },
   2: { label: 'High',     pill: 'var(--pri-yellow)', bar: 'var(--pri-yellow-soft)' },
@@ -36,7 +39,7 @@ export default function ToDo() {
   const toggle = (id) => {
     setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
     setTimeout(() => {
-      fetch(`http://localhost:4000/api/todos/${id}`, {
+      fetch(`${API_BASE}/api/todos/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ done: !rows.find(r => r.id === id).done })
@@ -46,12 +49,12 @@ export default function ToDo() {
 
   const deleteTask = (id) => {
     setRows(rows.filter(r => r.id !== id))
-    fetch(`http://localhost:4000/api/todos/${id}`, { method: 'DELETE' }).catch(err => console.error('Failed to delete:', err))
+    fetch(`${API_BASE}/api/todos/${id}`, { method: 'DELETE' }).catch(err => console.error('Failed to delete:', err))
   }
 
   const updateDueDate = (id, due) => {
     setRows(rows.map(r => r.id === id ? { ...r, due } : r))
-    fetch(`http://localhost:4000/api/todos/${id}`, {
+    fetch(`${API_BASE}/api/todos/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ due })
@@ -66,7 +69,7 @@ export default function ToDo() {
     const id = Math.max(0, ...rows.map(r => r.id)) + 1
     const newTask = { ...form, id, task: form.task.trim() }
     setRows([...rows, newTask])
-    fetch('http://localhost:4000/api/todos', {
+    fetch(`${API_BASE}/api/todos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newTask)
