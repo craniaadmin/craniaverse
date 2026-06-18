@@ -11,12 +11,14 @@
 //
 // Run:  npm install  &&  npm start     (listens on http://localhost:4000)
 // ============================================================
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { registrationToRecord, makeSeedRecord } from './mapping.js'
+import { sendRegistrationEmails } from './email.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_FILE = path.join(__dirname, 'data.json')
@@ -214,12 +216,15 @@ app.post('/api/registrations', (req, res) => {
     existing.programs = [...(existing.programs || []), ...newPrograms]
     save(records)
     console.log(`[registration] ~ merged ${newPrograms.length} program(s) into ${existing.displayName} (${existing.id})`)
+    // Fire-and-forget email so the response isn't blocked by SendGrid latency
+    sendRegistrationEmails(form, existing).catch(() => {})
     return res.status(200).json(existing)
   }
 
   records.push(record)
   save(records)
   console.log(`[registration] + ${record.displayName} (${record.id})`)
+  sendRegistrationEmails(form, record).catch(() => {})
   res.status(201).json(record)
 })
 

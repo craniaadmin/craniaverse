@@ -1074,6 +1074,7 @@ function flattenPrograms(cards){
       day: days.join(', '),
       time: times.join(', '),
       schedule: slots,
+      location: (variant && variant.location) || (program && program.location) || '',
       platform: c.offerings[0].platform || '',
       courseCost: courseCost,
       notes: c.notes || '',

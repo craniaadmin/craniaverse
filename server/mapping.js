@@ -130,6 +130,7 @@ export function registrationToRecord(form) {
         year: academicYear(new Date()),
         program: prog.program || '',
         schedule: prog.schedule || [prog.day, prog.time].filter(Boolean).join(' '),
+        location: prog.location || '',
         platform: prog.platform || '',
         methodOfPayment: prog.methodOfPayment || '',
         rate, rateUnit,
