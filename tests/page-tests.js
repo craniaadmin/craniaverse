@@ -30,22 +30,31 @@ const PAGES = [
   { group: 'Financial', item: 'Payroll'           },
 ]
 
-// Click a top-level nav group label. Opens the dropdown if there's
-// one; if the group is single-item, this already navigates.
-async function openGroup(page, label) {
+// Click a top-level nav group label. For multi-item groups this
+// opens the dropdown; for single-item groups, the click navigates
+// directly. `expectDropdown` tells us which behavior to wait for.
+async function openGroup(page, label, expectDropdown) {
   const btn = page.locator(`header.topbar nav.nav .nav-btn`, { hasText: new RegExp(`^${escapeRe(label)}\\s*$`) })
   const n = await btn.count().catch(() => 0)
   if (n === 0) return false
   await btn.first().click({ timeout: 2000 })
+  if (expectDropdown) {
+    // React batches state, so the .dropdown DOM doesn't necessarily
+    // exist the instant click() returns. Wait for it.
+    await page.locator('header.topbar .dropdown').first().waitFor({ state: 'visible', timeout: 2000 })
+  }
   return true
 }
 
-// Click an item inside an open dropdown (or a same-named single-item
-// group). The dropdown <button>s contain only the item label.
+// Click an item inside an open dropdown. The dropdown <button>s
+// contain only the item label.
 async function clickDropdownItem(page, label) {
   const it = page.locator(`header.topbar .dropdown button`, { hasText: new RegExp(`^${escapeRe(label)}\\s*$`) })
-  const n = await it.count().catch(() => 0)
-  if (n === 0) return false
+  try {
+    await it.first().waitFor({ state: 'visible', timeout: 2000 })
+  } catch {
+    return false
+  }
   await it.first().click({ timeout: 2000 })
   return true
 }
@@ -88,13 +97,13 @@ export async function runPageTests() {
     for (const { group, item } of PAGES) {
       results.push(await runTest(`Nav: ${group} → ${item}`, async () => {
         consoleErrors.length = 0
-        const opened = await openGroup(page, group)
+        // Single-item groups (group label === item label) navigate
+        // straight on click; multi-item groups open a dropdown.
+        const isSingleItem = group === item
+        const opened = await openGroup(page, group, !isSingleItem)
         assert(opened, `nav group "${group}" not found`)
 
-        // If the group label === item label (single-item group),
-        // the click above already navigated. Otherwise, click the
-        // dropdown item.
-        if (group !== item) {
+        if (!isSingleItem) {
           const clicked = await clickDropdownItem(page, item)
           assert(clicked, `dropdown item "${item}" not found under "${group}"`)
         }
