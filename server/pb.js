@@ -37,6 +37,16 @@ export function pb() {
   return _pb
 }
 
+function logPbError(label, err) {
+  console.error(`[pb] ${label} failed`, {
+    url:           err?.url,
+    status:        err?.status,
+    message:       err?.message,
+    data:          err?.response?.data ?? err?.data,
+    originalError: err?.originalError?.message,
+  })
+}
+
 async function ensureAuth() {
   const client = pb()
   if (client.authStore.isValid) return
@@ -45,17 +55,31 @@ async function ensureAuth() {
   if (!email || !password) {
     throw new Error('PB_ADMIN_EMAIL / PB_ADMIN_PASSWORD must be set in server/.env')
   }
+  console.log(`[pb] authenticating as ${email} against ${client.baseURL}`)
   if (!authPromise) {
     authPromise = client.collection('_superusers')
       .authWithPassword(email, password)
-      .catch((err) => { authPromise = null; throw err })
+      .then((r) => {
+        console.log(`[pb] auth ok, token prefix=${r?.token?.slice(0, 16)}`)
+        return r
+      })
+      .catch((err) => {
+        authPromise = null
+        logPbError('auth', err)
+        throw err
+      })
   }
   await authPromise
 }
 
 async function getFullList(collection) {
   await ensureAuth()
-  return pb().collection(collection).getFullList({ batch: 500, sort: 'created' })
+  try {
+    return await pb().collection(collection).getFullList({ batch: 500, sort: 'created' })
+  } catch (err) {
+    logPbError(`getFullList(${collection})`, err)
+    throw err
+  }
 }
 
 async function findByRecordId(collection, recordId) {
