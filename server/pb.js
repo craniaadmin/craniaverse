@@ -75,7 +75,10 @@ async function ensureAuth() {
 async function getFullList(collection) {
   await ensureAuth()
   try {
-    return await pb().collection(collection).getFullList({ batch: 500, sort: 'created' })
+    // No explicit sort: PocketBase v0.23+ requires opt-in `autodate`
+    // fields for `created`/`updated`, which our pb-setup doesn't add.
+    // Order doesn't matter for our load/save logic (Map lookups).
+    return await pb().collection(collection).getFullList({ batch: 500 })
   } catch (err) {
     logPbError(`getFullList(${collection})`, err)
     throw err
