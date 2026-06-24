@@ -13,6 +13,20 @@
 module.exports = {
   apps: [
     {
+      // PocketBase: a single self-contained binary that runs as its own
+      // HTTP server (default :8090) and stores everything in pb_data/.
+      // The Express API (craniaverse-api) talks to it via the JS SDK.
+      // The binary is downloaded per-machine — see server/POCKETBASE_SETUP.md.
+      name: 'craniaverse-pocketbase',
+      script: './server/pocketbase.exe',
+      args: 'serve --http=127.0.0.1:8090',
+      cwd: './server',
+      autorestart: true,
+      max_memory_restart: '512M',
+      min_uptime: 10000,
+      max_restarts: 10,
+    },
+    {
       name: 'craniaverse-api',
       script: 'server/server.js',
       env: {

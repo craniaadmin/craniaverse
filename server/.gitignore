@@ -1,3 +1,12 @@
 node_modules/
 data.json
 .env
+
+# PocketBase runtime data — created on first start of the pocketbase
+# binary. Contains the SQLite database, uploaded files, and the
+# auto-applied migrations history. Per-machine; never commit.
+pb_data/
+
+# PocketBase binary itself — downloaded per-machine.
+pocketbase
+pocketbase.exe

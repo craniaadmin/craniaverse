@@ -1,13 +1,15 @@
 // ============================================================
 // CraniaVerse backend — a small registration API
 // ------------------------------------------------------------
-// Stores submissions in a plain JSON file (server/data.json) — no
-// database engine to install. Fine for a single-location school.
+// Data lives in PocketBase (see server/pb.js). The HTTP edge
+// of this file is unchanged from the JSON-file era, so the
+// React admin and the public forms work without modification.
 //
 //   GET  /api/health         -> { ok: true }
-//   GET  /api/registrations  -> [ record, ... ]   (admin app reads this)
-//   POST /api/registrations  -> creates a record  (forms write this)
+//   GET  /api/registrations  -> [ record, ... ]
+//   POST /api/registrations  -> creates a record
 //   DELETE /api/registrations/:id -> removes a record
+//   ...
 //
 // Run:  npm install  &&  npm start     (listens on http://localhost:4000)
 // ============================================================
@@ -19,19 +21,17 @@ import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { sendRegistrationEmails } from './email.js'
+import {
+  loadRegistrations, saveRegistrations,
+  loadStaff,         saveStaff,
+  loadPrograms,      savePrograms,
+  loadRules,         saveRules,
+  loadComments,      saveCommentsForTab,
+  loadStaffBoard,    saveStaffBoard,
+} from './pb.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-// Load .env from next to this file, not the process CWD. This way PM2,
-// `node server/server.js` from the repo root, and `cd server && npm start`
-// all find the same key file.
 dotenv.config({ path: path.join(__dirname, '.env') })
-const DATA_FILE = path.join(__dirname, 'data.json')
-const COMMENTS_FILE = path.join(__dirname, 'comments.json')
-const RULES_FILE = path.join(__dirname, 'rules.json')
-const STAFF_FILE = path.join(__dirname, 'staff.json')
-const PROGRAMS_FILE = path.join(__dirname, 'programs.json')
-const PROGRAMS_SEED = path.join(__dirname, '..', 'src', 'data', 'programsData.json')
-const STAFF_BOARD_FILE = path.join(__dirname, 'staff-board.json')
 const PORT = process.env.PORT || 4000
 
 const DEFAULT_RULES = [
@@ -39,58 +39,6 @@ const DEFAULT_RULES = [
   { id: 'no-shirt', reason: 'No Shirt', delta: -5 },
 ]
 
-// ---- registrations store -----------------------------------
-function load() {
-  try {
-    const raw = fs.readFileSync(DATA_FILE, 'utf8')
-    const arr = JSON.parse(raw)
-    if (Array.isArray(arr)) return arr
-  } catch {
-    // file missing or unreadable — fall through to seed
-  }
-  const seeded = [makeSeedRecord()]
-  save(seeded)
-  return seeded
-}
-function save(records) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(records, null, 2))
-}
-
-// ---- comments store ----------------------------------------
-// Shape: { [studentId]: { [tabKey]: [ row, ... ] } }
-function loadComments() {
-  try {
-    const raw = fs.readFileSync(COMMENTS_FILE, 'utf8')
-    const obj = JSON.parse(raw)
-    if (obj && typeof obj === 'object') return obj
-  } catch {}
-  return {}
-}
-function saveComments(data) {
-  fs.writeFileSync(COMMENTS_FILE, JSON.stringify(data, null, 2))
-}
-
-// ---- migrate records missing the programs / cashLog fields ------------
-function migrate() {
-  const records = load()
-  let changed = false
-  records.forEach((r) => {
-    if (!Array.isArray(r.programs)) {
-      r.programs = r.registration?.program
-        ? [{ year: '25_26', program: r.registration.program }]
-        : []
-      changed = true
-    }
-    if (!Array.isArray(r.cashLog)) {
-      r.cashLog = []
-      changed = true
-    }
-  })
-  if (changed) save(records)
-}
-migrate()
-
-// ---- staff store -------------------------------------------
 const DEFAULT_STAFF = [
   {
     id: 'staff-tas',
@@ -111,41 +59,108 @@ const DEFAULT_STAFF = [
     active: true,
   },
 ]
-function loadStaff() {
-  try {
-    const raw = fs.readFileSync(STAFF_FILE, 'utf8')
-    const arr = JSON.parse(raw)
-    if (Array.isArray(arr)) return arr
-  } catch {}
-  saveStaff(DEFAULT_STAFF)
-  return DEFAULT_STAFF
-}
-function saveStaff(staff) {
-  fs.writeFileSync(STAFF_FILE, JSON.stringify(staff, null, 2))
+
+// ---- in-memory cache + write coalescing --------------------
+// Each "load*" function in pb.js does a getFullList round-trip
+// to PocketBase. The original JSON-file code freely called
+// load() inside every endpoint and that was cheap. To keep the
+// same ergonomics without 25 round-trips per request, we cache
+// each store and refresh from PocketBase on demand.
+const cache = {
+  registrations: null,
+  staff:         null,
+  programs:      null,
+  rules:         null,
 }
 
-// ---- rules store -------------------------------------------
-function loadRules() {
-  try {
-    const raw = fs.readFileSync(RULES_FILE, 'utf8')
-    const arr = JSON.parse(raw)
-    if (Array.isArray(arr)) return arr
-  } catch {}
-  saveRules(DEFAULT_RULES)
-  return DEFAULT_RULES
+async function getRegistrations() {
+  if (cache.registrations) return cache.registrations
+  cache.registrations = await loadRegistrations()
+  return cache.registrations
 }
-function saveRules(rules) {
-  fs.writeFileSync(RULES_FILE, JSON.stringify(rules, null, 2))
+async function commitRegistrations(records) {
+  cache.registrations = records
+  await saveRegistrations(records)
+}
+
+async function getStaff() {
+  if (cache.staff) return cache.staff
+  let staff = await loadStaff()
+  if (staff.length === 0) {
+    staff = [...DEFAULT_STAFF]
+    await saveStaff(staff)
+  }
+  cache.staff = staff
+  return cache.staff
+}
+async function commitStaff(staff) {
+  cache.staff = staff
+  await saveStaff(staff)
+}
+
+async function getPrograms() {
+  if (cache.programs) return cache.programs
+  cache.programs = await loadPrograms()
+  return cache.programs
+}
+async function commitPrograms(programs) {
+  cache.programs = programs
+  await savePrograms(programs)
+}
+
+async function getRules() {
+  if (cache.rules) return cache.rules
+  let rules = await loadRules()
+  if (rules.length === 0) {
+    rules = [...DEFAULT_RULES]
+    await saveRules(rules)
+  }
+  cache.rules = rules
+  return cache.rules
+}
+async function commitRules(rules) {
+  cache.rules = rules
+  await saveRules(rules)
+}
+
+// ---- registrations: one-time migration of legacy records ---
+// Earlier records may be missing the programs / cashLog
+// fields. Pull all records, patch in-memory, and write back
+// only if something changed.
+async function migrateRegistrations() {
+  const records = await getRegistrations()
+  let changed = false
+  records.forEach((r) => {
+    if (!Array.isArray(r.programs)) {
+      r.programs = r.registration?.program
+        ? [{ year: '25_26', program: r.registration.program }]
+        : []
+      changed = true
+    }
+    if (!Array.isArray(r.cashLog)) {
+      r.cashLog = []
+      changed = true
+    }
+  })
+  if (changed) await commitRegistrations(records)
+}
+
+// ---- one-time seed if database is empty --------------------
+// If the registrations collection is empty (first boot, no
+// import yet), drop in a single seed record so the admin UI
+// has something to render.
+async function seedIfEmpty() {
+  const records = await getRegistrations()
+  if (records.length === 0) {
+    await commitRegistrations([makeSeedRecord()])
+  }
 }
 
 // ---- app ---------------------------------------------------
 const app = express()
-app.use(cors())                       // allow the form + Vite dev server (any origin) for local use
+app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
-// Allow the public school website to embed /register and /staff-form in an iframe.
-// Override with the ALLOWED_FRAME_ANCESTORS env var (space-separated origins).
-// Default locks embedding to the official school site.
 const ALLOWED_FRAME_ANCESTORS = process.env.ALLOWED_FRAME_ANCESTORS
   || "'self' https://crania-schools.com https://www.crania-schools.com"
 app.use((req, res, next) => {
@@ -155,19 +170,19 @@ app.use((req, res, next) => {
   next()
 })
 
+// Wrap an async route handler so unhandled rejections become a 500
+// instead of crashing the process.
+const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
-// Serve the standalone registration form at /register
 const FORM_FILE = path.join(__dirname, '..', 'public', 'registration.html')
 app.get('/register', (_req, res) => res.sendFile(FORM_FILE))
 
-// Serve the standalone staff information form at /staff-form
 const STAFF_FORM_FILE = path.join(__dirname, '..', 'public', 'staff-form.html')
 app.get('/staff-form', (_req, res) => res.sendFile(STAFF_FORM_FILE))
 
-// In production, serve the built React admin from /dist (created by `npm run build`).
-// Anything that's not an API route, /register, or /staff-form falls back to index.html
-// so the in-app navigation works.
+// Production: serve built React admin from /dist
 const DIST_DIR = path.join(__dirname, '..', 'dist')
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR))
@@ -176,9 +191,9 @@ if (fs.existsSync(DIST_DIR)) {
   })
 }
 
-app.get('/api/registrations', (_req, res) => {
-  res.json(load())
-})
+app.get('/api/registrations', wrap(async (_req, res) => {
+  res.json(await getRegistrations())
+}))
 
 // Shared helper: take a per-student form, save it (creating or merging into
 // an existing record) and return the resulting record. Mutates `records`.
@@ -214,16 +229,13 @@ function processStudentForm(records, perStudentForm) {
   return record
 }
 
-app.post('/api/registrations', (req, res) => {
+app.post('/api/registrations', wrap(async (req, res) => {
   const body = req.body || {}
 
   if (body.website) {
-    // honeypot field was filled -> almost certainly a bot. Pretend success, store nothing.
     return res.status(201).json({ ok: true })
   }
 
-  // New batch shape: body has a `students` array. Process each child as its
-  // own record (with the same dedupe rules), then fire ONE batched email.
   if (Array.isArray(body.students)) {
     if (body.students.length === 0) {
       return res.status(400).json({ error: 'students array is empty' })
@@ -234,126 +246,112 @@ app.post('/api/registrations', (req, res) => {
       }
     }
 
-    const records = load()
+    const records = await getRegistrations()
     const created = body.students.map((s) => {
       const perStudentForm = { ...body, ...s }
       delete perStudentForm.students
       return processStudentForm(records, perStudentForm)
     })
-    save(records)
+    await commitRegistrations(records)
 
-    // Fire-and-forget so SendGrid latency doesn't block the response
     sendRegistrationEmails(body, created).catch(() => {})
     return res.status(201).json(created)
   }
 
-  // Legacy single-student shape: student fields at top level. Kept so any
-  // existing client (or curl test) continues to work.
   const form = body
   if (!String(form.studentFirstName || '').trim() || !String(form.studentLastName || '').trim()) {
     return res.status(400).json({ error: 'studentFirstName and studentLastName are required' })
   }
-  const records = load()
+  const records = await getRegistrations()
   const record = processStudentForm(records, form)
-  save(records)
+  await commitRegistrations(records)
   sendRegistrationEmails(form, record).catch(() => {})
   res.status(record === records[records.length - 1] ? 201 : 200).json(record)
-})
+}))
 
-app.delete('/api/registrations/:id', (req, res) => {
-  const records = load()
+app.delete('/api/registrations/:id', wrap(async (req, res) => {
+  const records = await getRegistrations()
   const next = records.filter((r) => r.id !== req.params.id)
-  save(next)
+  await commitRegistrations(next)
   res.json({ deleted: records.length - next.length })
-})
+}))
 
-// PUT /api/registrations/:id/student  -> update student fields
-app.put('/api/registrations/:id/student', (req, res) => {
-  const records = load()
+app.put('/api/registrations/:id/student', wrap(async (req, res) => {
+  const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
   records[idx] = { ...records[idx], student: { ...records[idx].student, ...req.body } }
-  save(records)
+  await commitRegistrations(records)
   res.json({ ok: true })
-})
+}))
 
-// PUT /api/registrations/:id/customer  -> update customer (guardian/emergency) fields
-app.put('/api/registrations/:id/customer', (req, res) => {
-  const records = load()
+app.put('/api/registrations/:id/customer', wrap(async (req, res) => {
+  const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
   records[idx] = { ...records[idx], customer: { ...records[idx].customer, ...req.body } }
-  save(records)
+  await commitRegistrations(records)
   res.json({ ok: true })
-})
+}))
 
-// PUT /api/registrations/:id/programs  -> replace programs list for a student
-app.put('/api/registrations/:id/programs', (req, res) => {
+app.put('/api/registrations/:id/programs', wrap(async (req, res) => {
   const programs = req.body
   if (!Array.isArray(programs)) return res.status(400).json({ error: 'body must be an array' })
-  const records = load()
+  const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
   records[idx] = { ...records[idx], programs }
-  save(records)
+  await commitRegistrations(records)
   res.json({ ok: true })
-})
+}))
 
-// PUT /api/registrations/:id/craniaCash  -> update student's crania cash
-app.put('/api/registrations/:id/craniaCash', (req, res) => {
+app.put('/api/registrations/:id/craniaCash', wrap(async (req, res) => {
   const { craniaCash } = req.body
   if (typeof craniaCash !== 'number' || craniaCash < 0) return res.status(400).json({ error: 'craniaCash must be a non-negative number' })
-  const records = load()
+  const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
   records[idx] = { ...records[idx], student: { ...records[idx].student, craniaCash } }
-  save(records)
+  await commitRegistrations(records)
   res.json({ ok: true })
-})
+}))
 
-// GET /api/comments/:studentId  -> { tabKey: [rows] }
-app.get('/api/comments/:studentId', (req, res) => {
-  const all = loadComments()
+app.get('/api/comments/:studentId', wrap(async (req, res) => {
+  const all = await loadComments()
   res.json(all[req.params.studentId] || {})
-})
+}))
 
-// PUT /api/comments/:studentId/:tabKey  -> save rows for one tab
-app.put('/api/comments/:studentId/:tabKey', (req, res) => {
+app.put('/api/comments/:studentId/:tabKey', wrap(async (req, res) => {
   const { studentId, tabKey } = req.params
   const rows = req.body
   if (!Array.isArray(rows)) return res.status(400).json({ error: 'body must be an array of rows' })
-  const all = loadComments()
-  if (!all[studentId]) all[studentId] = {}
-  all[studentId][tabKey] = rows
-  saveComments(all)
+  await saveCommentsForTab(studentId, tabKey, rows)
   res.json({ ok: true })
-})
+}))
 
-// POST /api/registrations/:id/cashEntry  -> append cash log entry, update balance
-app.post('/api/registrations/:id/cashEntry', (req, res) => {
+app.post('/api/registrations/:id/cashEntry', wrap(async (req, res) => {
   const { delta, reason } = req.body || {}
   if (typeof delta !== 'number' || !Number.isFinite(delta)) {
     return res.status(400).json({ error: 'delta must be a finite number' })
   }
-  const records = load()
+  const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
   const rec = records[idx]
   const log = Array.isArray(rec.cashLog) ? rec.cashLog : []
   const entry = { ts: new Date().toISOString(), delta, reason: String(reason || '').trim() || '—' }
-  const newBalance = (rec.student?.craniaCash || 0) + delta // can go negative
+  const newBalance = (rec.student?.craniaCash || 0) + delta
   records[idx] = {
     ...rec,
     cashLog: [...log, entry],
     student: { ...rec.student, craniaCash: newBalance },
   }
-  save(records)
+  await commitRegistrations(records)
   res.json({ ok: true, balance: newBalance, entry })
-})
+}))
 
-// GET / PUT /api/rules
-app.get('/api/rules', (_req, res) => res.json(loadRules()))
-app.put('/api/rules', (req, res) => {
+app.get('/api/rules', wrap(async (_req, res) => res.json(await getRules())))
+app.put('/api/rules', wrap(async (req, res) => {
   if (!Array.isArray(req.body)) return res.status(400).json({ error: 'body must be an array' })
   const cleaned = req.body
     .filter((r) => r && typeof r === 'object')
@@ -362,45 +360,37 @@ app.put('/api/rules', (req, res) => {
       reason: String(r.reason || '').trim(),
       delta: Number(r.delta) || 0,
     }))
-  saveRules(cleaned)
+  await commitRules(cleaned)
   res.json({ ok: true, rules: cleaned })
-})
+}))
 
-// ---- programs store ----------------------------------------
-function loadPrograms() {
-  try {
-    const raw = fs.readFileSync(PROGRAMS_FILE, 'utf8')
-    const arr = JSON.parse(raw)
-    if (Array.isArray(arr)) return arr
-  } catch {}
-  // first run — seed from the bundled programsData.json
-  try {
-    const raw = fs.readFileSync(PROGRAMS_SEED, 'utf8')
-    const arr = JSON.parse(raw)
-    if (Array.isArray(arr)) {
-      savePrograms(arr)
-      return arr
-    }
-  } catch {}
-  savePrograms([])
-  return []
-}
-function savePrograms(programs) {
-  fs.writeFileSync(PROGRAMS_FILE, JSON.stringify(programs, null, 2))
-}
+app.get('/api/programs', wrap(async (_req, res) => {
+  let programs = await getPrograms()
+  if (programs.length === 0) {
+    // first run on a fresh DB — seed from the bundled programsData.json
+    try {
+      const seedPath = path.join(__dirname, '..', 'src', 'data', 'programsData.json')
+      const raw = fs.readFileSync(seedPath, 'utf8')
+      const arr = JSON.parse(raw)
+      if (Array.isArray(arr) && arr.length > 0) {
+        await commitPrograms(arr)
+        programs = arr
+      }
+    } catch {}
+  }
+  res.json(programs)
+}))
 
-app.get('/api/programs', (_req, res) => res.json(loadPrograms()))
-app.put('/api/programs', (req, res) => {
+app.put('/api/programs', wrap(async (req, res) => {
   if (!Array.isArray(req.body)) return res.status(400).json({ error: 'body must be an array' })
-  savePrograms(req.body)
+  await commitPrograms(req.body)
   res.json({ ok: true })
-})
+}))
 
-// ---- decrement spots for registered offerings ---------------
-app.put('/api/programs/decrement-spots', (req, res) => {
+app.put('/api/programs/decrement-spots', wrap(async (req, res) => {
   const decrements = req.body || []
   if (!Array.isArray(decrements)) return res.status(400).json({ error: 'body must be an array of {programIdx, offeringIdx}' })
-  const programs = loadPrograms()
+  const programs = await getPrograms()
   let count = 0
   decrements.forEach(function(d) {
     const programIdx = parseInt(d.programIdx, 10)
@@ -416,47 +406,26 @@ app.put('/api/programs/decrement-spots', (req, res) => {
       }
     }
   })
-  if (count > 0) savePrograms(programs)
+  if (count > 0) await commitPrograms(programs)
   res.json({ ok: true, decremented: count })
-})
+}))
 
-// ---- staff hub (Trello-style board) ------------------------
-const DEFAULT_STAFF_BOARD = {
-  lists: [
-    { id: 'l1', title: 'To Do', cards: [] },
-    { id: 'l2', title: 'In Progress', cards: [] },
-    { id: 'l3', title: 'Done', cards: [] },
-  ],
-}
-function loadStaffBoard() {
-  try {
-    const raw = fs.readFileSync(STAFF_BOARD_FILE, 'utf8')
-    const obj = JSON.parse(raw)
-    if (obj && Array.isArray(obj.lists)) return obj
-  } catch {}
-  saveStaffBoard(DEFAULT_STAFF_BOARD)
-  return DEFAULT_STAFF_BOARD
-}
-function saveStaffBoard(board) {
-  fs.writeFileSync(STAFF_BOARD_FILE, JSON.stringify(board, null, 2))
-}
-app.get('/api/staff-board', (_req, res) => res.json(loadStaffBoard()))
-app.put('/api/staff-board', (req, res) => {
+app.get('/api/staff-board', wrap(async (_req, res) => res.json(await loadStaffBoard())))
+app.put('/api/staff-board', wrap(async (req, res) => {
   const body = req.body
   if (!body || !Array.isArray(body.lists)) return res.status(400).json({ error: 'body must have a lists array' })
-  saveStaffBoard(body)
+  await saveStaffBoard(body)
   res.json({ ok: true })
-})
+}))
 
-// ---- staff endpoints ---------------------------------------
-app.get('/api/staff', (_req, res) => res.json(loadStaff()))
+app.get('/api/staff', wrap(async (_req, res) => res.json(await getStaff())))
 
-app.post('/api/staff', (req, res) => {
+app.post('/api/staff', wrap(async (req, res) => {
   const body = req.body || {}
   if (!String(body.firstName || '').trim() || !String(body.lastName || '').trim()) {
     return res.status(400).json({ error: 'firstName and lastName are required' })
   }
-  const staff = loadStaff()
+  const staff = await getStaff()
   const id = `staff-${Date.now().toString(36)}`
   const record = {
     id,
@@ -468,27 +437,44 @@ app.post('/api/staff', (req, res) => {
     ...body,
   }
   staff.push(record)
-  saveStaff(staff)
+  await commitStaff(staff)
   res.status(201).json(record)
-})
+}))
 
-app.put('/api/staff/:id', (req, res) => {
-  const staff = loadStaff()
+app.put('/api/staff/:id', wrap(async (req, res) => {
+  const staff = await getStaff()
   const idx = staff.findIndex((s) => s.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
   staff[idx] = { ...staff[idx], ...req.body, id: staff[idx].id }
-  saveStaff(staff)
+  await commitStaff(staff)
   res.json({ ok: true })
-})
+}))
 
-app.delete('/api/staff/:id', (req, res) => {
-  const staff = loadStaff()
+app.delete('/api/staff/:id', wrap(async (req, res) => {
+  const staff = await getStaff()
   const next = staff.filter((s) => s.id !== req.params.id)
-  saveStaff(next)
+  await commitStaff(next)
   res.json({ deleted: staff.length - next.length })
+}))
+
+// Error handler — any thrown error from a wrap()-ed handler lands here
+app.use((err, _req, res, _next) => {
+  console.error('[api error]', err?.response || err?.message || err)
+  res.status(500).json({ error: err?.message || 'internal error' })
 })
 
-app.listen(PORT, () => {
-  console.log(`CraniaVerse API listening on http://localhost:${PORT}`)
-  console.log(`Data file: ${DATA_FILE}`)
-})
+async function start() {
+  try {
+    await migrateRegistrations()
+    await seedIfEmpty()
+  } catch (err) {
+    console.error('Startup migration failed:', err?.message || err)
+    console.error('The server will still start, but PocketBase may not be reachable yet.')
+  }
+  app.listen(PORT, () => {
+    console.log(`CraniaVerse API listening on http://localhost:${PORT}`)
+    console.log(`Backed by PocketBase at ${process.env.PB_URL || 'http://127.0.0.1:8090'}`)
+  })
+}
+
+start()
