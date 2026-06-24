@@ -61,7 +61,8 @@
       "Skill(update-config:*)",
       "Bash(git commit *)",
       "Bash(git ls-remote *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);console.log\\('total programs:',a.length\\);console.log\\('actives:',a.filter\\(p=>p.active\\).length\\);console.log\\('first program:',JSON.stringify\\(a[0],null,2\\).slice\\(0,800\\)\\);}\\)\")"
     ]
   },
   "hooks": {

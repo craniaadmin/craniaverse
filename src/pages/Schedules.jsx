@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Plus, X, Trash2, Edit3, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, X, Trash2, Settings, Download } from 'lucide-react'
 
 // Half-hour slots from 8:00 AM to 9:00 PM — the standard band for both
 // day-school classes and afterschool. Times are stored as "HH:MM".
@@ -28,11 +28,65 @@ const DEFAULT_LOCATIONS = [
   { id: 'loc_wateast',   name: 'Waterloo East' },
 ]
 
+// Default rooms map 1:1 to Crania's program categories so the seed import
+// from /api/programs has somewhere meaningful to land. Names + colors are
+// editable from the Rooms manager — these are just opinionated starters.
 const DEFAULT_ROOMS = [
-  { id: 'rm_1', name: 'Room 1', color: ROOM_PALETTE[0] },
-  { id: 'rm_2', name: 'Room 2', color: ROOM_PALETTE[1] },
-  { id: 'rm_3', name: 'Room 3', color: ROOM_PALETTE[3] },
+  { id: 'rm_flex',       name: 'FLEX',       color: '#5FA09E' },
+  { id: 'rm_enrichment', name: 'Enrichment', color: '#6aaa1e' },
+  { id: 'rm_private',    name: 'Private',    color: '#A6E2F9' },
+  { id: 'rm_teknokids',  name: 'Teknokids',  color: '#e8814a' },
+  { id: 'rm_piano',      name: 'Piano',      color: '#d97a8c' },
+  { id: 'rm_contest',    name: 'Contest',    color: '#20bab5' },
+  { id: 'rm_camp',       name: 'Camp',       color: '#cfa84a' },
 ]
+
+// Map program category → seed room id. Drives auto-assignment during import.
+const CATEGORY_TO_ROOM = {
+  FLEX:        'rm_flex',
+  ENRICHMENT:  'rm_enrichment',
+  PRIVATE:     'rm_private',
+  TEKNOKIDS:   'rm_teknokids',
+  PIANO:       'rm_piano',
+  CONTEST:     'rm_contest',
+  CAMP:        'rm_camp',
+}
+
+// Snap a "HH:MM:SS" or "HH:MM" string to the nearest 30-min schedule slot.
+function snapToSlot(t) {
+  if (!t) return null
+  const [h, m] = String(t).split(':').map(Number)
+  if (isNaN(h)) return null
+  const totalMin = h * 60 + (m || 0)
+  const slotMin = Math.round(totalMin / 30) * 30
+  const hh = String(Math.floor(slotMin / 60)).padStart(2, '0')
+  const mm = String(slotMin % 60).padStart(2, '0')
+  return `${hh}:${mm}`
+}
+
+// Translate program titles into something that fits inside a 30-min cell.
+function shortTitle(title = '') {
+  return title
+    .replace(/ - SINGLE$/i, '').replace(/ - DOUBLE$/i, '').replace(/ - UNLIMITED$/i, '')
+    .replace(/ - HALF DAY$/i, '').replace(/ - FULL DAY$/i, '')
+    .replace(/^MATH ENRICHMENT - LEVEL (\d)$/i, 'ENRICH L$1')
+    .replace(/^PRIVATE LESSONS - 55 MIN$/i, 'PRIVATE')
+    .replace(/^PIANO PRIVATE 30MIN - /i, 'PIANO ')
+    .replace(/^TEKNOKIDS CODING: /i, 'TK: ')
+    .replace(/^TEKNOKIDS /i, 'TK ')
+    .replace(/^FLEX KINDERGARTEN$/i, 'FLEX KINDER')
+}
+
+function categoryOf(title = '') {
+  const t = title.toUpperCase()
+  if (t.startsWith('FLEX')) return 'FLEX'
+  if (t.startsWith('MATH ENRICHMENT')) return 'ENRICHMENT'
+  if (t.startsWith('PRIVATE')) return 'PRIVATE'
+  if (t.startsWith('TEKNOKIDS')) return 'TEKNOKIDS'
+  if (t.startsWith('PIANO')) return 'PIANO'
+  if (t.startsWith('CONTEST')) return 'CONTEST'
+  return 'CAMP'
+}
 
 function fmtTime(t) {
   const [h, m] = t.split(':').map(Number)
@@ -62,6 +116,65 @@ export default function Schedules() {
   const [rooms, setRooms]         = useLocal('crania_sched_rooms', DEFAULT_ROOMS)
   const [locations, setLocations] = useLocal('crania_sched_locations', DEFAULT_LOCATIONS)
   const [entries, setEntries]     = useLocal('crania_sched_entries', [])
+
+  // Build schedule entries from the /api/programs feed. Each active
+  // offering becomes one entry. Manual edits are preserved by id, so
+  // re-importing only adds new offerings — it doesn't clobber notes,
+  // teacher tweaks, or drag-drop reassignments.
+  function importFromPrograms({ silent = false } = {}) {
+    return fetch('/api/programs')
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+      .then(programs => {
+        if (!Array.isArray(programs) || programs.length === 0) {
+          if (!silent) alert('No programs returned by /api/programs.')
+          return
+        }
+        const locByName = Object.fromEntries(locations.map(l => [l.name, l.id]))
+        const existing = new Map(entries.map(e => [e.id, e]))
+        let added = 0
+
+        programs.filter(p => p.active).forEach(prog => {
+          const cat = categoryOf(prog.title)
+          const roomId = CATEGORY_TO_ROOM[cat] || rooms[0]?.id
+          const locId = locByName[prog.location] || locations[0]?.id
+          if (!locId) return
+          ;(prog.offerings || []).filter(o => o.active).forEach((o, idx) => {
+            const start = snapToSlot(o.start)
+            const end   = snapToSlot(o.end)
+            if (!start || !end || end <= start) return
+            const id = `seed_${prog.code || prog.number}_${o.day}_${start}_${idx}`
+            if (existing.has(id)) return
+            existing.set(id, {
+              id,
+              title: shortTitle(prog.title),
+              teacher: o.teacher || '',
+              day: o.day,
+              startTime: start,
+              endTime: end,
+              locationId: locId,
+              roomId,
+              notes: '',
+            })
+            added++
+          })
+        })
+
+        setEntries([...existing.values()])
+        if (!silent) alert(`Imported ${added} new class${added === 1 ? '' : 'es'} from Programs.`)
+      })
+      .catch(err => {
+        if (!silent) alert('Could not import programs: ' + err.message)
+      })
+  }
+
+  // One-time auto-import on first visit when the user has nothing yet.
+  // Retries on every visit (silently) until at least one entry exists, so
+  // a transient API failure doesn't permanently leave the schedule empty.
+  useEffect(() => {
+    if (entries.length > 0) return
+    importFromPrograms({ silent: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [view, setView]           = useState('week') // 'week' | 'month'
   const [focusLoc, setFocusLoc]   = useState(null)   // location id or null for "all"
   const [editing, setEditing]     = useState(null)   // entry being edited or null
@@ -147,6 +260,10 @@ export default function Schedules() {
           <button className="btn ghost" onClick={() => setShowLocs(true)}>
             <Settings size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />
             Locations
+          </button>
+          <button className="btn ghost" onClick={() => importFromPrograms()}>
+            <Download size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />
+            Import from Programs
           </button>
           <button className="btn" onClick={() => newEntry()}>
             <Plus size={14} style={{ marginRight: 4, verticalAlign: '-2px' }} />

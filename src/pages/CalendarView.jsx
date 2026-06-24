@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Plus, X, Trash2, Repeat } from 'lucide-react'
 import { RRule } from 'rrule'
+import { CALENDAR_SEED } from '../data/calendarSeed'
 
 // Three calendar streams the admin views together or in isolation.
 // Each has its own palette so events read at a glance.
@@ -47,7 +48,10 @@ function buildMonth(year, month) {
   const days = []
   for (let i = startDow; i > 0; i--) days.push({ date: new Date(year, month, 1 - i), current: false })
   for (let d = 1; d <= lastDate; d++) days.push({ date: new Date(year, month, d), current: true })
-  while (days.length % 7 !== 0) days.push({ date: new Date(year, month, days.length - startDow - lastDate + 1), current: false })
+  let trailing = 1
+  while (days.length % 7 !== 0) {
+    days.push({ date: new Date(year, month + 1, trailing++), current: false })
+  }
   return days
 }
 
@@ -96,8 +100,12 @@ export default function CalendarView() {
   const [viewDate, setViewDate] = useState(today)
   const [activeCals, setActiveCals] = useState(CALENDARS.map(c => c.id))
   const [events, setEvents] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('crania_calendar_events') || '[]') }
-    catch { return [] }
+    try {
+      const raw = localStorage.getItem('crania_calendar_events')
+      if (raw === null) return CALENDAR_SEED  // first visit — seed from Crania's published calendar
+      const parsed = JSON.parse(raw)
+      return Array.isArray(parsed) ? parsed : CALENDAR_SEED
+    } catch { return CALENDAR_SEED }
   })
   const [editing, setEditing] = useState(null) // event being edited or null
   const [showForm, setShowForm] = useState(false)
