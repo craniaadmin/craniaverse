@@ -60,19 +60,27 @@ function calcTaxes(grossPay, periodsPerYear) {
   // Income tax (annualise → brackets → divide back)
   const fedTax   = bracketTax(annual - FED_BASIC, FED_BRACKETS)
   const onTax    = bracketTax(annual - ON_BASIC,  ON_BRACKETS)
-  const taxPP    = r2((fedTax + onTax) / periodsPerYear)
+  const fedTaxPP = r2(fedTax / periodsPerYear)
+  const onTaxPP  = r2(onTax / periodsPerYear)
+  const taxPP    = r2(fedTaxPP + onTaxPP)
 
   const totalDed = r2(cppEE + eiEE + taxPP)
   const netPay   = r2(grossPay - totalDed)
   const craRem   = r2(taxPP + cppEE + cppER + eiEE + eiER)
 
-  return { gross: grossPay, cppEE, cppER, eiEE, eiER, taxPP, totalDed, netPay, craRem }
+  return { gross: grossPay, cppEE, cppER, eiEE, eiER, fedTaxPP, onTaxPP, taxPP, totalDed, netPay, craRem }
 }
 
 const fmt = (n) =>
   n == null ? '—' : `$${Number(n).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 const todayStr = () => new Date().toISOString().slice(0, 10)
+
+const formatDateWithMonth = (dateStr) => {
+  if (!dateStr) return '—'
+  const d = new Date(dateStr + 'T00:00:00')
+  return d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
+}
 
 function lsLoad(key, fb) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fb } catch { return fb } }
 function lsSave(key, v)  { try { localStorage.setItem(key, JSON.stringify(v)) } catch {} }
@@ -109,23 +117,27 @@ function printHtml(title, body) {
 // ── Paystub modal ──────────────────────────────────────────────────────────
 function PaystubModal({ entry, run, onClose }) {
   const ytd = entry.ytd || {}
+  const [craPaidDate, setCraPaidDate] = useState('')
+  const [empPaidDate, setEmpPaidDate] = useState(run.processedAt)
 
   const handlePrint = () => {
     const body = `
-      <div class="hdr">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
         <div>
+          <img src="/crania-logo-black.jpg" style="height:40px;margin-bottom:8px;" />
           <div class="hdr-co">CRANIA SCHOOLS</div>
           <div style="font-size:12px;color:#666;">Employee Pay Statement · ${TAX_YEAR}</div>
         </div>
         <div style="text-align:right;font-size:12px;">
-          <div><b>Pay Period:</b> ${run.periodStart} — ${run.periodEnd}</div>
-          <div><b>Pay Date:</b> ${run.processedAt}</div>
+          <div><b>Pay Period:</b> ${formatDateWithMonth(run.periodStart)} — ${formatDateWithMonth(run.periodEnd)}</div>
+          <div><b>Pay Date:</b> ${formatDateWithMonth(run.processedAt)}</div>
           <div><b>Type:</b> ${run.periodType}</div>
         </div>
       </div>
 
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:16px;padding:12px;background:#f5f5f5;border-radius:4px;">
         <div class="bold" style="font-size:15px;">${entry.name}</div>
+        ${entry.address ? `<div class="grey" style="font-size:12px;margin-top:4px;">${entry.address}</div>` : ''}
         <div class="grey">${entry.role || 'Staff'}${entry.sin ? ' · SIN ***-***-' + String(entry.sin).slice(-3) : ''}</div>
       </div>
 
@@ -141,10 +153,18 @@ function PaystubModal({ entry, run, onClose }) {
       <table>
         <thead><tr><th>Deduction</th><th class="r">This Period</th><th class="r">YTD</th></tr></thead>
         <tbody>
+          <tr><td>Federal Income Tax</td><td class="r">${fmt(entry.fedTaxPP)}</td><td class="r grey">${ytd.fedTaxPP ? fmt(ytd.fedTaxPP) : '—'}</td></tr>
+          <tr><td>Ontario Income Tax</td><td class="r">${fmt(entry.onTaxPP)}</td><td class="r grey">${ytd.onTaxPP ? fmt(ytd.onTaxPP) : '—'}</td></tr>
           <tr><td>CPP Contributions (Box 16)</td><td class="r">${fmt(entry.cppEE)}</td><td class="r grey">${ytd.cppEE ? fmt(ytd.cppEE) : '—'}</td></tr>
           <tr><td>EI Premiums (Box 18)</td><td class="r">${fmt(entry.eiEE)}</td><td class="r grey">${ytd.eiEE ? fmt(ytd.eiEE) : '—'}</td></tr>
-          <tr><td>Income Tax — Fed + ON (Box 22)</td><td class="r">${fmt(entry.taxPP)}</td><td class="r grey">${ytd.taxPP ? fmt(ytd.taxPP) : '—'}</td></tr>
           <tr class="net-row"><td>Total Deductions</td><td class="r">${fmt(entry.totalDed)}</td><td class="r grey">${ytd.totalDed ? fmt(ytd.totalDed) : '—'}</td></tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead><tr><th>Earnings</th><th class="r">This Period</th><th class="r">YTD</th></tr></thead>
+        <tbody>
+          <tr class="net-row"><td>Gross Earnings</td><td class="r">${fmt(entry.gross)}</td><td class="r grey">${ytd.gross ? fmt(ytd.gross) : '—'}</td></tr>
         </tbody>
       </table>
 
@@ -153,10 +173,8 @@ function PaystubModal({ entry, run, onClose }) {
         <div style="font-size:26px;font-weight:800;">${fmt(entry.netPay)}</div>
       </div>
 
-      <div class="pill">
-        <b>CRA Remittance (employer owes):</b> ${fmt(entry.craRem)}
-        <span class="grey" style="font-size:11px;"> = tax + CPP×2 + EI×2.4</span>
-      </div>
+      ${craPaidDate ? `<div style="font-size:12px;color:#666;margin-bottom:8px;"><b>CRA Remittance Paid:</b> ${formatDateWithMonth(craPaidDate)}</div>` : ''}
+      ${empPaidDate ? `<div style="font-size:12px;color:#666;margin-bottom:12px;"><b>Employee Paid:</b> ${formatDateWithMonth(empPaidDate)}</div>` : ''}
 
       <p style="font-size:10px;color:#aaa;margin-top:16px;">
         Computer-generated estimate · ${TAX_YEAR} Ontario rates · Consult a payroll professional before filing.
@@ -173,10 +191,16 @@ function PaystubModal({ entry, run, onClose }) {
     </tr>
   )
 
+  const handleSave = async () => {
+    const subject = `Paystub — ${entry.name} (${run.periodStart} to ${run.periodEnd})`
+    const body = `Hi,\n\nPlease find the paystub attached.\n\nBest regards,\nCrania Schools`
+    window.location.href = `mailto:${entry.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  }
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ background: '#fff', borderRadius: 12, width: 620, maxHeight: '90vh', overflow: 'auto', padding: 30 }}>
+      <div style={{ background: '#fff', borderRadius: 12, width: 680, maxHeight: '90vh', overflow: 'auto', padding: 30 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ fontWeight: 700, fontSize: 17 }}>Paystub — {entry.name}</div>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -188,18 +212,20 @@ function PaystubModal({ entry, run, onClose }) {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 14, borderBottom: '2px solid #2c7a7b', marginBottom: 14 }}>
           <div>
+            <img src="/crania-logo-black.jpg" alt="Crania" style={{ height: 32, marginBottom: 8 }} />
             <div style={{ fontSize: 19, fontWeight: 800, color: '#2c7a7b' }}>CRANIA SCHOOLS</div>
             <div style={{ fontSize: 11, color: '#888' }}>Employee Pay Statement · {TAX_YEAR}</div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 12 }}>
-            <div><strong>Period:</strong> {run.periodStart} — {run.periodEnd}</div>
-            <div><strong>Pay Date:</strong> {run.processedAt}</div>
+            <div><strong>Period:</strong> {formatDateWithMonth(run.periodStart)} — {formatDateWithMonth(run.periodEnd)}</div>
+            <div><strong>Pay Date:</strong> {formatDateWithMonth(run.processedAt)}</div>
             <div><strong>Type:</strong> {run.periodType}</div>
           </div>
         </div>
 
-        <div style={{ marginBottom: 14 }}>
+        <div style={{ marginBottom: 14, padding: 12, background: '#f5f5f5', borderRadius: 6 }}>
           <div style={{ fontWeight: 700, fontSize: 15 }}>{entry.name}</div>
+          {entry.address && <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>{entry.address}</div>}
           <div style={{ fontSize: 12, color: '#666' }}>{entry.role || 'Staff'}{entry.sin ? ` · SIN ***-***-${String(entry.sin).slice(-3)}` : ''}</div>
         </div>
 
@@ -237,13 +263,35 @@ function PaystubModal({ entry, run, onClose }) {
               </tr>
             </thead>
             <tbody>
+              {row('Federal Income Tax', entry.fedTaxPP, ytd.fedTaxPP)}
+              {row('Ontario Income Tax', entry.onTaxPP, ytd.onTaxPP)}
               {row('CPP Contributions (Box 16)', entry.cppEE, ytd.cppEE)}
               {row('EI Premiums (Box 18)', entry.eiEE, ytd.eiEE)}
-              {row('Income Tax — Fed + ON (Box 22)', entry.taxPP, ytd.taxPP)}
               <tr style={{ background: '#f5f5f5' }}>
                 <td style={{ padding: '7px 10px', fontSize: 13, fontWeight: 700 }}>Total Deductions</td>
                 <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700 }}>{fmt(entry.totalDed)}</td>
                 <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, color: '#888' }}>{ytd.totalDed ? fmt(ytd.totalDed) : '—'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Earnings YTD */}
+        <div style={{ marginBottom: 14 }}>
+          <div className="panel-teal-head" style={{ marginBottom: 0 }}>Earnings</div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#3d8e90' }}>
+                {['Item', 'This Period', 'YTD'].map((h, i) => (
+                  <th key={h} style={{ padding: '6px 10px', color: '#fff', fontSize: 11, fontWeight: 700, textAlign: i > 0 ? 'right' : 'left' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ background: '#f5f5f5' }}>
+                <td style={{ padding: '7px 10px', fontSize: 13, fontWeight: 700 }}>Gross Earnings</td>
+                <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700 }}>{fmt(entry.gross)}</td>
+                <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, color: '#888' }}>{ytd.gross ? fmt(ytd.gross) : '—'}</td>
               </tr>
             </tbody>
           </table>
@@ -255,10 +303,33 @@ function PaystubModal({ entry, run, onClose }) {
           <div style={{ fontSize: 26, fontWeight: 800 }}>{fmt(entry.netPay)}</div>
         </div>
 
-        {/* CRA note */}
-        <div style={{ background: '#fff8e1', border: '1px solid #f9a825', borderRadius: 6, padding: '10px 14px', fontSize: 12 }}>
+        {/* Payment dates */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-soft)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Employee Paid Date</label>
+            <input type="date" value={empPaidDate} onChange={e => setEmpPaidDate(e.target.value)}
+              style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 6, padding: '7px 10px', fontSize: 13, fontFamily: 'inherit' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-soft)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>CRA Remittance Paid Date</label>
+            <input type="date" value={craPaidDate} onChange={e => setCraPaidDate(e.target.value)}
+              style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 6, padding: '7px 10px', fontSize: 13, fontFamily: 'inherit' }} />
+          </div>
+        </div>
+
+        {/* CRA remittance info */}
+        <div style={{ background: '#fff8e1', border: '1px solid #f9a825', borderRadius: 6, padding: '10px 14px', fontSize: 12, marginBottom: 12 }}>
           <strong>CRA remittance (employer owes this period):</strong> {fmt(entry.craRem)}
-          <span style={{ color: '#888', marginLeft: 6 }}>= income tax + CPP×2 + EI×2.4</span>
+        </div>
+
+        {/* Email / Save */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={handleSave} style={{ flex: 1, background: '#2c7a7b', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            Email Paystub
+          </button>
+          <button onClick={handlePrint} style={{ flex: 1, background: '#3d8e90', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            Print / PDF
+          </button>
         </div>
 
         <div style={{ marginTop: 12, fontSize: 10, color: '#bbb' }}>
@@ -403,10 +474,10 @@ export default function Payroll() {
 
   const processPayRun = () => {
     const entries = rows.filter(r => r.hours > 0 && r.gross > 0).map(r => ({
-      staffId: r.id, name: r.name, role: r.role, sin: r.sin,
+      staffId: r.id, name: r.name, role: r.role, sin: r.sin, address: r.address, email: r.email,
       hours: r.hours, rate: r.rate, gross: r.gross,
       cppEE: r.cppEE, cppER: r.cppER, eiEE: r.eiEE, eiER: r.eiER,
-      taxPP: r.taxPP, totalDed: r.totalDed, netPay: r.netPay, craRem: r.craRem,
+      fedTaxPP: r.fedTaxPP, onTaxPP: r.onTaxPP, taxPP: r.taxPP, totalDed: r.totalDed, netPay: r.netPay, craRem: r.craRem,
     }))
     if (!entries.length) { alert('Enter hours for at least one employee.'); return }
 
@@ -427,6 +498,8 @@ export default function Payroll() {
       const p = ytd[e.staffId] || {}
       ytd[e.staffId] = {
         gross:    (p.gross    || 0) + e.gross,
+        fedTaxPP: (p.fedTaxPP || 0) + e.fedTaxPP,
+        onTaxPP:  (p.onTaxPP  || 0) + e.onTaxPP,
         cppEE:    (p.cppEE   || 0) + e.cppEE,
         eiEE:     (p.eiEE    || 0) + e.eiEE,
         taxPP:    (p.taxPP   || 0) + e.taxPP,
@@ -579,7 +652,7 @@ export default function Payroll() {
                 { label: 'Employee EI',         sub: 'Collected from EE',  val: totals.eiEE   },
                 { label: 'Employer EI',         sub: '1.4× employee EI',   val: totals.eiER   },
               ].map(({ label, sub, val }) => (
-                <div key={label} style={{ background: '#fff', border: '1px solid #f0c0b0', borderRadius: 8, padding: '12px 14px' }}>
+                <div key={label} style={{ background: '#ffffff', border: '1px solid #f0c0b0', borderRadius: 8, padding: '12px 14px' }}>
                   <div style={{ fontSize: 11, color: '#8b2020', fontWeight: 700 }}>{label}</div>
                   <div style={{ fontSize: 10, color: '#aaa', margin: '2px 0 6px' }}>{sub}</div>
                   <div style={{ fontSize: 17, fontWeight: 700, color: '#6a1f10' }}>{fmt(val)}</div>
@@ -588,7 +661,7 @@ export default function Payroll() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div style={{ background: '#fff', border: '1px solid #f0c0b0', borderRadius: 8, padding: '14px 16px', fontSize: 13 }}>
+              <div style={{ background: '#ffffff', border: '1px solid #f0c0b0', borderRadius: 8, padding: '14px 16px', fontSize: 13 }}>
                 <div style={{ fontWeight: 700, marginBottom: 6 }}>Total Employer Labour Cost</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                   <span>Gross payroll</span><span style={{ fontWeight: 600 }}>{fmt(totals.gross)}</span>
@@ -601,13 +674,13 @@ export default function Payroll() {
                 </div>
               </div>
 
-              <div style={{ background: 'linear-gradient(135deg,#6a1f10,#9a3020)', borderRadius: 8, padding: '14px 16px', color: '#fff' }}>
+              <div style={{ background: '#ffffff', border: '1px solid #f0c0b0', borderRadius: 8, padding: '14px 16px', color: '#6a1f10' }}>
                 <div style={{ fontSize: 11, opacity: .8, fontWeight: 700, marginBottom: 4 }}>TOTAL DUE TO CRA THIS PERIOD</div>
-                <div style={{ fontSize: 11, opacity: .65, marginBottom: 10 }}>
+                <div style={{ fontSize: 11, opacity: .7, marginBottom: 10, color: '#888' }}>
                   Income tax + Employee CPP + Employer CPP + Employee EI + Employer EI
                 </div>
                 <div style={{ fontSize: 30, fontWeight: 800 }}>{fmt(totals.craRem)}</div>
-                <div style={{ fontSize: 11, opacity: .7, marginTop: 6 }}>
+                <div style={{ fontSize: 11, opacity: .7, marginTop: 6, color: '#888' }}>
                   Due: 15th of the following month (regular remitter)
                 </div>
               </div>
