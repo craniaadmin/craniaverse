@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { Check, Filter, Plus, X } from 'lucide-react'
+import { Check, Filter, Plus, X, Trash2 } from 'lucide-react'
 import { todos as seed } from '../data/mockData'
+
+// API base URL - uses env var in dev/prod, or relative path as fallback
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 const PRI = {
   1: { label: 'Urgent',   pill: 'var(--pri-red)',    bar: 'var(--pri-red-soft)' },
@@ -30,8 +33,33 @@ export default function ToDo() {
   const [showDone, setShowDone] = useState(true)
   const [modal, setModal] = useState(false)
   const [form, setForm] = useState(BLANK)
+  const [filterCategory, setFilterCategory] = useState(null)
+  const [filterPriority, setFilterPriority] = useState(null)
 
-  const toggle = (id) => setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
+  const toggle = (id) => {
+    setRows(rows.map(r => r.id === id ? { ...r, done: !r.done } : r))
+    setTimeout(() => {
+      fetch(`${API_BASE}/api/todos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ done: !rows.find(r => r.id === id).done })
+      }).catch(err => console.error('Failed to save:', err))
+    }, 300)
+  }
+
+  const deleteTask = (id) => {
+    setRows(rows.filter(r => r.id !== id))
+    fetch(`${API_BASE}/api/todos/${id}`, { method: 'DELETE' }).catch(err => console.error('Failed to delete:', err))
+  }
+
+  const updateDueDate = (id, due) => {
+    setRows(rows.map(r => r.id === id ? { ...r, due } : r))
+    fetch(`${API_BASE}/api/todos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ due })
+    }).catch(err => console.error('Failed to save:', err))
+  }
 
   const openAdd = () => { setForm(BLANK); setModal(true) }
   const closeModal = () => setModal(false)
@@ -39,15 +67,34 @@ export default function ToDo() {
   const save = () => {
     if (!form.task.trim()) return
     const id = Math.max(0, ...rows.map(r => r.id)) + 1
-    setRows([...rows, { ...form, id, task: form.task.trim() }])
+    const newTask = { ...form, id, task: form.task.trim() }
+    setRows([...rows, newTask])
+    fetch(`${API_BASE}/api/todos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTask)
+    }).catch(err => console.error('Failed to save:', err))
     setModal(false)
   }
 
-  const visible = showDone ? rows : rows.filter(r => !r.done)
+  const active = rows.filter(r => !r.done)
+  const archived = rows.filter(r => r.done)
+
+  let visibleActive = showDone ? active : active
+  if (filterCategory) visibleActive = visibleActive.filter(r => r.category === filterCategory)
+  if (filterPriority) visibleActive = visibleActive.filter(r => r.priority === filterPriority)
+
+  let visibleArchived = archived
+  if (filterCategory) visibleArchived = visibleArchived.filter(r => r.category === filterCategory)
+  if (filterPriority) visibleArchived = visibleArchived.filter(r => r.priority === filterPriority)
 
   // Group by category in the defined order
   const groups = CATEGORIES
-    .map(cat => ({ cat, items: visible.filter(r => r.category === cat) }))
+    .map(cat => ({ cat, items: visibleActive.filter(r => r.category === cat) }))
+    .filter(g => g.items.length > 0)
+
+  const archivedGroups = CATEGORIES
+    .map(cat => ({ cat, items: visibleArchived.filter(r => r.category === cat) }))
     .filter(g => g.items.length > 0)
 
   return (
@@ -55,32 +102,47 @@ export default function ToDo() {
       <div className="page-head">
         <h2 className="page-title">To Do</h2>
         <div className="head-actions">
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <select value={filterCategory || ''} onChange={e => setFilterCategory(e.target.value || null)} style={{
+              padding: '8px 12px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6,
+              background: '#fff', cursor: 'pointer', color: 'var(--ink-soft)'
+            }}>
+              <option value="">All categories</option>
+              {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
+            <select value={filterPriority || ''} onChange={e => setFilterPriority(e.target.value ? parseInt(e.target.value) : null)} style={{
+              padding: '8px 12px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6,
+              background: '#fff', cursor: 'pointer', color: 'var(--ink-soft)'
+            }}>
+              <option value="">All urgencies</option>
+              {[1, 2, 3, 4].map(p => <option key={p} value={p}>{PRI[p].label}</option>)}
+            </select>
+          </div>
           <button className="icon-btn" title="Show / hide completed" onClick={() => setShowDone(s => !s)}>
-            <Filter size={22} fill={showDone ? 'none' : '#111418'} />
+            <Filter size={22} />
           </button>
           <button className="icon-btn solid" title="Add task" onClick={openAdd}><Plus size={22} /></button>
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* Active tasks */}
         {groups.map(({ cat, items }) => {
-          const c = CAT_COLORS[cat] ?? CAT_COLORS.Other
           return (
             <div key={cat} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
               {/* Category header */}
               <div style={{
-                background: '#fafbfc',
-                borderLeft: `5px solid ${c.border}`,
+                background: 'var(--header-blue)',
                 borderBottom: '1px solid var(--line)',
                 padding: '10px 18px',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
                 <span style={{
                   fontWeight: 800, fontSize: 13, letterSpacing: '.6px',
-                  textTransform: 'uppercase', color: c.text,
+                  textTransform: 'uppercase', color: 'var(--ink)',
                 }}>{cat}</span>
                 <span style={{
-                  background: c.border, color: c.text,
+                  background: 'var(--header-blue-soft)', color: 'var(--ink-soft)',
                   borderRadius: 999, fontSize: 11, fontWeight: 700,
                   padding: '2px 8px',
                 }}>{items.length}</span>
@@ -89,38 +151,48 @@ export default function ToDo() {
               {/* Tasks table */}
               <table className="grid" style={{ margin: 0 }}>
                 <colgroup>
-                  <col style={{ width: 110 }} />
+                  <col style={{ width: 130 }} />
                   <col />
-                  <col style={{ width: 120 }} />
-                  <col style={{ width: 70 }} />
+                  <col style={{ width: 130 }} />
+                  <col style={{ width: 90 }} />
                 </colgroup>
                 <thead>
                   <tr>
-                    <th>PRIORITY</th>
-                    <th>TASK</th>
-                    <th>DUE DATE</th>
-                    <th>DONE</th>
+                    <th style={{ paddingLeft: 18, fontSize: 12 }}>PRIORITY</th>
+                    <th style={{ paddingLeft: 18, fontSize: 14 }}>TASK</th>
+                    <th style={{ fontSize: 11 }}>DUE DATE</th>
+                    <th style={{ fontSize: 11 }}>COMPLETE</th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map(r => (
                     <tr key={r.id} style={{ opacity: r.done ? 0.5 : 1 }}>
                       <td>
-                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 12 }}>
+                        <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 12, marginLeft: 18 }}>
                           {PRI[r.priority].label}
                         </div>
                       </td>
                       <td>
-                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none' }}>
+                        <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: r.done ? 'line-through' : 'none', fontSize: 14, marginLeft: 18 }}>
                           {r.task}
                         </div>
                       </td>
-                      <td><div className="due-chip">{r.due || '—'}</div></td>
                       <td>
-                        <div style={{ display: 'grid', placeItems: 'center', height: 42 }}>
+                        <input
+                          type="date"
+                          value={r.due}
+                          onChange={e => updateDueDate(r.id, e.target.value)}
+                          style={{ padding: '6px 8px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6, cursor: 'pointer' }}
+                        />
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42 }}>
                           <div className={'cbx' + (r.done ? ' checked' : '')} onClick={() => toggle(r.id)}>
                             {r.done && <Check size={18} strokeWidth={3} />}
                           </div>
+                          <button onClick={() => deleteTask(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', display: 'grid', placeItems: 'center', padding: 0 }}>
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -130,6 +202,79 @@ export default function ToDo() {
             </div>
           )
         })}
+
+        {/* Archived tasks */}
+        {archivedGroups.length > 0 && (
+          <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
+            <div style={{
+              background: '#f5f5f5',
+              borderBottom: '1px solid var(--line)',
+              padding: '10px 18px',
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+              <span style={{
+                fontWeight: 800, fontSize: 13, letterSpacing: '.6px',
+                textTransform: 'uppercase', color: 'var(--ink)',
+              }}>Archived</span>
+              <span style={{
+                background: '#e0e0e0', color: 'var(--ink-soft)',
+                borderRadius: 999, fontSize: 11, fontWeight: 700,
+                padding: '2px 8px',
+              }}>{visibleArchived.length}</span>
+            </div>
+
+            {/* Archived items grouped by original category */}
+            <div style={{ padding: '12px' }}>
+              {archivedGroups.map(({ cat, items }) => (
+                <div key={cat} style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-soft)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: 8, paddingLeft: 6 }}>from {cat}</div>
+                  <table className="grid" style={{ margin: 0 }}>
+                    <colgroup>
+                      <col style={{ width: 130 }} />
+                      <col />
+                      <col style={{ width: 130 }} />
+                      <col style={{ width: 90 }} />
+                    </colgroup>
+                    <tbody>
+                      {items.map(r => (
+                        <tr key={r.id} style={{ opacity: 0.5 }}>
+                          <td>
+                            <div className="chip-pill" style={{ background: PRI[r.priority].pill, fontSize: 12, marginLeft: 18 }}>
+                              {PRI[r.priority].label}
+                            </div>
+                          </td>
+                          <td>
+                            <div className="task-bar" style={{ background: PRI[r.priority].bar, textDecoration: 'line-through', fontSize: 14, marginLeft: 18 }}>
+                              {r.task}
+                            </div>
+                          </td>
+                          <td>
+                            <input
+                              type="date"
+                              value={r.due}
+                              onChange={e => updateDueDate(r.id, e.target.value)}
+                              style={{ padding: '6px 8px', fontSize: 13, border: '1px solid var(--line)', borderRadius: 6, cursor: 'pointer' }}
+                            />
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, height: 42 }}>
+                              <div className='cbx checked' onClick={() => toggle(r.id)} style={{ cursor: 'pointer' }}>
+                                <Check size={18} strokeWidth={3} />
+                              </div>
+                              <button onClick={() => deleteTask(r.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', display: 'grid', placeItems: 'center', padding: 0 }}>
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Add Task Modal */}
@@ -212,11 +357,10 @@ export default function ToDo() {
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Due Date</label>
                 <input
+                  type="date"
                   className="reg-input"
-                  placeholder="e.g. Jun 30"
                   value={form.due}
                   onChange={e => setForm(f => ({ ...f, due: e.target.value }))}
-                  onKeyDown={e => e.key === 'Enter' && save()}
                 />
               </div>
             </div>

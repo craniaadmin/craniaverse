@@ -290,8 +290,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord }) {
   const [showOnlyActive, setShowOnlyActive] = useState(false)
   const [progs, setProgs] = useState(allPrograms)
   const [custFields, setCustFields] = useState(selected.customer)
-  const RAW_API_URL = import.meta.env && import.meta.env.VITE_API_URL
-  const API_BASE = RAW_API_URL !== undefined ? RAW_API_URL : 'http://localhost:4000'
+  const API_BASE = import.meta.env?.VITE_API_URL || ''
   const saveTimers = useRef({})
 
   useEffect(() => {
