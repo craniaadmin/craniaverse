@@ -1,5 +1,28 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Plus, X, Trash2, Settings, Download } from 'lucide-react'
+import { Plus, X, Trash2, Settings, Download, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+]
+
+// Build a 7-column Monday-first month grid (same algorithm as CalendarView).
+function buildMonth(year, month) {
+  const firstDay = new Date(year, month, 1)
+  const lastDate = new Date(year, month + 1, 0).getDate()
+  const startDow = (firstDay.getDay() + 6) % 7
+  const days = []
+  for (let i = startDow; i > 0; i--) days.push({ date: new Date(year, month, 1 - i), current: false })
+  for (let d = 1; d <= lastDate; d++) days.push({ date: new Date(year, month, d), current: true })
+  let trailing = 1
+  while (days.length % 7 !== 0) {
+    days.push({ date: new Date(year, month + 1, trailing++), current: false })
+  }
+  return days
+}
+
+// JS day index (Sun=0) -> our Mon-first DAYS index.
+const JS_TO_DAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 // Half-hour slots from 8:00 AM to 9:00 PM — the standard band for both
 // day-school classes and afterschool. Times are stored as "HH:MM".
@@ -178,6 +201,7 @@ export default function Schedules() {
   const [view, setView]           = useState('week') // 'month' | 'week' | 'day'
   const [focusLoc, setFocusLoc]   = useState(null)   // location id or null for "all"
   const [dayOfWeek, setDayOfWeek] = useState('Mon')  // selected day for day view
+  const [monthDate, setMonthDate] = useState(new Date()) // anchor for month view
   const [editing, setEditing]     = useState(null)   // entry being edited or null
   const [showRooms, setShowRooms] = useState(false)
   const [showLocs, setShowLocs]   = useState(false)
@@ -409,26 +433,18 @@ export default function Schedules() {
         />
       ))}
 
-      {view === 'month' && merged && (
-        <MonthList
-          location={{ id: '__all__', name: 'All Locations' }}
+      {view === 'month' && (
+        <MonthCalendar
+          monthDate={monthDate}
+          setMonthDate={setMonthDate}
           roomById={roomById}
           locById={locById}
-          entries={filteredEntries}
-          merged
+          merged={merged}
+          visibleLocations={visibleLocations}
+          entries={filteredEntries.filter(e => merged || visibleLocations.some(l => l.id === e.locationId))}
           onEntryEdit={(en) => setEditing({ ...en })}
         />
       )}
-      {view === 'month' && !merged && visibleLocations.map(loc => (
-        <MonthList
-          key={loc.id}
-          location={loc}
-          roomById={roomById}
-          locById={locById}
-          entries={filteredEntries.filter(e => e.locationId === loc.id)}
-          onEntryEdit={(en) => setEditing({ ...en })}
-        />
-      ))}
 
       {editing && (
         <EntryForm
@@ -600,10 +616,22 @@ function DayGrid({ location, day, roomById, locById, entries, merged, onCellNew,
 // adding wrapper divs that would break the 2-column grid.
 function ReactFragment({ children }) { return <>{children}</> }
 
-// ─── Month list view ──────────────────────────────────────────────────────────
-function MonthList({ location, roomById, locById, entries, merged, onEntryEdit }) {
-  // Group by day, sorted by time
-  const byDay = useMemo(() => {
+// ─── Month calendar view ──────────────────────────────────────────────────────
+// Mirrors the Calendar page's square-cell grid: one card with a 7-column,
+// Monday-first month layout. Each square shows the classes scheduled for
+// that weekday (since schedule entries recur weekly by day-of-week).
+function MonthCalendar({ monthDate, setMonthDate, roomById, locById, merged, visibleLocations, entries, onEntryEdit }) {
+  const today = new Date()
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+  const days = useMemo(
+    () => buildMonth(monthDate.getFullYear(), monthDate.getMonth()),
+    [monthDate]
+  )
+
+  // Bucket entries by day-of-week, time-sorted. Same set repeats on every
+  // matching weekday cell in the month.
+  const byDow = useMemo(() => {
     const m = {}
     DAYS.forEach(d => { m[d] = [] })
     entries.forEach(en => { if (m[en.day]) m[en.day].push(en) })
@@ -611,41 +639,67 @@ function MonthList({ location, roomById, locById, entries, merged, onEntryEdit }
     return m
   }, [entries])
 
+  function nav(delta) {
+    const d = new Date(monthDate); d.setMonth(d.getMonth() + delta); setMonthDate(d)
+  }
+
+  const locHead = merged ? 'All Locations' : visibleLocations.map(l => l.name).join(' + ')
+
   return (
     <div className="sch-card card">
-      <div className="sch-loc-head">{location.name}</div>
-      <div className="sch-month">
-        {DAYS.map((d, i) => (
-          <div key={d} className="sch-month-day">
-            <div className="sch-month-day-head">{DAYS_LONG[i]}</div>
-            <div className="sch-month-day-body">
-              {byDay[d].length === 0 ? (
-                <div className="sch-month-empty">No classes</div>
-              ) : byDay[d].map(en => {
-                const room = roomById[en.roomId]
-                const unassigned = !room
-                const color = room?.color || '#9aa4b1'
-                const locName = merged ? (locById?.[en.locationId]?.name || '') : ''
-                return (
-                  <button key={en.id} className="sch-month-row" onClick={() => onEntryEdit(en)}>
-                    <span className="sch-month-time">{fmtTime(en.startTime)}</span>
-                    <span className="sch-month-title" style={{ borderLeftColor: color }}>
-                      <strong>{en.title}</strong>
-                      {en.teacher && <span className="sch-month-teacher"> - {en.teacher}</span>}
-                      {locName && <span className="sch-month-loc"> • {locName}</span>}
-                    </span>
-                    <span
-                      className={'sch-month-room' + (unassigned ? ' sch-month-room-unassigned' : '')}
+      <div className="sch-loc-head sch2-month-head">
+        <span>{locHead}</span>
+        <span className="sch2-month-nav">
+          <button className="sch2-nav-btn" onClick={() => nav(-1)} aria-label="Previous month"><ChevronLeft size={16} /></button>
+          <span className="sch2-month-label">{MONTH_NAMES[monthDate.getMonth()]} {monthDate.getFullYear()}</span>
+          <button className="sch2-nav-btn" onClick={() => nav(1)} aria-label="Next month"><ChevronRight size={16} /></button>
+          <button className="sch2-today-btn" onClick={() => setMonthDate(new Date())}>Today</button>
+        </span>
+      </div>
+
+      <div className="sch2-month-grid">
+        {DAYS.map(d => <div key={d} className="sch2-dow">{d.toUpperCase()}</div>)}
+        {days.map(({ date, current }, i) => {
+          const k = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+          const isToday = k === todayKey
+          const dowKey = JS_TO_DAY[date.getDay()]
+          const classes = current ? (byDow[dowKey] || []) : []
+          return (
+            <div
+              key={i}
+              className={'sch2-cell' + (current ? '' : ' out') + (isToday ? ' today' : '')}
+            >
+              <div className="sch2-cell-head">
+                <span className="sch2-day-num">{date.getDate()}</span>
+                {isToday && <span className="sch2-today-dot" />}
+              </div>
+              <div className="sch2-cell-body">
+                {classes.slice(0, 5).map(en => {
+                  const room = roomById[en.roomId]
+                  const unassigned = !room
+                  const color = room?.color || '#9aa4b1'
+                  const locName = merged ? (locById?.[en.locationId]?.name || '') : ''
+                  return (
+                    <button
+                      key={en.id}
+                      className={'sch2-pill' + (unassigned ? ' sch2-pill-unassigned' : '')}
                       style={{ background: color }}
+                      onClick={(e) => { e.stopPropagation(); onEntryEdit(en) }}
+                      title={`${fmtTime(en.startTime)} ${en.title}${en.teacher ? ' - ' + en.teacher : ''}${locName ? ' • ' + locName : ''}${unassigned ? ' • Click to assign room' : ''}`}
                     >
-                      {room?.name || 'Assign room'}
-                    </span>
-                  </button>
-                )
-              })}
+                      <span className="sch2-pill-time">{fmtTime(en.startTime)}</span>
+                      <span className="sch2-pill-title">{en.title}</span>
+                      {en.teacher && <span className="sch2-pill-teacher">- {en.teacher}</span>}
+                    </button>
+                  )
+                })}
+                {classes.length > 5 && (
+                  <span className="sch2-more">+{classes.length - 5} more</span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
