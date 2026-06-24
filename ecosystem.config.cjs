@@ -37,6 +37,23 @@ module.exports = {
       max_memory_restart: '512M',
     },
     {
+      // Continuous smoke tests. Runs once per fire (autorestart:false)
+      // and PM2 re-fires it on the cron schedule below. Tests hit the
+      // local API at port 4000 and a headless Chromium against the
+      // same. On failure, writes to tests/logs/ AND emails the
+      // operator (if TEST_NOTIFY_EMAIL is set).
+      //
+      // One-time setup on maya-pc:
+      //   cd tests && npm install && npx playwright install chromium
+      name: 'craniaverse-tests',
+      script: './tests/run.js',
+      cwd: './',
+      cron_restart: '*/15 * * * *', // every 15 minutes
+      autorestart: false,
+      watch: false,
+      max_memory_restart: '1G',
+    },
+    {
       name: 'craniaverse-tunnel',
       // ngrok was installed as the Microsoft Store / MSIX package, which lives at
       // C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\ngrok.exe as a shell

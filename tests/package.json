@@ -1,0 +1,16 @@
+{
+  "name": "craniaverse-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Continuous smoke tests for the live CraniaVerse app",
+  "type": "module",
+  "scripts": {
+    "test": "node run.js",
+    "install-browser": "playwright install chromium"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "dotenv": "^17.4.2",
+    "playwright": "^1.48.0"
+  }
+}
