@@ -175,13 +175,23 @@ async function importPrograms() {
     records = readJsonIfExists(path.join('..', 'src', 'data', 'programsData.json'))
   }
   if (!Array.isArray(records)) return
-  let c = 0, u = 0
-  for (const rec of records) {
-    const recordId = String(rec.number)
-    const action = await upsertByRecordId('programs', recordId, { recordId, payload: rec })
-    if (action === 'created') c++; else u++
+  let c = 0, u = 0, skipped = 0
+  for (let i = 0; i < records.length; i++) {
+    const rec = records[i]
+    // Some legacy program rows have a blank `number`. Fall back to
+    // `code`, then to a positional id, so every row imports.
+    let recordId = String(rec.number || '').trim()
+    if (!recordId) recordId = String(rec.code || '').trim()
+    if (!recordId) recordId = `prog-${i}`
+    try {
+      const action = await upsertByRecordId('programs', recordId, { recordId, payload: rec })
+      if (action === 'created') c++; else u++
+    } catch (err) {
+      console.warn(`  ! skipped program row ${i} (${recordId}): ${err?.message || err}`)
+      skipped++
+    }
   }
-  console.log(`  · programs: ${c} created, ${u} updated`)
+  console.log(`  · programs: ${c} created, ${u} updated${skipped ? `, ${skipped} skipped` : ''}`)
 }
 
 async function importRules() {
