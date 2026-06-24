@@ -83,6 +83,18 @@ const formatDateWithMonth = (dateStr) => {
   return d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
+const formatFullName = (s) => {
+  const mid = s.middleName ? `${s.middleName.charAt(0).toUpperCase()}. ` : ''
+  return `${s.firstName || ''} ${mid}${s.lastName || ''}`.trim()
+}
+
+const formatAddress = (addr) => {
+  if (!addr || typeof addr !== 'object') return ''
+  const line1 = [addr.street, addr.unit && `Unit ${addr.unit}`].filter(Boolean).join(', ')
+  const line2 = [addr.city, addr.province, addr.postalCode].filter(Boolean).join(', ')
+  return [line1, line2, addr.country].filter(Boolean).join(' · ')
+}
+
 function lsLoad(key, fb) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fb } catch { return fb } }
 function lsSave(key, v)  { try { localStorage.setItem(key, JSON.stringify(v)) } catch {} }
 
@@ -118,8 +130,8 @@ function printHtml(title, body) {
 // ── Paystub modal ──────────────────────────────────────────────────────────
 function PaystubModal({ entry, run, onClose }) {
   const ytd = entry.ytd || {}
-  const [craPaidDate, setCraPaidDate] = useState('')
-  const [empPaidDate, setEmpPaidDate] = useState(run.processedAt)
+  const empPaidDate = entry.empPaidDate || ''
+  const craPaidDate = entry.craPaidDate || ''
 
   const handlePrint = () => {
     const body = `
@@ -232,7 +244,6 @@ function PaystubModal({ entry, run, onClose }) {
 
         {/* Earnings */}
         <div style={{ marginBottom: 12 }}>
-          <div className="panel-teal-head" style={{ marginBottom: 0 }}>Earnings</div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#3d8e90' }}>
@@ -254,7 +265,6 @@ function PaystubModal({ entry, run, onClose }) {
 
         {/* Deductions */}
         <div style={{ marginBottom: 14 }}>
-          <div className="panel-teal-head" style={{ marginBottom: 0 }}>Deductions</div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#3d8e90' }}>
@@ -268,7 +278,7 @@ function PaystubModal({ entry, run, onClose }) {
               {row('Ontario Income Tax', entry.onTaxPP, ytd.onTaxPP)}
               {row('CPP Contributions (Box 16)', entry.cppEE, ytd.cppEE)}
               {row('EI Premiums (Box 18)', entry.eiEE, ytd.eiEE)}
-              <tr style={{ background: '#f5f5f5' }}>
+              <tr style={{ background: '#ffffff' }}>
                 <td style={{ padding: '7px 10px', fontSize: 13, fontWeight: 700 }}>Total Deductions</td>
                 <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700 }}>{fmt(entry.totalDed)}</td>
                 <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, color: '#888' }}>{ytd.totalDed ? fmt(ytd.totalDed) : '—'}</td>
@@ -279,7 +289,6 @@ function PaystubModal({ entry, run, onClose }) {
 
         {/* Earnings YTD */}
         <div style={{ marginBottom: 14 }}>
-          <div className="panel-teal-head" style={{ marginBottom: 0 }}>Earnings</div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#3d8e90' }}>
@@ -289,7 +298,7 @@ function PaystubModal({ entry, run, onClose }) {
               </tr>
             </thead>
             <tbody>
-              <tr style={{ background: '#f5f5f5' }}>
+              <tr style={{ background: '#ffffff' }}>
                 <td style={{ padding: '7px 10px', fontSize: 13, fontWeight: 700 }}>Gross Earnings</td>
                 <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700 }}>{fmt(entry.gross)}</td>
                 <td style={{ padding: '7px 10px', textAlign: 'right', fontSize: 13, color: '#888' }}>{ytd.gross ? fmt(ytd.gross) : '—'}</td>
@@ -304,23 +313,17 @@ function PaystubModal({ entry, run, onClose }) {
           <div style={{ fontSize: 26, fontWeight: 800 }}>{fmt(entry.netPay)}</div>
         </div>
 
-        {/* Payment dates */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-          <div>
-            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-soft)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Employee Paid Date</label>
-            <input type="date" value={empPaidDate} onChange={e => setEmpPaidDate(e.target.value)}
-              style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 6, padding: '7px 10px', fontSize: 13, fontFamily: 'inherit' }} />
+        {/* Payment dates summary */}
+        {(empPaidDate || craPaidDate) && (
+          <div style={{ background: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 6, padding: '10px 14px', fontSize: 12, marginBottom: 12 }}>
+            {empPaidDate && <div><strong>Employee Paid:</strong> {formatDateWithMonth(empPaidDate)}</div>}
+            {craPaidDate && <div><strong>CRA Remittance Paid:</strong> {formatDateWithMonth(craPaidDate)}</div>}
           </div>
-          <div>
-            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-soft)', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>CRA Remittance Paid Date</label>
-            <input type="date" value={craPaidDate} onChange={e => setCraPaidDate(e.target.value)}
-              style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 6, padding: '7px 10px', fontSize: 13, fontFamily: 'inherit' }} />
-          </div>
-        </div>
+        )}
 
-        {/* CRA remittance info */}
+        {/* CRA remittance amount */}
         <div style={{ background: '#fff8e1', border: '1px solid #f9a825', borderRadius: 6, padding: '10px 14px', fontSize: 12, marginBottom: 12 }}>
-          <strong>CRA remittance (employer owes this period):</strong> {fmt(entry.craRem)}
+          <strong>CRA remittance:</strong> {fmt(entry.craRem)}
         </div>
 
         {/* Email / Save */}
@@ -431,6 +434,8 @@ export default function Payroll() {
   const [periodStart, setPeriodStart] = useState(todayStr())
   const [periodEnd,   setPeriodEnd]   = useState('')
   const [hoursMap,    setHoursMap]    = useState({})
+  const [empPaidMap,  setEmpPaidMap]  = useState({})  // employee paid date per staff id
+  const [craPaidMap,  setCraPaidMap]  = useState({})  // CRA remittance paid date per staff id
   const [runs,        setRuns]        = useState(() => lsLoad('payroll-runs', []))
   const [expandedRun, setExpandedRun] = useState(null)
   const [paystub,     setPaystub]     = useState(null)  // { entry, run }
@@ -453,7 +458,13 @@ export default function Payroll() {
     const hours = parseFloat(hoursMap[s.id]) || 0
     const gross = Math.round(rate * hours * 100) / 100
     const taxes = gross > 0 ? calcTaxes(gross, periodsPerYear) : null
-    return { ...s, name: `${s.firstName} ${s.lastName}`, rate, hours, ...(taxes || {}) }
+    return {
+      ...s,
+      name: formatFullName(s),
+      address: formatAddress(s.currentAddress || s.permanentAddress),
+      rate, hours,
+      ...(taxes || {}),
+    }
   }), [staff, hoursMap, periodsPerYear])
 
   const totals = useMemo(() => rows.reduce((a, r) => ({
@@ -567,7 +578,7 @@ export default function Payroll() {
           <span style={{ fontSize: 11, opacity: .6 }}>{TAX_YEAR} · CPP 5.95% · EI 1.66% · Fed+ON brackets</span>
         </div>
         <div style={{ overflowX: 'auto', border: '1px solid var(--line)', borderTop: 'none', borderRadius: '0 0 8px 8px', background: '#fff' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 900 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 1100 }}>
             <thead>
               <tr style={{ background: '#3d8e90' }}>
                 <TH>Employee</TH>
@@ -579,20 +590,22 @@ export default function Payroll() {
                 <TH right>EI (EE)</TH>
                 <TH right>Income Tax</TH>
                 <TH right>Net Pay</TH>
+                <TH>Employee Paid</TH>
+                <TH>CRA Paid</TH>
                 <TH>Paystub</TH>
               </tr>
             </thead>
             <tbody>
               {staff.length === 0 ? (
-                <tr><td colSpan={10} style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontStyle: 'italic' }}>
+                <tr><td colSpan={12} style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontStyle: 'italic' }}>
                   No staff found. Add staff in Staff Information.
                 </td></tr>
-              ) : staff.map((s, i) => {
+              ) : staff.map((s) => {
                 const r = rows.find(x => x.id === s.id)
                 const hasGross = r && r.gross > 0
                 return (
-                  <tr key={s.id} style={{ background: i % 2 === 0 ? '#fff' : '#fafbfb', borderBottom: '1px solid #f0f0f0' }}>
-                    <td style={{ padding: '8px 10px', fontWeight: 600, fontSize: 13 }}>{s.firstName} {s.lastName}</td>
+                  <tr key={s.id} style={{ background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
+                    <td style={{ padding: '8px 10px', fontWeight: 600, fontSize: 13 }}>{formatFullName(s)}</td>
                     <td style={{ padding: '8px 10px', fontSize: 13, color: 'var(--ink-soft)' }}>{s.role || '—'}</td>
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13 }}>
                       {s.ratePerHour ? fmt(parseFloat(s.ratePerHour)) : <span style={{ color: '#e53935', fontSize: 11 }}>no rate set</span>}
@@ -611,9 +624,22 @@ export default function Payroll() {
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, color: hasGross ? '#1a1a1a' : '#ccc' }}>{hasGross ? fmt(r.eiEE) : '—'}</td>
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, color: hasGross ? '#1a1a1a' : '#ccc' }}>{hasGross ? fmt(r.taxPP) : '—'}</td>
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: hasGross ? '#2c7a7b' : '#ccc' }}>{hasGross ? fmt(r.netPay) : '—'}</td>
+                    <td style={{ padding: '4px 8px' }}>
+                      <input type="date" value={empPaidMap[s.id] || ''}
+                        onChange={e => setEmpPaidMap(p => ({ ...p, [s.id]: e.target.value }))}
+                        style={{ border: '1px solid var(--line)', borderRadius: 5, padding: '4px 6px', fontSize: 12, fontFamily: 'inherit' }} />
+                    </td>
+                    <td style={{ padding: '4px 8px' }}>
+                      <input type="date" value={craPaidMap[s.id] || ''}
+                        onChange={e => setCraPaidMap(p => ({ ...p, [s.id]: e.target.value }))}
+                        style={{ border: '1px solid var(--line)', borderRadius: 5, padding: '4px 6px', fontSize: 12, fontFamily: 'inherit' }} />
+                    </td>
                     <td style={{ padding: '6px 10px' }}>
                       {hasGross && (
-                        <button onClick={() => setPaystub({ entry: { ...r, ytd: ytdAll[s.id] }, run: currentRun })}
+                        <button onClick={() => setPaystub({
+                          entry: { ...r, ytd: ytdAll[s.id], empPaidDate: empPaidMap[s.id], craPaidDate: craPaidMap[s.id] },
+                          run: currentRun,
+                        })}
                           style={{ background: 'none', border: '1px solid var(--logo-teal)', borderRadius: 4, padding: '3px 9px', fontSize: 11, cursor: 'pointer', color: 'var(--logo-teal)', fontWeight: 600 }}>
                           View
                         </button>
@@ -630,7 +656,7 @@ export default function Payroll() {
                     <td key={i} style={{ padding: '10px 10px', textAlign: 'right', fontWeight: i === 0 ? 700 : 400, fontSize: 13 }}>{fmt(v)}</td>
                   ))}
                   <td style={{ padding: '10px 10px', textAlign: 'right', fontWeight: 700, fontSize: 13, color: '#a6e2f9' }}>{fmt(totals.netPay)}</td>
-                  <td />
+                  <td colSpan={3} />
                 </tr>
               )}
             </tbody>
