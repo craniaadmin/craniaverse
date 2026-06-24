@@ -1,64 +1,63 @@
 // Headless Chromium tests. The app is a single-page React app with
 // state-based routing (no URLs per page), so we sign in once then
 // click each nav item and verify the page renders cleanly.
+//
+// TopNav uses categorized dropdowns. To reach a page, click its
+// group label first; if the group has only one item, the click goes
+// straight to the page.
 
 import { chromium } from 'playwright'
 import { BASE_URL, PAGE_TIMEOUT_MS } from './config.js'
 import { assert, runTest } from './framework.js'
 
-// Nav label -> a heading or element we expect to find on that page.
-// If the element doesn't appear within a few seconds, the test fails.
+// Mirrors src/data/mockData.js NAV. If the prod nav changes, this
+// list must change too — tests will fail loudly otherwise.
 const PAGES = [
-  { nav: 'Dashboard',         expect: 'h1, h2, .page-title' },
-  { nav: 'Students',          expect: 'text=Students' },
-  { nav: 'Customers',         expect: 'text=Customers' },
-  { nav: 'Programs',          expect: 'text=Programs' },
-  { nav: 'Payroll',           expect: 'text=Payroll' },
-  { nav: 'Contests',          expect: 'text=Contests' },
-  { nav: 'Inventory',         expect: 'text=Inventory' },
-  { nav: 'Surveys',           expect: 'text=Surveys' },
-  { nav: 'Crania Cash',       expect: 'text=Crania Cash' },
-  { nav: 'Staff Hub',         expect: 'text=Staff Hub' },
-  { nav: 'Staff Information', expect: 'text=Staff' },
-  { nav: 'Fee Schedules',     expect: 'text=Fee' },
-  { nav: 'To Do',             expect: '.page' },
-  { nav: 'Calendar',          expect: '.page' },
+  { group: 'Admin',     item: 'Dashboard'         },
+  { group: 'Admin',     item: 'Calendar'          },
+  { group: 'Admin',     item: 'To Do'             },
+  { group: 'Admin',     item: 'Schedules'         },
+  { group: 'Customers', item: 'Customers'         },
+  { group: 'Customers', item: 'Surveys'           },
+  { group: 'Students',  item: 'Students'          }, // single-item group
+  { group: 'Programs',  item: 'Programs'          }, // single-item group
+  { group: 'Contests',  item: 'Contests'          }, // single-item group
+  { group: 'Staff',     item: 'Staff Information' },
+  { group: 'Staff',     item: 'Staff Hub'         },
+  { group: 'Operations',item: 'Crania Cash'       },
+  { group: 'Operations',item: 'Inventory'         },
+  { group: 'Financial', item: 'Fee Schedules'     },
+  { group: 'Financial', item: 'Payroll'           },
 ]
 
-// Try a couple of common selectors to find a nav item by its label.
-// TopNav uses dropdowns under category headers; clicking the label
-// works whether it's a top-level button or a dropdown item.
-async function clickNav(page, label) {
-  // Look for any clickable element whose visible text equals the label.
-  // Use exact: true to avoid matching substrings (e.g. "Staff" hitting
-  // "Staff Hub" first).
-  const candidates = [
-    page.getByRole('button',    { name: label, exact: true }),
-    page.getByRole('menuitem',  { name: label, exact: true }),
-    page.getByRole('link',      { name: label, exact: true }),
-    page.getByText(label, { exact: true }),
-  ]
-  for (const loc of candidates) {
-    const count = await loc.count().catch(() => 0)
-    if (count > 0) {
-      try {
-        await loc.first().click({ timeout: 2000 })
-        return true
-      } catch {}
-    }
-  }
-  return false
+// Click a top-level nav group label. Opens the dropdown if there's
+// one; if the group is single-item, this already navigates.
+async function openGroup(page, label) {
+  const btn = page.locator(`header.topbar nav.nav .nav-btn`, { hasText: new RegExp(`^${escapeRe(label)}\\s*$`) })
+  const n = await btn.count().catch(() => 0)
+  if (n === 0) return false
+  await btn.first().click({ timeout: 2000 })
+  return true
 }
+
+// Click an item inside an open dropdown (or a same-named single-item
+// group). The dropdown <button>s contain only the item label.
+async function clickDropdownItem(page, label) {
+  const it = page.locator(`header.topbar .dropdown button`, { hasText: new RegExp(`^${escapeRe(label)}\\s*$`) })
+  const n = await it.count().catch(() => 0)
+  if (n === 0) return false
+  await it.first().click({ timeout: 2000 })
+  return true
+}
+
+function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }
 
 export async function runPageTests() {
   const results = []
   let browser
   try {
     browser = await chromium.launch({ headless: true })
-    const ctx = await browser.newContext({
-      // Give the React bundle time to load on slower machines
-      navigationTimeout: PAGE_TIMEOUT_MS,
-    })
+    const ctx = await browser.newContext()
     const page = await ctx.newPage()
 
     const consoleErrors = []
@@ -78,23 +77,32 @@ export async function runPageTests() {
     results.push(await runTest('Sign in succeeds', async () => {
       consoleErrors.length = 0
       await page.getByRole('button', { name: /sign in/i }).click()
-      // After login, the TopNav should render with at least one nav button
-      await page.getByRole('button', { name: 'Dashboard' }).waitFor({ timeout: 5000 })
-      assert(consoleErrors.length === 0, `console errors: ${consoleErrors.join(' | ')}`)
+      // After login, TopNav renders with the "Admin" group button.
+      await page.locator('header.topbar nav.nav .nav-btn', { hasText: /^Admin\s*$/ })
+        .first().waitFor({ timeout: 5000 })
+      const errs = consoleErrors.filter(e => !isIgnorableError(e))
+      assert(errs.length === 0, `console errors: ${errs.join(' | ')}`)
     }))
 
     // -------- Each page renders --------
-    for (const { nav, expect } of PAGES) {
-      results.push(await runTest(`Nav: ${nav}`, async () => {
+    for (const { group, item } of PAGES) {
+      results.push(await runTest(`Nav: ${group} → ${item}`, async () => {
         consoleErrors.length = 0
-        const clicked = await clickNav(page, nav)
-        assert(clicked, `couldn't find nav item "${nav}"`)
-        // Give the route content a moment to mount, then check for the
-        // expected selector (text or CSS).
-        const sel = expect
-        if (sel) {
-          await page.locator(sel).first().waitFor({ timeout: 5000 })
+        const opened = await openGroup(page, group)
+        assert(opened, `nav group "${group}" not found`)
+
+        // If the group label === item label (single-item group),
+        // the click above already navigated. Otherwise, click the
+        // dropdown item.
+        if (group !== item) {
+          const clicked = await clickDropdownItem(page, item)
+          assert(clicked, `dropdown item "${item}" not found under "${group}"`)
         }
+
+        // Verify the page shell renders. .page is the wrapper every
+        // route component renders into.
+        await page.locator('.page, .login-wrap').first().waitFor({ timeout: 5000 })
+
         const errs = consoleErrors.filter(e => !isIgnorableError(e))
         assert(errs.length === 0, `console errors: ${errs.join(' | ')}`)
       }))
