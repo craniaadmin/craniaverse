@@ -47,7 +47,34 @@
       "Bash(git merge *)",
       "Bash(git cherry-pick *)",
       "Bash(git fetch *)",
-      "Bash(gh pr *)"
+      "Bash(gh pr *)",
+      "Bash(gh auth *)",
+      "PowerShell(gh auth status)",
+      "Bash(git stash *)",
+      "Bash(npm run *)",
+      "Bash(npx vite *)",
+      "Bash(gh api *)",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "Bash(powershell -Command \"\\(Get-Content server/pb.js -Raw\\) -replace 'pb\\\\.collection', 'pb\\(\\).collection' | Set-Content -NoNewline server/pb.js\")",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(git commit *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if [ -n \"$f\" ] && [ -f \"$f\" ] && git diff --quiet -- \"$f\" 2>/dev/null | grep -q .; then git add \"$f\" && git commit -m \"Update $(basename \"$f\")\" && git push 2>/dev/null || true; fi; }",
+            "timeout": 30,
+            "async": true
+          }
+        ]
+      }
     ]
   }
 }

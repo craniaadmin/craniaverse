@@ -91,7 +91,7 @@ input, select, textarea { font-family: inherit; }
   box-shadow: 0 2px 6px rgba(30, 60, 80, .08);
 }
 .brand { display: flex; align-items: center; gap: 12px; padding-right: 26px; }
-.brand-logo { display: block; object-fit: contain; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.brand-logo { display: block; object-fit: contain; }
 .login-card .brand-logo { margin: 0 auto 16px; }
 .brand .mark { width: 54px; height: 54px; flex: none; }
 .brand .word { line-height: .9; }
