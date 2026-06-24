@@ -21,22 +21,33 @@
 // ============================================================
 import PocketBase from 'pocketbase'
 
-const PB_URL            = process.env.PB_URL            || 'http://127.0.0.1:8090'
-const PB_ADMIN_EMAIL    = process.env.PB_ADMIN_EMAIL    || ''
-const PB_ADMIN_PASSWORD = process.env.PB_ADMIN_PASSWORD || ''
-
-export const pb = new PocketBase(PB_URL)
-pb.autoCancellation(false) // server-side: no per-request cancellation
-
+// The PocketBase client is created lazily on the first call so that
+// process.env is read AFTER server.js has called dotenv.config().
+// (ES module top-level code in this file would otherwise run before
+// the importer's body, leaving the env vars empty.)
+let _pb = null
 let authPromise = null
+
+export function pb() {
+  if (!_pb) {
+    const url = process.env.PB_URL || 'http://127.0.0.1:8090'
+    _pb = new PocketBase(url)
+    _pb.autoCancellation(false)
+  }
+  return _pb
+}
+
 async function ensureAuth() {
-  if (pb.authStore.isValid) return
-  if (!PB_ADMIN_EMAIL || !PB_ADMIN_PASSWORD) {
+  const client = pb()
+  if (client.authStore.isValid) return
+  const email = process.env.PB_ADMIN_EMAIL || ''
+  const password = process.env.PB_ADMIN_PASSWORD || ''
+  if (!email || !password) {
     throw new Error('PB_ADMIN_EMAIL / PB_ADMIN_PASSWORD must be set in server/.env')
   }
   if (!authPromise) {
-    authPromise = pb.collection('_superusers')
-      .authWithPassword(PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD)
+    authPromise = client.collection('_superusers')
+      .authWithPassword(email, password)
       .catch((err) => { authPromise = null; throw err })
   }
   await authPromise
@@ -44,13 +55,13 @@ async function ensureAuth() {
 
 async function getFullList(collection) {
   await ensureAuth()
-  return pb.collection(collection).getFullList({ batch: 500, sort: 'created' })
+  return pb().collection(collection).getFullList({ batch: 500, sort: 'created' })
 }
 
 async function findByRecordId(collection, recordId) {
   await ensureAuth()
   try {
-    return await pb.collection(collection).getFirstListItem(`recordId="${String(recordId).replace(/"/g, '\\"')}"`)
+    return await pb().collection(collection).getFirstListItem(`recordId="${String(recordId).replace(/"/g, '\\"')}"`)
   } catch (err) {
     if (err?.status === 404) return null
     throw err
@@ -84,15 +95,15 @@ export async function saveRegistrations(records) {
     }
     const found = byRecordId.get(recordId)
     if (found) {
-      await pb.collection('registrations').update(found.id, data)
+      await pb().collection('registrations').update(found.id, data)
     } else {
-      await pb.collection('registrations').create(data)
+      await pb().collection('registrations').create(data)
     }
   }
   // delete rows that are no longer in the incoming list
   for (const row of existing) {
     if (!incomingIds.has(row.recordId)) {
-      await pb.collection('registrations').delete(row.id)
+      await pb().collection('registrations').delete(row.id)
     }
   }
 }
@@ -114,14 +125,14 @@ export async function saveStaff(staff) {
     const data = { recordId, payload: { ...member } }
     const found = byRecordId.get(recordId)
     if (found) {
-      await pb.collection('staff').update(found.id, data)
+      await pb().collection('staff').update(found.id, data)
     } else {
-      await pb.collection('staff').create(data)
+      await pb().collection('staff').create(data)
     }
   }
   for (const row of existing) {
     if (!incomingIds.has(row.recordId)) {
-      await pb.collection('staff').delete(row.id)
+      await pb().collection('staff').delete(row.id)
     }
   }
 }
@@ -144,14 +155,14 @@ export async function savePrograms(programs) {
     const data = { recordId, payload: { ...program } }
     const found = byRecordId.get(recordId)
     if (found) {
-      await pb.collection('programs').update(found.id, data)
+      await pb().collection('programs').update(found.id, data)
     } else {
-      await pb.collection('programs').create(data)
+      await pb().collection('programs').create(data)
     }
   }
   for (const row of existing) {
     if (!incomingIds.has(row.recordId)) {
-      await pb.collection('programs').delete(row.id)
+      await pb().collection('programs').delete(row.id)
     }
   }
 }
@@ -173,14 +184,14 @@ export async function saveRules(rules) {
     const data = { recordId, payload: { ...rule } }
     const found = byRecordId.get(recordId)
     if (found) {
-      await pb.collection('rules').update(found.id, data)
+      await pb().collection('rules').update(found.id, data)
     } else {
-      await pb.collection('rules').create(data)
+      await pb().collection('rules').create(data)
     }
   }
   for (const row of existing) {
     if (!incomingIds.has(row.recordId)) {
-      await pb.collection('rules').delete(row.id)
+      await pb().collection('rules').delete(row.id)
     }
   }
 }
@@ -205,7 +216,7 @@ export async function saveCommentsForTab(studentId, tabKey, rowsArray) {
   await ensureAuth()
   let existing = null
   try {
-    existing = await pb.collection('comments').getFirstListItem(
+    existing = await pb().collection('comments').getFirstListItem(
       `studentId="${studentId}" && tabKey="${tabKey}"`
     )
   } catch (err) {
@@ -213,9 +224,9 @@ export async function saveCommentsForTab(studentId, tabKey, rowsArray) {
   }
   const data = { studentId, tabKey, rows: rowsArray }
   if (existing) {
-    await pb.collection('comments').update(existing.id, data)
+    await pb().collection('comments').update(existing.id, data)
   } else {
-    await pb.collection('comments').create(data)
+    await pb().collection('comments').create(data)
   }
 }
 
@@ -241,8 +252,8 @@ export async function saveStaffBoard(board) {
   await ensureAuth()
   const rows = await getFullList('staffBoard')
   if (rows.length === 0) {
-    await pb.collection('staffBoard').create({ payload: board })
+    await pb().collection('staffBoard').create({ payload: board })
   } else {
-    await pb.collection('staffBoard').update(rows[0].id, { payload: board })
+    await pb().collection('staffBoard').update(rows[0].id, { payload: board })
   }
 }
