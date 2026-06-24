@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useStore } from '../data/store'
+import craniaLogo from '../assets/crania-logo.png'
 
 // ── 2025 Canadian Payroll Tax Constants (Ontario) ──────────────────────────
 const TAX_YEAR = 2025
@@ -124,7 +125,7 @@ function PaystubModal({ entry, run, onClose }) {
     const body = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
         <div>
-          <img src="/crania-logo-black.jpg" style="height:40px;margin-bottom:8px;" />
+          <img src="${craniaLogo}" style="height:40px;margin-bottom:8px;" />
           <div class="hdr-co">CRANIA SCHOOLS</div>
           <div style="font-size:12px;color:#666;">Employee Pay Statement · ${TAX_YEAR}</div>
         </div>
@@ -212,7 +213,7 @@ function PaystubModal({ entry, run, onClose }) {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 14, borderBottom: '2px solid #2c7a7b', marginBottom: 14 }}>
           <div>
-            <img src="/crania-logo-black.jpg" alt="Crania" style={{ height: 32, marginBottom: 8 }} />
+            <img src={craniaLogo} alt="Crania" style={{ height: 40, marginBottom: 8 }} />
             <div style={{ fontSize: 19, fontWeight: 800, color: '#2c7a7b' }}>CRANIA SCHOOLS</div>
             <div style={{ fontSize: 11, color: '#888' }}>Employee Pay Statement · {TAX_YEAR}</div>
           </div>
