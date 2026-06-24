@@ -641,6 +641,42 @@ textarea.reg-input { resize: vertical; min-height: 96px; }
 .sch-entry-title { font-weight: 800; }
 .sch-entry-teacher { font-weight: 600; opacity: 0.92; }
 .sch-entry-time { font-size: 10px; opacity: 0.88; margin-top: 1px; }
+.sch-entry-loc {
+  font-size: 9.5px; font-weight: 700;
+  background: rgba(255,255,255,0.22);
+  padding: 1px 5px; border-radius: 3px;
+  display: inline-block; margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+.sch-entry-unassigned {
+  color: #1f2733;
+  background: repeating-linear-gradient(
+    45deg, #e6e9ec, #e6e9ec 6px, #d9dde0 6px, #d9dde0 12px
+  ) !important;
+  border: 1.5px dashed #9aa4b1;
+}
+.sch-entry-unassigned-tag {
+  font-size: 9.5px; font-weight: 800;
+  color: #c0392b;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Day view: 2-column grid (time | classes) */
+.sch-grid-day { grid-template-columns: 120px 1fr; }
+.sch-grid-day .sch-cell { min-height: 64px; }
+
+.sch-month-loc {
+  font-weight: 600; color: var(--btn-teal);
+}
+.sch-month-room-unassigned {
+  color: #c0392b !important;
+  background: repeating-linear-gradient(
+    45deg, #fff, #fff 4px, #fde2e2 4px, #fde2e2 8px
+  ) !important;
+  border: 1px dashed #c0392b;
+}
 
 /* Month view */
 .sch-month {

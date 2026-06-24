@@ -175,21 +175,49 @@ export default function Schedules() {
     importFromPrograms({ silent: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const [view, setView]           = useState('week') // 'week' | 'month'
+  const [view, setView]           = useState('week') // 'month' | 'week' | 'day'
   const [focusLoc, setFocusLoc]   = useState(null)   // location id or null for "all"
+  const [dayOfWeek, setDayOfWeek] = useState('Mon')  // selected day for day view
   const [editing, setEditing]     = useState(null)   // entry being edited or null
   const [showRooms, setShowRooms] = useState(false)
   const [showLocs, setShowLocs]   = useState(false)
   const [filterRoom, setFilterRoom] = useState('all')
-  const [filterTeacher, setFilterTeacher] = useState('')
+  const [filterTeacher, setFilterTeacher] = useState('all')
+  const [staff, setStaff]         = useState([])
 
+  // Pull live staff so the teacher filter shows everyone currently active.
+  // Falls back to whatever teacher names already live on the entries — that
+  // way the dropdown still works in dev where /api/staff returns 500.
+  useEffect(() => {
+    fetch('/api/staff')
+      .then(r => r.ok ? r.json() : [])
+      .then(s => { if (Array.isArray(s)) setStaff(s) })
+      .catch(() => {})
+  }, [])
+
+  // Set of teacher names that should appear in the filter dropdown — union of
+  // active staff and any teacher referenced on an entry (in case staff was
+  // typed manually).
+  const teacherOptions = useMemo(() => {
+    const set = new Set()
+    staff.filter(s => s.active !== false).forEach(s => {
+      const name = [s.firstName, s.lastName].filter(Boolean).join(' ').trim()
+      if (name) set.add(name)
+    })
+    entries.forEach(e => { if (e.teacher) set.add(e.teacher) })
+    return [...set].sort((a, b) => a.localeCompare(b))
+  }, [staff, entries])
+
+  // When the user is looking at all locations together, merge into one grid;
+  // otherwise show just the focused location.
   const visibleLocations = focusLoc
     ? locations.filter(l => l.id === focusLoc)
     : locations
+  const merged = !focusLoc && locations.length > 1
 
   const filteredEntries = useMemo(() => entries.filter(e => {
     if (filterRoom !== 'all' && e.roomId !== filterRoom) return false
-    if (filterTeacher && !(e.teacher || '').toLowerCase().includes(filterTeacher.toLowerCase())) return false
+    if (filterTeacher !== 'all' && (e.teacher || '') !== filterTeacher) return false
     return true
   }), [entries, filterRoom, filterTeacher])
 
@@ -291,14 +319,23 @@ export default function Schedules() {
       {/* Filters + view switch */}
       <div className="sch-filters">
         <div className="seg">
-          <button className={view === 'week' ? 'active' : ''} onClick={() => setView('week')}>Week</button>
           <button className={view === 'month' ? 'active' : ''} onClick={() => setView('month')}>Month</button>
+          <button className={view === 'week'  ? 'active' : ''} onClick={() => setView('week')}>Week</button>
+          <button className={view === 'day'   ? 'active' : ''} onClick={() => setView('day')}>Day</button>
         </div>
+        {view === 'day' && (
+          <select className="form-input" style={{ width: 140 }} value={dayOfWeek} onChange={e => setDayOfWeek(e.target.value)}>
+            {DAYS.map((d, i) => <option key={d} value={d}>{DAYS_LONG[i]}</option>)}
+          </select>
+        )}
         <select className="form-input" style={{ width: 160 }} value={filterRoom} onChange={e => setFilterRoom(e.target.value)}>
           <option value="all">All rooms</option>
           {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
         </select>
-        <input className="form-input" style={{ width: 180 }} placeholder="Filter teacher…" value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)} />
+        <select className="form-input" style={{ width: 200 }} value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)}>
+          <option value="all">All teachers</option>
+          {teacherOptions.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
         <div style={{ flex: 1 }} />
         <div className="sch-room-legend">
           {rooms.map(r => (
@@ -307,13 +344,31 @@ export default function Schedules() {
         </div>
       </div>
 
-      {/* Schedules — one full grid per visible location, stacked */}
-      {view === 'week' && visibleLocations.map(loc => (
+      {/* Schedules — when "All Locations" is selected we merge into one
+          grid and tag each entry with a location chip; otherwise show
+          just the focused location. */}
+      {view === 'week' && merged && (
+        <WeekGrid
+          location={{ id: '__all__', name: 'All Locations' }}
+          rooms={rooms}
+          roomById={roomById}
+          locById={locById}
+          entries={filteredEntries}
+          merged
+          onCellNew={(day, time) => newEntry(null, day, time)}
+          onEntryEdit={(en) => setEditing({ ...en })}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        />
+      )}
+      {view === 'week' && !merged && visibleLocations.map(loc => (
         <WeekGrid
           key={loc.id}
           location={loc}
           rooms={rooms}
           roomById={roomById}
+          locById={locById}
           entries={filteredEntries.filter(e => e.locationId === loc.id)}
           onCellNew={(day, time) => newEntry(loc.id, day, time)}
           onEntryEdit={(en) => setEditing({ ...en })}
@@ -323,11 +378,53 @@ export default function Schedules() {
         />
       ))}
 
-      {view === 'month' && visibleLocations.map(loc => (
+      {view === 'day' && merged && (
+        <DayGrid
+          location={{ id: '__all__', name: 'All Locations' }}
+          day={dayOfWeek}
+          roomById={roomById}
+          locById={locById}
+          entries={filteredEntries.filter(e => e.day === dayOfWeek)}
+          merged
+          onCellNew={(time) => newEntry(null, dayOfWeek, time)}
+          onEntryEdit={(en) => setEditing({ ...en })}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDrop={(e, time) => onDrop(e, null, dayOfWeek, time)}
+        />
+      )}
+      {view === 'day' && !merged && visibleLocations.map(loc => (
+        <DayGrid
+          key={loc.id}
+          location={loc}
+          day={dayOfWeek}
+          roomById={roomById}
+          locById={locById}
+          entries={filteredEntries.filter(e => e.locationId === loc.id && e.day === dayOfWeek)}
+          onCellNew={(time) => newEntry(loc.id, dayOfWeek, time)}
+          onEntryEdit={(en) => setEditing({ ...en })}
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          onDrop={(e, time) => onDrop(e, loc.id, dayOfWeek, time)}
+        />
+      ))}
+
+      {view === 'month' && merged && (
+        <MonthList
+          location={{ id: '__all__', name: 'All Locations' }}
+          roomById={roomById}
+          locById={locById}
+          entries={filteredEntries}
+          merged
+          onEntryEdit={(en) => setEditing({ ...en })}
+        />
+      )}
+      {view === 'month' && !merged && visibleLocations.map(loc => (
         <MonthList
           key={loc.id}
           location={loc}
           roomById={roomById}
+          locById={locById}
           entries={filteredEntries.filter(e => e.locationId === loc.id)}
           onEntryEdit={(en) => setEditing({ ...en })}
         />
@@ -339,6 +436,7 @@ export default function Schedules() {
           onChange={setEditing}
           rooms={rooms}
           locations={locations}
+          teacherOptions={teacherOptions}
           onSave={saveEntry}
           onDelete={deleteEntry}
           onClose={() => setEditing(null)}
@@ -356,7 +454,7 @@ export default function Schedules() {
 }
 
 // ─── Week grid ────────────────────────────────────────────────────────────────
-function WeekGrid({ location, rooms, roomById, entries, onCellNew, onEntryEdit, onDragStart, onDragOver, onDrop }) {
+function WeekGrid({ location, rooms, roomById, locById, entries, merged, onCellNew, onEntryEdit, onDragStart, onDragOver, onDrop }) {
   // Group entries by day -> slot for quick lookup
   const byCell = useMemo(() => {
     const m = {}
@@ -382,6 +480,8 @@ function WeekGrid({ location, rooms, roomById, entries, onCellNew, onEntryEdit, 
           <Row key={t} t={t}
             byCell={byCell}
             roomById={roomById}
+            locById={locById}
+            merged={merged}
             onCellNew={onCellNew}
             onEntryEdit={onEntryEdit}
             onDragStart={onDragStart}
@@ -395,7 +495,7 @@ function WeekGrid({ location, rooms, roomById, entries, onCellNew, onEntryEdit, 
   )
 }
 
-function Row({ t, byCell, roomById, onCellNew, onEntryEdit, onDragStart, onDragOver, onDrop, locId }) {
+function Row({ t, byCell, roomById, locById, merged, onCellNew, onEntryEdit, onDragStart, onDragOver, onDrop, locId }) {
   return (
     <>
       <div className="sch-cell sch-time">{fmtTime(t)}</div>
@@ -407,27 +507,17 @@ function Row({ t, byCell, roomById, onCellNew, onEntryEdit, onDragStart, onDragO
             className="sch-cell sch-slot"
             onClick={() => ents.length === 0 && onCellNew(d, t)}
             onDragOver={onDragOver}
-            onDrop={(e) => onDrop(e, locId, d, t)}
+            onDrop={(e) => onDrop(e, locId === '__all__' ? null : locId, d, t)}
           >
-            {ents.map(en => {
-              const room = roomById[en.roomId]
-              const color = room?.color || '#888'
-              return (
-                <div
-                  key={en.id}
-                  className="sch-entry"
-                  style={{ background: color }}
-                  draggable
-                  onDragStart={(e) => onDragStart(e, en.id)}
-                  onClick={(e) => { e.stopPropagation(); onEntryEdit(en) }}
-                  title={`${en.title}${en.teacher ? ' - ' + en.teacher : ''}`}
-                >
-                  <div className="sch-entry-title">{en.title}</div>
-                  {en.teacher && <div className="sch-entry-teacher">- {en.teacher}</div>}
-                  <div className="sch-entry-time">{fmtTime(en.startTime)}–{fmtTime(en.endTime)}</div>
-                </div>
-              )
-            })}
+            {ents.map(en => (
+              <ScheduleEntry key={en.id} en={en}
+                roomById={roomById}
+                locById={locById}
+                merged={merged}
+                onDragStart={onDragStart}
+                onEntryEdit={onEntryEdit}
+              />
+            ))}
           </div>
         )
       })}
@@ -435,8 +525,83 @@ function Row({ t, byCell, roomById, onCellNew, onEntryEdit, onDragStart, onDragO
   )
 }
 
+// One pill rendered inside a schedule slot. Hoisted so the day view can
+// reuse it.
+function ScheduleEntry({ en, roomById, locById, merged, onDragStart, onEntryEdit }) {
+  const room = roomById[en.roomId]
+  const unassigned = !room
+  const color = room?.color || '#9aa4b1'
+  const locName = merged ? (locById?.[en.locationId]?.name || '') : ''
+  return (
+    <div
+      className={'sch-entry' + (unassigned ? ' sch-entry-unassigned' : '')}
+      style={{ background: color }}
+      draggable
+      onDragStart={(e) => onDragStart(e, en.id)}
+      onClick={(e) => { e.stopPropagation(); onEntryEdit(en) }}
+      title={`${en.title}${en.teacher ? ' - ' + en.teacher : ''}${locName ? ' • ' + locName : ''}${unassigned ? ' • Click to assign room' : ''}`}
+    >
+      <div className="sch-entry-title">{en.title}</div>
+      {en.teacher && <div className="sch-entry-teacher">- {en.teacher}</div>}
+      <div className="sch-entry-time">{fmtTime(en.startTime)}–{fmtTime(en.endTime)}</div>
+      {merged && locName && (
+        <div className="sch-entry-loc">{locName}</div>
+      )}
+      {unassigned && <div className="sch-entry-unassigned-tag">Assign room</div>}
+    </div>
+  )
+}
+
+// ─── Day grid ─────────────────────────────────────────────────────────────────
+// A single-day, single-column schedule. One pill per entry; same drag-drop
+// vocabulary as the week grid.
+function DayGrid({ location, day, roomById, locById, entries, merged, onCellNew, onEntryEdit, onDragStart, onDragOver, onDrop }) {
+  const byTime = useMemo(() => {
+    const m = {}
+    entries.forEach(en => { (m[en.startTime] ||= []).push(en) })
+    return m
+  }, [entries])
+
+  return (
+    <div className="sch-card card">
+      <div className="sch-loc-head">{location.name}</div>
+      <div className="sch-grid sch-grid-day">
+        <div className="sch-cell sch-head sch-time-head">TIME</div>
+        <div className="sch-cell sch-head">CLASSES</div>
+        {SLOTS.map(t => {
+          const ents = byTime[t] || []
+          return (
+            <ReactFragment key={t}>
+              <div className="sch-cell sch-time">{fmtTime(t)}</div>
+              <div
+                className="sch-cell sch-slot"
+                onClick={() => ents.length === 0 && onCellNew(t)}
+                onDragOver={onDragOver}
+                onDrop={(e) => onDrop(e, t)}
+              >
+                {ents.map(en => (
+                  <ScheduleEntry key={en.id} en={en}
+                    roomById={roomById}
+                    locById={locById}
+                    merged={merged}
+                    onDragStart={onDragStart}
+                    onEntryEdit={onEntryEdit}
+                  />
+                ))}
+              </div>
+            </ReactFragment>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+// Tiny alias so JSX can destructure-render two cells per row without
+// adding wrapper divs that would break the 2-column grid.
+function ReactFragment({ children }) { return <>{children}</> }
+
 // ─── Month list view ──────────────────────────────────────────────────────────
-function MonthList({ location, roomById, entries, onEntryEdit }) {
+function MonthList({ location, roomById, locById, entries, merged, onEntryEdit }) {
   // Group by day, sorted by time
   const byDay = useMemo(() => {
     const m = {}
@@ -458,15 +623,23 @@ function MonthList({ location, roomById, entries, onEntryEdit }) {
                 <div className="sch-month-empty">No classes</div>
               ) : byDay[d].map(en => {
                 const room = roomById[en.roomId]
-                const color = room?.color || '#888'
+                const unassigned = !room
+                const color = room?.color || '#9aa4b1'
+                const locName = merged ? (locById?.[en.locationId]?.name || '') : ''
                 return (
                   <button key={en.id} className="sch-month-row" onClick={() => onEntryEdit(en)}>
                     <span className="sch-month-time">{fmtTime(en.startTime)}</span>
                     <span className="sch-month-title" style={{ borderLeftColor: color }}>
                       <strong>{en.title}</strong>
                       {en.teacher && <span className="sch-month-teacher"> - {en.teacher}</span>}
+                      {locName && <span className="sch-month-loc"> • {locName}</span>}
                     </span>
-                    <span className="sch-month-room" style={{ background: color }}>{room?.name || '—'}</span>
+                    <span
+                      className={'sch-month-room' + (unassigned ? ' sch-month-room-unassigned' : '')}
+                      style={{ background: color }}
+                    >
+                      {room?.name || 'Assign room'}
+                    </span>
                   </button>
                 )
               })}
@@ -479,7 +652,7 @@ function MonthList({ location, roomById, entries, onEntryEdit }) {
 }
 
 // ─── Entry form ───────────────────────────────────────────────────────────────
-function EntryForm({ entry, onChange, rooms, locations, onSave, onDelete, onClose }) {
+function EntryForm({ entry, onChange, rooms, locations, teacherOptions = [], onSave, onDelete, onClose }) {
   const set = (patch) => onChange({ ...entry, ...patch })
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -493,7 +666,17 @@ function EntryForm({ entry, onChange, rooms, locations, onSave, onDelete, onClos
           <input className="form-input" autoFocus value={entry.title} onChange={e => set({ title: e.target.value })} placeholder="e.g. Flex Math L4" />
 
           <label className="form-label">Teacher</label>
-          <input className="form-input" value={entry.teacher} onChange={e => set({ teacher: e.target.value })} placeholder="e.g. Tas" />
+          {teacherOptions.length > 0 ? (
+            <select className="form-input" value={entry.teacher} onChange={e => set({ teacher: e.target.value })}>
+              <option value="">— No teacher —</option>
+              {teacherOptions.map(t => <option key={t} value={t}>{t}</option>)}
+              {entry.teacher && !teacherOptions.includes(entry.teacher) && (
+                <option value={entry.teacher}>{entry.teacher} (custom)</option>
+              )}
+            </select>
+          ) : (
+            <input className="form-input" value={entry.teacher} onChange={e => set({ teacher: e.target.value })} placeholder="e.g. Tas" />
+          )}
 
           <div className="form-row-2">
             <div>
@@ -504,7 +687,8 @@ function EntryForm({ entry, onChange, rooms, locations, onSave, onDelete, onClos
             </div>
             <div>
               <label className="form-label">Room</label>
-              <select className="form-input" value={entry.roomId} onChange={e => set({ roomId: e.target.value })}>
+              <select className="form-input" value={entry.roomId || ''} onChange={e => set({ roomId: e.target.value })}>
+                <option value="">— Assign room —</option>
                 {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
             </div>

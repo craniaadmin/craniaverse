@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Plus, X, Trash2, Repeat } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, X, Trash2, Repeat, RefreshCw } from 'lucide-react'
 import { RRule } from 'rrule'
 import { CALENDAR_SEED } from '../data/calendarSeed'
 
@@ -8,7 +8,9 @@ import { CALENDAR_SEED } from '../data/calendarSeed'
 const CALENDARS = [
   { id: 'dayschool',   label: 'Day School',         color: '#5FA09E' },
   { id: 'afterschool', label: 'Crania Afterschool', color: '#20bab5' },
-  { id: 'personal',    label: 'Personal',           color: '#e8814a' },
+  // Logo dark-navy — keeps Personal inside the Crania palette while
+  // staying clearly distinct from the two teal calendars.
+  { id: 'personal',    label: 'Personal',           color: '#20304a' },
 ]
 const CAL_BY_ID = Object.fromEntries(CALENDARS.map(c => [c.id, c]))
 
@@ -174,6 +176,14 @@ export default function CalendarView() {
       <div className="page-head">
         <h2 className="page-title">Calendar</h2>
         <div className="head-actions">
+          <button className="btn ghost" onClick={() => {
+            if (window.confirm('Reload Crania\'s default calendar? This replaces all current events.')) {
+              setEvents(CALENDAR_SEED)
+            }
+          }}>
+            <RefreshCw size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />
+            Reset to defaults
+          </button>
           <button className="btn" onClick={() => openNew(today)}>
             <Plus size={16} style={{ marginRight: 4, verticalAlign: '-3px' }} />
             New Event
