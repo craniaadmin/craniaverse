@@ -28,6 +28,7 @@ import {
   loadRules,         saveRules,
   loadComments,      saveCommentsForTab,
   loadStaffBoard,    saveStaffBoard,
+  loadInventory,     saveInventory,
 } from './pb.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
