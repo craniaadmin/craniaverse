@@ -122,75 +122,93 @@ export default function Inventory() {
         ))}
       </div>
 
-      {/* Items table */}
-      <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0' }}>
-          <thead>
-            <tr style={{ background: '#f5f7f8', borderBottom: '1px solid var(--line)' }}>
-              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '12px 16px' }}>ITEM</th>
-              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '12px 16px' }}>CATEGORY</th>
-              {hasItemsWithSize && <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 80 }}>SIZE</th>}
-              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 140 }}>QTY</th>
-              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 100 }}>PRICE</th>
-              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 120 }}>VALUE</th>
-              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 40 }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.length === 0 ? (
-              <tr>
-                <td colSpan={hasItemsWithSize ? 7 : 6} style={{ padding: '24px', textAlign: 'center', color: 'var(--muted)', fontSize: 14 }}>
-                  No items yet. Add one to get started.
-                </td>
-              </tr>
-            ) : (
-              sorted.map((item, idx) => {
-                const low = item.qty <= LOW_STOCK && item.qty > 0
-                const out = item.qty === 0
-                return (
-                  <tr key={item.id} style={{
-                    borderBottom: idx < sorted.length - 1 ? '1px solid var(--line)' : 'none',
-                    opacity: out ? 0.6 : 1,
-                  }}>
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{
-                        fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
-                      }}>
-                        {item.name}
-                        {out && <span style={{ fontSize: 11, fontWeight: 700, color: '#c62828', background: '#fde0e0', borderRadius: 4, padding: '2px 7px' }}>OUT</span>}
-                        {low && <span style={{ fontSize: 11, fontWeight: 700, color: '#cc7800', background: '#fffbf0', borderRadius: 4, padding: '2px 7px' }}>LOW</span>}
-                      </div>
-                    </td>
-                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ink-soft)' }}>
-                      {item.category}
-                    </td>
-                    {hasItemsWithSize && (
-                      <td style={{ padding: '12px 16px', fontSize: 13, textAlign: 'center', color: 'var(--ink-soft)' }}>
-                        {item.size || '—'}
+      {/* Category groups */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {grouped.map(({ cat, items: catItems, hasSize }) => (
+          <div key={cat} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
+            {/* Category header */}
+            <div style={{
+              borderLeft: '5px solid var(--logo-teal)',
+              borderBottom: '1px solid var(--line)',
+              background: '#fafbfc',
+              padding: '12px 18px',
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+              <span style={{ fontWeight: 800, fontSize: 13, letterSpacing: '.6px', textTransform: 'uppercase', color: 'var(--logo-teal)' }}>
+                {cat}
+              </span>
+              <span style={{ background: 'var(--logo-teal)', color: '#fff', borderRadius: 999, fontSize: 11, fontWeight: 700, padding: '2px 8px' }}>
+                {catItems.length}
+              </span>
+              {catItems.some(i => i.qty <= LOW_STOCK) && (
+                <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#cc7800' }}>
+                  <AlertTriangle size={13} /> Low stock
+                </span>
+              )}
+            </div>
+
+            {/* Items table */}
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0' }}>
+              <thead>
+                <tr style={{ background: '#f5f7f8', borderBottom: '1px solid var(--line)' }}>
+                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '12px 16px' }}>ITEM</th>
+                  {hasSize && <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 80 }}>SIZE</th>}
+                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 140 }}>QTY</th>
+                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 100 }}>PRICE</th>
+                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 120 }}>VALUE</th>
+                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 60 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {catItems.map((item, idx) => {
+                  const low = item.qty <= LOW_STOCK && item.qty > 0
+                  const out = item.qty === 0
+                  return (
+                    <tr key={item.id} style={{
+                      borderBottom: idx < catItems.length - 1 ? '1px solid var(--line)' : 'none',
+                      opacity: out ? 0.6 : 1,
+                    }}>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{
+                          fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+                        }}>
+                          {item.name}
+                          {out && <span style={{ fontSize: 11, fontWeight: 700, color: '#c62828', background: '#fde0e0', borderRadius: 4, padding: '2px 7px' }}>OUT</span>}
+                          {low && <span style={{ fontSize: 11, fontWeight: 700, color: '#cc7800', background: '#fffbf0', borderRadius: 4, padding: '2px 7px' }}>LOW</span>}
+                        </div>
                       </td>
-                    )}
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <QtyControl qty={item.qty} onChange={qty => updateQty(item.id, qty)} />
-                      </div>
-                    </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: 'var(--ink-soft)' }}>
-                      ${item.price.toFixed(2)}
-                    </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
-                      ${(item.qty * item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                      <button onClick={() => deleteItem(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }} title="Delete item">
-                        <X size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })
-            )}
-          </tbody>
-        </table>
+                      {hasSize && (
+                        <td style={{ padding: '12px 16px', fontSize: 13, textAlign: 'center', color: 'var(--ink-soft)' }}>
+                          {item.size || '—'}
+                        </td>
+                      )}
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                          <QtyControl qty={item.qty} onChange={qty => updateQty(item.id, qty)} />
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: 'var(--ink-soft)' }}>
+                        ${item.price.toFixed(2)}
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
+                        ${(item.qty * item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'center', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                        <button onClick={() => openEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }} title="Edit item">
+                          <Edit2 size={16} />
+                        </button>
+                        <button onClick={() => deleteItem(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }} title="Delete item">
+                          <X size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <div style={{ height: 8 }} />
+          </div>
+        ))}
       </div>
 
       {/* Add Item Modal */}
