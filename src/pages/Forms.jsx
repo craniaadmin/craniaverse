@@ -435,7 +435,15 @@ export default function Forms() {
       .finally(() => setLoading(false))
   }, [])
 
-  const publicUrl = (id) => `${API_BASE || window.location.origin}/form/${id}`
+  const publicUrl = (formOrId) => {
+    const origin = API_BASE || window.location.origin
+    // Accept either a form object or a bare id (backwards compat).
+    if (typeof formOrId === 'object' && formOrId) {
+      return `${origin}/form/${formOrId.slug || formOrId.id}`
+    }
+    const form = forms.find(f => f.id === formOrId)
+    return `${origin}/form/${(form && form.slug) || formOrId}`
+  }
 
   const createForm = async (draft) => {
     const res = await fetch(`${API_BASE}/api/forms`, {
