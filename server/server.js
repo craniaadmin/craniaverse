@@ -528,6 +528,96 @@ app.delete('/api/inventory/:id', wrap(async (req, res) => {
   res.json({ deleted: items.length - next.length })
 }))
 
+// ---- forms (custom form builder) ------------------------
+// A "form" is a definition: title + ordered field list. Anyone
+// with the form's shareable URL (/form/:id) can submit it, and
+// submissions land in the formSubmissions collection.
+app.get('/api/forms', wrap(async (_req, res) => res.json(await getForms())))
+
+app.get('/api/forms/:id', wrap(async (req, res) => {
+  const forms = await getForms()
+  const form = forms.find((f) => String(f.id) === String(req.params.id))
+  if (!form) return res.status(404).json({ error: 'not found' })
+  res.json(form)
+}))
+
+app.post('/api/forms', wrap(async (req, res) => {
+  const forms = await getForms()
+  const id = 'form-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7)
+  const record = {
+    id,
+    title:       String(req.body.title || 'Untitled Form').trim(),
+    description: String(req.body.description || '').trim(),
+    fields:      Array.isArray(req.body.fields) ? req.body.fields : [],
+    createdAt:   new Date().toISOString(),
+  }
+  forms.push(record)
+  await commitForms(forms)
+  res.status(201).json(record)
+}))
+
+app.put('/api/forms/:id', wrap(async (req, res) => {
+  const forms = await getForms()
+  const idx = forms.findIndex((f) => String(f.id) === String(req.params.id))
+  if (idx === -1) return res.status(404).json({ error: 'not found' })
+  forms[idx] = {
+    ...forms[idx],
+    title:       req.body.title       !== undefined ? String(req.body.title).trim()       : forms[idx].title,
+    description: req.body.description !== undefined ? String(req.body.description).trim() : forms[idx].description,
+    fields:      Array.isArray(req.body.fields) ? req.body.fields : forms[idx].fields,
+  }
+  await commitForms(forms)
+  res.json(forms[idx])
+}))
+
+app.delete('/api/forms/:id', wrap(async (req, res) => {
+  const forms = await getForms()
+  const next = forms.filter((f) => String(f.id) !== String(req.params.id))
+  await commitForms(next)
+  await deleteSubmissionsForForm(String(req.params.id))
+  res.json({ deleted: forms.length - next.length })
+}))
+
+// ---- submissions ---
+// Public — no auth. Rate-limit / CAPTCHA can be added later.
+app.post('/api/forms/:id/submit', wrap(async (req, res) => {
+  const forms = await getForms()
+  const form = forms.find((f) => String(f.id) === String(req.params.id))
+  if (!form) return res.status(404).json({ error: 'form not found' })
+
+  const answers = (req.body && typeof req.body.answers === 'object') ? req.body.answers : {}
+  // Enforce required fields server-side.
+  for (const field of form.fields || []) {
+    if (field.required) {
+      const v = answers[field.key]
+      const empty = v === undefined || v === null || v === '' ||
+                    (Array.isArray(v) && v.length === 0)
+      if (empty) return res.status(400).json({ error: `Missing required field: ${field.label || field.key}` })
+    }
+  }
+
+  const submission = {
+    id:          'sub-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+    formId:      String(req.params.id),
+    answers,
+    submittedAt: new Date().toISOString(),
+  }
+  await createSubmission(submission)
+  res.status(201).json({ ok: true, id: submission.id })
+}))
+
+app.get('/api/forms/:id/submissions', wrap(async (req, res) => {
+  const subs = await loadSubmissions(String(req.params.id))
+  // newest first
+  subs.sort((a, b) => (b.submittedAt || '').localeCompare(a.submittedAt || ''))
+  res.json(subs)
+}))
+
+app.delete('/api/forms/:formId/submissions/:subId', wrap(async (req, res) => {
+  await deleteSubmission(String(req.params.subId))
+  res.json({ ok: true })
+}))
+
 // Error handler — any thrown error from a wrap()-ed handler lands here
 app.use((err, _req, res, _next) => {
   console.error('[api error]', err?.response || err?.message || err)
