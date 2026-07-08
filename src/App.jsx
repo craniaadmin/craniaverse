@@ -43,6 +43,7 @@ export default function App() {
       case 'Staff Hub': return <StaffHub />
       case 'Staff Information': return <StaffInformation />
       case 'Payroll': return <Payroll />
+      case 'Forms': return <Forms />
       default: return <Placeholder title={page} />
     }
   }
