@@ -267,6 +267,10 @@ export default function FeeSchedule() {
     } finally { setPdfBusy(false) }
   }
 
+  // "Email To Parent" — mailto: can't attach files, so we download the
+  // PDF and then open the mail client with the parent's address, subject,
+  // and a body pre-filled with the schedule summary + a reminder to
+  // attach the just-downloaded PDF.
   const emailParent = async () => {
     if (!selectedReg) return
     const parentEmail =
@@ -278,23 +282,54 @@ export default function FeeSchedule() {
       alert('No parent email on file for this student.')
       return
     }
-    setEmailStatus('sending')
+
+    // 1) Download the PDF first so the user can attach it.
+    const payload = buildPdfPayload()
+    let downloaded = false
     try {
-      const res = await fetch(`${API_BASE}/api/fee-schedule/email`, {
+      const res = await fetch(`${API_BASE}/api/fee-schedule/pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...buildPdfPayload(), to: parentEmail }),
+        body: JSON.stringify(payload),
       })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || 'send failed')
-      }
-      setEmailStatus('ok')
-      setTimeout(() => setEmailStatus(''), 3500)
+      if (!res.ok) throw new Error('PDF request failed: ' + res.status)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = payload.filename
+      document.body.appendChild(a); a.click(); a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 5000)
+      downloaded = true
     } catch (err) {
-      console.error(err)
-      setEmailStatus('Error: ' + err.message)
+      console.error('PDF generation failed:', err)
+      alert('Could not generate the PDF: ' + err.message + '\n\nThe email will still open, but you\'ll need to generate the PDF separately.')
     }
+
+    // 2) Open the mail client with a body summarising the schedule.
+    const studentName = selectedReg.displayName || 'your child'
+    const bodyLines = [
+      'Hi,',
+      '',
+      `Please find attached the tuition schedule for ${studentName} — ${programKey} (${yearCfg.label}).`,
+      '',
+      `First Lesson: Week ${firstLesson}`,
+      `Scheduled Weeks: ${schedule.scheduledWeeks} of ${schedule.weeksPerYear}`,
+      `Tuition: ${money(schedule.tuition)}`,
+      `Registration Fee: ${money(schedule.regFee)}`,
+      `Material Fee: ${money(schedule.matFee)}`,
+      `Total: ${money(schedule.total)}`,
+      '',
+      downloaded
+        ? `(The PDF "${payload.filename}" was saved to your Downloads folder — please attach it before sending.)`
+        : `(Please generate the PDF from the Fee Schedule page and attach it before sending.)`,
+      '',
+      'Thanks,',
+      'Crania Schools',
+    ]
+    const subject = `Tuition Schedule — ${studentName} (${yearCfg.label})`
+    const href = `mailto:${encodeURIComponent(parentEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\r\n'))}`
+    window.location.href = href
   }
 
   if (loading) {
