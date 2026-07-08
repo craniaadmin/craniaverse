@@ -224,27 +224,22 @@ function StaffList({ onSelect, onAdd }) {
           </div>
         ) : (
           filtered.map((s, i) => (
-            <div key={s.id} style={{
-              display: 'grid', gridTemplateColumns: '1.6fr 1.2fr 1fr 1.4fr 1fr 0.5fr',
+            <div key={s.id} onClick={() => onSelect(s.id)} style={{
+              display: 'grid', gridTemplateColumns: '1.6fr 1.2fr 1fr 1.4fr 1fr',
               padding: '13px 20px', alignItems: 'center',
               borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
               background: i % 2 === 0 ? '#fff' : '#fafbfb',
-            }}>
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = i % 2 === 0 ? '#f5f9fa' : '#eef3f4'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = i % 2 === 0 ? '#fff' : '#fafbfb'}
+            >
               <div style={{ fontWeight: 600, fontSize: 14 }}>{s.firstName} {s.lastName}</div>
               <div style={{ fontSize: 13 }}>{s.role || '—'}</div>
               <div style={{ fontSize: 13 }}>{s.phoneMobile || s.phone || '—'}</div>
               <div style={{ fontSize: 13, color: 'var(--logo-teal)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.email || '—'}</div>
               <div style={{ fontSize: 13 }}>{s.startDate || '—'}</div>
-              <div>
-                <button onClick={() => onSelect(s.id)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--logo-teal)', padding: 4 }}
-                  title="View details">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                    <polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </button>
-              </div>
             </div>
           ))
         )}
