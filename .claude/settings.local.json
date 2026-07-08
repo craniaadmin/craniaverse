@@ -76,7 +76,9 @@
       "Bash(git rebase *)",
       "Bash(node --check server/server.js)",
       "Bash(node --check server/pb.js)",
-      "Bash(node --check server/scripts/pb-setup.js)"
+      "Bash(node --check server/scripts/pb-setup.js)",
+      "Bash(awk 'length\\($0\\) < 500')",
+      "Bash(awk 'length\\($0\\) > 500 {print NR, \"len=\"length\\($0\\)}' \"C:/Users/hanak/Downloads/CraniaVerse To Do v43 [claude-opus-4-8].html\")"
     ]
   },
   "hooks": {

@@ -104,6 +104,13 @@ const collectionSpecs = [
     indexes: ['CREATE UNIQUE INDEX `idx_forms_recordId` ON `forms` (`recordId`)'],
   },
   {
+    name: 'todo',
+    fields: [
+      { name: 'payload', type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: [],
+  },
+  {
     name: 'formSubmissions',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },
