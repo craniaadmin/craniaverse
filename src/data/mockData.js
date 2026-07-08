@@ -12,6 +12,7 @@ export const NAV = [
   { label: 'Operations', items: ['Crania Cash', 'Inventory'] },
   { label: 'Financial', items: ['Accounting', 'Fee Schedules', 'Payroll', 'Payments', 'Invoices', 'Receipts'] },
   { label: 'Marketing', items: ['Marketing'] },
+  { label: 'Forms', items: ['Forms'] },
 ]
 
 export const revenueByProgram = [
