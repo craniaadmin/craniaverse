@@ -87,6 +87,14 @@ const collectionSpecs = [
     ],
     indexes: [],
   },
+  {
+    name: 'inventory',
+    fields: [
+      { name: 'recordId', type: 'text', required: true,  presentable: true },
+      { name: 'payload',  type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: ['CREATE UNIQUE INDEX `idx_inventory_recordId` ON `inventory` (`recordId`)'],
+  },
 ]
 
 async function ensureCollection(spec) {
