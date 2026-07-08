@@ -125,6 +125,16 @@ async function commitRules(rules) {
   await saveRules(rules)
 }
 
+async function getInventory() {
+  if (cache.inventory) return cache.inventory
+  cache.inventory = await loadInventory()
+  return cache.inventory
+}
+async function commitInventory(items) {
+  cache.inventory = items
+  await saveInventory(items)
+}
+
 // ---- registrations: one-time migration of legacy records ---
 // Earlier records may be missing the programs / cashLog
 // fields. Pull all records, patch in-memory, and write back
