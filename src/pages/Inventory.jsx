@@ -245,7 +245,7 @@ export default function Inventory() {
                 />
               </div>
 
-              {/* Category - select from existing or add new */}
+              {/* Category */}
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Category</label>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -320,6 +320,90 @@ export default function Inventory() {
               <button className="btn ghost" onClick={() => setModal(false)}>Cancel</button>
               <button className="btn" onClick={save} disabled={!form.name.trim() || !(form.category || form.newCategory)} style={{ opacity: (form.name.trim() && (form.category || form.newCategory)) ? 1 : 0.45 }}>
                 Add Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Item Modal */}
+      {editModal && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(15,25,40,.45)',
+          display: 'grid', placeItems: 'center', zIndex: 200, padding: 16,
+        }} onClick={e => e.target === e.currentTarget && setEditModal(false)}>
+          <div style={{
+            background: '#fff', borderRadius: 16, width: 500, maxWidth: '100%',
+            boxShadow: '0 20px 60px rgba(15,25,40,.2)', overflow: 'hidden',
+          }}>
+            <div style={{
+              background: 'var(--header-blue)', padding: '16px 20px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Edit Item</span>
+              <button onClick={() => setEditModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: 'var(--ink-soft)' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+              {/* Item Name */}
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Item Name</label>
+                <input
+                  className="reg-input"
+                  value={editForm.name}
+                  onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                  autoFocus
+                />
+              </div>
+
+              {/* Size (only if item has size) */}
+              {editForm.size !== null && (
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Size</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+                    {COMMON_SIZES.map(sz => (
+                      <button key={sz} onClick={() => setEditForm(f => ({ ...f, size: sz }))} style={{
+                        border: `2px solid ${editForm.size === sz ? 'var(--logo-teal)' : 'var(--line)'}`,
+                        background: editForm.size === sz ? '#5FA09E18' : '#fafbfc',
+                        color: editForm.size === sz ? 'var(--logo-teal)' : 'var(--ink-soft)',
+                        borderRadius: 7, padding: '6px 12px', fontSize: 13,
+                        fontWeight: editForm.size === sz ? 700 : 500, cursor: 'pointer',
+                      }}>{sz}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Qty + Price */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Qty in Stock</label>
+                  <input
+                    className="reg-input"
+                    type="number" min="0"
+                    value={editForm.qty}
+                    onChange={e => setEditForm(f => ({ ...f, qty: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Price ($)</label>
+                  <input
+                    className="reg-input"
+                    type="number" min="0" step="0.01"
+                    value={editForm.price}
+                    onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ padding: '0 24px 22px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button className="btn ghost" onClick={() => setEditModal(false)}>Cancel</button>
+              <button className="btn" onClick={saveEdit} disabled={!editForm.name.trim()} style={{ opacity: editForm.name.trim() ? 1 : 0.45 }}>
+                Save Changes
               </button>
             </div>
           </div>
