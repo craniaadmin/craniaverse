@@ -78,7 +78,13 @@
       "Bash(node --check server/pb.js)",
       "Bash(node --check server/scripts/pb-setup.js)",
       "Bash(awk 'length\\($0\\) < 500')",
-      "Bash(awk 'length\\($0\\) > 500 {print NR, \"len=\"length\\($0\\)}' \"C:/Users/hanak/Downloads/CraniaVerse To Do v43 [claude-opus-4-8].html\")"
+      "Bash(awk 'length\\($0\\) > 500 {print NR, \"len=\"length\\($0\\)}' \"C:/Users/hanak/Downloads/CraniaVerse To Do v43 [claude-opus-4-8].html\")",
+      "Bash(node -e \"const d=require\\('./server/programs.json'\\); console.log\\(JSON.stringify\\(d[0], null, 2\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./server/programs.json'\\); console.log\\('programs:', d.length\\); const keys=new Set\\(\\); d.forEach\\(p=>Object.keys\\(p\\).forEach\\(k=>keys.add\\(k\\)\\)\\); console.log\\('all keys:', [...keys].join\\(','\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./server/data.json'\\); console.log\\('registrations:', d.length\\); console.log\\(JSON.stringify\\(d[0], null, 2\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./server/data.json'\\); console.log\\('programs:', JSON.stringify\\(d[0].programs, null, 2\\)\\); console.log\\('customer.guardian1:', JSON.stringify\\(d[0].customer.guardian1, null, 2\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./server/data.json'\\); console.log\\('Sample program rates:'\\); d.slice\\(0,5\\).forEach\\(r => r.programs && r.programs.forEach\\(p => console.log\\('  ', r.displayName, '-', p.year, p.program, p.rate, p.rateUnit\\)\\)\\)\")",
+      "Bash(node -e \"const d=require\\('./server/data.json'\\); const years=new Set\\(\\), progs=new Set\\(\\); d.forEach\\(r => \\(r.programs||[]\\).forEach\\(p => {years.add\\(p.year\\); progs.add\\(p.program\\)}\\)\\); console.log\\('years:', [...years]\\); console.log\\('progs:', [...progs].slice\\(0,15\\)\\)\")"
     ]
   },
   "hooks": {
