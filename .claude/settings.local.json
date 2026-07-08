@@ -65,7 +65,13 @@
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);console.log\\('total programs:',a.length\\);console.log\\('actives:',a.filter\\(p=>p.active\\).length\\);console.log\\('first program:',JSON.stringify\\(a[0],null,2\\).slice\\(0,800\\)\\);}\\)\")",
       "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node -e ' *)",
       "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node tests/run.js)",
-      "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node --input-type=module -e ' *)"
+      "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node --input-type=module -e ' *)",
+      "Bash(curl -sS -H \"ngrok-skip-browser-warning: 1\" https://craniaverse.ngrok.app/api/inventory -o /tmp/inv.json -w \"HTTP:%{http_code} size:%{size_download}\\\\n\")",
+      "Read(//tmp/**)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app/api/inventory\" -Headers @{\"ngrok-skip-browser-warning\"=\"1\"} -UseBasicParsing -TimeoutSec 15; \"HTTP:\" + $r.StatusCode; \\($r.Content.Substring\\(0, [Math]::Min\\(500, $r.Content.Length\\)\\)\\) } catch { \"ERR: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app/\" -Headers @{\"ngrok-skip-browser-warning\"=\"1\"} -UseBasicParsing -TimeoutSec 30; \"HTTP:\" + $r.StatusCode + \" len:\" + $r.Content.Length } catch { \"ERR: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app/api/inventory\" -Headers @{\"ngrok-skip-browser-warning\"=\"1\"} -UseBasicParsing -TimeoutSec 60; \"HTTP:\" + $r.StatusCode + \" len:\" + $r.Content.Length; \\($r.Content.Substring\\(0, [Math]::Min\\(600, $r.Content.Length\\)\\)\\) } catch { \"ERR: $\\($_.Exception.Message\\)\" })",
+      "PowerShell($eps = @\\('/api/students','/api/staff','/api/inventory','/api/programs','/api/registrations'\\); foreach \\($e in $eps\\) { try { $r = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app$e\" -Headers @{\"ngrok-skip-browser-warning\"=\"1\"} -UseBasicParsing -TimeoutSec 30; \"$e -> HTTP:$\\($r.StatusCode\\) len:$\\($r.Content.Length\\)\" } catch { \"$e -> ERR: $\\($_.Exception.Message\\)\" } })"
     ]
   },
   "hooks": {
@@ -77,8 +83,8 @@
             "type": "command",
             "command": "bash -c 'f=$(jq -r \".tool_input.file_path // .tool_response.filePath\" 2>/dev/null); git add -A; msg=\"Update $(basename \"$f\" 2>/dev/null || echo 'files')\"; git commit -m \"$msg\" 2>/dev/null && git push 2>/dev/null || true'",
             "timeout": 60,
-            "async": true,
-            "statusMessage": "Committing and pushing..."
+            "statusMessage": "Committing and pushing...",
+            "async": true
           }
         ]
       }
