@@ -41,14 +41,31 @@ function QtyControl({ qty, onChange }) {
 export default function Inventory() {
   const [items, setItems] = useState(SEED)
   const [modal, setModal] = useState(false)
+  const [editModal, setEditModal] = useState(false)
   const [form, setForm] = useState(BLANK)
+  const [editForm, setEditForm] = useState(BLANK_EDIT)
 
   const categories = [...new Set(items.map(i => i.category))].sort()
-  const uniqueSizes = [...new Set(items.filter(i => i.size).map(i => i.size))].sort()
-  const hasItemsWithSize = items.some(i => i.size)
 
   const updateQty = (id, qty) => setItems(prev => prev.map(i => i.id === id ? { ...i, qty } : i))
   const deleteItem = (id) => setItems(prev => prev.filter(i => i.id !== id))
+
+  const openEdit = (item) => {
+    setEditForm({ ...item })
+    setEditModal(true)
+  }
+
+  const saveEdit = () => {
+    if (!editForm.name.trim()) return
+    setItems(prev => prev.map(i => i.id === editForm.id ? {
+      ...editForm,
+      name: editForm.name.trim(),
+      qty: Number(editForm.qty) || 0,
+      price: Number(editForm.price) || 0,
+    } : i))
+    setEditModal(false)
+    setEditForm(BLANK_EDIT)
+  }
 
   const save = () => {
     if (!form.name.trim() || !form.category.trim()) return
@@ -72,7 +89,11 @@ export default function Inventory() {
   const outOfStock = items.filter(i => i.qty === 0).length
   const totalValue = items.reduce((s, i) => s + i.qty * i.price, 0)
 
-  const sorted = [...items].sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))
+  const grouped = categories.map(cat => {
+    const catItems = items.filter(i => i.category === cat).sort((a, b) => a.name.localeCompare(b.name))
+    const hasSize = catItems.some(i => i.size)
+    return { cat, items: catItems, hasSize }
+  })
 
   return (
     <div className="page">
