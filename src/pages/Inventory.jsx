@@ -1,14 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, X, AlertTriangle, Edit2 } from 'lucide-react'
 
 const LOW_STOCK = 5
 const COMMON_SIZES = ['One Size', 'YXS', 'YS', 'YM', 'YL', 'YXL', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
-
-const SEED = [
-  { id: 1,  category: 'Apparel', name: 'T-Shirt', size: 'YXS', qty: 8,  price: 15 },
-  { id: 2,  category: 'Apparel', name: 'T-Shirt', size: 'YS',  qty: 10, price: 15 },
-  { id: 3,  category: 'Apparel', name: 'T-Shirt', size: 'YM',  qty: 14, price: 15 },
-]
+const API_URL = 'http://localhost:4000'
 
 const BLANK = { category: '', name: '', size: null, qty: 0, price: 0, newCategory: '' }
 const BLANK_EDIT = { id: null, category: '', name: '', size: null, qty: 0, price: 0 }
