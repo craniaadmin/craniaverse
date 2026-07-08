@@ -73,7 +73,10 @@
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app/api/inventory\" -Headers @{\"ngrok-skip-browser-warning\"=\"1\"} -UseBasicParsing -TimeoutSec 60; \"HTTP:\" + $r.StatusCode + \" len:\" + $r.Content.Length; \\($r.Content.Substring\\(0, [Math]::Min\\(600, $r.Content.Length\\)\\)\\) } catch { \"ERR: $\\($_.Exception.Message\\)\" })",
       "PowerShell($eps = @\\('/api/students','/api/staff','/api/inventory','/api/programs','/api/registrations'\\); foreach \\($e in $eps\\) { try { $r = Invoke-WebRequest -Uri \"https://craniaverse.ngrok.app$e\" -Headers @{\"ngrok-skip-browser-warning\"=\"1\"} -UseBasicParsing -TimeoutSec 30; \"$e -> HTTP:$\\($r.StatusCode\\) len:$\\($r.Content.Length\\)\" } catch { \"$e -> ERR: $\\($_.Exception.Message\\)\" } })",
       "Bash(git check-ignore *)",
-      "Bash(git rebase *)"
+      "Bash(git rebase *)",
+      "Bash(node --check server/server.js)",
+      "Bash(node --check server/pb.js)",
+      "Bash(node --check server/scripts/pb-setup.js)"
     ]
   },
   "hooks": {
