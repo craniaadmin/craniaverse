@@ -177,10 +177,10 @@ export default function Inventory() {
       {modal && (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(15,25,40,.45)',
-          display: 'grid', placeItems: 'center', zIndex: 200,
+          display: 'grid', placeItems: 'center', zIndex: 200, padding: 16,
         }} onClick={e => e.target === e.currentTarget && setModal(false)}>
           <div style={{
-            background: '#fff', borderRadius: 16, width: 460, maxWidth: 'calc(100vw - 32px)',
+            background: '#fff', borderRadius: 16, width: 500, maxWidth: '100%',
             boxShadow: '0 20px 60px rgba(15,25,40,.2)', overflow: 'hidden',
           }}>
             <div style={{
@@ -193,25 +193,9 @@ export default function Inventory() {
               </button>
             </div>
 
-            <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18, maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
 
-              {/* Category */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Category</label>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {CATEGORIES.map(cat => (
-                    <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat, size: cat === 'Shirts' ? 'YS' : null }))} style={{
-                      flex: 1, border: `2px solid ${form.category === cat ? CAT_COLOR[cat] : 'var(--line)'}`,
-                      background: form.category === cat ? CAT_COLOR[cat] + '18' : '#fafbfc',
-                      color: form.category === cat ? CAT_COLOR[cat] : 'var(--ink-soft)',
-                      borderRadius: 8, padding: '8px 4px', fontSize: 13,
-                      fontWeight: form.category === cat ? 700 : 500, cursor: 'pointer',
-                    }}>{cat}</button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Name */}
+              {/* Item Name */}
               <div>
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Item Name</label>
                 <input
@@ -223,23 +207,51 @@ export default function Inventory() {
                 />
               </div>
 
-              {/* Size (shirts only) */}
-              {hasSize && (
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Size</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-                    {SHIRT_SIZES.map(sz => (
-                      <button key={sz} onClick={() => setForm(f => ({ ...f, size: sz }))} style={{
-                        border: `2px solid ${form.size === sz ? CAT_COLOR.Shirts : 'var(--line)'}`,
-                        background: form.size === sz ? CAT_COLOR.Shirts + '18' : '#fafbfc',
-                        color: form.size === sz ? CAT_COLOR.Shirts : 'var(--ink-soft)',
-                        borderRadius: 7, padding: '6px 12px', fontSize: 13,
-                        fontWeight: form.size === sz ? 700 : 500, cursor: 'pointer',
-                      }}>{sz}</button>
-                    ))}
-                  </div>
+              {/* Category - select from existing or add new */}
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Category</label>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+                  {categories.map(cat => (
+                    <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat, newCategory: '' }))} style={{
+                      border: `2px solid ${form.category === cat && !form.newCategory ? 'var(--logo-teal)' : 'var(--line)'}`,
+                      background: form.category === cat && !form.newCategory ? '#5FA09E18' : '#fafbfc',
+                      color: form.category === cat && !form.newCategory ? 'var(--logo-teal)' : 'var(--ink-soft)',
+                      borderRadius: 8, padding: '8px 12px', fontSize: 13,
+                      fontWeight: form.category === cat && !form.newCategory ? 700 : 500, cursor: 'pointer',
+                    }}>{cat}</button>
+                  ))}
                 </div>
-              )}
+                <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 10 }}>or create new:</div>
+                <input
+                  className="reg-input"
+                  placeholder="New category name"
+                  value={form.newCategory}
+                  onChange={e => setForm(f => ({ ...f, newCategory: e.target.value, category: e.target.value ? e.target.value : f.category }))}
+                />
+              </div>
+
+              {/* Size (optional) */}
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Size (Optional)</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+                  <button onClick={() => setForm(f => ({ ...f, size: null }))} style={{
+                    border: `2px solid ${!form.size ? 'var(--logo-teal)' : 'var(--line)'}`,
+                    background: !form.size ? '#5FA09E18' : '#fafbfc',
+                    color: !form.size ? 'var(--logo-teal)' : 'var(--ink-soft)',
+                    borderRadius: 7, padding: '6px 12px', fontSize: 13,
+                    fontWeight: !form.size ? 700 : 500, cursor: 'pointer',
+                  }}>None</button>
+                  {COMMON_SIZES.map(sz => (
+                    <button key={sz} onClick={() => setForm(f => ({ ...f, size: sz }))} style={{
+                      border: `2px solid ${form.size === sz ? 'var(--logo-teal)' : 'var(--line)'}`,
+                      background: form.size === sz ? '#5FA09E18' : '#fafbfc',
+                      color: form.size === sz ? 'var(--logo-teal)' : 'var(--ink-soft)',
+                      borderRadius: 7, padding: '6px 12px', fontSize: 13,
+                      fontWeight: form.size === sz ? 700 : 500, cursor: 'pointer',
+                    }}>{sz}</button>
+                  ))}
+                </div>
+              </div>
 
               {/* Qty + Price */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
@@ -268,7 +280,7 @@ export default function Inventory() {
 
             <div style={{ padding: '0 24px 22px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button className="btn ghost" onClick={() => setModal(false)}>Cancel</button>
-              <button className="btn" onClick={save} disabled={!form.name.trim()} style={{ opacity: form.name.trim() ? 1 : 0.45 }}>
+              <button className="btn" onClick={save} disabled={!form.name.trim() || !(form.category || form.newCategory)} style={{ opacity: (form.name.trim() && (form.category || form.newCategory)) ? 1 : 0.45 }}>
                 Add Item
               </button>
             </div>
