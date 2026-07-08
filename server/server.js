@@ -72,6 +72,7 @@ const cache = {
   staff:         null,
   programs:      null,
   rules:         null,
+  inventory:     null,
 }
 
 async function getRegistrations() {
