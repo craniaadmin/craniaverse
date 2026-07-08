@@ -313,3 +313,71 @@ export async function saveInventory(items) {
     }
   }
 }
+
+// ---- forms (definitions) --------------------------------
+export async function loadForms() {
+  const rows = await getFullList('forms')
+  return rows.map(r => r.payload || {})
+}
+
+export async function saveForms(forms) {
+  await ensureAuth()
+  const existing = await getFullList('forms')
+  const byRecordId = new Map(existing.map(r => [r.recordId, r]))
+  const incomingIds = new Set(forms.map(f => String(f.id)))
+
+  for (const form of forms) {
+    const recordId = String(form.id)
+    const data = { recordId, payload: { ...form } }
+    const found = byRecordId.get(recordId)
+    if (found) {
+      await pb().collection('forms').update(found.id, data)
+    } else {
+      await pb().collection('forms').create(data)
+    }
+  }
+  for (const row of existing) {
+    if (!incomingIds.has(row.recordId)) {
+      await pb().collection('forms').delete(row.id)
+    }
+  }
+}
+
+// ---- form submissions -----------------------------------
+export async function loadSubmissions(formId = null) {
+  await ensureAuth()
+  const filter = formId ? { filter: `formId="${String(formId).replace(/"/g, '\\"')}"` } : {}
+  const rows = await pb().collection('formSubmissions').getFullList({ batch: 200, ...filter })
+  return rows.map(r => r.payload || {})
+}
+
+export async function createSubmission(sub) {
+  await ensureAuth()
+  await pb().collection('formSubmissions').create({
+    recordId: String(sub.id),
+    formId:   String(sub.formId),
+    payload:  { ...sub },
+  })
+}
+
+export async function deleteSubmission(id) {
+  await ensureAuth()
+  try {
+    const row = await pb().collection('formSubmissions')
+      .getFirstListItem(`recordId="${String(id).replace(/"/g, '\\"')}"`)
+    await pb().collection('formSubmissions').delete(row.id)
+  } catch (err) {
+    if (err?.status !== 404) throw err
+  }
+}
+
+export async function deleteSubmissionsForForm(formId) {
+  await ensureAuth()
+  const rows = await pb().collection('formSubmissions').getFullList({
+    batch: 200,
+    filter: `formId="${String(formId).replace(/"/g, '\\"')}"`,
+  })
+  for (const row of rows) {
+    await pb().collection('formSubmissions').delete(row.id)
+  }
+}
