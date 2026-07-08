@@ -284,3 +284,32 @@ export async function saveStaffBoard(board) {
     await pb().collection('staffBoard').update(rows[0].id, { payload: board })
   }
 }
+
+// ---- inventory ------------------------------------------
+export async function loadInventory() {
+  const rows = await getFullList('inventory')
+  return rows.map(r => r.payload || {})
+}
+
+export async function saveInventory(items) {
+  await ensureAuth()
+  const existing = await getFullList('inventory')
+  const byRecordId = new Map(existing.map(r => [r.recordId, r]))
+  const incomingIds = new Set(items.map(i => String(i.id)))
+
+  for (const item of items) {
+    const recordId = String(item.id)
+    const data = { recordId, payload: { ...item } }
+    const found = byRecordId.get(recordId)
+    if (found) {
+      await pb().collection('inventory').update(found.id, data)
+    } else {
+      await pb().collection('inventory').create(data)
+    }
+  }
+  for (const row of existing) {
+    if (!incomingIds.has(row.recordId)) {
+      await pb().collection('inventory').delete(row.id)
+    }
+  }
+}
