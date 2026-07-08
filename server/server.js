@@ -529,6 +529,19 @@ app.delete('/api/inventory/:id', wrap(async (req, res) => {
   res.json({ deleted: items.length - next.length })
 }))
 
+// ---- todo (singleton {lists, items, checklists}) --------
+app.get('/api/todo', wrap(async (_req, res) => res.json(await loadTodo())))
+app.put('/api/todo', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    lists:      Array.isArray(body.lists) ? body.lists : [],
+    items:      Array.isArray(body.items) ? body.items : [],
+    checklists: Array.isArray(body.checklists) ? body.checklists : [],
+  }
+  await saveTodo(payload)
+  res.json({ ok: true })
+}))
+
 // ---- forms (custom form builder) ------------------------
 // A "form" is a definition: title + ordered field list. Anyone
 // with the form's shareable URL (/form/:slug) can submit it, and
