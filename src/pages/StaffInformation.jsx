@@ -211,10 +211,10 @@ function StaffList({ onSelect, onAdd }) {
       </div>
       <div style={{ border: '2px solid var(--logo-teal)', borderTop: 'none', borderRadius: '0 0 10px 10px', overflow: 'hidden', background: '#fff' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: '1.6fr 1.2fr 1fr 1.4fr 1fr 0.5fr',
+          display: 'grid', gridTemplateColumns: '1.6fr 1.2fr 1fr 1.4fr 1fr',
           background: '#3d8e90', padding: '11px 20px',
         }}>
-          {['Name', 'Role', 'Phone', 'Email', 'Start Date', 'More'].map(h => (
+          {['Name', 'Role', 'Phone', 'Email', 'Start Date'].map(h => (
             <div key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>{h}</div>
           ))}
         </div>

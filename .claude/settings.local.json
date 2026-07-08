@@ -62,7 +62,10 @@
       "Bash(git commit *)",
       "Bash(git ls-remote *)",
       "Bash(npm install *)",
-      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);console.log\\('total programs:',a.length\\);console.log\\('actives:',a.filter\\(p=>p.active\\).length\\);console.log\\('first program:',JSON.stringify\\(a[0],null,2\\).slice\\(0,800\\)\\);}\\)\")"
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const a=JSON.parse\\(d\\);console.log\\('total programs:',a.length\\);console.log\\('actives:',a.filter\\(p=>p.active\\).length\\);console.log\\('first program:',JSON.stringify\\(a[0],null,2\\).slice\\(0,800\\)\\);}\\)\")",
+      "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node -e ' *)",
+      "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node tests/run.js)",
+      "Bash(TEST_BASE_URL=https://craniaverse.ngrok.app node --input-type=module -e ' *)"
     ]
   },
   "hooks": {
@@ -72,9 +75,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; if [ -n \"$f\" ] && [ -f \"$f\" ]; then case \"$f\" in *src/*|*public/*|*index.html) (cd \"$(git rev-parse --show-toplevel)\" && npm run build >/dev/null 2>&1 && git add dist/) ;; esac; git add \"$f\" && git commit -m \"Update $(basename \"$f\")\" 2>/dev/null && git push 2>/dev/null || true; fi; }",
-            "timeout": 120,
-            "async": true
+            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // .tool_response.filePath\" 2>/dev/null); git add -A; msg=\"Update $(basename \"$f\" 2>/dev/null || echo 'files')\"; git commit -m \"$msg\" 2>/dev/null && git push 2>/dev/null || true'",
+            "timeout": 60,
+            "async": true,
+            "statusMessage": "Committing and pushing..."
           }
         ]
       }
