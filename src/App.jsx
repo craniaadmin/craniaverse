@@ -16,6 +16,7 @@ import Contests from './pages/Contests'
 import StaffHub from './pages/StaffHub'
 import StaffInformation from './pages/StaffInformation'
 import Payroll from './pages/Payroll'
+import Forms from './pages/Forms'
 import Placeholder from './pages/Placeholder'
 import { StoreProvider } from './data/store'
 
