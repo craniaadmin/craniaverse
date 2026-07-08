@@ -44,13 +44,28 @@ export default function Inventory() {
   const [modal, setModal] = useState(false)
   const [form, setForm] = useState(BLANK)
 
+  const categories = [...new Set(items.map(i => i.category))].sort()
+  const uniqueSizes = [...new Set(items.filter(i => i.size).map(i => i.size))].sort()
+  const hasItemsWithSize = items.some(i => i.size)
+
   const updateQty = (id, qty) => setItems(prev => prev.map(i => i.id === id ? { ...i, qty } : i))
+  const deleteItem = (id) => setItems(prev => prev.filter(i => i.id !== id))
 
   const save = () => {
-    if (!form.name.trim()) return
+    if (!form.name.trim() || !form.category.trim()) return
+    const finalCategory = form.newCategory.trim() || form.category
     const id = Math.max(0, ...items.map(i => i.id)) + 1
-    setItems(prev => [...prev, { ...form, id, name: form.name.trim(), qty: Number(form.qty) || 0, price: Number(form.price) || 0 }])
+    setItems(prev => [...prev, {
+      ...form,
+      id,
+      category: finalCategory,
+      name: form.name.trim(),
+      size: form.size || null,
+      qty: Number(form.qty) || 0,
+      price: Number(form.price) || 0,
+    }])
     setModal(false)
+    setForm(BLANK)
   }
 
   const totalItems = items.reduce((s, i) => s + i.qty, 0)
@@ -58,11 +73,7 @@ export default function Inventory() {
   const outOfStock = items.filter(i => i.qty === 0).length
   const totalValue = items.reduce((s, i) => s + i.qty * i.price, 0)
 
-  const groups = CATEGORIES
-    .map(cat => ({ cat, items: items.filter(i => i.category === cat) }))
-    .filter(g => g.items.length > 0)
-
-  const hasSize = form.category === 'Shirts'
+  const sorted = [...items].sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))
 
   return (
     <div className="page">
@@ -91,91 +102,75 @@ export default function Inventory() {
         ))}
       </div>
 
-      {/* Category groups */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {groups.map(({ cat, items: catItems }) => (
-          <div key={cat} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
-
-            {/* Category header */}
-            <div style={{
-              borderLeft: `5px solid ${CAT_COLOR[cat]}`,
-              borderBottom: '1px solid var(--line)',
-              background: '#fafbfc',
-              padding: '10px 18px',
-              display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-              <span style={{ fontWeight: 800, fontSize: 13, letterSpacing: '.6px', textTransform: 'uppercase', color: CAT_COLOR[cat] }}>
-                {cat}
-              </span>
-              <span style={{ background: CAT_COLOR[cat], color: '#fff', borderRadius: 999, fontSize: 11, fontWeight: 700, padding: '2px 8px' }}>
-                {catItems.length}
-              </span>
-              {catItems.some(i => i.qty <= LOW_STOCK) && (
-                <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#cc7800' }}>
-                  <AlertTriangle size={13} /> Low stock
-                </span>
-              )}
-            </div>
-
-            {/* Items table */}
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 6px' }}>
-              <thead>
-                <tr>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '4px 14px' }}>ITEM</th>
-                  {cat === 'Shirts' && <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '4px 14px', width: 80 }}>SIZE</th>}
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '4px 14px', width: 140 }}>QTY IN STOCK</th>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '4px 18px', width: 100 }}>PRICE</th>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '4px 18px', width: 120 }}>VALUE</th>
-                </tr>
-              </thead>
-              <tbody>
-                {catItems.map(item => {
-                  const low = item.qty <= LOW_STOCK && item.qty > 0
-                  const out = item.qty === 0
-                  return (
-                    <tr key={item.id} style={{ opacity: out ? 0.55 : 1 }}>
-                      <td style={{ padding: '0 0 0 14px' }}>
-                        <div style={{
-                          background: out ? '#fff0f0' : low ? '#fffbf0' : 'var(--field-bg-soft)',
-                          borderRadius: 7, padding: '10px 14px', fontSize: 14, fontWeight: 600,
-                          display: 'flex', alignItems: 'center', gap: 8,
-                        }}>
-                          {item.name}
-                          {out && <span style={{ fontSize: 11, fontWeight: 700, color: '#c62828', background: '#fde0e0', borderRadius: 4, padding: '2px 7px' }}>OUT</span>}
-                        </div>
+      {/* Items table */}
+      <div style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
+        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0' }}>
+          <thead>
+            <tr style={{ background: '#f5f7f8', borderBottom: '1px solid var(--line)' }}>
+              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '12px 16px' }}>ITEM</th>
+              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '12px 16px' }}>CATEGORY</th>
+              {hasItemsWithSize && <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 80 }}>SIZE</th>}
+              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 140 }}>QTY</th>
+              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 100 }}>PRICE</th>
+              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 120 }}>VALUE</th>
+              <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 40 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.length === 0 ? (
+              <tr>
+                <td colSpan={hasItemsWithSize ? 7 : 6} style={{ padding: '24px', textAlign: 'center', color: 'var(--muted)', fontSize: 14 }}>
+                  No items yet. Add one to get started.
+                </td>
+              </tr>
+            ) : (
+              sorted.map((item, idx) => {
+                const low = item.qty <= LOW_STOCK && item.qty > 0
+                const out = item.qty === 0
+                return (
+                  <tr key={item.id} style={{
+                    borderBottom: idx < sorted.length - 1 ? '1px solid var(--line)' : 'none',
+                    opacity: out ? 0.6 : 1,
+                  }}>
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{
+                        fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+                      }}>
+                        {item.name}
+                        {out && <span style={{ fontSize: 11, fontWeight: 700, color: '#c62828', background: '#fde0e0', borderRadius: 4, padding: '2px 7px' }}>OUT</span>}
+                        {low && <span style={{ fontSize: 11, fontWeight: 700, color: '#cc7800', background: '#fffbf0', borderRadius: 4, padding: '2px 7px' }}>LOW</span>}
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--ink-soft)' }}>
+                      {item.category}
+                    </td>
+                    {hasItemsWithSize && (
+                      <td style={{ padding: '12px 16px', fontSize: 13, textAlign: 'center', color: 'var(--ink-soft)' }}>
+                        {item.size || '—'}
                       </td>
-                      {cat === 'Shirts' && (
-                        <td style={{ padding: '0 6px' }}>
-                          <div style={{
-                            background: CAT_COLOR[cat] + '22', color: CAT_COLOR[cat],
-                            borderRadius: 7, padding: '10px 0', fontSize: 13, fontWeight: 800,
-                            textAlign: 'center',
-                          }}>{item.size}</div>
-                        </td>
-                      )}
-                      <td style={{ padding: '0 6px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '6px 0' }}>
-                          <QtyControl qty={item.qty} onChange={qty => updateQty(item.id, qty)} />
-                        </div>
-                      </td>
-                      <td style={{ padding: '0 6px' }}>
-                        <div style={{ background: 'var(--field-bg-soft)', borderRadius: 7, padding: '10px 14px', fontSize: 13, color: 'var(--ink-soft)', textAlign: 'right' }}>
-                          ${item.price}
-                        </div>
-                      </td>
-                      <td style={{ padding: '0 14px 0 6px' }}>
-                        <div style={{ background: 'var(--field-bg-soft)', borderRadius: 7, padding: '10px 14px', fontSize: 13, fontWeight: 700, color: 'var(--ink)', textAlign: 'right' }}>
-                          ${(item.qty * item.price).toLocaleString()}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-            <div style={{ height: 8 }} />
-          </div>
-        ))}
+                    )}
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <QtyControl qty={item.qty} onChange={qty => updateQty(item.id, qty)} />
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: 'var(--ink-soft)' }}>
+                      ${item.price.toFixed(2)}
+                    </td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
+                      ${(item.qty * item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                      <button onClick={() => deleteItem(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }} title="Delete item">
+                        <X size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Add Item Modal */}
