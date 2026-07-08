@@ -139,6 +139,16 @@ async function commitInventory(items) {
   await saveInventory(items)
 }
 
+async function getForms() {
+  if (cache.forms) return cache.forms
+  cache.forms = await loadForms()
+  return cache.forms
+}
+async function commitForms(forms) {
+  cache.forms = forms
+  await saveForms(forms)
+}
+
 // ---- registrations: one-time migration of legacy records ---
 // Earlier records may be missing the programs / cashLog
 // fields. Pull all records, patch in-memory, and write back
