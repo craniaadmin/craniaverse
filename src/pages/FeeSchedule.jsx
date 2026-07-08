@@ -347,10 +347,8 @@ export default function FeeSchedule() {
       <div className="fs-head">
         <h2 className="fs-title">Tuition Schedule</h2>
         <div className="fs-head-actions">
-          <button className="fs-btn-outline" onClick={emailParent}
-            disabled={!selectedReg || emailStatus === 'sending'}>
-            <Mail size={15} />
-            {emailStatus === 'sending' ? 'Sending…' : emailStatus === 'ok' ? 'Sent!' : 'Email To Parent'}
+          <button className="fs-btn-outline" onClick={emailParent} disabled={!selectedReg}>
+            <Mail size={15} /> Email To Parent
           </button>
           <button className="fs-btn-outline" onClick={downloadPdf} disabled={pdfBusy}>
             <Download size={15} /> {pdfBusy ? 'Generating…' : 'Download PDF'}
