@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { ChevronDown, X, Mail, Download } from 'lucide-react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -6,74 +6,69 @@ const API_BASE = import.meta.env?.VITE_API_URL || ''
 const money = (n) =>
   '$' + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-const parseRate = (rate) => {
-  if (rate == null) return 0
-  const m = String(rate).replace(/[^\d.]/g, '')
-  return Number(m) || 0
+const parseNum = (v, fallback = 0) => {
+  if (v === '' || v == null) return fallback
+  const n = Number(String(v).replace(/[^\d.-]/g, ''))
+  return Number.isFinite(n) ? n : fallback
 }
+const parseRate = (rate) => parseNum(rate, 0)
 
-// Registration year label helpers: "26_27" <-> "2026–27"
+// "26_27" <-> "2026–27"
 const yearToLabel = (y) => {
   if (!y) return ''
   if (/^\d{2}_\d{2}$/.test(y)) return `20${y.slice(0, 2)}–${y.slice(3)}`
   if (/^\d{4}-\d{2}$/.test(y)) return y.replace('-', '–')
   return y
 }
-// Default registration/material fees. Editable in the UI.
+const yearToStart = (y) => {
+  if (/^\d{2}_\d{2}$/.test(y)) return 2000 + Number(y.slice(0, 2))
+  if (/^\d{4}-\d{2}$/.test(y)) return Number(y.slice(0, 4))
+  return new Date().getFullYear()
+}
+
 const DEFAULT_REG_FEE = 79
 const DEFAULT_MAT_FEE = 59
 
 const MONTH_ORDER = ['sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug']
 const MONTH_LABEL = { sep: 'Sep', oct: 'Oct', nov: 'Nov', dec: 'Dec', jan: 'Jan', feb: 'Feb', mar: 'Mar', apr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', aug: 'Aug' }
 const MONTH_LONG  = { sep: 'September', oct: 'October', nov: 'November', dec: 'December', jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June', jul: 'July', aug: 'August' }
-// Academic months (payment window). Sep-Jun. Jul/Aug are dashed.
 const ACADEMIC = new Set(['sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun'])
-// Cross-year: sep-dec belong to the first year (2026), jan-aug to the second (2027)
-const CAL_YEAR = (yy) => (y) => (['sep', 'oct', 'nov', 'dec'].includes(y) ? yy : yy + 1)
+const calYearFn = (yy) => (m) => (['sep', 'oct', 'nov', 'dec'].includes(m) ? yy : yy + 1)
 
-// ---------- Year config ----------
-// A timeline is a flat list of week-cells. Each cell is either a
-// lesson (numbered 1..N), a break (with a label rendered below the
-// strip), or a gap (unlabelled grey box, e.g. summer padding at the
-// ends of the year).
-//
-// Only the sequence and the month tag of each cell matters — nothing
-// depends on real calendar dates. That keeps the math simple while
-// the strip still renders month-grouped.
-const YEAR_CONFIGS = {
-  '26_27': {
-    label: '2026–27',
-    startCalYear: 2026,
-    weeksPerYear: 35,
-    // 35 total weeks: sep 2, oct 3+Thanksgiving+1, nov 4, dec 2+Christmas,
-    // jan +Christmas+3, feb 2+Family Day+2, mar 3+March Break+1, apr 4,
-    // may 4+Victoria Day, jun 5.
-    timeline: [
-      { kind: 'gap',    month: 'sep' }, { kind: 'gap', month: 'sep' },
-      { kind: 'lesson', n: 1, month: 'sep' }, { kind: 'lesson', n: 2, month: 'sep' }, { kind: 'lesson', n: 3, month: 'sep' }, { kind: 'lesson', n: 4, month: 'sep' },
-      { kind: 'gap',    month: 'oct' },
-      { kind: 'lesson', n: 5, month: 'oct' }, { kind: 'lesson', n: 6, month: 'oct' }, { kind: 'lesson', n: 7, month: 'oct' },
-      { kind: 'break',  month: 'oct', label: 'Thanksgiving' },
-      { kind: 'lesson', n: 8, month: 'oct' }, { kind: 'lesson', n: 9, month: 'oct' }, { kind: 'lesson', n: 10, month: 'oct' }, { kind: 'lesson', n: 11, month: 'nov' },
-      { kind: 'lesson', n: 12, month: 'dec' }, { kind: 'lesson', n: 13, month: 'dec' }, { kind: 'lesson', n: 14, month: 'dec' },
-      { kind: 'break',  month: 'dec', label: 'Christmas Break' },
-      { kind: 'break',  month: 'jan' },
-      { kind: 'lesson', n: 15, month: 'jan' }, { kind: 'lesson', n: 16, month: 'jan' }, { kind: 'lesson', n: 17, month: 'jan' }, { kind: 'lesson', n: 18, month: 'feb' }, { kind: 'lesson', n: 19, month: 'feb' }, { kind: 'lesson', n: 20, month: 'feb' },
-      { kind: 'break',  month: 'feb', label: 'Family Day' },
-      { kind: 'lesson', n: 21, month: 'feb' },
-      { kind: 'break',  month: 'mar' }, { kind: 'break', month: 'mar', label: 'March Break' },
-      { kind: 'lesson', n: 22, month: 'mar' }, { kind: 'lesson', n: 23, month: 'mar' }, { kind: 'lesson', n: 24, month: 'mar' }, { kind: 'lesson', n: 25, month: 'apr' }, { kind: 'lesson', n: 26, month: 'apr' }, { kind: 'lesson', n: 27, month: 'apr' }, { kind: 'lesson', n: 28, month: 'apr' },
-      { kind: 'break',  month: 'may', label: 'Victoria Day' },
-      { kind: 'lesson', n: 29, month: 'may' }, { kind: 'lesson', n: 30, month: 'may' }, { kind: 'lesson', n: 31, month: 'may' }, { kind: 'lesson', n: 32, month: 'jun' }, { kind: 'lesson', n: 33, month: 'jun' }, { kind: 'lesson', n: 34, month: 'jun' }, { kind: 'lesson', n: 35, month: 'jun' },
-      { kind: 'gap',    month: 'jun' },
-    ],
-  },
-}
+// ---------- Year timeline (35 weeks + 5 breaks) ----------
+// Same academic-week layout regardless of calendar year — only the
+// display year label + calendar year on installments differ.
+const STANDARD_TIMELINE = [
+  { kind: 'gap',    month: 'sep' }, { kind: 'gap', month: 'sep' },
+  { kind: 'lesson', n: 1, month: 'sep' }, { kind: 'lesson', n: 2, month: 'sep' }, { kind: 'lesson', n: 3, month: 'sep' }, { kind: 'lesson', n: 4, month: 'sep' },
+  { kind: 'gap',    month: 'oct' },
+  { kind: 'lesson', n: 5, month: 'oct' }, { kind: 'lesson', n: 6, month: 'oct' }, { kind: 'lesson', n: 7, month: 'oct' },
+  { kind: 'break',  month: 'oct', label: 'Thanksgiving' },
+  { kind: 'lesson', n: 8, month: 'oct' }, { kind: 'lesson', n: 9, month: 'oct' }, { kind: 'lesson', n: 10, month: 'oct' }, { kind: 'lesson', n: 11, month: 'nov' },
+  { kind: 'lesson', n: 12, month: 'dec' }, { kind: 'lesson', n: 13, month: 'dec' }, { kind: 'lesson', n: 14, month: 'dec' },
+  { kind: 'break',  month: 'dec', label: 'Christmas Break' },
+  { kind: 'break',  month: 'jan' },
+  { kind: 'lesson', n: 15, month: 'jan' }, { kind: 'lesson', n: 16, month: 'jan' }, { kind: 'lesson', n: 17, month: 'jan' }, { kind: 'lesson', n: 18, month: 'feb' }, { kind: 'lesson', n: 19, month: 'feb' }, { kind: 'lesson', n: 20, month: 'feb' },
+  { kind: 'break',  month: 'feb', label: 'Family Day' },
+  { kind: 'lesson', n: 21, month: 'feb' },
+  { kind: 'break',  month: 'mar' }, { kind: 'break', month: 'mar', label: 'March Break' },
+  { kind: 'lesson', n: 22, month: 'mar' }, { kind: 'lesson', n: 23, month: 'mar' }, { kind: 'lesson', n: 24, month: 'mar' }, { kind: 'lesson', n: 25, month: 'apr' }, { kind: 'lesson', n: 26, month: 'apr' }, { kind: 'lesson', n: 27, month: 'apr' }, { kind: 'lesson', n: 28, month: 'apr' },
+  { kind: 'break',  month: 'may', label: 'Victoria Day' },
+  { kind: 'lesson', n: 29, month: 'may' }, { kind: 'lesson', n: 30, month: 'may' }, { kind: 'lesson', n: 31, month: 'may' }, { kind: 'lesson', n: 32, month: 'jun' }, { kind: 'lesson', n: 33, month: 'jun' }, { kind: 'lesson', n: 34, month: 'jun' }, { kind: 'lesson', n: 35, month: 'jun' },
+  { kind: 'gap',    month: 'jun' },
+]
+
+const buildYearCfg = (yearKey) => ({
+  key: yearKey,
+  label: yearToLabel(yearKey),
+  startCalYear: yearToStart(yearKey),
+  weeksPerYear: 35,
+  timeline: STANDARD_TIMELINE,
+})
+
+const AVAILABLE_YEARS = ['22_23', '23_24', '24_25', '25_26', '26_27', '27_28', '28_29']
 
 // ---------- Fee math ----------
-// weekly rate is derived so that a full academic month averages
-// exactly `monthly`. With Sep-Jun = 10 months across 35 weeks that's
-// weeksPerMonth = 3.5, and weeklyRate = monthly / 3.5.
 function computeSchedule(cfg, monthly, firstLesson, regFee, matFee) {
   const timeline = cfg.timeline
   const weeksPerYear = cfg.weeksPerYear
@@ -81,26 +76,15 @@ function computeSchedule(cfg, monthly, firstLesson, regFee, matFee) {
   const weeklyRate = monthly * academicMonthCount / weeksPerYear
   const scheduledWeeks = Math.max(0, weeksPerYear - (firstLesson - 1))
 
-  // Scheduled weeks per academic month for this student = lesson cells
-  // in that month with n >= firstLesson.
   const perMonthWeeks = {}
-  MONTH_ORDER.forEach(m => (perMonthWeeks[m] = 0))
-  for (const cell of timeline) {
-    if (cell.kind === 'lesson' && cell.n >= firstLesson) perMonthWeeks[cell.month] += 1
-  }
-
-  // Also track total lesson weeks per month regardless of student — used
-  // to decide "full month" vs "prorated" for the display.
   const totalMonthWeeks = {}
-  MONTH_ORDER.forEach(m => (totalMonthWeeks[m] = 0))
+  MONTH_ORDER.forEach(m => { perMonthWeeks[m] = 0; totalMonthWeeks[m] = 0 })
   for (const cell of timeline) {
-    if (cell.kind === 'lesson') totalMonthWeeks[cell.month] += 1
+    if (cell.kind === 'lesson') {
+      totalMonthWeeks[cell.month] += 1
+      if (cell.n >= firstLesson) perMonthWeeks[cell.month] += 1
+    }
   }
-
-  // Find first academic month with any scheduled weeks for this
-  // student → that's the first paid month (potentially prorated).
-  const monthsInOrder = MONTH_ORDER.filter(m => ACADEMIC.has(m))
-  const firstPaidMonth = monthsInOrder.find(m => perMonthWeeks[m] > 0) || null
 
   let tuition = 0
   const installments = MONTH_ORDER.map(m => {
@@ -118,24 +102,29 @@ function computeSchedule(cfg, monthly, firstLesson, regFee, matFee) {
   })
 
   const total = tuition + regFee + matFee
-  return {
-    weeksPerYear, scheduledWeeks, weeklyRate,
-    monthly, tuition, regFee, matFee, total,
-    installments, firstPaidMonth,
-  }
+  return { weeksPerYear, scheduledWeeks, weeklyRate, monthly, tuition, regFee, matFee, total, installments }
 }
 
 // ---------- Component ----------
 export default function FeeSchedule() {
   const [regs, setRegs] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Selection
   const [studentId, setStudentId] = useState('')
   const [programKey, setProgramKey] = useState('')
   const [yearKey, setYearKey] = useState('26_27')
-  const [firstLesson, setFirstLesson] = useState(7)
-  const [monthly, setMonthly] = useState(299)
-  const [regFee, setRegFee] = useState(DEFAULT_REG_FEE)
-  const [matFee, setMatFee] = useState(DEFAULT_MAT_FEE)
+
+  // Editable numbers. Kept as strings while typing (so the field can
+  // be blank) and coerced to numbers only when computing / persisting.
+  const [firstLessonStr, setFirstLessonStr] = useState('1')
+  const [monthlyStr, setMonthlyStr] = useState('289')
+  const [regFeeStr, setRegFeeStr] = useState(String(DEFAULT_REG_FEE))
+  const [matFeeStr, setMatFeeStr] = useState(String(DEFAULT_MAT_FEE))
+
+  // Async status
+  const [emailStatus, setEmailStatus] = useState('') // '', 'sending', 'ok', or an error message
+  const [pdfBusy, setPdfBusy] = useState(false)
 
   useEffect(() => {
     fetch(`${API_BASE}/api/registrations`)
@@ -146,15 +135,6 @@ export default function FeeSchedule() {
 
   const selectedReg = regs.find(r => r.id === studentId)
 
-  // Years available for this student — union of program years + a
-  // guaranteed 26_27 entry so the demo year is always pickable.
-  const availableYears = useMemo(() => {
-    const set = new Set(['26_27'])
-    ;(selectedReg?.programs || []).forEach(p => p.year && set.add(p.year))
-    return [...set].sort()
-  }, [selectedReg])
-
-  // Programs for the selected student + year.
   const programsForStudent = useMemo(() => {
     if (!selectedReg) return []
     return (selectedReg.programs || []).filter(p => p.year === yearKey)
@@ -162,67 +142,159 @@ export default function FeeSchedule() {
 
   const selectedProgram = programsForStudent.find(p => p.program === programKey)
 
-  // When the student changes: auto-select their newest year and first program.
+  // On student change: pick the newest year they have (or default 26_27).
   useEffect(() => {
     if (!selectedReg) return
     const years = (selectedReg.programs || []).map(p => p.year).filter(Boolean)
-    const newest = years.sort().pop() || '26_27'
+    const newest = [...years].sort().pop() || '26_27'
     setYearKey(newest)
   }, [studentId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // When the (student, year) combo changes: auto-pick first program +
-  // pull monthly installment from its rate field.
+  // On (student, year) change: auto-pick the first program.
   useEffect(() => {
     if (programsForStudent.length === 0) { setProgramKey(''); return }
-    const p = programsForStudent[0]
-    setProgramKey(p.program)
+    setProgramKey(programsForStudent[0].program)
   }, [studentId, yearKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // On program change: hydrate firstLesson + monthly from the saved
+  // entry, or fall back to the program's advertised rate.
   useEffect(() => {
     if (!selectedProgram) return
-    const parsed = parseRate(selectedProgram.rate)
-    if (parsed > 0) setMonthly(parsed)
-  }, [selectedProgram])
+    const savedFL = selectedProgram.firstLesson
+    setFirstLessonStr(savedFL != null && savedFL !== '' ? String(savedFL) : '1')
 
-  const yearCfg = YEAR_CONFIGS[yearKey] || YEAR_CONFIGS['26_27']
+    const savedMonthly = selectedProgram.monthlyInstallment
+    if (savedMonthly != null && savedMonthly !== '') {
+      setMonthlyStr(String(savedMonthly))
+    } else {
+      const advertised = parseRate(selectedProgram.rate)
+      setMonthlyStr(advertised > 0 ? String(advertised) : '289')
+    }
+    setRegFeeStr(String(selectedProgram.registrationFee ?? DEFAULT_REG_FEE))
+    setMatFeeStr(String(selectedProgram.materialFee ?? DEFAULT_MAT_FEE))
+  }, [selectedReg?.id, yearKey, programKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Numeric coercions for math.
+  const firstLesson = Math.max(1, Math.min(35, parseNum(firstLessonStr, 1)))
+  const monthly = parseNum(monthlyStr, 0)
+  const regFee  = parseNum(regFeeStr, 0)
+  const matFee  = parseNum(matFeeStr, 0)
+
+  const yearCfg = useMemo(() => buildYearCfg(yearKey), [yearKey])
   const schedule = useMemo(
     () => computeSchedule(yearCfg, monthly, firstLesson, regFee, matFee),
     [yearCfg, monthly, firstLesson, regFee, matFee],
   )
 
-  const printPdf = () => window.print()
-  const emailParent = () => {
+  // ---- Persistence: save firstLesson / monthly / fees per program ----
+  // Debounced write of the FULL programs[] array back via
+  // PUT /api/registrations/:id/programs (existing endpoint).
+  const saveTimer = useRef(null)
+  const suppressSaveRef = useRef(true) // skip the initial hydrate
+  useEffect(() => {
+    if (!selectedReg || !selectedProgram) return
+    if (suppressSaveRef.current) { suppressSaveRef.current = false; return }
+    clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => {
+      const nextPrograms = (selectedReg.programs || []).map(p => {
+        if (p.year === yearKey && p.program === programKey) {
+          return {
+            ...p,
+            firstLesson,
+            monthlyInstallment: monthly,
+            registrationFee: regFee,
+            materialFee: matFee,
+          }
+        }
+        return p
+      })
+      fetch(`${API_BASE}/api/registrations/${selectedReg.id}/programs`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nextPrograms),
+      })
+        .then(r => { if (!r.ok) throw new Error('save failed') })
+        .then(() => {
+          // Update local regs cache so refresh isn't needed
+          setRegs(prev => prev.map(r => r.id === selectedReg.id ? { ...r, programs: nextPrograms } : r))
+        })
+        .catch(err => console.error('Failed to save program tuition:', err))
+    }, 500)
+    return () => clearTimeout(saveTimer.current)
+  }, [firstLesson, monthly, regFee, matFee, selectedReg?.id, programKey, yearKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Reset the suppress flag whenever the (student, program, year) tuple
+  // changes so the very next hydrate doesn't trigger a save.
+  useEffect(() => { suppressSaveRef.current = true }, [selectedReg?.id, programKey, yearKey])
+
+  // ---- Build the payload used by the server PDF renderer ----
+  const buildPdfPayload = () => ({
+    studentName: selectedReg?.displayName || 'Student',
+    programName: programKey || '',
+    yearLabel: yearCfg.label,
+    yearStart: yearCfg.startCalYear,
+    weeksPerYear: schedule.weeksPerYear,
+    firstLesson,
+    scheduledWeeks: schedule.scheduledWeeks,
+    timeline: yearCfg.timeline,
+    tuition: schedule.tuition,
+    regFee: schedule.regFee,
+    matFee: schedule.matFee,
+    total: schedule.total,
+    installments: schedule.installments,
+    filename: `Tuition-${(selectedReg?.displayName || 'student').replace(/[^\w]+/g, '-')}-${yearCfg.label}.pdf`,
+  })
+
+  const downloadPdf = async () => {
+    setPdfBusy(true)
+    try {
+      const res = await fetch(`${API_BASE}/api/fee-schedule/pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildPdfPayload()),
+      })
+      if (!res.ok) throw new Error('PDF request failed: ' + res.status)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = buildPdfPayload().filename
+      document.body.appendChild(a); a.click(); a.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 5000)
+    } catch (err) {
+      console.error(err)
+      alert('Failed to generate PDF: ' + err.message)
+    } finally { setPdfBusy(false) }
+  }
+
+  const emailParent = async () => {
     if (!selectedReg) return
     const parentEmail =
       selectedReg.customer?.guardian1?.Email ||
       selectedReg.customer?.guardian1?.email ||
-      selectedReg.customer?.guardian2?.Email || ''
-    const studentName = selectedReg.displayName || 'your child'
-    const yr = yearCfg.label
-    const lines = [
-      `Hello,`, ``,
-      `Here is the tuition schedule for ${studentName} — ${programKey} (${yr}).`, ``,
-      `First Lesson: Week ${firstLesson}`,
-      `Scheduled Weeks: ${schedule.scheduledWeeks} of ${schedule.weeksPerYear}`,
-      `Tuition: ${money(schedule.tuition)}`,
-      `Registration Fee: ${money(schedule.regFee)}`,
-      `Material Fee: ${money(schedule.matFee)}`,
-      `Total: ${money(schedule.total)}`, ``,
-      `Monthly Installments:`,
-      ...schedule.installments.map(i => {
-        const monthLabel = `${MONTH_LONG[i.month]} ${CAL_YEAR(yearCfg.startCalYear)(i.month)}`
-        if (i.kind === 'skip') return `  ${monthLabel} — —`
-        if (i.kind === 'prorated') return `  ${monthLabel} · Prorated — ${money(i.amount)}`
-        return `  ${monthLabel} — ${money(i.amount)}`
-      }),
-      ``,
-      `Thanks,`,
-      `Crania Schools`,
-    ]
-    const subject = `Tuition Schedule — ${studentName} ${yr}`
-    const body = encodeURIComponent(lines.join('\n'))
-    const to = encodeURIComponent(parentEmail)
-    window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${body}`, '_blank')
+      selectedReg.customer?.guardian2?.Email ||
+      selectedReg.customer?.guardian2?.email || ''
+    if (!parentEmail) {
+      alert('No parent email on file for this student.')
+      return
+    }
+    setEmailStatus('sending')
+    try {
+      const res = await fetch(`${API_BASE}/api/fee-schedule/email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...buildPdfPayload(), to: parentEmail }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || 'send failed')
+      }
+      setEmailStatus('ok')
+      setTimeout(() => setEmailStatus(''), 3500)
+    } catch (err) {
+      console.error(err)
+      setEmailStatus('Error: ' + err.message)
+    }
   }
 
   if (loading) {
@@ -238,83 +310,95 @@ export default function FeeSchedule() {
     <div className="page fs-root">
       <style>{CSS}</style>
 
-      {/* Header */}
-      <div className="fs-head no-print">
+      <div className="fs-head">
         <h2 className="fs-title">Tuition Schedule</h2>
         <div className="fs-head-actions">
-          <button className="fs-btn-outline" onClick={emailParent} disabled={!selectedReg}>
-            <Mail size={15} /> Email To Parent
+          <button className="fs-btn-outline" onClick={emailParent}
+            disabled={!selectedReg || emailStatus === 'sending'}>
+            <Mail size={15} />
+            {emailStatus === 'sending' ? 'Sending…' : emailStatus === 'ok' ? 'Sent!' : 'Email To Parent'}
           </button>
-          <button className="fs-btn-outline" onClick={printPdf}>
-            <Download size={15} /> Download PDF
+          <button className="fs-btn-outline" onClick={downloadPdf} disabled={pdfBusy}>
+            <Download size={15} /> {pdfBusy ? 'Generating…' : 'Download PDF'}
           </button>
         </div>
       </div>
 
-      {/* Pickers */}
-      <div className="fs-pickers no-print">
+      {emailStatus.startsWith('Error') && (
+        <div className="fs-email-err">{emailStatus}</div>
+      )}
+
+      <div className="fs-pickers">
         <StudentPicker regs={regs} value={studentId} onChange={setStudentId} />
-        <SelectField value={programKey} onChange={setProgramKey} placeholder="Choose program…" disabled={!selectedReg}>
+        <SelectField value={programKey} onChange={setProgramKey}
+          placeholder={selectedReg ? 'Choose program…' : 'Pick a student first'}
+          disabled={!selectedReg || programsForStudent.length === 0}>
           {programsForStudent.map(p => (
             <option key={p.program} value={p.program}>{p.program}</option>
           ))}
         </SelectField>
         <SelectField value={yearKey} onChange={setYearKey}>
-          {availableYears.map(y => (
+          {AVAILABLE_YEARS.map(y => (
             <option key={y} value={y}>{yearToLabel(y)}</option>
           ))}
         </SelectField>
       </div>
 
-      {/* Calendar strip label row */}
-      <div className="fs-strip-labels no-print">
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
+      <div className="fs-strip-labels">
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink, #1f2733)' }}>
           {schedule.weeksPerYear}-Weeks Per Year
         </div>
-        <div style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
+        <div style={{ fontSize: 13, color: '#5a6470' }}>
           Tuition Covers {schedule.weeksPerYear} Weeks · Late Starts are Pro-Rated
         </div>
       </div>
 
-      {/* Calendar strip */}
-      <CalendarStrip cfg={yearCfg} firstLesson={firstLesson} onWeekClick={setFirstLesson} />
+      <CalendarStrip cfg={yearCfg} firstLesson={firstLesson}
+        onWeekClick={(n) => setFirstLessonStr(String(n))} />
 
-      {/* Bottom grid: left column + monthly installments */}
       <div className="fs-grid">
         <div className="fs-left">
           <EditableRow label="First Lesson">
             <input
-              type="number" min="1" max={schedule.weeksPerYear}
-              value={firstLesson}
-              onChange={e => setFirstLesson(Math.max(1, Math.min(schedule.weeksPerYear, Number(e.target.value) || 1)))}
+              type="text" inputMode="numeric"
+              value={firstLessonStr}
+              onChange={e => setFirstLessonStr(e.target.value.replace(/[^\d]/g, ''))}
+              onBlur={e => {
+                const n = parseNum(e.target.value, 1)
+                setFirstLessonStr(String(Math.max(1, Math.min(35, n))))
+              }}
               className="fs-num"
+              placeholder="1"
             />
           </EditableRow>
           <EditableRow label="Monthly Installment">
             <input
-              type="number" min="0" step="0.01"
-              value={monthly}
-              onChange={e => setMonthly(Number(e.target.value) || 0)}
+              type="text" inputMode="decimal"
+              value={monthlyStr}
+              onChange={e => setMonthlyStr(e.target.value.replace(/[^\d.]/g, ''))}
               className="fs-num" style={{ textAlign: 'right' }}
+              placeholder="0"
             />
           </EditableRow>
-          <div className="fs-cal-note no-print">See Calendar For Scheduled Lesson Dates</div>
+          <div className="fs-cal-note">See Calendar For Scheduled Lesson Dates</div>
           <ReadRow label="Scheduled Weeks" value={schedule.scheduledWeeks} />
           <ReadRow label="Tuition" value={money(schedule.tuition)} />
           <EditableRow label="Registration Fee" gold>
             <input
-              type="number" min="0" step="0.01"
-              value={regFee}
-              onChange={e => setRegFee(Number(e.target.value) || 0)}
+              type="text" inputMode="decimal"
+              value={regFeeStr}
+              onChange={e => setRegFeeStr(e.target.value.replace(/[^\d.]/g, ''))}
               className="fs-num fs-num-gold" style={{ textAlign: 'right' }}
+              placeholder="0"
             />
           </EditableRow>
           <EditableRow label="Material Fee" gold>
             <input
-              type="number" min="0" step="0.01"
-              value={matFee}
-              onChange={e => setMatFee(Number(e.target.value) || 0)}
+              type="text" inputMode="decimal"
+              value={matFeeStr}
+              onChange={e => setMatFeeStr(e.target.value.replace(/[^\d.]/g, ''))}
               className="fs-num fs-num-gold" style={{ textAlign: 'right' }}
+              placeholder="0"
             />
           </EditableRow>
           <div className="fs-total">
@@ -324,30 +408,6 @@ export default function FeeSchedule() {
 
         <InstallmentsCard schedule={schedule} yearCfg={yearCfg} />
       </div>
-
-      {/* Print-only header — matches the sample PDF */}
-      <div className="print-only fs-print-block">
-        <div className="fs-print-head">
-          <div className="fs-print-logo">crania</div>
-          <div className="fs-print-title">
-            <div>Tuition Schedule</div>
-            <div className="fs-print-year">{yearCfg.label}</div>
-          </div>
-        </div>
-        <hr />
-        <div className="fs-print-sub">
-          <b>{selectedReg?.displayName || ''}</b> — {programKey}
-          <span style={{ float: 'right' }}>
-            First Week: {firstLesson} &nbsp;·&nbsp; Scheduled Weeks: {schedule.scheduledWeeks}
-          </span>
-        </div>
-      </div>
-
-      {selectedReg && (
-        <div className="fs-selected-block no-print">
-          {/* nothing extra — pickers show it */}
-        </div>
-      )}
     </div>
   )
 }
@@ -363,10 +423,13 @@ function StudentPicker({ regs, value, onChange }) {
           <button className="fs-picker-x" title="Clear" onClick={() => onChange('')}><X size={13} /></button>
         </>
       ) : (
-        <select className="fs-select-raw" value="" onChange={e => onChange(e.target.value)}>
-          <option value="">Choose student…</option>
-          {regs.map(r => <option key={r.id} value={r.id}>{r.displayName}</option>)}
-        </select>
+        <>
+          <select className="fs-select-raw" value="" onChange={e => onChange(e.target.value)}>
+            <option value="">Choose student…</option>
+            {regs.map(r => <option key={r.id} value={r.id}>{r.displayName}</option>)}
+          </select>
+          <ChevronDown size={16} className="fs-picker-caret" />
+        </>
       )}
     </div>
   )
@@ -385,7 +448,6 @@ function SelectField({ value, onChange, children, placeholder, disabled }) {
 }
 
 function CalendarStrip({ cfg, firstLesson, onWeekClick }) {
-  // Group consecutive cells by month for the top month labels.
   const cells = cfg.timeline
   const groups = []
   let current = null
@@ -397,15 +459,12 @@ function CalendarStrip({ cfg, firstLesson, onWeekClick }) {
       current.cells.push(cell)
     }
   })
-
-  // Break labels: rendered below the strip, positioned at the break cell's index.
   const breaks = cells
     .map((c, i) => (c.kind === 'break' && c.label ? { i, label: c.label } : null))
     .filter(Boolean)
 
   return (
     <div className="fs-cal-wrap">
-      {/* Month row */}
       <div className="fs-month-row">
         {groups.map((g, i) => (
           <div key={i} className="fs-month-label" style={{ flex: g.cells.length }}>
@@ -414,7 +473,6 @@ function CalendarStrip({ cfg, firstLesson, onWeekClick }) {
         ))}
       </div>
 
-      {/* Cells */}
       <div className="fs-cells">
         {cells.map((c, i) => {
           if (c.kind === 'lesson') {
@@ -432,8 +490,7 @@ function CalendarStrip({ cfg, firstLesson, onWeekClick }) {
         })}
       </div>
 
-      {/* Break labels */}
-      <div className="fs-break-labels" style={{ position: 'relative', height: 20 }}>
+      <div className="fs-break-labels">
         {breaks.map((b, i) => (
           <div
             key={i}
@@ -447,7 +504,7 @@ function CalendarStrip({ cfg, firstLesson, onWeekClick }) {
 }
 
 function InstallmentsCard({ schedule, yearCfg }) {
-  const calYear = CAL_YEAR(yearCfg.startCalYear)
+  const calYear = calYearFn(yearCfg.startCalYear)
   return (
     <div className="fs-inst-card">
       <div className="fs-inst-head">Monthly Installments</div>
@@ -490,15 +547,14 @@ function ReadRow({ label, value }) {
 
 // ---------- CSS ----------
 const CSS = `
-.fs-root{--fs-teal:#5FA09E;--fs-blue:#B6DEF0;--fs-gold:#DEDA75;--fs-ink:#1f2733;--fs-line:#e2e5e8;
-  color:var(--fs-ink);}
-
+.fs-root{--fs-teal:#5FA09E;--fs-blue:#B6DEF0;--fs-gold:#DEDA75;--fs-ink:#1f2733;--fs-line:#e2e5e8;color:var(--fs-ink);}
 .fs-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:14px;}
 .fs-title{font-family:var(--serif);font-size:34px;font-weight:400;color:var(--fs-ink);margin:0;line-height:1;}
 .fs-head-actions{display:flex;gap:10px;flex-wrap:wrap;}
 .fs-btn-outline{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--fs-teal);color:var(--fs-teal);border-radius:8px;padding:9px 16px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .fs-btn-outline:hover{background:var(--fs-teal);color:#fff;}
 .fs-btn-outline:disabled{opacity:.5;cursor:not-allowed;background:#fff;color:var(--fs-teal);}
+.fs-email-err{background:#fdecea;border:1px solid #f5b5b0;color:#8a1c15;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:14px;}
 
 .fs-pickers{display:grid;grid-template-columns:minmax(180px,220px) minmax(220px,1fr) minmax(140px,180px);gap:12px;margin-bottom:20px;}
 .fs-picker{position:relative;background:#fff;border:1px solid #d5d0c4;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:6px;font-size:14px;}
@@ -511,7 +567,7 @@ const CSS = `
 
 .fs-strip-labels{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
 
-.fs-cal-wrap{margin-bottom:28px;}
+.fs-cal-wrap{margin-bottom:36px;}
 .fs-month-row{display:flex;gap:2px;font-size:11px;color:var(--fs-ink);font-weight:400;margin-bottom:4px;}
 .fs-month-label{padding-left:2px;}
 .fs-cells{display:flex;gap:4px;}
@@ -520,15 +576,13 @@ const CSS = `
 .fs-cell-lesson{background:var(--fs-teal);color:#fff;cursor:pointer;transition:filter .15s;}
 .fs-cell-lesson:hover{filter:brightness(1.1);}
 .fs-cell-past{background:#c9d8d8;color:#fff;}
-.fs-break-labels{display:flex;position:relative;margin-top:2px;}
+.fs-break-labels{position:relative;height:22px;margin-top:4px;}
 .fs-break-label{position:absolute;font-size:11px;color:var(--fs-ink);white-space:nowrap;transform:translateX(-40%);}
 
 .fs-grid{display:grid;grid-template-columns:minmax(320px,410px) 1fr;gap:24px;align-items:start;}
-
 .fs-left{display:flex;flex-direction:column;gap:10px;}
 .fs-row{display:flex;align-items:center;justify-content:space-between;background:var(--fs-blue);border-radius:8px;padding:14px 20px;font-size:14px;font-weight:700;color:var(--fs-ink);}
 .fs-row-gold{background:var(--fs-gold);}
-.fs-row-label{}
 .fs-row-val{display:flex;align-items:center;font-weight:700;}
 .fs-row-read{padding:2px 4px;}
 .fs-num{width:110px;padding:6px 10px;border:1px solid #cfd6da;border-radius:6px;background:#fff;font:inherit;font-size:14px;font-weight:700;text-align:center;color:var(--fs-ink);}
@@ -541,31 +595,6 @@ const CSS = `
 .fs-inst-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:14px 12px;}
 .fs-inst-row{display:flex;align-items:center;justify-content:space-between;background:var(--fs-blue);border-radius:6px;padding:10px 16px;margin:4px 6px;font-size:13.5px;font-weight:700;color:var(--fs-ink);}
 .fs-inst-skip{background:#eef1f3;color:#98a1a8;font-weight:600;}
-.fs-inst-month{}
 .fs-inst-prorated{font-weight:600;color:var(--fs-ink);}
 .fs-inst-amt{font-weight:700;}
-
-/* ---- print styles ---- */
-.print-only{display:none;}
-@media print {
-  @page { size: letter portrait; margin: 20mm 18mm; }
-  body { background:#fff !important; }
-  .topbar, .no-print { display:none !important; }
-  .page { padding: 0 !important; }
-  .fs-grid { display:block; }
-  .fs-inst-grid { grid-template-columns:1fr; padding:8px 10px; }
-  .fs-inst-row { margin:3px 0; }
-  .fs-strip-labels, .fs-cal-note { display:none; }
-  .fs-cal-wrap { margin-bottom:20px; }
-  .print-only { display:block; margin-bottom:20px; }
-  .fs-print-head { display:flex; align-items:flex-start; justify-content:space-between; }
-  .fs-print-logo { font-family:var(--serif); font-size:22px; color:var(--fs-teal); font-weight:700; }
-  .fs-print-title { text-align:right; }
-  .fs-print-title > div:first-child { font-size:28px; font-weight:700; }
-  .fs-print-year { font-size:14px; color:#5a6470; margin-top:2px; }
-  .fs-print-sub { font-size:14px; margin-top:10px; }
-  hr { border:none; border-top:2px solid var(--fs-teal); margin:8px 0; }
-  .fs-left { display:block; }
-  .fs-row, .fs-total, .fs-inst-row { break-inside:avoid; page-break-inside:avoid; }
-}
 `
