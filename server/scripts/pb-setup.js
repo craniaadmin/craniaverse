@@ -95,6 +95,23 @@ const collectionSpecs = [
     ],
     indexes: ['CREATE UNIQUE INDEX `idx_inventory_recordId` ON `inventory` (`recordId`)'],
   },
+  {
+    name: 'forms',
+    fields: [
+      { name: 'recordId', type: 'text', required: true,  presentable: true },
+      { name: 'payload',  type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: ['CREATE UNIQUE INDEX `idx_forms_recordId` ON `forms` (`recordId`)'],
+  },
+  {
+    name: 'formSubmissions',
+    fields: [
+      { name: 'recordId', type: 'text', required: true,  presentable: true },
+      { name: 'formId',   type: 'text', required: true,  presentable: true },
+      { name: 'payload',  type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: ['CREATE UNIQUE INDEX `idx_formSubmissions_recordId` ON `formSubmissions` (`recordId`)'],
+  },
 ]
 
 async function ensureCollection(spec) {
