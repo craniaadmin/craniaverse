@@ -632,7 +632,7 @@ app.post('/api/forms/:key/submit', wrap(async (req, res) => {
 
   const submission = {
     id:          'sub-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
-    formId:      String(req.params.id),
+    formId:      String(form.id),
     answers,
     submittedAt: new Date().toISOString(),
   }
