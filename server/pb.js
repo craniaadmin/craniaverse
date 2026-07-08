@@ -314,6 +314,30 @@ export async function saveInventory(items) {
   }
 }
 
+// ---- todo (singleton payload with lists + items + checklists) ---
+const DEFAULT_TODO = { lists: [], items: [], checklists: [] }
+
+export async function loadTodo() {
+  const rows = await getFullList('todo')
+  if (rows.length === 0) return DEFAULT_TODO
+  const p = rows[0].payload || {}
+  return {
+    lists:      Array.isArray(p.lists) ? p.lists : [],
+    items:      Array.isArray(p.items) ? p.items : [],
+    checklists: Array.isArray(p.checklists) ? p.checklists : [],
+  }
+}
+
+export async function saveTodo(payload) {
+  await ensureAuth()
+  const rows = await getFullList('todo')
+  if (rows.length === 0) {
+    await pb().collection('todo').create({ payload })
+  } else {
+    await pb().collection('todo').update(rows[0].id, { payload })
+  }
+}
+
 // ---- forms (definitions) --------------------------------
 export async function loadForms() {
   const rows = await getFullList('forms')
