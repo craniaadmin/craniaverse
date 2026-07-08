@@ -356,10 +356,6 @@ export default function FeeSchedule() {
         </div>
       </div>
 
-      {emailStatus.startsWith('Error') && (
-        <div className="fs-email-err">{emailStatus}</div>
-      )}
-
       <div className="fs-pickers">
         <StudentPicker regs={regs} value={studentId} onChange={setStudentId} />
         <SelectField value={programKey} onChange={setProgramKey}
