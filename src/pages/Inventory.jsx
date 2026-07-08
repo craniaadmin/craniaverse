@@ -3,7 +3,6 @@ import { Plus, X, AlertTriangle, Edit2 } from 'lucide-react'
 
 const LOW_STOCK = 5
 const COMMON_SIZES = ['One Size', 'YXS', 'YS', 'YM', 'YL', 'YXL', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
-const API_URL = 'http://localhost:4000'
 
 const BLANK = { category: '', name: '', size: null, qty: 0, price: 0, newCategory: '' }
 const BLANK_EDIT = { id: null, category: '', name: '', size: null, qty: 0, price: 0 }
