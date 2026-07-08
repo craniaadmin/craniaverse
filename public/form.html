@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crania Schools — Form</title>
+<style>
+  :root{
+    --header-blue:#c2e7f8; --panel:#c2e7f8; --ink:#1f2733; --ink-soft:#2a3744;
+    --line:#cfd6da; --btn-teal:#2c7a7b; --btn-teal-hover:#246364; --danger:#d92020;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:var(--sans); color:var(--ink); background:#f4f8fa; padding:24px 16px; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:720px; margin:0 auto;}
+  .title{font-family:var(--serif); font-weight:700; font-size:30px; color:#26303a; text-align:center; margin:0 0 8px;}
+  .desc{text-align:center; color:var(--ink-soft); font-size:14px; margin:0 0 20px; line-height:1.5;}
+  .card{background:var(--panel); border-radius:14px; padding:26px 30px 30px; box-shadow:0 6px 18px rgba(20,30,45,.08);}
+  .row{display:grid; grid-template-columns:220px 1fr; gap:16px; align-items:start; margin-bottom:16px;}
+  @media (max-width:640px){ .row{grid-template-columns:1fr;} }
+  .label{font-size:13.5px; font-weight:700; color:var(--ink-soft); line-height:1.3; padding-top:9px;}
+  .req{color:var(--danger); font-weight:700;}
+  .control{min-width:0;}
+  .input{width:100%; background:#fff; border:1px solid var(--line); border-radius:6px; padding:9px 11px; font-size:14px; color:var(--ink); font-family:inherit;}
+  .input:focus{outline:none; border-color:var(--btn-teal); box-shadow:0 0 0 3px rgba(44,122,123,.15);}
+  textarea.input{resize:vertical; min-height:96px;}
+  .checks{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:8px; padding-top:4px;}
+  .check,.radio{display:flex; align-items:flex-start; gap:8px; font-size:13.5px; color:var(--ink-soft); line-height:1.35; cursor:pointer;}
+  .check input,.radio input{margin-top:2px; accent-color:var(--btn-teal); width:16px; height:16px;}
+  .radios{display:flex; flex-direction:column; gap:8px; padding-top:4px;}
+  .btn{border:none; border-radius:8px; padding:11px 22px; font-weight:700; font-size:14px; background:var(--btn-teal); color:#fff; cursor:pointer; font-family:inherit;}
+  .btn:hover{background:var(--btn-teal-hover);}
+  .btn:disabled{opacity:.6; cursor:default;}
+  .actions{display:flex; justify-content:flex-end; margin-top:22px; padding-top:20px; border-top:1px solid rgba(42,55,68,.18);}
+  .success{background:#fff; border:1px solid var(--line); border-radius:14px; padding:48px 40px; text-align:center; box-shadow:0 6px 18px rgba(20,30,45,.08);}
+  .success .check-icon{width:64px; height:64px; border-radius:50%; background:#e3f1f1; display:grid; place-items:center; margin:0 auto 16px; color:var(--btn-teal); font-size:34px; font-weight:800;}
+  .success h3{margin:4px 0 6px; font-family:var(--serif); font-weight:400; font-size:26px;}
+  .success p{color:var(--ink-soft); font-size:15px; max-width:460px; margin:0 auto; line-height:1.6;}
+  .err{background:#fdecea; border:1px solid #f5b5b0; color:#8a1c15; border-radius:8px; padding:10px 14px; font-size:14px; margin-bottom:16px;}
+  .loading, .not-found{text-align:center; color:var(--ink-soft); padding:60px 20px; font-size:15px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="root">
+  <div class="loading">Loading form…</div>
+</div>
+
+<script>
+(async function() {
+  const root = document.getElementById('root')
+
+  // Extract form id from /form/:id
+  const parts = location.pathname.split('/').filter(Boolean)
+  const formId = parts[parts.length - 1]
+
+  const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])
+  )
+
+  let form = null
+  try {
+    const res = await fetch(`/api/forms/${encodeURIComponent(formId)}`)
+    if (!res.ok) throw new Error('not found')
+    form = await res.json()
+  } catch {
+    root.innerHTML = '<div class="not-found">This form could not be found.<br>The link may be broken or the form was deleted.</div>'
+    return
+  }
+
+  document.title = `Crania Schools — ${form.title || 'Form'}`
+
+  const renderField = (f) => {
+    const req = f.required ? ' <span class="req">*</span>' : ''
+    const labelHtml = `<div class="label">${escapeHtml(f.label || f.key)}${req}</div>`
+    let controlHtml = ''
+    const name = `f_${escapeHtml(f.key)}`
+    switch (f.type) {
+      case 'longtext':
+        controlHtml = `<textarea class="input" name="${name}" ${f.required ? 'required' : ''}></textarea>`; break
+      case 'email':
+        controlHtml = `<input class="input" type="email" name="${name}" ${f.required ? 'required' : ''} />`; break
+      case 'number':
+        controlHtml = `<input class="input" type="number" name="${name}" ${f.required ? 'required' : ''} />`; break
+      case 'date':
+        controlHtml = `<input class="input" type="date" name="${name}" ${f.required ? 'required' : ''} />`; break
+      case 'select': {
+        const opts = (f.options || []).map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')
+        controlHtml = `<select class="input" name="${name}" ${f.required ? 'required' : ''}><option value="">— choose —</option>${opts}</select>`; break
+      }
+      case 'radio': {
+        const opts = (f.options || []).map(o =>
+          `<label class="radio"><input type="radio" name="${name}" value="${escapeHtml(o)}" ${f.required ? 'required' : ''}/>${escapeHtml(o)}</label>`).join('')
+        controlHtml = `<div class="radios">${opts}</div>`; break
+      }
+      case 'checkbox': {
+        const opts = (f.options || []).map(o =>
+          `<label class="check"><input type="checkbox" name="${name}" value="${escapeHtml(o)}"/>${escapeHtml(o)}</label>`).join('')
+        controlHtml = `<div class="checks">${opts}</div>`; break
+      }
+      default: // 'text'
+        controlHtml = `<input class="input" type="text" name="${name}" ${f.required ? 'required' : ''} />`
+    }
+    return `<div class="row">${labelHtml}<div class="control">${controlHtml}</div></div>`
+  }
+
+  const fieldsHtml = (form.fields || []).map(renderField).join('')
+
+  root.innerHTML = `
+    <h1 class="title">${escapeHtml(form.title || 'Form')}</h1>
+    ${form.description ? `<p class="desc">${escapeHtml(form.description)}</p>` : ''}
+    <form class="card" id="the-form">
+      <div id="err"></div>
+      ${fieldsHtml || '<div style="text-align:center; color:var(--ink-soft); padding:20px;">This form has no fields yet.</div>'}
+      <div class="actions">
+        <button class="btn" type="submit" id="submit-btn">Submit</button>
+      </div>
+    </form>
+  `
+
+  const collectAnswers = () => {
+    const answers = {}
+    for (const f of form.fields || []) {
+      const name = `f_${f.key}`
+      const els = document.getElementsByName(name)
+      if (f.type === 'checkbox') {
+        answers[f.key] = Array.from(els).filter(e => e.checked).map(e => e.value)
+      } else if (f.type === 'radio') {
+        const picked = Array.from(els).find(e => e.checked)
+        answers[f.key] = picked ? picked.value : ''
+      } else {
+        answers[f.key] = els[0] ? els[0].value : ''
+      }
+    }
+    return answers
+  }
+
+  document.getElementById('the-form').addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const btn = document.getElementById('submit-btn')
+    const errBox = document.getElementById('err')
+    errBox.innerHTML = ''
+    btn.disabled = true
+    btn.textContent = 'Submitting…'
+    try {
+      const res = await fetch(`/api/forms/${encodeURIComponent(formId)}/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: collectAnswers() }),
+      })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || 'Submission failed')
+      }
+      root.innerHTML = `
+        <div class="success">
+          <div class="check-icon">✓</div>
+          <h3>Thank you</h3>
+          <p>Your response has been submitted.</p>
+        </div>`
+    } catch (err) {
+      errBox.innerHTML = `<div class="err">${escapeHtml(err.message)}</div>`
+      btn.disabled = false
+      btn.textContent = 'Submit'
+    }
+  })
+})()
+</script>
+</body>
+</html>
