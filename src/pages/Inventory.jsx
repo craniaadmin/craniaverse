@@ -3,40 +3,16 @@ import { Plus, X, AlertTriangle } from 'lucide-react'
 
 const LOW_STOCK = 5
 
-const CATEGORIES = ['Shirts', 'Bags', 'Other']
-
-const CAT_COLOR = {
-  Shirts: '#5FA09E',
-  Bags:   '#7a5fae',
-  Other:  '#a07a3a',
-}
-
 const SHIRT_SIZES = ['YXS', 'YS', 'YM', 'YL', 'YXL', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
+const COMMON_SIZES = ['One Size', ...SHIRT_SIZES]
 
 const SEED = [
-  // Shirts — kids
-  { id: 1,  category: 'Shirts', name: 'T-Shirt', size: 'YXS', qty: 8,  price: 15 },
-  { id: 2,  category: 'Shirts', name: 'T-Shirt', size: 'YS',  qty: 10, price: 15 },
-  { id: 3,  category: 'Shirts', name: 'T-Shirt', size: 'YM',  qty: 14, price: 15 },
-  { id: 4,  category: 'Shirts', name: 'T-Shirt', size: 'YL',  qty: 6,  price: 15 },
-  { id: 5,  category: 'Shirts', name: 'T-Shirt', size: 'YXL', qty: 4,  price: 15 },
-  // Shirts — adult
-  { id: 6,  category: 'Shirts', name: 'T-Shirt', size: 'XS',  qty: 3,  price: 18 },
-  { id: 7,  category: 'Shirts', name: 'T-Shirt', size: 'S',   qty: 9,  price: 18 },
-  { id: 8,  category: 'Shirts', name: 'T-Shirt', size: 'M',   qty: 11, price: 18 },
-  { id: 9,  category: 'Shirts', name: 'T-Shirt', size: 'L',   qty: 7,  price: 18 },
-  { id: 10, category: 'Shirts', name: 'T-Shirt', size: 'XL',  qty: 2,  price: 18 },
-  { id: 11, category: 'Shirts', name: 'T-Shirt', size: 'XXL', qty: 1,  price: 18 },
-  // Bags
-  { id: 12, category: 'Bags', name: 'Tote Bag',  size: null, qty: 18, price: 12 },
-  { id: 13, category: 'Bags', name: 'Backpack',  size: null, qty: 5,  price: 35 },
-  // Other
-  { id: 14, category: 'Other', name: 'Water Bottle', size: null, qty: 20, price: 22 },
-  { id: 15, category: 'Other', name: 'Pencil Case',  size: null, qty: 30, price: 8  },
-  { id: 16, category: 'Other', name: 'Lanyard',      size: null, qty: 3,  price: 5  },
+  { id: 1,  category: 'Apparel', name: 'T-Shirt', size: 'YXS', qty: 8,  price: 15 },
+  { id: 2,  category: 'Apparel', name: 'T-Shirt', size: 'YS',  qty: 10, price: 15 },
+  { id: 3,  category: 'Apparel', name: 'T-Shirt', size: 'YM',  qty: 14, price: 15 },
 ]
 
-const BLANK = { category: 'Shirts', name: '', size: 'YS', qty: 0, price: 0 }
+const BLANK = { category: '', name: '', size: null, qty: 0, price: 0, newCategory: '' }
 
 function QtyControl({ qty, onChange }) {
   return (
