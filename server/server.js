@@ -543,47 +543,6 @@ app.post('/api/fee-schedule/pdf', wrap(async (req, res) => {
   res.send(pdf)
 }))
 
-app.post('/api/fee-schedule/email', wrap(async (req, res) => {
-  const key = process.env.SENDGRID_API_KEY
-  if (!key) return res.status(500).json({ error: 'SENDGRID_API_KEY not configured on server' })
-  const body = req.body || {}
-  const to = String(body.to || '').trim()
-  if (!to) return res.status(400).json({ error: 'recipient (to) is required' })
-
-  const pdf = await generateFeeSchedulePdf(body)
-  const filename = (body.filename || 'tuition-schedule.pdf').replace(/[^\w.-]+/g, '_')
-
-  sgMail.setApiKey(key)
-  const studentName = body.studentName || 'your child'
-  const programName = body.programName || ''
-  const yearLabel   = body.yearLabel || ''
-  const subject = `Tuition Schedule — ${studentName} · ${programName} (${yearLabel})`.trim()
-  const html = `
-    <div style="font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#1f2733;line-height:1.5">
-      <p>Hello,</p>
-      <p>Please find attached the tuition schedule for <b>${studentName}</b>
-      — ${programName} (${yearLabel}).</p>
-      <p>If you have any questions please reply to this email.</p>
-      <p>Thanks,<br/>Crania Schools</p>
-    </div>`
-
-  await sgMail.send({
-    from: { email: 'registrations@crania-schools.com', name: 'Crania Schools' },
-    to,
-    cc: 'registrations@crania-schools.com',
-    subject,
-    html,
-    attachments: [{
-      content: pdf.toString('base64'),
-      filename,
-      type: 'application/pdf',
-      disposition: 'attachment',
-    }],
-  })
-
-  res.json({ ok: true })
-}))
-
 // ---- todo (singleton {lists, items, checklists}) --------
 app.get('/api/todo', wrap(async (_req, res) => res.json(await loadTodo())))
 app.put('/api/todo', wrap(async (req, res) => {
