@@ -34,49 +34,98 @@ function QtyControl({ qty, onChange }) {
 }
 
 export default function Inventory() {
-  const [items, setItems] = useState(SEED)
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
   const [modal, setModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
   const [form, setForm] = useState(BLANK)
   const [editForm, setEditForm] = useState(BLANK_EDIT)
 
+  useEffect(() => {
+    fetch(`${API_URL}/api/inventory`)
+      .then(r => r.json())
+      .then(setItems)
+      .catch(err => console.error('Failed to load inventory:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
   const categories = [...new Set(items.map(i => i.category))].sort()
 
-  const updateQty = (id, qty) => setItems(prev => prev.map(i => i.id === id ? { ...i, qty } : i))
-  const deleteItem = (id) => setItems(prev => prev.filter(i => i.id !== id))
+  const updateQty = async (id, qty) => {
+    try {
+      await fetch(`${API_URL}/api/inventory/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qty }),
+      })
+      setItems(prev => prev.map(i => i.id === id ? { ...i, qty } : i))
+    } catch (err) {
+      console.error('Failed to update qty:', err)
+    }
+  }
+
+  const deleteItem = async (id) => {
+    try {
+      await fetch(`${API_URL}/api/inventory/${id}`, { method: 'DELETE' })
+      setItems(prev => prev.filter(i => i.id !== id))
+    } catch (err) {
+      console.error('Failed to delete item:', err)
+    }
+  }
 
   const openEdit = (item) => {
     setEditForm({ ...item })
     setEditModal(true)
   }
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (!editForm.name.trim()) return
-    setItems(prev => prev.map(i => i.id === editForm.id ? {
-      ...editForm,
-      name: editForm.name.trim(),
-      qty: Number(editForm.qty) || 0,
-      price: Number(editForm.price) || 0,
-    } : i))
-    setEditModal(false)
-    setEditForm(BLANK_EDIT)
+    try {
+      await fetch(`${API_URL}/api/inventory/${editForm.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editForm.name.trim(),
+          size: editForm.size,
+          qty: Number(editForm.qty) || 0,
+          price: Number(editForm.price) || 0,
+        }),
+      })
+      setItems(prev => prev.map(i => i.id === editForm.id ? {
+        ...editForm,
+        name: editForm.name.trim(),
+        qty: Number(editForm.qty) || 0,
+        price: Number(editForm.price) || 0,
+      } : i))
+      setEditModal(false)
+      setEditForm(BLANK_EDIT)
+    } catch (err) {
+      console.error('Failed to save edit:', err)
+    }
   }
 
-  const save = () => {
+  const save = async () => {
     if (!form.name.trim() || !form.category.trim()) return
     const finalCategory = form.newCategory.trim() || form.category
-    const id = Math.max(0, ...items.map(i => i.id)) + 1
-    setItems(prev => [...prev, {
-      ...form,
-      id,
-      category: finalCategory,
-      name: form.name.trim(),
-      size: form.size || null,
-      qty: Number(form.qty) || 0,
-      price: Number(form.price) || 0,
-    }])
-    setModal(false)
-    setForm(BLANK)
+    try {
+      const res = await fetch(`${API_URL}/api/inventory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: finalCategory,
+          name: form.name.trim(),
+          size: form.size || null,
+          qty: Number(form.qty) || 0,
+          price: Number(form.price) || 0,
+        }),
+      })
+      const newItem = await res.json()
+      setItems(prev => [...prev, newItem])
+      setModal(false)
+      setForm(BLANK)
+    } catch (err) {
+      console.error('Failed to add item:', err)
+    }
   }
 
   const totalItems = items.reduce((s, i) => s + i.qty, 0)
