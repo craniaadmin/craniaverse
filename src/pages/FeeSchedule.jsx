@@ -582,7 +582,6 @@ const CSS = `
 .fs-btn-outline{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--fs-teal);color:var(--fs-teal);border-radius:8px;padding:9px 16px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit;}
 .fs-btn-outline:hover{background:var(--fs-teal);color:#fff;}
 .fs-btn-outline:disabled{opacity:.5;cursor:not-allowed;background:#fff;color:var(--fs-teal);}
-.fs-email-err{background:#fdecea;border:1px solid #f5b5b0;color:#8a1c15;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:14px;}
 
 .fs-pickers{display:grid;grid-template-columns:minmax(180px,220px) minmax(220px,1fr) minmax(140px,180px);gap:12px;margin-bottom:20px;}
 .fs-picker{position:relative;background:#fff;border:1px solid #d5d0c4;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:6px;font-size:14px;}
