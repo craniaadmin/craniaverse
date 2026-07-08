@@ -139,6 +139,17 @@ export default function Inventory() {
     return { cat, items: catItems, hasSize }
   })
 
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="page-head">
+          <h2 className="page-title">Inventory</h2>
+        </div>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)' }}>Loading inventory...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="page">
       <div className="page-head">
