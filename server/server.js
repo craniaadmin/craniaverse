@@ -469,6 +469,48 @@ app.delete('/api/staff/:id', wrap(async (req, res) => {
   res.json({ deleted: staff.length - next.length })
 }))
 
+// ---- inventory ------------------------------------------
+app.get('/api/inventory', wrap(async (_req, res) => res.json(await getInventory())))
+
+app.post('/api/inventory', wrap(async (req, res) => {
+  const items = await getInventory()
+  const id = Math.max(0, ...items.map(i => i.id || 0)) + 1
+  const record = {
+    id,
+    category: String(req.body.category || '').trim(),
+    name: String(req.body.name || '').trim(),
+    size: req.body.size || null,
+    qty: Number(req.body.qty) || 0,
+    price: Number(req.body.price) || 0,
+  }
+  items.push(record)
+  await commitInventory(items)
+  res.status(201).json(record)
+}))
+
+app.put('/api/inventory/:id', wrap(async (req, res) => {
+  const items = await getInventory()
+  const idx = items.findIndex((i) => i.id === Number(req.params.id))
+  if (idx === -1) return res.status(404).json({ error: 'not found' })
+  items[idx] = {
+    ...items[idx],
+    category: req.body.category !== undefined ? String(req.body.category).trim() : items[idx].category,
+    name: req.body.name !== undefined ? String(req.body.name).trim() : items[idx].name,
+    size: req.body.size !== undefined ? req.body.size : items[idx].size,
+    qty: req.body.qty !== undefined ? Number(req.body.qty) : items[idx].qty,
+    price: req.body.price !== undefined ? Number(req.body.price) : items[idx].price,
+  }
+  await commitInventory(items)
+  res.json({ ok: true })
+}))
+
+app.delete('/api/inventory/:id', wrap(async (req, res) => {
+  const items = await getInventory()
+  const next = items.filter((i) => i.id !== Number(req.params.id))
+  await commitInventory(next)
+  res.json({ deleted: items.length - next.length })
+}))
+
 // Error handler — any thrown error from a wrap()-ed handler lands here
 app.use((err, _req, res, _next) => {
   console.error('[api error]', err?.response || err?.message || err)
