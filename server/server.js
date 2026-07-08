@@ -530,13 +530,39 @@ app.delete('/api/inventory/:id', wrap(async (req, res) => {
 
 // ---- forms (custom form builder) ------------------------
 // A "form" is a definition: title + ordered field list. Anyone
-// with the form's shareable URL (/form/:id) can submit it, and
+// with the form's shareable URL (/form/:slug) can submit it, and
 // submissions land in the formSubmissions collection.
+//
+// Each form has:
+//   id    — random, immutable. Used as recordId + submissions FK.
+//   slug  — derived from title, unique, URL-friendly. Regenerated
+//           when the title changes. Public URLs use this.
+// The public route accepts either — so old links keep working.
+
+const slugify = (s) => String(s || '')
+  .toLowerCase()
+  .normalize('NFKD').replace(/[̀-ͯ]/g, '')  // strip accents
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '')
+  .slice(0, 60)
+
+const uniqueSlug = (base, forms, excludeId) => {
+  const taken = new Set(forms.filter(f => f.id !== excludeId).map(f => f.slug).filter(Boolean))
+  const root = base || 'form'
+  if (!taken.has(root)) return root
+  let n = 2
+  while (taken.has(`${root}-${n}`)) n++
+  return `${root}-${n}`
+}
+
+const findForm = (forms, key) => forms.find(f =>
+  String(f.slug) === String(key) || String(f.id) === String(key)
+)
+
 app.get('/api/forms', wrap(async (_req, res) => res.json(await getForms())))
 
-app.get('/api/forms/:id', wrap(async (req, res) => {
-  const forms = await getForms()
-  const form = forms.find((f) => String(f.id) === String(req.params.id))
+app.get('/api/forms/:key', wrap(async (req, res) => {
+  const form = findForm(await getForms(), req.params.key)
   if (!form) return res.status(404).json({ error: 'not found' })
   res.json(form)
 }))
@@ -544,9 +570,11 @@ app.get('/api/forms/:id', wrap(async (req, res) => {
 app.post('/api/forms', wrap(async (req, res) => {
   const forms = await getForms()
   const id = 'form-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7)
+  const title = String(req.body.title || 'Untitled Form').trim()
   const record = {
     id,
-    title:       String(req.body.title || 'Untitled Form').trim(),
+    slug:        uniqueSlug(slugify(title), forms),
+    title,
     description: String(req.body.description || '').trim(),
     fields:      Array.isArray(req.body.fields) ? req.body.fields : [],
     createdAt:   new Date().toISOString(),
@@ -560,11 +588,18 @@ app.put('/api/forms/:id', wrap(async (req, res) => {
   const forms = await getForms()
   const idx = forms.findIndex((f) => String(f.id) === String(req.params.id))
   if (idx === -1) return res.status(404).json({ error: 'not found' })
+  const current = forms[idx]
+  const nextTitle = req.body.title !== undefined ? String(req.body.title).trim() : current.title
+  // Regenerate slug when the title changes (or when the form doesn't have one yet).
+  const nextSlug = (!current.slug || nextTitle !== current.title)
+    ? uniqueSlug(slugify(nextTitle), forms, current.id)
+    : current.slug
   forms[idx] = {
-    ...forms[idx],
-    title:       req.body.title       !== undefined ? String(req.body.title).trim()       : forms[idx].title,
-    description: req.body.description !== undefined ? String(req.body.description).trim() : forms[idx].description,
-    fields:      Array.isArray(req.body.fields) ? req.body.fields : forms[idx].fields,
+    ...current,
+    title:       nextTitle,
+    slug:        nextSlug,
+    description: req.body.description !== undefined ? String(req.body.description).trim() : current.description,
+    fields:      Array.isArray(req.body.fields) ? req.body.fields : current.fields,
   }
   await commitForms(forms)
   res.json(forms[idx])
@@ -580,9 +615,8 @@ app.delete('/api/forms/:id', wrap(async (req, res) => {
 
 // ---- submissions ---
 // Public — no auth. Rate-limit / CAPTCHA can be added later.
-app.post('/api/forms/:id/submit', wrap(async (req, res) => {
-  const forms = await getForms()
-  const form = forms.find((f) => String(f.id) === String(req.params.id))
+app.post('/api/forms/:key/submit', wrap(async (req, res) => {
+  const form = findForm(await getForms(), req.params.key)
   if (!form) return res.status(404).json({ error: 'form not found' })
 
   const answers = (req.body && typeof req.body.answers === 'object') ? req.body.answers : {}
