@@ -39,20 +39,21 @@ export default function Inventory() {
   const [editModal, setEditModal] = useState(false)
   const [form, setForm] = useState(BLANK)
   const [editForm, setEditForm] = useState(BLANK_EDIT)
+  const API_BASE = import.meta.env?.VITE_API_URL || ''
 
   useEffect(() => {
-    fetch(`${API_URL}/api/inventory`)
+    fetch(`${API_BASE}/api/inventory`)
       .then(r => r.json())
       .then(setItems)
       .catch(err => console.error('Failed to load inventory:', err))
       .finally(() => setLoading(false))
-  }, [])
+  }, [API_BASE])
 
   const categories = [...new Set(items.map(i => i.category))].sort()
 
   const updateQty = async (id, qty) => {
     try {
-      await fetch(`${API_URL}/api/inventory/${id}`, {
+      await fetch(`${API_BASE}/api/inventory/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ qty }),
@@ -65,7 +66,7 @@ export default function Inventory() {
 
   const deleteItem = async (id) => {
     try {
-      await fetch(`${API_URL}/api/inventory/${id}`, { method: 'DELETE' })
+      await fetch(`${API_BASE}/api/inventory/${id}`, { method: 'DELETE' })
       setItems(prev => prev.filter(i => i.id !== id))
     } catch (err) {
       console.error('Failed to delete item:', err)
@@ -80,7 +81,7 @@ export default function Inventory() {
   const saveEdit = async () => {
     if (!editForm.name.trim()) return
     try {
-      await fetch(`${API_URL}/api/inventory/${editForm.id}`, {
+      await fetch(`${API_BASE}/api/inventory/${editForm.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -107,7 +108,7 @@ export default function Inventory() {
     if (!form.name.trim() || !form.category.trim()) return
     const finalCategory = form.newCategory.trim() || form.category
     try {
-      const res = await fetch(`${API_URL}/api/inventory`, {
+      const res = await fetch(`${API_BASE}/api/inventory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
