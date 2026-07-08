@@ -22,7 +22,6 @@ import dotenv from 'dotenv'
 import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { sendRegistrationEmails } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
-import sgMail from '@sendgrid/mail'
 import {
   loadRegistrations, saveRegistrations,
   loadStaff,         saveStaff,
