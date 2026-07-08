@@ -123,7 +123,6 @@ export default function FeeSchedule() {
   const [matFeeStr, setMatFeeStr] = useState(String(DEFAULT_MAT_FEE))
 
   // Async status
-  const [emailStatus, setEmailStatus] = useState('') // '', 'sending', 'ok', or an error message
   const [pdfBusy, setPdfBusy] = useState(false)
 
   useEffect(() => {
