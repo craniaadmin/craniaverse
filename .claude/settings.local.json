@@ -84,7 +84,8 @@
       "Bash(node -e \"const d=require\\('./server/data.json'\\); console.log\\('registrations:', d.length\\); console.log\\(JSON.stringify\\(d[0], null, 2\\)\\)\")",
       "Bash(node -e \"const d=require\\('./server/data.json'\\); console.log\\('programs:', JSON.stringify\\(d[0].programs, null, 2\\)\\); console.log\\('customer.guardian1:', JSON.stringify\\(d[0].customer.guardian1, null, 2\\)\\)\")",
       "Bash(node -e \"const d=require\\('./server/data.json'\\); console.log\\('Sample program rates:'\\); d.slice\\(0,5\\).forEach\\(r => r.programs && r.programs.forEach\\(p => console.log\\('  ', r.displayName, '-', p.year, p.program, p.rate, p.rateUnit\\)\\)\\)\")",
-      "Bash(node -e \"const d=require\\('./server/data.json'\\); const years=new Set\\(\\), progs=new Set\\(\\); d.forEach\\(r => \\(r.programs||[]\\).forEach\\(p => {years.add\\(p.year\\); progs.add\\(p.program\\)}\\)\\); console.log\\('years:', [...years]\\); console.log\\('progs:', [...progs].slice\\(0,15\\)\\)\")"
+      "Bash(node -e \"const d=require\\('./server/data.json'\\); const years=new Set\\(\\), progs=new Set\\(\\); d.forEach\\(r => \\(r.programs||[]\\).forEach\\(p => {years.add\\(p.year\\); progs.add\\(p.program\\)}\\)\\); console.log\\('years:', [...years]\\); console.log\\('progs:', [...progs].slice\\(0,15\\)\\)\")",
+      "Bash(node --check server/pdf-fee-schedule.js)"
     ]
   },
   "hooks": {
