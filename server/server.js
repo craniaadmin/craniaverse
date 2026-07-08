@@ -190,7 +190,7 @@ app.use(express.json({ limit: '1mb' }))
 const ALLOWED_FRAME_ANCESTORS = process.env.ALLOWED_FRAME_ANCESTORS
   || "'self' https://crania-schools.com https://www.crania-schools.com"
 app.use((req, res, next) => {
-  if (req.path === '/register' || req.path === '/staff-form') {
+  if (req.path === '/register' || req.path === '/staff-form' || req.path.startsWith('/form/')) {
     res.setHeader('Content-Security-Policy', `frame-ancestors ${ALLOWED_FRAME_ANCESTORS}`)
   }
   next()
