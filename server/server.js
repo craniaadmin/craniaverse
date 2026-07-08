@@ -76,6 +76,7 @@ const cache = {
   programs:      null,
   rules:         null,
   inventory:     null,
+  forms:         null,
 }
 
 async function getRegistrations() {
