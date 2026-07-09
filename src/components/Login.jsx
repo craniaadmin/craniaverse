@@ -2,12 +2,39 @@ import { useState } from 'react'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import BrandMark from './BrandMark'
 
+const API_BASE = import.meta.env?.VITE_API_URL || ''
+
 export default function Login({ onSignIn }) {
   const [email, setEmail] = useState('admin@craniaverse.ca')
-  const [pw, setPw] = useState('password')
+  const [pw, setPw] = useState('')
   const [show, setShow] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
 
-  const submit = (e) => { e.preventDefault(); onSignIn() }
+  const submit = async (e) => {
+    e.preventDefault()
+    if (!pw) return
+    setBusy(true); setError('')
+    try {
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ password: pw }),
+      })
+      if (res.ok) {
+        onSignIn()
+      } else {
+        const body = await res.json().catch(() => ({}))
+        setError(body.error || 'Login failed')
+      }
+    } catch (err) {
+      setError('Network problem — please try again.')
+      console.error(err)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="login-wrap">
@@ -28,7 +55,13 @@ export default function Login({ onSignIn }) {
           <label>Password</label>
           <div className="input-shell">
             <Lock size={17} color="#9aa4b1" />
-            <input type={show ? 'text' : 'password'} value={pw} onChange={(e) => setPw(e.target.value)} placeholder="••••••••" />
+            <input
+              type={show ? 'text' : 'password'}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder="••••••••"
+              autoFocus
+            />
             <button type="button" className="eye" onClick={() => setShow(!show)} aria-label="toggle password">
               {show ? <EyeOff size={17} /> : <Eye size={17} />}
             </button>
@@ -36,7 +69,17 @@ export default function Login({ onSignIn }) {
         </div>
         <a className="forgot" href="#">Forgot password?</a>
 
-        <button className="btn block" type="submit">Sign In</button>
+        {error && (
+          <div style={{
+            background: '#fdecea', border: '1px solid #f5b5b0', color: '#8a1c15',
+            borderRadius: 8, padding: '8px 12px', fontSize: 13, margin: '8px 0',
+          }}>{error}</div>
+        )}
+
+        <button className="btn block" type="submit" disabled={busy || !pw}
+          style={{ opacity: busy || !pw ? 0.5 : 1 }}>
+          {busy ? 'Signing in…' : 'Sign In'}
+        </button>
 
         <div className="or">or</div>
         <p className="login-foot">Need help? <a href="#">Contact your administrator.</a></p>

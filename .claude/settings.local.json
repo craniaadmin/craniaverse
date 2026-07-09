@@ -88,7 +88,8 @@
       "Bash(node --check server/pdf-fee-schedule.js)",
       "Bash(grep -v \"^$\")",
       "Bash(awk 'length\\($0\\) > 500 {print NR, \"len=\"length\\($0\\)}' \"C:/Users/hanak/Downloads/Crania Booth Sign-Up App v7 [claude-fable-5].html\")",
-      "Bash(node --check server/email.js)"
+      "Bash(node --check server/email.js)",
+      "Bash(node --check server/auth.js)"
     ]
   },
   "hooks": {
