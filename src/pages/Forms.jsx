@@ -29,12 +29,12 @@ const BLANK_FIELD = () => ({
 const BLANK_FORM = { title: '', description: '', fields: [] }
 
 // ------------------------------ FORMS LIST ------------------------------
-function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl }) {
+function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl }) {
   const [copied, setCopied] = useState(null)
-  const copy = async (id) => {
+  const copy = async (url, key) => {
     try {
-      await navigator.clipboard.writeText(publicUrl(id))
-      setCopied(id); setTimeout(() => setCopied(null), 1400)
+      await navigator.clipboard.writeText(url)
+      setCopied(key); setTimeout(() => setCopied(null), 1400)
     } catch { /* clipboard blocked */ }
   }
   return (
@@ -46,16 +46,49 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl }) {
         </button>
       </div>
 
-      {forms.length === 0 ? (
+      <div style={{ display: 'grid', gap: 12 }}>
+        {/* Built-in: Booth Sign-Up */}
         <div style={{
-          background: '#fff', border: '1px solid var(--line)', borderRadius: 12,
-          padding: '60px 20px', textAlign: 'center', color: 'var(--muted)',
+          background: 'linear-gradient(135deg, #f2fbfd 0%, #fdf9e8 100%)',
+          border: '1px solid #d5ecef', borderRadius: 12,
+          padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr auto',
+          gap: 12, alignItems: 'center', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
         }}>
-          <div style={{ fontSize: 15, marginBottom: 6 }}>No forms yet.</div>
-          <div style={{ fontSize: 13 }}>Click <b>+</b> above to build your first one.</div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Star size={15} style={{ color: '#5FA09E', fill: '#5FA09E' }} />
+              Booth Sign-Up
+              <span style={{ background: '#5FA09E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, letterSpacing: '.4px', textTransform: 'uppercase' }}>Built-in</span>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <span>Free assessment · Open house RSVP · Agenda orders</span>
+              <span>·</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{boothUrl}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="icon-btn" title={copied === 'booth' ? 'Copied!' : 'Copy public link'} onClick={() => copy(boothUrl, 'booth')}>
+              <Copy size={16} />
+            </button>
+            <button className="icon-btn" title="Open public form" onClick={() => window.open(boothUrl, '_blank')}>
+              <ExternalLink size={16} />
+            </button>
+            <button className="icon-btn" title="View sign-ups" onClick={onOpenBooth}>
+              <Eye size={16} />
+            </button>
+          </div>
         </div>
-      ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
+
+        {forms.length === 0 ? (
+          <div style={{
+            background: '#fff', border: '1px solid var(--line)', borderRadius: 12,
+            padding: '40px 20px', textAlign: 'center', color: 'var(--muted)',
+          }}>
+            <div style={{ fontSize: 15, marginBottom: 6 }}>No custom forms yet.</div>
+            <div style={{ fontSize: 13 }}>Click <b>+</b> above to build one.</div>
+          </div>
+        ) : (
+          <>
           {forms.map((f) => (
             <div key={f.id} style={{
               background: '#fff', border: '1px solid var(--line)', borderRadius: 12,
