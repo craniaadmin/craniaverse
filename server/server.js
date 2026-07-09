@@ -547,6 +547,20 @@ app.post('/api/booth-signup', wrap(async (req, res) => {
   try {
     const result = await upsertBoothSignup(body)
     if (result.conflict) return res.status(409).json(result)
+
+    // Fire-and-forget: notify events@ with the full merged record.
+    // Which form triggered this submission is inferred from the fields
+    // present on the request body (not the merged record, so we don't
+    // re-notify about assessments the family booked days ago).
+    const kind = body.assessDate ? 'assessment'
+      : body.openHouse ? 'openHouse'
+      : body.agenda    ? 'agenda'
+      : null
+    if (kind) {
+      sendBoothSignupEmail(result.entry, kind)
+        .catch(err => console.error('[booth-email]', err))
+    }
+
     res.json({ ok: true, count: result.count })
   } catch (err) {
     console.error('[booth-signup]', err)
