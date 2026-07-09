@@ -338,6 +338,95 @@ export async function saveTodo(payload) {
   }
 }
 
+// ---- booth signups (one row per family, keyed by email) ------
+// Same upsert semantics as the original localStorage flow: a
+// family may submit the assessment form, then come back and RSVP
+// for the open house, then order agendas, all under the same
+// email — each submission merges into their single record.
+export async function loadBoothSignups() {
+  const rows = await getFullList('boothSignups')
+  return rows.map(r => r.payload || {})
+}
+
+function mergeSignup(existing, fields) {
+  const next = { ...existing }
+  next.name  = fields.name  ?? existing.name  ?? ''
+  next.phone = fields.phone ?? existing.phone ?? ''
+  next.email = existing.email || fields.email
+  next.consent = 'yes'
+  if (fields.grade) next.grade = fields.grade
+  if (fields.child) next.child = fields.child
+  if (fields.openHouse) next.openHouse = 'yes'
+  if (fields.assessDate) {
+    next.assessDate = fields.assessDate
+    next.assessTime = fields.assessTime || ''
+  }
+  if (fields.agenda) {
+    next.agReg   = Number(fields.agReg  || 0)
+    next.agIsl   = Number(fields.agIsl  || 0)
+    next.agShip  = fields.agShip || ''
+    next.agAddr  = fields.agAddr || ''
+    next.agTotal = Number(fields.agTotal || 0)
+  }
+  if (!existing.when) next.when = new Date().toISOString()
+  next.updatedAt = new Date().toISOString()
+  return next
+}
+
+export async function upsertBoothSignup(fields) {
+  await ensureAuth()
+  const email = String(fields.email || '').toLowerCase().trim()
+  if (!email) throw new Error('email is required')
+  const recordId = email
+
+  let existing = null
+  try {
+    existing = await pb().collection('boothSignups')
+      .getFirstListItem(`recordId="${recordId.replace(/"/g, '\\"')}"`)
+  } catch (err) {
+    if (err?.status !== 404) throw err
+  }
+
+  const existingPayload = existing?.payload || {}
+  // Enforce "already-booked" rules: only assessment + open house are
+  // exclusive; agenda orders can happen multiple times.
+  if (fields.assessDate && existingPayload.assessDate) {
+    return {
+      conflict: 'assessment',
+      existing: existingPayload,
+      message: `This email already has an assessment booked (${existingPayload.assessDate}, ${existingPayload.assessTime}). Ask our team if you need to change it!`,
+    }
+  }
+  if (fields.openHouse && existingPayload.openHouse === 'yes') {
+    return {
+      conflict: 'openHouse',
+      existing: existingPayload,
+      message: `Good news — that email is already on the open house list! See you July 30. 🎉`,
+    }
+  }
+
+  const merged = mergeSignup({ ...existingPayload, email }, fields)
+  const data = { recordId, payload: merged }
+  if (existing) await pb().collection('boothSignups').update(existing.id, data)
+  else          await pb().collection('boothSignups').create(data)
+
+  const rows = await pb().collection('boothSignups').getFullList({ batch: 500 })
+  return { ok: true, entry: merged, count: rows.length }
+}
+
+export async function deleteBoothSignup(email) {
+  await ensureAuth()
+  const recordId = String(email || '').toLowerCase().trim()
+  if (!recordId) return
+  try {
+    const row = await pb().collection('boothSignups')
+      .getFirstListItem(`recordId="${recordId.replace(/"/g, '\\"')}"`)
+    await pb().collection('boothSignups').delete(row.id)
+  } catch (err) {
+    if (err?.status !== 404) throw err
+  }
+}
+
 // ---- forms (definitions) --------------------------------
 export async function loadForms() {
   const rows = await getFullList('forms')
