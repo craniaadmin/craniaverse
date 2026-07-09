@@ -108,7 +108,7 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
-                <button className="icon-btn" title={copied === f.id ? 'Copied!' : 'Copy public link'} onClick={() => copy(f.id)}>
+                <button className="icon-btn" title={copied === f.id ? 'Copied!' : 'Copy public link'} onClick={() => copy(publicUrl(f.id), f.id)}>
                   <Copy size={16} />
                 </button>
                 <button className="icon-btn" title="Open public form" onClick={() => window.open(publicUrl(f.id), '_blank')}>
