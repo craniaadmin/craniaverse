@@ -534,6 +534,36 @@ app.delete('/api/inventory/:id', wrap(async (req, res) => {
   res.json({ deleted: items.length - next.length })
 }))
 
+// ---- booth signups (Crania Schools booth kiosk) --------
+// Public POST: upsert-by-email so a family can submit multiple
+// forms (assessment, open house, agenda order) under the same email.
+// Admin GET: list all sign-ups (used by the Forms page).
+app.post('/api/booth-signup', wrap(async (req, res) => {
+  const body = req.body || {}
+  const email = String(body.email || '').toLowerCase().trim()
+  if (!email) return res.status(400).json({ error: 'email is required' })
+  try {
+    const result = await upsertBoothSignup(body)
+    if (result.conflict) return res.status(409).json(result)
+    res.json({ ok: true, count: result.count })
+  } catch (err) {
+    console.error('[booth-signup]', err)
+    res.status(500).json({ error: err?.message || 'save failed' })
+  }
+}))
+
+app.get('/api/booth-signup', wrap(async (_req, res) => {
+  const list = await loadBoothSignups()
+  // Newest first
+  list.sort((a, b) => (b.when || '').localeCompare(a.when || ''))
+  res.json(list)
+}))
+
+app.delete('/api/booth-signup/:email', wrap(async (req, res) => {
+  await deleteBoothSignup(req.params.email)
+  res.json({ ok: true })
+}))
+
 // ---- fee schedule PDF + email ---------------------------
 // The client posts the fully-computed schedule (timeline + numbers)
 // and we render it to a PDF via pdfkit. Two endpoints share the
