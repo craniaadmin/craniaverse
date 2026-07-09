@@ -24,8 +24,32 @@ import { StoreProvider } from './data/store'
 
 export default function App() {
   const [authed, setAuthed] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
   const [page, setPage] = useState('Dashboard')
 
+  // On mount, ask the server whether an existing session cookie is
+  // still valid. If yes, skip the login screen; if no, show it.
+  useEffect(() => {
+    fetch(`${API_BASE}/api/me`, { credentials: 'include' })
+      .then(r => setAuthed(r.ok))
+      .catch(() => setAuthed(false))
+      .finally(() => setCheckingAuth(false))
+  }, [])
+
+  const logout = async () => {
+    try {
+      await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' })
+    } catch (err) { console.error(err) }
+    setAuthed(false)
+  }
+
+  if (checkingAuth) {
+    return (
+      <div style={{ display: 'grid', placeItems: 'center', height: '100vh', color: '#5a6470' }}>
+        Loading…
+      </div>
+    )
+  }
   if (!authed) return <Login onSignIn={() => { setAuthed(true); setPage('Dashboard') }} />
 
   const render = () => {
