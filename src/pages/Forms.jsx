@@ -722,6 +722,9 @@ export default function Forms() {
     if (!f) { setView({ mode: 'list' }); return null }
     return <SubmissionsView form={f} onBack={() => setView({ mode: 'list' })} />
   }
+  if (view.mode === 'booth') {
+    return <BoothSignupsView onBack={() => setView({ mode: 'list' })} />
+  }
 
   return (
     <FormsList
@@ -731,6 +734,8 @@ export default function Forms() {
       onDelete={deleteForm}
       onNew={() => setView({ mode: 'new' })}
       publicUrl={publicUrl}
+      boothUrl={boothUrl}
+      onOpenBooth={() => setView({ mode: 'booth' })}
     />
   )
 }
