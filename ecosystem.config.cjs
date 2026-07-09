@@ -54,25 +54,41 @@ module.exports = {
       max_memory_restart: '1G',
     },
     {
-      name: 'craniaverse-tunnel',
+      // Admin tunnel — serves the CraniaVerse React admin.
       // ngrok was installed as the Microsoft Store / MSIX package, which lives at
       // C:\Users\<user>\AppData\Local\Microsoft\WindowsApps\ngrok.exe as a shell
       // reparse point — not a real PE binary, so PM2 can't CreateProcess it
       // directly. Wrap with cmd.exe, which knows how to resolve execution aliases.
+      //
+      // We deliberately use ONE domain per tunnel: `ngrok http` in v3 doesn't
+      // reliably bind multiple --url flags on a single tunnel (only the first
+      // binds, the rest stay offline). Add another PM2 entry per additional
+      // hostname — both tunnels forward to the same local port 4000, so the
+      // same Express app answers both. Host-based routing inside server.js
+      // (SIGNUP_HOSTS) decides what each hostname gets to see.
+      name: 'craniaverse-tunnel',
       script: 'cmd.exe',
       // --log=stdout switches ngrok off the interactive TUI dashboard and into
       // a daemon mode that writes structured logs to stdout. Without it, ngrok
       // tries to render the dashboard, fails (no TTY under PM2), and exits.
-      //
-      // Multiple domains: one tunnel can front several hostnames — repeat the
-      // --url flag. Example (uncomment after claiming crania-signup.ngrok.app
-      // in the ngrok dashboard and setting SIGNUP_HOSTS in server/.env):
-      //   --url=craniaverse.ngrok.app --url=crania-signup.ngrok.app
-      // Traffic hits the same Express app; the host-guard in server.js sends
-      // sign-up-host requests only to the public kiosk.
       args: '/c ngrok http 4000 --url=craniaverse.ngrok.app --log=stdout --log-format=logfmt --log-level=info',
       autorestart: true,
       // Throttle restarts if ngrok keeps dying (e.g. account auth issue)
+      min_uptime: 10000,
+      max_restarts: 10,
+    },
+    {
+      // Public sign-up tunnel — serves the booth kiosk on a separate
+      // hostname. The host-guard in server.js sends this hostname only
+      // to the sign-up form + POST /api/booth-signup; everything else
+      // 404s so the admin UI is invisible from this domain.
+      //
+      // Set SIGNUP_HOSTS=crania-signup.ngrok.app in server/.env so
+      // the guard knows to apply to this hostname.
+      name: 'craniaverse-signup-tunnel',
+      script: 'cmd.exe',
+      args: '/c ngrok http 4000 --url=crania-signup.ngrok.app --log=stdout --log-format=logfmt --log-level=info',
+      autorestart: true,
       min_uptime: 10000,
       max_restarts: 10,
     },
