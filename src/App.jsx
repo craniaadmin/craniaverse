@@ -77,7 +77,7 @@ export default function App() {
   return (
     <StoreProvider>
       <div className="app">
-        <TopNav current={page} onNavigate={setPage} onLogout={() => setAuthed(false)} />
+        <TopNav current={page} onNavigate={setPage} onLogout={logout} />
         {render()}
       </div>
     </StoreProvider>
