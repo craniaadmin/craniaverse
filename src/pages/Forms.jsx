@@ -652,6 +652,7 @@ export default function Forms() {
     const form = forms.find(f => f.id === formOrId)
     return `${origin}/form/${(form && form.slug) || formOrId}`
   }
+  const boothUrl = `${API_BASE || window.location.origin}/booth-signup`
 
   const createForm = async (draft) => {
     const res = await fetch(`${API_BASE}/api/forms`, {
