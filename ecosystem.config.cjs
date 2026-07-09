@@ -63,6 +63,13 @@ module.exports = {
       // --log=stdout switches ngrok off the interactive TUI dashboard and into
       // a daemon mode that writes structured logs to stdout. Without it, ngrok
       // tries to render the dashboard, fails (no TTY under PM2), and exits.
+      //
+      // Multiple domains: one tunnel can front several hostnames — repeat the
+      // --url flag. Example (uncomment after claiming crania-signup.ngrok.app
+      // in the ngrok dashboard and setting SIGNUP_HOSTS in server/.env):
+      //   --url=craniaverse.ngrok.app --url=crania-signup.ngrok.app
+      // Traffic hits the same Express app; the host-guard in server.js sends
+      // sign-up-host requests only to the public kiosk.
       args: '/c ngrok http 4000 --url=craniaverse.ngrok.app --log=stdout --log-format=logfmt --log-level=info',
       autorestart: true,
       // Throttle restarts if ngrok keeps dying (e.g. account auth issue)
