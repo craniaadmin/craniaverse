@@ -23,6 +23,13 @@ import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { sendRegistrationEmails, sendBoothSignupEmail } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
 import {
+  authRequired,
+  checkPassword,
+  makeSessionCookie,
+  clearSessionCookie,
+  readSession,
+} from './auth.js'
+import {
   loadRegistrations, saveRegistrations,
   loadStaff,         saveStaff,
   loadPrograms,      savePrograms,
