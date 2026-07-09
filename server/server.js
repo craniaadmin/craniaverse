@@ -194,8 +194,35 @@ async function seedIfEmpty() {
 
 // ---- app ---------------------------------------------------
 const app = express()
-app.use(cors())
+// CORS with credentials on so the browser sends the session cookie
+// even when the admin runs on a different origin during dev.
+app.use(cors({
+  credentials: true,
+  origin: (origin, cb) => cb(null, true), // reflect any origin — we're behind ngrok in prod
+}))
 app.use(express.json({ limit: '1mb' }))
+
+// ---- auth: login / logout / me + gate all admin API ---------
+// Public HTML routes (/register, /form/:id, /sign-up, ...) and the
+// public /api/* subset are allowlisted inside auth.js. Everything
+// else under /api/ requires a valid session cookie.
+app.post('/api/login', (req, res) => {
+  const { password } = req.body || {}
+  if (!checkPassword(password)) return res.status(401).json({ error: 'Wrong password' })
+  res.setHeader('Set-Cookie', makeSessionCookie())
+  res.json({ ok: true })
+})
+app.post('/api/logout', (_req, res) => {
+  res.setHeader('Set-Cookie', clearSessionCookie())
+  res.json({ ok: true })
+})
+app.get('/api/me', (req, res) => {
+  const session = readSession(req)
+  if (!session) return res.status(401).json({ authed: false })
+  res.json({ authed: true })
+})
+
+app.use(authRequired)
 
 const ALLOWED_FRAME_ANCESTORS = process.env.ALLOWED_FRAME_ANCESTORS
   || "'self' https://crania-schools.com https://www.crania-schools.com"
