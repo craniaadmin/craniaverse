@@ -214,11 +214,14 @@ app.get('/staff-form', (_req, res) => res.sendFile(STAFF_FORM_FILE))
 const CUSTOM_FORM_FILE = path.join(__dirname, '..', 'public', 'form.html')
 app.get('/form/:id', (_req, res) => res.sendFile(CUSTOM_FORM_FILE))
 
+const BOOTH_SIGNUP_FILE = path.join(__dirname, '..', 'public', 'booth-signup.html')
+app.get('/booth-signup', (_req, res) => res.sendFile(BOOTH_SIGNUP_FILE))
+
 // Production: serve built React admin from /dist
 const DIST_DIR = path.join(__dirname, '..', 'dist')
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR))
-  app.get(/^\/(?!api|register|staff-form|form\/).*/, (_req, res) => {
+  app.get(/^\/(?!api|register|staff-form|form\/|booth-signup).*/, (_req, res) => {
     res.sendFile(path.join(DIST_DIR, 'index.html'))
   })
 }
