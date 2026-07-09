@@ -239,6 +239,34 @@ app.use((req, res, next) => {
   next()
 })
 
+// ---- host guard for the public sign-up subdomain -----------
+// SIGNUP_HOSTS is a comma-separated list of hostnames that should
+// only serve the sign-up form and its POST endpoint — every other
+// URL 404s so nothing about the admin app leaks. Configure via
+// server/.env:
+//   SIGNUP_HOSTS=crania-signup.ngrok.app,sign-up.crania-schools.com
+// Requests on any other host are unaffected.
+const SIGNUP_HOSTS = new Set(
+  String(process.env.SIGNUP_HOSTS || '')
+    .split(',').map(s => s.trim().toLowerCase()).filter(Boolean),
+)
+const BOOTH_SIGNUP_FILE_PATH = path.join(__dirname, '..', 'public', 'booth-signup.html')
+app.use((req, res, next) => {
+  if (SIGNUP_HOSTS.size === 0) return next()
+  const host = String(req.hostname || '').toLowerCase()
+  if (!SIGNUP_HOSTS.has(host)) return next()
+
+  // On the sign-up host: only serve the kiosk and let its POST
+  // submission through. Everything else — the SPA, admin API,
+  // login, PDFs, submissions viewer — is 404.
+  if (req.method === 'GET' && (req.path === '/' || req.path === '/sign-up' || req.path === '/booth-signup')) {
+    return res.sendFile(BOOTH_SIGNUP_FILE_PATH)
+  }
+  if (req.method === 'POST' && req.path === '/api/booth-signup') return next()
+  if (req.method === 'GET' && req.path === '/api/health') return next()
+  return res.status(404).send('Not found')
+})
+
 // Wrap an async route handler so unhandled rejections become a 500
 // instead of crashing the process.
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
