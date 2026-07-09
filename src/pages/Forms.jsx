@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, X, Edit2, Copy, Eye, ExternalLink, ChevronLeft, Trash2, GripVertical } from 'lucide-react'
+import { Plus, X, Edit2, Copy, Eye, ExternalLink, ChevronLeft, Trash2, GripVertical, Star, Download, RefreshCw } from 'lucide-react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
