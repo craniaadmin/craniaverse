@@ -457,6 +457,180 @@ const fmtDate = (iso) => {
 }
 
 // ------------------------------ MAIN ------------------------------
+// ------------------------------ BOOTH SIGN-UPS VIEW ------------------------------
+function BoothSignupsView({ onBack }) {
+  const [list, setList] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  const refresh = () => {
+    setLoading(true)
+    fetch(`${API_BASE}/api/booth-signup`)
+      .then(r => r.json())
+      .then(d => setList(Array.isArray(d) ? d : []))
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false))
+  }
+  useEffect(() => { refresh() }, [])
+
+  const deleteRow = async (email) => {
+    if (!confirm(`Delete sign-up for ${email}?`)) return
+    try {
+      await fetch(`${API_BASE}/api/booth-signup/${encodeURIComponent(email)}`, { method: 'DELETE' })
+      setList(prev => prev.filter(e => e.email !== email))
+    } catch (err) { console.error(err) }
+  }
+
+  // Rollups matching the HTML staff panel.
+  const assessBySlot = {}
+  let ohCount = 0, agOrders = 0, agReg = 0, agIsl = 0, agRev = 0
+  list.forEach(e => {
+    if (e.assessDate) {
+      const k = `${e.assessDate} • ${e.assessTime || ''}`
+      assessBySlot[k] = (assessBySlot[k] || 0) + 1
+    }
+    if (e.openHouse === 'yes') ohCount++
+    if ((e.agReg || 0) + (e.agIsl || 0) > 0) {
+      agOrders++
+      agReg += Number(e.agReg || 0)
+      agIsl += Number(e.agIsl || 0)
+      agRev += Number(e.agTotal || 0)
+    }
+  })
+  const slotKeys = Object.keys(assessBySlot).sort()
+
+  const downloadCsv = () => {
+    const rows = [[
+      'Name', 'Email', 'Phone', 'Child name', 'Child grade',
+      'Open house RSVP (Jul 30)', 'Assessment date', 'Assessment time',
+      'Agenda regular qty', 'Agenda islamic qty', 'Agenda shipping', 'Agenda shipping address', 'Agenda total ($)',
+      'Email consent', 'Signed up at',
+    ]]
+    list.forEach(e => rows.push([
+      e.name, e.email, e.phone, e.child || '', e.grade || '',
+      e.openHouse || '', e.assessDate || '', e.assessTime || '',
+      e.agReg || 0, e.agIsl || 0, e.agShip || '', e.agAddr || '', e.agTotal || 0,
+      e.consent || '', e.when || '',
+    ]))
+    const csv = rows.map(r => r.map(c => `"${String(c == null ? '' : c).replace(/"/g, '""')}"`).join(',')).join('\r\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `booth-signups-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a); a.click(); a.remove()
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+  }
+
+  const copyEmails = async () => {
+    try { await navigator.clipboard.writeText(list.map(e => e.email).join(', ')) }
+    catch { /* clipboard blocked */ }
+  }
+
+  return (
+    <div className="page">
+      <div className="page-head" style={{ alignItems: 'center' }}>
+        <button className="icon-btn" onClick={onBack} title="Back">
+          <ChevronLeft size={20} />
+        </button>
+        <h2 className="page-title" style={{ marginLeft: 4 }}>Booth Sign-Ups</h2>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+          <button className="btn ghost" onClick={refresh} title="Refresh">
+            <RefreshCw size={14} style={{ marginRight: 4 }} /> Refresh
+          </button>
+          <button className="btn ghost" onClick={copyEmails} disabled={list.length === 0}>
+            Copy emails
+          </button>
+          <button className="btn" onClick={downloadCsv} disabled={list.length === 0}>
+            <Download size={14} style={{ marginRight: 4 }} /> CSV
+          </button>
+        </div>
+      </div>
+
+      {/* Rollups */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
+        {[
+          { label: 'Total sign-ups', value: list.length },
+          { label: 'Open House RSVPs', value: ohCount },
+          { label: 'Agenda orders', value: `${agOrders} · $${agRev}` },
+        ].map(({ label, value }) => (
+          <div key={label} style={{
+            background: '#fff', border: '1px solid var(--line)', borderRadius: 10,
+            padding: '14px 16px', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 6 }}>{label}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--ink)' }}>{value}</div>
+          </div>
+        ))}
+      </div>
+
+      {slotKeys.length > 0 && (
+        <div style={{
+          background: '#fff', border: '1px solid var(--line)', borderRadius: 10,
+          padding: '12px 16px', marginBottom: 16, fontSize: 13, color: 'var(--ink-soft)',
+        }}>
+          <div style={{ fontWeight: 700, marginBottom: 6, color: 'var(--ink)' }}>Assessment bookings by slot</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 8 }}>
+            {slotKeys.map(k => (
+              <div key={k} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>{k}</span>
+                <b style={{ color: '#5FA09E' }}>{assessBySlot[k]}</b>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {loading ? (
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
+      ) : list.length === 0 ? (
+        <div style={{
+          background: '#fff', border: '1px solid var(--line)', borderRadius: 12,
+          padding: '60px 20px', textAlign: 'center', color: 'var(--muted)',
+        }}>
+          <div style={{ fontSize: 15, marginBottom: 6 }}>No sign-ups yet.</div>
+          <div style={{ fontSize: 13 }}>Share the public link to start collecting.</div>
+        </div>
+      ) : (
+        <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, overflow: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: '#f5f7f8', borderBottom: '1px solid var(--line)' }}>
+                {['Name', 'Email', 'Phone', 'Child · Grade', 'Assessment', 'OH', 'Agenda', ''].map(h => (
+                  <th key={h} style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink-soft)', fontSize: 12, textTransform: 'uppercase', letterSpacing: '.4px' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((e, i) => {
+                const agSum = (e.agReg || 0) + (e.agIsl || 0)
+                return (
+                  <tr key={e.email || i} style={{ borderBottom: '1px solid var(--line)' }}>
+                    <td style={{ padding: '10px 12px' }}>{e.name || '—'}</td>
+                    <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontSize: 12 }}>{e.email || '—'}</td>
+                    <td style={{ padding: '10px 12px' }}>{e.phone || '—'}</td>
+                    <td style={{ padding: '10px 12px' }}>{e.child ? `${e.child} · ${e.grade || '—'}` : (e.grade || '—')}</td>
+                    <td style={{ padding: '10px 12px' }}>
+                      {e.assessDate ? `${String(e.assessDate).replace('July', 'Jul')} ${e.assessTime || ''}` : '—'}
+                    </td>
+                    <td style={{ padding: '10px 12px' }}>{e.openHouse === 'yes' ? '✓' : '—'}</td>
+                    <td style={{ padding: '10px 12px' }}>
+                      {agSum > 0 ? `${e.agReg || 0}R / ${e.agIsl || 0}I · $${e.agTotal || 0}` : '—'}
+                    </td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                      <button className="icon-btn" title="Delete" onClick={() => deleteRow(e.email)}>
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Forms() {
   const [forms, setForms] = useState([])
   const [loading, setLoading] = useState(true)
