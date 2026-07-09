@@ -388,6 +388,108 @@ function buildInternalEmail(payload, records) {
   }
 }
 
+// ---- booth signup notifier ---------------------------------
+// Fires after each POST /api/booth-signup. Sends a single email to
+// events@ with the full merged record plus a header identifying which
+// of the three forms triggered this submission.
+const BOOTH_RECIPIENT = 'events@crania-schools.com'
+
+const KIND_META = {
+  assessment: { emoji: '📝', label: 'Free Assessment', color: '#5FA09E' },
+  openHouse:  { emoji: '🏫', label: 'Open House RSVP',  color: '#5FA09E' },
+  agenda:     { emoji: '📓', label: 'Agenda Order',      color: '#5FA09E' },
+}
+
+const SHIP_LABEL = {
+  pickup:   'Pick up at the Open House — Jul 30 (Boardwalk)',
+  waterloo: 'Delivery — Waterloo Region (+$5)',
+  ontario:  'Delivery — within Ontario (+$10)',
+}
+
+const esc = (s) => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+function boothRow(label, value) {
+  if (value == null || value === '') return ''
+  return `<tr>
+    <td style="padding:6px 12px;color:#5a6470;font-size:13px;width:180px;">${esc(label)}</td>
+    <td style="padding:6px 12px;color:#1f2733;font-size:14px;font-weight:600;">${esc(value)}</td>
+  </tr>`
+}
+
+function buildBoothSignupEmail(payload, kind) {
+  const meta = KIND_META[kind] || { emoji: '📩', label: 'Booth Sign-Up', color: '#5FA09E' }
+  const name = payload.name || 'Sign-up'
+  const rows = []
+
+  rows.push(boothRow('Name',  payload.name))
+  rows.push(boothRow('Email', payload.email))
+  rows.push(boothRow('Phone', payload.phone))
+  if (payload.child) rows.push(boothRow("Child's name", payload.child))
+  if (payload.grade) rows.push(boothRow("Child's grade (Sept 2026)", payload.grade))
+
+  if (kind === 'assessment') {
+    rows.push(boothRow('Assessment date', payload.assessDate))
+    rows.push(boothRow('Assessment time', payload.assessTime))
+  }
+  if (kind === 'openHouse') {
+    rows.push(boothRow('Open House RSVP', 'Yes — Thu, July 30 (3–6 pm)'))
+  }
+  if (kind === 'agenda') {
+    const qtyLine = [
+      Number(payload.agReg) ? `${payload.agReg} × Regular` : null,
+      Number(payload.agIsl) ? `${payload.agIsl} × Islamic` : null,
+    ].filter(Boolean).join(' + ')
+    rows.push(boothRow('Agendas ordered', qtyLine))
+    rows.push(boothRow('Delivery', SHIP_LABEL[payload.agShip] || payload.agShip))
+    if (payload.agAddr) rows.push(boothRow('Shipping address', payload.agAddr))
+    rows.push(boothRow('Total (no tax)', `$${payload.agTotal || 0}`))
+  }
+
+  rows.push(boothRow('Email consent', payload.consent === 'yes' ? 'Yes' : 'No'))
+  rows.push(boothRow('Submitted at', payload.updatedAt || payload.when))
+
+  const html = `
+    <div style="font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:#1f2733;line-height:1.5;max-width:640px;margin:0 auto;padding:20px;background:#f4f7f8;">
+      <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(20,30,45,.08);">
+        <div style="background:${meta.color};color:#fff;padding:18px 22px;">
+          <div style="font-size:13px;letter-spacing:1px;text-transform:uppercase;opacity:.85;">New Booth Sign-Up</div>
+          <div style="font-size:22px;font-weight:700;margin-top:4px;">${meta.emoji}&nbsp; ${esc(meta.label)}</div>
+        </div>
+        <div style="padding:20px 22px;">
+          <div style="font-size:16px;font-weight:700;margin-bottom:12px;">${esc(name)}</div>
+          <table style="width:100%;border-collapse:collapse;">
+            ${rows.join('')}
+          </table>
+        </div>
+        <div style="padding:14px 22px;background:#fafbfc;border-top:1px solid #eef1f3;font-size:12px;color:#5a6470;">
+          Sent automatically from the CraniaVerse booth sign-up (craniaverse.ngrok.app/sign-up).
+        </div>
+      </div>
+    </div>`
+
+  return {
+    from: SENDER,
+    to: BOOTH_RECIPIENT,
+    subject: `[Booth] ${meta.label} — ${name}`,
+    html,
+  }
+}
+
+export async function sendBoothSignupEmail(payload, kind) {
+  if (!ensureSgConfigured()) {
+    console.warn('[booth-email] SENDGRID_API_KEY not set — skipping')
+    return { skipped: true }
+  }
+  try {
+    await sgMail.send(buildBoothSignupEmail(payload, kind))
+    return { ok: true }
+  } catch (err) {
+    console.error('[booth-email] send failed', err?.response?.body || err?.message || err)
+    return { error: err?.message || 'send failed' }
+  }
+}
+
 // ---- entry point -------------------------------------------
 export async function sendRegistrationEmails(payloadOrForm, recordsOrRecord) {
   if (!ensureSgConfigured()) {
