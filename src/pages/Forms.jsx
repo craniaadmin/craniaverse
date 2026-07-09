@@ -128,8 +128,9 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
               </div>
             </div>
           ))}
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </div>
   )
 }
