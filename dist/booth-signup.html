@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Crania Schools — Booth Sign-Up</title>
+<style>
+  :root{ --lb:#A6E2F9; --db:#5FA09E; --lbr:#E0DE85; --dbr:#2E2516; --teal:#1d7d79; }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{ font-family:'Poppins','Segoe UI',sans-serif; background:var(--lb); color:var(--dbr);
+        display:flex; flex-direction:column; align-items:center; overflow-x:hidden; }
+  .bg1,.bg2{ position:fixed; border-radius:50%; background:#bdeafc; z-index:0; }
+  .bg1{ width:60vmax; height:60vmax; top:-25vmax; right:-20vmax; }
+  .bg2{ width:45vmax; height:45vmax; bottom:-20vmax; left:-15vmax; }
+
+  .wrap{ position:relative; z-index:1; width:100%; max-width:640px; padding:28px 22px 40px; display:none; }
+  header{ text-align:center; margin-bottom:18px; }
+  .brand{ font-weight:700; letter-spacing:4px; color:var(--teal); font-size:20px; user-select:none; }
+  h1{ font-size:30px; line-height:1.2; margin-top:10px; }
+  .when{ display:inline-block; margin-top:10px; background:var(--dbr); color:var(--lbr); font-weight:700;
+         padding:8px 18px; border-radius:100px; font-size:15px; }
+  .sub{ margin-top:10px; font-size:15px; color:#1f5a58; font-weight:700;}
+
+  /* home menu */
+  .menu{ display:flex; flex-direction:column; gap:18px; margin-top:6px; }
+  .menu button{ font-family:inherit; text-align:left; background:#fff; border:none; border-radius:22px;
+      padding:26px 22px; cursor:pointer; box-shadow:0 10px 30px rgba(46,37,22,.12); color:var(--dbr);
+      display:flex; gap:16px; align-items:center; }
+  .menu button:active{ transform:scale(.99); }
+  .menu .ico{ font-size:40px; flex:0 0 auto; }
+  .menu .t{ font-size:21px; font-weight:700; line-height:1.25; }
+  .menu .go{ margin-left:auto; font-size:26px; color:var(--db); font-weight:700; }
+
+  form,.card{ background:#fff; border-radius:22px; padding:24px 22px; box-shadow:0 10px 30px rgba(46,37,22,.12); }
+  .pagehead{ text-align:center; margin-bottom:16px; }
+  .pagehead h1{ font-size:26px; }
+  .backlink{ display:block; width:fit-content; margin:0 0 14px; background:#fff; color:var(--teal);
+             font-weight:700; font-size:19px; cursor:pointer; border:3px solid var(--db);
+             border-radius:100px; padding:12px 26px; box-shadow:0 6px 18px rgba(46,37,22,.12);
+             user-select:none; }
+  .backlink:active{ background:var(--db); color:#fff; }
+  label{ display:block; font-weight:700; font-size:15px; margin:16px 0 6px; }
+  label .opt{ font-weight:400; color:#8a8a8a; font-size:13px; }
+  input[type=text],input[type=email],input[type=tel],select,textarea{
+    width:100%; font-family:inherit; font-size:18px; padding:14px 14px; border:2.5px solid var(--db);
+    border-radius:12px; background:#F4FBFE; color:var(--dbr); outline:none; }
+  textarea{ resize:vertical; min-height:70px; }
+  input:focus,select:focus,textarea:focus{ border-color:var(--teal); background:#fff; }
+  .row{ display:flex; gap:12px; } .row>div{ flex:1; }
+
+  .slotbox{ margin-top:16px; padding:16px; background:#FCFBEF; border:2px solid var(--lbr); border-radius:14px; }
+  .slotbox > b{ font-size:15px; }
+  .dates{ display:flex; gap:8px; margin-top:8px; }
+  .dates label{ flex:1; margin:0; display:flex; gap:7px; align-items:center; background:#fff;
+                border:2.5px solid var(--db); border-radius:12px; padding:12px 8px; font-size:13.5px; cursor:pointer; }
+  .dates input{ width:20px; height:20px; accent-color:var(--db); flex:0 0 auto; }
+  .slotbox .slot-label{ margin-top:14px; }
+  .slothint{ font-size:12px; color:#777; margin-top:6px; }
+  .eventbox{ margin:14px 0 6px; }
+  .ev-when{ background:var(--dbr); color:var(--lbr); font-weight:700; font-size:19px; border-radius:12px; padding:13px 16px; text-align:center; }
+  .ev-where{ margin-top:8px; background:#FCFBEF; border:2px solid var(--lbr); color:var(--dbr); font-weight:700; font-size:16px; border-radius:12px; padding:13px 16px; line-height:1.45; text-align:center; }
+
+  .edrow{ display:flex; align-items:center; gap:12px; margin-top:12px; background:#F4FBFE;
+          border:2px solid var(--lb); border-radius:14px; padding:14px; }
+  .edrow .info{ flex:1; }
+  .edrow .info b{ font-size:16px; }
+  .edrow .info span{ display:block; font-size:13px; color:#666; margin-top:2px; }
+  .qty{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+  .qty button{ width:44px; height:44px; border-radius:50%; border:none; background:var(--db); color:#fff;
+               font-size:26px; font-weight:700; line-height:1; cursor:pointer; }
+  .qty button:active{ background:var(--teal); }
+  .qty .n{ min-width:30px; text-align:center; font-size:22px; font-weight:700; }
+
+  .ship label{ display:flex; gap:10px; align-items:center; margin:10px 0 0; background:#fff;
+               border:2.5px solid var(--db); border-radius:12px; padding:14px; font-size:15px; cursor:pointer; font-weight:400; }
+  .ship label b{ font-weight:700; }
+  .ship input{ width:22px; height:22px; accent-color:var(--db); flex:0 0 auto; }
+  .ship .shipinfo{ flex:1; }
+  .ship .shiploc{ display:block; font-size:13px; color:#666; font-weight:400; margin-top:3px; line-height:1.35; }
+  .ship .cost{ font-weight:700; color:var(--teal); flex:0 0 auto; }
+
+  .total{ margin-top:18px; background:var(--dbr); color:#fff; border-radius:14px; padding:16px 18px;
+          display:flex; justify-content:space-between; align-items:center; font-size:18px; font-weight:700; }
+  .total .amt{ color:var(--lbr); font-size:26px; }
+
+  .consent{ display:flex; gap:12px; align-items:flex-start; margin-top:18px; background:#FCFBEF;
+            border:2px solid var(--lbr); border-radius:14px; padding:14px; }
+  .consent input{ width:26px; height:26px; margin-top:2px; flex:0 0 auto; accent-color:var(--db); }
+  .consent span{ font-size:13px; line-height:1.5; }
+  .err{ display:none; margin-top:14px; background:#fde8e8; color:#9b2c2c; border-radius:12px;
+        padding:12px 14px; font-size:14px; font-weight:700; }
+  button.primary{ width:100%; margin-top:20px; font-family:inherit; font-size:22px; font-weight:700; color:#fff;
+    background:var(--db); border:none; border-radius:100px; padding:18px; cursor:pointer; }
+  button.primary:active{ background:var(--teal); }
+  button.primary[disabled]{ opacity:.55; cursor:default; }
+
+  #thanks{ text-align:center; }
+  #thanks .card{ padding:44px 26px; }
+  #thanks .big{ font-size:64px; }
+  #thanks h2{ font-size:28px; margin-top:10px; }
+  #thanks p{ margin-top:12px; font-size:16px; line-height:1.5; }
+  #thanks button{ margin-top:26px; width:auto; padding:16px 44px; }
+  .count-pill{ margin-top:16px; display:inline-block; background:var(--lbr); color:var(--dbr);
+               font-weight:700; border-radius:100px; padding:6px 16px; font-size:14px; }
+
+  footer{ position:relative; z-index:1; margin-top:auto; padding:14px; font-size:12px; color:#4c7f7d;
+          text-align:center; width:100%; }
+  #staffLink{ text-decoration:underline; cursor:pointer; }
+
+  #staff .card{ margin-top:8px; }
+  #staff h2{ font-size:22px; color:var(--teal); }
+  .stat{ font-size:44px; font-weight:700; margin:8px 0 2px; }
+  .slots{ margin-top:14px; background:#F4FBFE; border-radius:12px; padding:12px 14px; font-size:13.5px; line-height:1.7; }
+  .slots b{ color:var(--teal); }
+  .staff-btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .staff-btns button{ font-family:inherit; font-weight:700; font-size:15px; padding:12px 18px; border-radius:100px;
+      border:2.5px solid var(--db); background:#fff; color:var(--teal); cursor:pointer; }
+  .staff-btns button.solid{ background:var(--db); color:#fff; }
+  #entries{ margin-top:16px; max-height:34vh; overflow:auto; border:1.5px solid #e3e3e3; border-radius:12px; }
+  #entries table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  #entries th,#entries td{ text-align:left; padding:8px 10px; border-bottom:1px solid #eee; }
+  #entries th{ background:#F4FBFE; position:sticky; top:0; }
+  .pinrow{ display:flex; gap:10px; margin-top:14px; }
+  .pinrow input{ flex:1; }
+  .note{ margin-top:14px; font-size:12.5px; color:#666; line-height:1.5; }
+  .hidden{ display:none !important; }
+</style>
+</head>
+<body>
+<div class="bg1"></div><div class="bg2"></div>
+
+<!-- HOME -->
+<div class="wrap" id="home">
+  <header>
+    <div class="brand" id="logoTap">CRANIA SCHOOLS</div>
+    <h1>Hi there! 👋</h1>
+    <div class="when">🎁 Sign up here!</div>
+    <div class="sub">What would you like to do?</div>
+  </header>
+  <div class="menu">
+    <button id="goAssess">
+      <span class="ico">📝</span>
+      <span class="t">Book a FREE assessment</span>
+      <span class="go">›</span>
+    </button>
+    <button id="goOh">
+      <span class="ico">🏫</span>
+      <span class="t">RSVP — Day School Open House<br>(get a FREE gift! 🎁)</span>
+      <span class="go">›</span>
+    </button>
+    <button id="goAgenda">
+      <span class="ico">📓</span>
+      <span class="t">Order 2026–27 school agendas</span>
+      <span class="go">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- ASSESSMENT PAGE -->
+<div class="wrap" id="assessPage">
+  <div class="pagehead">
+    <span class="backlink" data-back>‹ Back</span>
+    <h1>📝 Free Assessment</h1>
+    <div class="eventbox">
+      <div class="ev-when">📅 July 14–17 • from 2 pm</div>
+      <div class="ev-where">📍 The Boardwalk<br>245 The Boardwalk, Suite 301, Waterloo</div>
+    </div>
+    <div class="sub">60-minute appointment • limited spots!</div>
+  </div>
+  <form id="formA" autocomplete="off">
+    <label for="nameA">Parent / guardian name</label>
+    <input type="text" id="nameA" placeholder="e.g. Jordan Smith">
+    <label for="phoneA">Phone <span class="opt">(e.g. 519-555-1234)</span></label>
+    <input type="tel" id="phoneA" inputmode="tel">
+    <label for="emailA">Email address</label>
+    <input type="email" id="emailA" placeholder="you@example.com" inputmode="email" autocapitalize="off">
+    <div class="row">
+      <div>
+        <label for="childA">Child's name</label>
+        <input type="text" id="childA" placeholder="e.g. Sara Smith">
+      </div>
+      <div>
+        <label for="gradeA">Child's grade in Sept 2026</label>
+        <select id="gradeA">
+          <option value="" selected disabled>Choose…</option>
+          <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option>
+          <option>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option>
+          <option>Grade 9</option><option>Grade 10</option>
+        </select>
+      </div>
+    </div>
+    <div class="slotbox">
+      <b>Pick a date:</b>
+      <div class="dates">
+        <label><input type="radio" name="adate" value="Tue, July 14"> Tue<br>Jul 14</label>
+        <label><input type="radio" name="adate" value="Wed, July 15"> Wed<br>Jul 15</label>
+        <label><input type="radio" name="adate" value="Thu, July 16"> Thu<br>Jul 16</label>
+        <label><input type="radio" name="adate" value="Fri, July 17"> Fri<br>Jul 17</label>
+      </div>
+      <label class="slot-label" for="aslot">Pick a time:</label>
+      <select id="aslot">
+        <option value="" selected disabled>Choose a time…</option>
+      </select>
+      <div class="slothint">60-minute appointments, starting every 30 minutes (2:00–6:00 pm).</div>
+    </div>
+    <div class="consent">
+      <input type="checkbox" id="consentA">
+      <span><b>I'd like to receive emails from Crania Schools</b> about my booking and its programs. You can unsubscribe anytime. Crania Schools, 245 The Boardwalk Suite 301 &amp; 370 University Ave E Unit 205, Waterloo, ON • boardwalk@crania-schools.com • 519-781-8810</span>
+    </div>
+    <div class="err" id="errA"></div>
+    <button type="submit" class="primary" id="submitA">Book my spot! 🎉</button>
+  </form>
+</div>
+
+<!-- OPEN HOUSE PAGE -->
+<div class="wrap" id="ohPage">
+  <div class="pagehead">
+    <span class="backlink" data-back>‹ Back</span>
+    <h1>🏫 Open House RSVP</h1>
+    <div class="eventbox">
+      <div class="ev-when">📅 Thursday, July 30 • 3–6 pm</div>
+      <div class="ev-where">📍 The Boardwalk<br>245 The Boardwalk, Suite 301, Waterloo</div>
+    </div>
+    <div class="sub">Tour the school, meet the teachers — kids welcome!</div>
+  </div>
+  <form id="formO" autocomplete="off">
+    <label for="nameO">Parent / guardian name</label>
+    <input type="text" id="nameO" placeholder="e.g. Jordan Smith">
+    <label for="emailO">Email address</label>
+    <input type="email" id="emailO" placeholder="you@example.com" inputmode="email" autocapitalize="off">
+    <div class="row">
+      <div>
+        <label for="phoneO">Phone <span class="opt">(e.g. 519-555-1234)</span></label>
+        <input type="tel" id="phoneO" inputmode="tel">
+      </div>
+      <div>
+        <label for="gradeO">Child's grade in Sept 2026</label>
+        <select id="gradeO">
+          <option value="" selected disabled>Choose…</option>
+          <option>JK</option><option>SK</option>
+          <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option><option>Grade 4</option>
+          <option>Grade 5</option><option>Grade 6</option><option>Grade 7</option><option>Grade 8</option>
+          <option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+        </select>
+      </div>
+    </div>
+    <div class="consent">
+      <input type="checkbox" id="consentO">
+      <span><b>I'd like to receive emails from Crania Schools</b> about the open house and its programs. You can unsubscribe anytime. Crania Schools, 245 The Boardwalk Suite 301 &amp; 370 University Ave E Unit 205, Waterloo, ON • boardwalk@crania-schools.com • 519-781-8810</span>
+    </div>
+    <div class="err" id="errO"></div>
+    <button type="submit" class="primary" id="submitO">Count me in! 🎉</button>
+  </form>
+</div>
+
+<!-- AGENDA ORDER PAGE -->
+<div class="wrap" id="agPage">
+  <div class="pagehead">
+    <span class="backlink" data-back>‹ Back</span>
+    <h1>📓 Order Agendas</h1>
+    <div class="sub">2026–2027 Crania school agendas — $15 each (no tax). Order now, we'll confirm by email.</div>
+  </div>
+  <form id="formG" autocomplete="off">
+    <label for="nameG">Name</label>
+    <input type="text" id="nameG" placeholder="e.g. Jordan Smith">
+    <label for="emailG">Email address</label>
+    <input type="email" id="emailG" placeholder="you@example.com" inputmode="email" autocapitalize="off">
+    <label for="phoneG">Phone <span class="opt">(e.g. 519-555-1234)</span></label>
+    <input type="tel" id="phoneG" inputmode="tel">
+
+    <label>How many of each edition? <span class="opt">($15 each — no tax)</span></label>
+    <div class="edrow">
+      <div class="info"><b>Regular edition</b></div>
+      <div class="qty">
+        <button type="button" data-q="reg" data-d="-1">−</button>
+        <span class="n" id="qReg">0</span>
+        <button type="button" data-q="reg" data-d="1">+</button>
+      </div>
+    </div>
+    <div class="edrow">
+      <div class="info"><b>Islamic edition</b></div>
+      <div class="qty">
+        <button type="button" data-q="isl" data-d="-1">−</button>
+        <span class="n" id="qIsl">0</span>
+        <button type="button" data-q="isl" data-d="1">+</button>
+      </div>
+    </div>
+
+    <label>Delivery</label>
+    <div class="ship">
+      <label><input type="radio" name="ship" value="pickup" data-cost="0"> <span class="shipinfo"><b>Pick up at the Open House — Jul 30</b><span class="shiploc">📍 Boardwalk Location — 245 The Boardwalk, Suite 301</span></span> <span class="cost">FREE</span></label>
+      <label><input type="radio" name="ship" value="waterloo" data-cost="5"> <span class="shipinfo"><b>Delivery — Waterloo Region</b></span> <span class="cost">+$5</span></label>
+      <label><input type="radio" name="ship" value="ontario" data-cost="10"> <span class="shipinfo"><b>Delivery — within Ontario</b></span> <span class="cost">+$10</span></label>
+    </div>
+    <div id="addrBox" class="hidden">
+      <label for="addrG">Shipping address</label>
+      <textarea id="addrG" placeholder="Street, city, postal code"></textarea>
+    </div>
+
+    <div class="total"><span>Total <span style="font-weight:400;font-size:14px;">(no tax)</span></span><span class="amt" id="agTotal">$0</span></div>
+    <div class="slothint" style="text-align:center;margin-top:8px;font-size:13px;">💳 Pay by e-transfer to <b>events@crania-schools.com</b></div>
+
+    <div class="consent">
+      <input type="checkbox" id="consentG">
+      <span><b>I'd like to receive emails from Crania Schools</b> about my order and its programs. You can unsubscribe anytime. Crania Schools, 245 The Boardwalk Suite 301 &amp; 370 University Ave E Unit 205, Waterloo, ON • boardwalk@crania-schools.com • 519-781-8810</span>
+    </div>
+    <div class="err" id="errG"></div>
+    <button type="submit" class="primary" id="submitG">Place order! 🎉</button>
+  </form>
+</div>
+
+<!-- THANKS -->
+<div class="wrap" id="thanks">
+  <div class="card">
+    <div class="big">🎉</div>
+    <h2 id="thanksName">Thank you!</h2>
+    <p id="thanksLine"></p>
+    <p>Grab your <b>free gift</b> from our team before you go! 🎁</p>
+    <span class="count-pill" id="countPill"></span><br>
+    <button class="primary" id="nextBtn">Done →</button>
+  </div>
+</div>
+
+<!-- STAFF -->
+<div class="wrap" id="staff">
+  <div class="card">
+    <h2>Staff panel 🔒</h2>
+    <div id="pinGate">
+      <p class="note">Enter staff PIN to view sign-ups.</p>
+      <div class="pinrow">
+        <input type="tel" id="pin" placeholder="PIN" inputmode="numeric">
+        <button class="primary" style="width:auto;margin-top:0;padding:12px 26px;font-size:16px;" id="pinBtn">Open</button>
+      </div>
+    </div>
+    <div id="panel" class="hidden">
+      <div class="stat" id="stat">0</div>
+      <div>sign-ups total</div>
+      <div class="slots" id="slotSummary"></div>
+      <div class="staff-btns">
+        <button class="solid" id="csvBtn">⬇ Download CSV</button>
+        <button id="copyBtn">Copy all emails</button>
+        <button id="refreshBtn">Refresh</button>
+      </div>
+      <div id="entries"></div>
+      <p class="note">Data is saved to the CraniaVerse database (PocketBase). This panel is a live view — press Refresh to re-fetch. The full admin lives inside CraniaVerse → Forms.</p>
+    </div>
+    <button class="primary" style="margin-top:18px;font-size:16px;padding:14px;" id="backBtn">← Back to start</button>
+  </div>
+</div>
+
+<footer>Crania Schools • crania-schools.com • <span id="staffLink">staff</span></footer>
+
+<script>
+(function(){
+  var STAFF_PIN = "2026";
+  var AGENDA_PRICE = 15;
+  var API_BASE = ""; // same-origin — served by the Express API
+
+  var SLOT_TIMES = ["2:00 pm","2:30 pm","3:00 pm","3:30 pm","4:00 pm","4:30 pm","5:00 pm","5:30 pm","6:00 pm"];
+  var NO_SIX = "Wed, July 15";
+  var SHIP_LABEL = { pickup:"pick up free at the Open House", waterloo:"delivery within Waterloo Region (+$5)", ontario:"delivery within Ontario (+$10)" };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var SCREENS = ["home","assessPage","ohPage","agPage","thanks","staff"];
+  function show(id){
+    SCREENS.forEach(function(s){ $(s).style.display = s===id ? "block" : "none"; });
+    window.scrollTo(0,0);
+  }
+
+  // Submit helper — always POST to /api/booth-signup. Server handles
+  // the upsert-by-email merge + duplicate-detection (409 conflict).
+  function api(path, body){
+    return fetch(API_BASE + path, {
+      method: body ? "POST" : "GET",
+      headers: body ? {"Content-Type":"application/json"} : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    }).then(function(r){
+      return r.json().then(function(j){ return { status:r.status, body:j }; })
+        .catch(function(){ return { status:r.status, body:{} }; });
+    });
+  }
+  function apiDelete(path){
+    return fetch(API_BASE + path, { method:"DELETE" });
+  }
+
+  // ---- assessment slots ----
+  function slotsFor(date){
+    if(date === "Thu, July 16") return ["2:00 pm","2:30 pm"];
+    if(date === NO_SIX) return SLOT_TIMES.filter(function(t){ return t !== "6:00 pm"; });
+    return SLOT_TIMES;
+  }
+  function fillSlots(){
+    var sel = $("aslot"), prev = sel.value;
+    var checked = document.querySelector('input[name="adate"]:checked');
+    var date = checked ? checked.value : "";
+    sel.innerHTML = '<option value="" selected disabled>Choose a time…</option>';
+    slotsFor(date).forEach(function(t){
+      var o = document.createElement("option"); o.textContent = t; sel.appendChild(o);
+    });
+    if(prev && Array.prototype.some.call(sel.options, function(o){ return o.textContent===prev; })){ sel.value = prev; }
+  }
+  fillSlots();
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="adate"]'), function(rb){
+    rb.addEventListener("change", fillSlots);
+  });
+
+  // ---- agenda quantities + total ----
+  var qty = { reg:0, isl:0 };
+  function shipCost(){
+    var s = document.querySelector('input[name="ship"]:checked');
+    return s ? parseInt(s.getAttribute("data-cost"),10) : 0;
+  }
+  function updateTotal(){
+    $("qReg").textContent = qty.reg; $("qIsl").textContent = qty.isl;
+    var total = (qty.reg + qty.isl) * AGENDA_PRICE + shipCost();
+    $("agTotal").textContent = "$" + total;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-q]'), function(b){
+    b.addEventListener("click", function(){
+      var k = b.getAttribute("data-q"), d = parseInt(b.getAttribute("data-d"),10);
+      qty[k] = Math.max(0, qty[k] + d);
+      updateTotal();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="ship"]'), function(rb){
+    rb.addEventListener("change", function(){
+      $("addrBox").classList.toggle("hidden", rb.value === "pickup");
+      updateTotal();
+    });
+  });
+
+  // ---- nav ----
+  $("goAssess").addEventListener("click", function(){ show("assessPage"); });
+  $("goOh").addEventListener("click", function(){ show("ohPage"); });
+  $("goAgenda").addEventListener("click", function(){ show("agPage"); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-back]"), function(b){
+    b.addEventListener("click", function(){ show("home"); });
+  });
+
+  function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e); }
+
+  var resetTimer = null;
+  function thanks(name, line, count){
+    $("thanksName").textContent = "Thank you, " + name.split(" ")[0] + "!";
+    $("thanksLine").innerHTML = line;
+    $("countPill").textContent = "You're sign-up #" + count;
+    show("thanks");
+    resetTimer = setTimeout(function(){ show("home"); }, 15000);
+  }
+  $("nextBtn").addEventListener("click", function(){ clearTimeout(resetTimer); show("home"); });
+
+  function fail(el, msg){ el.textContent = msg; el.style.display = "block"; }
+  function setBusy(btn, busy){
+    btn.disabled = !!busy;
+    if(busy){ btn.setAttribute("data-lbl", btn.textContent); btn.textContent = "Saving…"; }
+    else if(btn.getAttribute("data-lbl")){ btn.textContent = btn.getAttribute("data-lbl"); }
+  }
+
+  // ---- assessment submit ----
+  $("formA").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var err = $("errA"); err.style.display = "none";
+    var name = $("nameA").value.trim(), email = $("emailA").value.trim().toLowerCase();
+    var child = $("childA").value.trim();
+    var phone = $("phoneA").value.trim(), grade = $("gradeA").value;
+    var checked = document.querySelector('input[name="adate"]:checked');
+    var adate = checked ? checked.value : "", aslot = $("aslot").value;
+    if(!name){ return fail(err,"Please enter your name."); }
+    if(!child){ return fail(err,"Please enter your child's name."); }
+    if(!validEmail(email)){ return fail(err,"That email doesn't look right — mind checking it?"); }
+    if(!phone){ return fail(err,"Please enter a phone number."); }
+    if(!grade){ return fail(err,"Please pick your child's grade."); }
+    if(!adate){ return fail(err,"Which date works best — July 14, 15, 16 or 17?"); }
+    if(!aslot){ return fail(err,"Please pick a time for the assessment."); }
+    if(!$("consentA").checked){ return fail(err,"Please tick the consent box so we're allowed to email you. 🙂"); }
+
+    var self = this;
+    setBusy($("submitA"), true);
+    api("/api/booth-signup", { name:name, email:email, phone:phone, grade:grade, child:child, assessDate:adate, assessTime:aslot })
+      .then(function(r){
+        setBusy($("submitA"), false);
+        if(r.status === 409){ return fail(err, r.body.message || "This email already has an assessment booked."); }
+        if(r.status >= 400){ return fail(err, r.body.error || "Could not save — please try again."); }
+        self.reset(); fillSlots();
+        thanks(name, "📝 <b>Free assessment booked:</b> " + adate + " at " + aslot + ",<br>The Boardwalk — 245 The Boardwalk, Suite 301.<br>We'll confirm by email.", r.body.count || 0);
+      })
+      .catch(function(e){ setBusy($("submitA"), false); fail(err, "Network problem — please try again."); console.error(e); });
+  });
+
+  // ---- open house submit ----
+  $("formO").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var err = $("errO"); err.style.display = "none";
+    var name = $("nameO").value.trim(), email = $("emailO").value.trim().toLowerCase();
+    var phone = $("phoneO").value.trim(), grade = $("gradeO").value;
+    if(!name){ return fail(err,"Please enter your name."); }
+    if(!validEmail(email)){ return fail(err,"That email doesn't look right — mind checking it?"); }
+    if(!phone){ return fail(err,"Please enter a phone number."); }
+    if(!grade){ return fail(err,"Please pick your child's grade."); }
+    if(!$("consentO").checked){ return fail(err,"Please tick the consent box so we're allowed to email you. 🙂"); }
+
+    var self = this;
+    setBusy($("submitO"), true);
+    api("/api/booth-signup", { name:name, email:email, phone:phone, grade:grade, openHouse:true })
+      .then(function(r){
+        setBusy($("submitO"), false);
+        if(r.status === 409){ return fail(err, r.body.message || "That email is already on the open house list."); }
+        if(r.status >= 400){ return fail(err, r.body.error || "Could not save — please try again."); }
+        self.reset();
+        thanks(name, "🏫 <b>You're on the list</b> for the Open House —<br>Thursday, July 30, 3–6 pm at The Boardwalk.<br>Watch your inbox for the invitation!", r.body.count || 0);
+      })
+      .catch(function(e){ setBusy($("submitO"), false); fail(err, "Network problem — please try again."); console.error(e); });
+  });
+
+  // ---- agenda submit ----
+  $("formG").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var err = $("errG"); err.style.display = "none";
+    var name = $("nameG").value.trim(), email = $("emailG").value.trim().toLowerCase();
+    var phone = $("phoneG").value.trim();
+    var ship = document.querySelector('input[name="ship"]:checked');
+    var addr = $("addrG").value.trim();
+    if(!name){ return fail(err,"Please enter your name."); }
+    if(!validEmail(email)){ return fail(err,"That email doesn't look right — mind checking it?"); }
+    if(!phone){ return fail(err,"Please enter a phone number."); }
+    if(qty.reg + qty.isl < 1){ return fail(err,"Add at least one agenda using the + buttons."); }
+    if(!ship){ return fail(err,"Please choose a delivery option."); }
+    if(ship.value !== "pickup" && !addr){ return fail(err,"Please enter a shipping address for delivery."); }
+    if(!$("consentG").checked){ return fail(err,"Please tick the consent box so we're allowed to email you. 🙂"); }
+
+    var total = (qty.reg + qty.isl) * AGENDA_PRICE + shipCost();
+    var self = this;
+    setBusy($("submitG"), true);
+    api("/api/booth-signup", {
+      name:name, email:email, phone:phone, agenda:true,
+      agReg:qty.reg, agIsl:qty.isl, agShip:ship.value,
+      agAddr: ship.value==="pickup" ? "" : addr, agTotal:total,
+    })
+      .then(function(r){
+        setBusy($("submitG"), false);
+        if(r.status >= 400){ return fail(err, r.body.error || "Could not save — please try again."); }
+        var parts = [];
+        if(qty.reg) parts.push(qty.reg + " Regular");
+        if(qty.isl) parts.push(qty.isl + " Islamic");
+        var line = "📓 <b>Agenda order:</b> " + parts.join(" + ") + " = <b>$" + total + "</b> (no tax)<br>" + SHIP_LABEL[ship.value] + ".<br>Please send your e-transfer to <b>events@crania-schools.com</b>. We'll email your confirmation.";
+        self.reset(); qty = { reg:0, isl:0 }; $("addrBox").classList.add("hidden"); updateTotal();
+        thanks(name, line, r.body.count || 0);
+      })
+      .catch(function(e){ setBusy($("submitG"), false); fail(err, "Network problem — please try again."); console.error(e); });
+  });
+
+  // ---- staff ----
+  var taps = 0, tapTimer = null;
+  $("logoTap").addEventListener("click", function(){
+    taps++; clearTimeout(tapTimer);
+    tapTimer = setTimeout(function(){ taps = 0; }, 1600);
+    if(taps>=5){ taps = 0; show("staff"); }
+  });
+  $("staffLink").addEventListener("click", function(){ show("staff"); });
+  $("backBtn").addEventListener("click", function(){
+    $("panel").classList.add("hidden"); $("pinGate").classList.remove("hidden"); $("pin").value="";
+    show("home");
+  });
+  $("pinBtn").addEventListener("click", function(){
+    if($("pin").value === STAFF_PIN){
+      $("pinGate").classList.add("hidden"); $("panel").classList.remove("hidden"); refresh();
+    } else { $("pin").value=""; $("pin").placeholder="Wrong PIN"; }
+  });
+  $("refreshBtn").addEventListener("click", function(){ refresh(); });
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+  var currentList = [];
+  function refresh(){
+    api("/api/booth-signup").then(function(r){
+      var list = Array.isArray(r.body) ? r.body : [];
+      currentList = list;
+      render(list);
+    }).catch(function(e){ console.error(e); });
+  }
+
+  function render(list){
+    $("stat").textContent = list.length;
+    var slots = {};
+    list.forEach(function(e){
+      if(e.assessDate){ var k = e.assessDate + " • " + e.assessTime; slots[k] = (slots[k]||0)+1; }
+    });
+    var keys = Object.keys(slots).sort();
+    var sHtml = "<b>Assessment bookings by slot:</b><br>";
+    if(!keys.length){ sHtml += "none yet<br>"; }
+    else { keys.forEach(function(k){ sHtml += k + " — <b>" + slots[k] + "</b><br>"; }); }
+    var ohCount = list.filter(function(e){ return e.openHouse==="yes"; }).length;
+    sHtml += "<b>Open house RSVPs:</b> " + ohCount + "<br>";
+    var reg = 0, isl = 0, rev = 0, orders = 0;
+    list.forEach(function(e){ if((e.agReg||0)+(e.agIsl||0)>0){ orders++; reg+=e.agReg||0; isl+=e.agIsl||0; rev+=e.agTotal||0; } });
+    sHtml += "<b>Agenda orders:</b> " + orders + " (" + reg + " reg / " + isl + " islamic) — <b>$" + rev + "</b>";
+    $("slotSummary").innerHTML = sHtml;
+
+    var html = "<table><tr><th>#</th><th>Name</th><th>Email</th><th>Assess</th><th>OH</th><th>Agenda</th></tr>";
+    list.forEach(function(e,i){
+      var ag = ((e.agReg||0)+(e.agIsl||0)>0) ? ((e.agReg||0)+"R/"+(e.agIsl||0)+"I $"+(e.agTotal||0)) : "—";
+      html += "<tr><td>"+(i+1)+"</td><td>"+esc(e.name||"")+"</td><td>"+esc(e.email||"")+"</td><td>"
+            + (e.assessDate ? esc(String(e.assessDate).replace("July","Jul")+" "+(e.assessTime||"")) : "—")
+            + "</td><td>"+(e.openHouse==="yes"?"✓":"—")+"</td><td>"+esc(ag)+"</td></tr>";
+    });
+    $("entries").innerHTML = html + "</table>";
+  }
+
+  function csv(){
+    var rows = [["Name","Email","Phone","Child name","Child grade","Open house RSVP (Jul 30)","Assessment date","Assessment time",
+                 "Agenda regular qty","Agenda islamic qty","Agenda shipping","Agenda shipping address","Agenda total ($)",
+                 "Email consent","Signed up at"]];
+    currentList.forEach(function(e){ rows.push([e.name,e.email,e.phone,e.child||"",e.grade||"",e.openHouse,e.assessDate,e.assessTime,
+                 e.agReg||0,e.agIsl||0,e.agShip||"",e.agAddr||"",e.agTotal||0,e.consent,e.when]); });
+    return rows.map(function(r){ return r.map(function(c){ return '"'+String(c==null?"":c).replace(/"/g,'""')+'"'; }).join(","); }).join("\r\n");
+  }
+
+  $("csvBtn").addEventListener("click", function(){
+    var blob = new Blob(["﻿"+csv()], {type:"text/csv;charset=utf-8;"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    var d = new Date();
+    a.download = "crania-booth-signups-" + d.toISOString().slice(0,10) + ".csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  });
+
+  $("copyBtn").addEventListener("click", function(){
+    var emails = currentList.map(function(e){ return e.email; }).join(", ");
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(emails).then(function(){ $("copyBtn").textContent = "Copied ✓"; setTimeout(function(){ $("copyBtn").textContent="Copy all emails"; },2000); });
+    } else {
+      var ta = document.createElement("textarea"); ta.value = emails; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+      $("copyBtn").textContent = "Copied ✓"; setTimeout(function(){ $("copyBtn").textContent="Copy all emails"; },2000);
+    }
+  });
+
+  updateTotal();
+  show("home");
+})();
+</script>
+</body>
+</html>
