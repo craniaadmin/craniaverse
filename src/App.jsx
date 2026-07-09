@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TopNav from './components/TopNav'
 import Login from './components/Login'
+
+const API_BASE = import.meta.env?.VITE_API_URL || ''
 import Dashboard from './pages/Dashboard'
 import ToDo from './pages/ToDo'
 import CalendarView from './pages/CalendarView'
