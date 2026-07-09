@@ -31,6 +31,7 @@ import {
   loadStaffBoard,    saveStaffBoard,
   loadInventory,     saveInventory,
   loadTodo,          saveTodo,
+  loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
   deleteSubmission,  deleteSubmissionsForForm,
