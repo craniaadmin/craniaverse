@@ -102,18 +102,6 @@ export function useFinance() {
 
   useEffect(() => { refresh() }, [refresh])
 
-  const persist = useCallback((next) => {
-    setData(next)
-    clearTimeout(saveTimer.current)
-    saveTimer.current = setTimeout(() => {
-      fetch(ENDPOINT, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...HEADERS },
-        body: JSON.stringify(latest.current),
-      }).catch(() => {})
-    }, 350)
-  }, [])
-
   const updateData = useCallback((mut) => {
     setData(prev => {
       const draft = {
