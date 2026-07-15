@@ -675,6 +675,25 @@ app.put('/api/todo', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- finance (singleton {invoices, payments, meta}) -----
+// The whole payload is written on every save. That's fine at the
+// expected volume (few thousand transactions per year for a small
+// school) and lets the four financial pages share one shape.
+app.get('/api/finance', wrap(async (_req, res) => res.json(await loadFinance())))
+app.put('/api/finance', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    invoices: Array.isArray(body.invoices) ? body.invoices : [],
+    payments: Array.isArray(body.payments) ? body.payments : [],
+    meta: {
+      nextInvoiceNumber: Number(body.meta?.nextInvoiceNumber) || 1001,
+      nextReceiptNumber: Number(body.meta?.nextReceiptNumber) || 1001,
+    },
+  }
+  await saveFinance(payload)
+  res.json({ ok: true })
+}))
+
 // ---- forms (custom form builder) ------------------------
 // A "form" is a definition: title + ordered field list. Anyone
 // with the form's shareable URL (/form/:slug) can submit it, and
