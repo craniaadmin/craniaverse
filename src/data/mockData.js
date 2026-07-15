@@ -11,7 +11,6 @@ export const NAV = [
   { label: 'Staff', items: ['Staff Information', 'Staff Information Form', 'Staff Hub'] },
   { label: 'Operations', items: ['Crania Cash', 'Inventory'] },
   { label: 'Financial', items: ['Accounting', 'Fee Schedules', 'Payroll', 'Payments', 'Invoices', 'Receipts'] },
-  { label: 'Marketing', items: ['Marketing'] },
   { label: 'Forms', items: ['Forms'] },
 ]
 
