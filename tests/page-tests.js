@@ -12,6 +12,11 @@ import { assert, runTest } from './framework.js'
 
 // Mirrors src/data/mockData.js NAV. If the prod nav changes, this
 // list must change too — tests will fail loudly otherwise.
+// Which nav groups render as a single button (click navigates
+// directly) vs a dropdown (click opens the menu). Mirrors the
+// NAV structure in src/data/mockData.js — keep in sync there.
+const SINGLE_ITEM_GROUPS = new Set(['Students', 'Programs', 'Contests', 'Forms'])
+
 const PAGES = [
   { group: 'Admin',     item: 'Dashboard'         },
   { group: 'Admin',     item: 'Calendar'          },
