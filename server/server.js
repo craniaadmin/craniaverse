@@ -37,6 +37,7 @@ import {
   loadComments,      saveCommentsForTab,
   loadStaffBoard,    saveStaffBoard,
   loadInventory,     saveInventory,
+  loadFinance,       saveFinance,
   loadTodo,          saveTodo,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
