@@ -338,6 +338,40 @@ export async function saveTodo(payload) {
   }
 }
 
+// ---- finance (singleton payload with invoices + payments + meta) ---
+const DEFAULT_FINANCE = {
+  invoices: [],
+  payments: [],
+  meta: { nextInvoiceNumber: 1001, nextReceiptNumber: 1001 },
+}
+
+export async function loadFinance() {
+  try {
+    const rows = await getFullList('finance')
+    if (rows.length === 0) return DEFAULT_FINANCE
+    const p = rows[0].payload || {}
+    return {
+      invoices: Array.isArray(p.invoices) ? p.invoices : [],
+      payments: Array.isArray(p.payments) ? p.payments : [],
+      meta: { ...DEFAULT_FINANCE.meta, ...(p.meta || {}) },
+    }
+  } catch (err) {
+    // Collection missing (pb-setup not run yet) — degrade gracefully.
+    if (err?.status === 404) return DEFAULT_FINANCE
+    throw err
+  }
+}
+
+export async function saveFinance(payload) {
+  await ensureAuth()
+  const rows = await getFullList('finance')
+  if (rows.length === 0) {
+    await pb().collection('finance').create({ payload })
+  } else {
+    await pb().collection('finance').update(rows[0].id, { payload })
+  }
+}
+
 // ---- booth signups (one row per family, keyed by email) ------
 // Same upsert semantics as the original localStorage flow: a
 // family may submit the assessment form, then come back and RSVP

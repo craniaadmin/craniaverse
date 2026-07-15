@@ -91,7 +91,8 @@
       "Bash(node --check server/email.js)",
       "Bash(node --check server/auth.js)",
       "Bash(node -e \"require\\('./ecosystem.config.cjs'\\)\")",
-      "Bash(node -e \"console.log\\(require\\('./ecosystem.config.cjs'\\).apps.map\\(a => a.name\\).join\\(', '\\)\\)\")"
+      "Bash(node -e \"console.log\\(require\\('./ecosystem.config.cjs'\\).apps.map\\(a => a.name\\).join\\(', '\\)\\)\")",
+      "Bash(xargs cat)"
     ]
   },
   "hooks": {
