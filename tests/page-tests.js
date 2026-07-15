@@ -26,8 +26,13 @@ const PAGES = [
   { group: 'Staff',     item: 'Staff Hub'         },
   { group: 'Operations',item: 'Crania Cash'       },
   { group: 'Operations',item: 'Inventory'         },
+  { group: 'Financial', item: 'Accounting'        },
   { group: 'Financial', item: 'Fee Schedules'     },
   { group: 'Financial', item: 'Payroll'           },
+  { group: 'Financial', item: 'Payments'          },
+  { group: 'Financial', item: 'Invoices'          },
+  { group: 'Financial', item: 'Receipts'          },
+  { group: 'Forms',     item: 'Forms'             }, // single-item group
 ]
 
 // Click a top-level nav group label. For multi-item groups this
