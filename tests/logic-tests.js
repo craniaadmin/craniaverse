@@ -3,12 +3,13 @@
 // DELETE removes it cleanly. Each test cleans up after itself
 // so re-running doesn't accumulate junk records.
 
-import { BASE_URL } from './config.js'
 import { assert, runTest } from './framework.js'
+import { authedFetch } from './utils/auth.js'
 
+// Authed HTTP helper — everything below /api/health goes through
+// authRequired middleware.
 async function http(method, path, body) {
-  const url = `${BASE_URL}${path}`
-  const r = await fetch(url, {
+  const r = await authedFetch(path, {
     method,
     headers: body ? { 'Content-Type': 'application/json' } : {},
     body: body ? JSON.stringify(body) : undefined,
@@ -18,6 +19,10 @@ async function http(method, path, body) {
   try { json = JSON.parse(text) } catch {}
   return { status: r.status, json, text }
 }
+
+// POST /api/registrations is on the public allowlist so the booth
+// kiosk works; sending a body directly is fine (no cookie required),
+// but we still use `http()` so the cookie carries in test-run order.
 
 export async function runLogicTests() {
   return [
@@ -81,6 +86,89 @@ export async function runLogicTests() {
       const sample = r.json[0]
       assert(sample.title || sample.code || sample.number,
         `first program should have title/code/number, got keys: ${Object.keys(sample || {}).join(',')}`)
+    }),
+
+    await runTest('Finance round-trip: PUT invoice+payment → GET → PUT cleanup', async () => {
+      const before = await http('GET', '/api/finance')
+      assert(before.status === 200, `GET status ${before.status}`)
+      const original = before.json
+      assert(original && Array.isArray(original.invoices), 'expected finance payload with invoices array')
+
+      // Add one temp invoice + one temp payment tied to it.
+      const tag = `logic-test-${Date.now()}`
+      const invId = `inv_${tag}`
+      const payId = `pay_${tag}`
+      const patched = {
+        invoices: [
+          ...original.invoices,
+          {
+            id: invId, number: `TEST-${tag}`, date: '2026-01-01', dueDate: '2026-01-31',
+            customerName: 'PB Test Customer', customerEmail: `${tag}@test.invalid`,
+            studentName: 'PB Test Student', program: 'PB Test Program',
+            lineItems: [{ id: 'li1', desc: 'Test line', qty: 1, unitPrice: 100 }],
+            total: 100, status: 'sent', notes: '',
+          },
+        ],
+        payments: [
+          ...original.payments,
+          {
+            id: payId, receiptNumber: `RT-${tag}`, date: '2026-01-05',
+            invoiceId: invId, customerName: 'PB Test Customer',
+            amount: 60, method: 'Cash', reference: '', note: '',
+          },
+        ],
+        meta: original.meta,
+      }
+      const put = await http('PUT', '/api/finance', patched)
+      assert(put.status === 200, `PUT status ${put.status}: ${put.text?.slice(0, 200)}`)
+
+      try {
+        const after = await http('GET', '/api/finance')
+        assert(after.status === 200, `GET after status ${after.status}`)
+        const inv = after.json.invoices.find(i => i.id === invId)
+        const pay = after.json.payments.find(p => p.id === payId)
+        assert(inv, `expected invoice ${invId} in payload`)
+        assert(pay, `expected payment ${payId} in payload`)
+        assert(inv.total === 100, `invoice total expected 100, got ${inv.total}`)
+        assert(pay.invoiceId === invId, `payment.invoiceId expected ${invId}, got ${pay.invoiceId}`)
+      } finally {
+        // Restore the original payload — always, even if assertions above failed.
+        await http('PUT', '/api/finance', original).catch(() => {})
+      }
+
+      const restored = await http('GET', '/api/finance')
+      assert(!restored.json.invoices.some(i => i.id === invId), 'invoice should be gone after restore')
+      assert(!restored.json.payments.some(p => p.id === payId), 'payment should be gone after restore')
+    }),
+
+    await runTest('Inventory round-trip: POST → GET → PUT → DELETE', async () => {
+      const tag = `logic-inv-${Date.now()}`
+      const created = await http('POST', '/api/inventory', {
+        category: 'TEST',
+        name: `Widget ${tag}`,
+        size: null,
+        qty: 3,
+        price: 9.99,
+      })
+      assert(created.status === 201 || created.status === 200,
+        `POST expected 200/201, got ${created.status}`)
+      const id = created.json?.id
+      assert(id, `POST response missing id: ${JSON.stringify(created.json).slice(0, 200)}`)
+
+      try {
+        const list = await http('GET', '/api/inventory')
+        assert(Array.isArray(list.json) && list.json.some(i => i.id === id),
+          `expected inventory item ${id} in GET`)
+
+        const updated = await http('PUT', `/api/inventory/${id}`, { qty: 5 })
+        assert(updated.status === 200, `PUT status ${updated.status}`)
+
+        const list2 = await http('GET', '/api/inventory')
+        const row = list2.json.find(i => i.id === id)
+        assert(row && row.qty === 5, `expected qty=5 after PUT, got ${row?.qty}`)
+      } finally {
+        await http('DELETE', `/api/inventory/${id}`).catch(() => {})
+      }
     }),
   ]
 }
