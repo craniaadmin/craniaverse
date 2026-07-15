@@ -113,9 +113,14 @@ export async function runPageTests() {
     for (const { group, item } of PAGES) {
       results.push(await runTest(`Nav: ${group} → ${item}`, async () => {
         consoleErrors.length = 0
-        // Single-item groups (group label === item label) navigate
-        // straight on click; multi-item groups open a dropdown.
-        const isSingleItem = group === item
+        // Single-item groups navigate straight on click; multi-item
+        // groups open a dropdown. Bug this replaces: `group === item`
+        // wrongly treated Customers→Customers as single-item because
+        // the item label matches the group label, even though
+        // Customers has {Customers, Surveys} — clicking opened a
+        // dropdown, then the next test toggled it closed and timed
+        // out waiting for it to be visible.
+        const isSingleItem = SINGLE_ITEM_GROUPS.has(group)
         const opened = await openGroup(page, group, !isSingleItem)
         assert(opened, `nav group "${group}" not found`)
 
