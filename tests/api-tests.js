@@ -1,13 +1,16 @@
 // API-level smoke tests. Hits each /api/* endpoint and checks
 // the response is well-formed. Doesn't require a browser, so
 // these are the fastest tests in the suite.
+//
+// Most endpoints require a session cookie — see utils/auth.js.
 
 import { BASE_URL } from './config.js'
 import { assert, assertEq, runTest } from './framework.js'
+import { authedFetch, authedJson } from './utils/auth.js'
 
+// Public (no auth) fetch helper for endpoints on the allowlist.
 async function fetchJson(path, opts = {}) {
-  const url = `${BASE_URL}${path}`
-  const r = await fetch(url, opts)
+  const r = await fetch(`${BASE_URL}${path}`, opts)
   const text = await r.text()
   let json
   try { json = JSON.parse(text) } catch {}
@@ -16,14 +19,21 @@ async function fetchJson(path, opts = {}) {
 
 export async function runApiTests() {
   return [
+    // ---- Public endpoints (no auth needed) ----
     await runTest('GET /api/health returns {ok:true}', async () => {
       const { status, json } = await fetchJson('/api/health')
       assertEq(status, 200, 'status')
       assert(json?.ok === true, `expected ok:true, got ${JSON.stringify(json)}`)
     }),
 
+    await runTest('GET /api/me without cookie returns 401', async () => {
+      const { status } = await fetchJson('/api/me')
+      assertEq(status, 401, 'status')
+    }),
+
+    // ---- Authenticated endpoints ----
     await runTest('GET /api/registrations returns array', async () => {
-      const { status, json } = await fetchJson('/api/registrations')
+      const { status, json } = await authedJson('/api/registrations')
       assertEq(status, 200, 'status')
       assert(Array.isArray(json), 'expected array response')
       assert(json.length > 0, 'expected at least one registration')
@@ -31,7 +41,7 @@ export async function runApiTests() {
     }),
 
     await runTest('GET /api/staff returns array', async () => {
-      const { status, json } = await fetchJson('/api/staff')
+      const { status, json } = await authedJson('/api/staff')
       assertEq(status, 200, 'status')
       assert(Array.isArray(json), 'expected array response')
       assert(json.length > 0, 'expected at least one staff member')
@@ -39,34 +49,65 @@ export async function runApiTests() {
     }),
 
     await runTest('GET /api/programs returns array', async () => {
-      const { status, json } = await fetchJson('/api/programs')
+      const { status, json } = await authedJson('/api/programs')
       assertEq(status, 200, 'status')
       assert(Array.isArray(json), 'expected array response')
       assert(json.length > 0, 'expected at least one program')
     }),
 
     await runTest('GET /api/rules returns array', async () => {
-      const { status, json } = await fetchJson('/api/rules')
+      const { status, json } = await authedJson('/api/rules')
       assertEq(status, 200, 'status')
       assert(Array.isArray(json), 'expected array response')
     }),
 
     await runTest('GET /api/staff-board returns {lists:[...]}', async () => {
-      const { status, json } = await fetchJson('/api/staff-board')
+      const { status, json } = await authedJson('/api/staff-board')
       assertEq(status, 200, 'status')
       assert(json && typeof json === 'object', 'expected object response')
       assert(Array.isArray(json.lists), 'expected lists array')
     }),
 
     await runTest('GET /api/comments/<id> returns object', async () => {
-      const { status, json } = await fetchJson('/api/comments/seed')
+      const { status, json } = await authedJson('/api/comments/seed')
       assertEq(status, 200, 'status')
       assert(json && typeof json === 'object' && !Array.isArray(json), 'expected object response')
     }),
 
+    await runTest('GET /api/inventory returns array', async () => {
+      const { status, json } = await authedJson('/api/inventory')
+      assertEq(status, 200, 'status')
+      assert(Array.isArray(json), 'expected array response')
+    }),
+
+    await runTest('GET /api/todo returns {lists, items, checklists}', async () => {
+      const { status, json } = await authedJson('/api/todo')
+      assertEq(status, 200, 'status')
+      assert(json && Array.isArray(json.items), 'expected items array')
+      assert(Array.isArray(json.lists), 'expected lists array')
+      assert(Array.isArray(json.checklists), 'expected checklists array')
+    }),
+
+    await runTest('GET /api/finance returns {invoices, payments, meta}', async () => {
+      const { status, json } = await authedJson('/api/finance')
+      assertEq(status, 200, 'status')
+      assert(json && typeof json === 'object', 'expected object response')
+      assert(Array.isArray(json.invoices), 'expected invoices array')
+      assert(Array.isArray(json.payments), 'expected payments array')
+      assert(json.meta && typeof json.meta.nextInvoiceNumber === 'number',
+        `expected meta.nextInvoiceNumber number, got ${JSON.stringify(json.meta)}`)
+    }),
+
+    await runTest('GET /api/forms returns array', async () => {
+      const { status, json } = await authedJson('/api/forms')
+      assertEq(status, 200, 'status')
+      assert(Array.isArray(json), 'expected array response')
+    }),
+
     await runTest('Unknown route returns 404', async () => {
-      const { status } = await fetchJson('/api/definitely-not-a-real-route-' + Date.now())
-      assert(status === 404, `expected 404, got ${status}`)
+      // Hit it authenticated so a 401 doesn't mask the 404.
+      const r = await authedFetch('/api/definitely-not-a-real-route-' + Date.now())
+      assertEq(r.status, 404, `expected 404, got ${r.status}`)
     }),
   ]
 }
