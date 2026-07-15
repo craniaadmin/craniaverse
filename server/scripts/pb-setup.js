@@ -119,6 +119,13 @@ const collectionSpecs = [
     indexes: ['CREATE UNIQUE INDEX `idx_boothSignups_recordId` ON `boothSignups` (`recordId`)'],
   },
   {
+    name: 'finance',
+    fields: [
+      { name: 'payload', type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: [],
+  },
+  {
     name: 'formSubmissions',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },
