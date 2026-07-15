@@ -319,10 +319,6 @@ export default function FeeSchedule() {
       `Material Fee: ${money(schedule.matFee)}`,
       `Total: ${money(schedule.total)}`,
       '',
-      downloaded
-        ? `(The PDF "${payload.filename}" was saved to your Downloads folder — please attach it before sending.)`
-        : `(Please generate the PDF from the Fee Schedule page and attach it before sending.)`,
-      '',
       'Thanks,',
       'Crania Schools',
     ]
