@@ -90,6 +90,12 @@ export async function runPageTests() {
     // -------- Sign in --------
     results.push(await runTest('Sign in succeeds', async () => {
       consoleErrors.length = 0
+      const pw = process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || ''
+      assert(pw, 'ADMIN_PASSWORD (or TEST_ADMIN_PASSWORD) must be set in server/.env for page tests')
+      // The Login component has one password input. Type into it, then submit.
+      const pwInput = page.locator('input[type="password"]').first()
+      await pwInput.waitFor({ timeout: 5000 })
+      await pwInput.fill(pw)
       await page.getByRole('button', { name: /sign in/i }).click()
       // After login, TopNav renders with the "Admin" group button.
       await page.locator('header.topbar nav.nav .nav-btn', { hasText: /^Admin\s*$/ })
