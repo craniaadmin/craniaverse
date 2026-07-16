@@ -10,9 +10,10 @@ export default function TopNav({ section, sub, onSubSelect, onLogout }) {
   return (
     <header className="topbar-v7">
       <div className="brandwrap">
-        <BrandMark height={26} />
+        <BrandMark height={22} />
       </div>
       <span className="title">CraniaVerse</span>
+      <div className="spacer" />
       <div className="submenu">
         {subs.map(label => (
           <button
@@ -24,7 +25,6 @@ export default function TopNav({ section, sub, onSubSelect, onLogout }) {
           </button>
         ))}
       </div>
-      <div className="spacer" />
       <button className="icon-btn" title="Notifications"><Bell size={16} /></button>
       <button className="icon-btn" title="Sign out" onClick={onLogout}><LogOut size={16} /></button>
       <div className="avatar">AD</div>
