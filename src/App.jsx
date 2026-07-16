@@ -118,7 +118,7 @@ export default function App() {
     const key = `${section}:${sub}`
     const route = ROUTES[key]
     if (route) return route(navigate)
-    return <Placeholder title={sub} section={sub && sub !== section ? undefined : undefined} />
+    return <Placeholder title={sub} />
   }, [section, sub, navigate])
 
   if (checkingAuth) {
