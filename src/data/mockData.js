@@ -2,17 +2,47 @@
 // CraniaVerse — sample data
 // ============================================================
 
-export const NAV = [
-  { label: 'Admin', items: ['Dashboard', 'Calendar', 'To Do', 'Schedules'] },
-  { label: 'Customers', items: ['Customers', 'Surveys'] },
-  { label: 'Students', items: ['Students'] },
-  { label: 'Programs', items: ['Programs'] },
-  { label: 'Contests', items: ['Contests'] },
-  { label: 'Staff', items: ['Staff Information', 'Staff Information Form', 'Staff Hub'] },
-  { label: 'Operations', items: ['Crania Cash', 'Inventory'] },
-  { label: 'Financial', items: ['Accounting', 'Fee Schedules', 'Payroll', 'Payments', 'Invoices', 'Receipts'] },
-  { label: 'Forms', items: ['Forms'] },
+// Sidebar sections — order matches the client's mockup. `divider:true`
+// inserts a horizontal rule between groups in the sidebar.
+export const SECTIONS = [
+  { id: 'home',        label: 'Home' },
+  { id: 'programs',    label: 'Programs' },
+  { id: 'customers',   label: 'Customers' },
+  { id: 'students',    label: 'Students' },
+  { id: 'staff',       label: 'Staff' },
+  { id: 'operations',  label: 'Operations' },
+  { id: 'financial',   label: 'Financial' },
+  { id: 'marketing',   label: 'Marketing' },
+  { id: 'merchandise', label: 'Merchandise' },
+  { id: 'contacts',    label: 'Contacts' },
+  { divider: true },
+  { id: 'forms',       label: 'Forms' },
+  { divider: true },
+  { id: 'dayschool',   label: 'Day School' },
 ]
+
+// Submenu shown in the top bar when a section is active. First entry
+// is the default sub-page when the section is opened.
+export const SUBMENUS = {
+  home:        ['Dashboard', 'Calendar', 'To-Do', 'Checklists', 'Projects'],
+  programs:    ['Programs', 'Class Lists', 'Contests', 'Assessments'],
+  customers:   ['Customers', 'Emergency Contacts'],
+  students:    ['Students', 'Attendance', 'Comments', 'Crania Cash', 'Logins'],
+  staff:       ['Staff', 'Schedules', 'Keys'],
+  operations:  ['Inventory', 'Crania Store', 'IT Accounts'],
+  financial:   ['Tuition Schedules', 'Invoices', 'Receipts'],
+  marketing:   ['Marketing', 'Calendar', 'Leads', 'Surveys'],
+  merchandise: ['Merchandise'],
+  contacts:    ['Contacts'],
+  forms:       ['All Forms', 'Submissions', 'Templates', 'Form Builder'],
+  dayschool:   ['Day School'],
+}
+
+// Legacy flat nav used by the old top-nav-dropdown component and
+// tests. Deprecated after the mockup switch — kept only so
+// tests/page-tests.js doesn't crash on import while it's being
+// updated. Safe to delete once the new sidebar tests exist.
+export const NAV = []
 
 export const revenueByProgram = [
   { name: 'Flex Math', target: 8200, actual: 13450 },

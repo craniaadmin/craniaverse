@@ -100,7 +100,10 @@
       "Bash(node --check logic-tests.js)",
       "Bash(node --check page-tests.js)",
       "Bash(node --check utils/auth.js)",
-      "Bash(head -20 ../src/data/mockData.js)"
+      "Bash(head -20 ../src/data/mockData.js)",
+      "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/1. CraniaVerse - Home v7 [claude-fable-5].html\")",
+      "Bash(sort -k2 -n)",
+      "Bash(awk 'NR==49 {print \"  <!-- LOGO IMAGE \\(base64, 404KB - stripped for reading\\) -->\"; next} {print}' \"/c/Users/hanak/Downloads/1. CraniaVerse - Home v7 [claude-fable-5].html\")"
     ]
   },
   "hooks": {
