@@ -65,9 +65,115 @@ body {
 button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
 
-/* ---------------- App shell ---------------- */
-.app { min-height: 100%; display: flex; flex-direction: column; }
+/* ---------------- App shell (v7 sidebar layout) ---------------- */
+.app {
+  min-height: 100vh; display: flex; flex-direction: column;
+  background: var(--brand-bg); color: var(--brand-dark-brown);
+}
+.app-shell { display: flex; flex: 1; min-height: 0; }
+.app-main  { flex: 1; min-width: 0; }
 .page { flex: 1; padding: 24px 34px 60px; max-width: 1480px; width: 100%; margin: 0 auto; }
+
+/* Sidebar (left) — dark-teal gradient with dark-brown pill buttons */
+.sidebar {
+  width: 170px; flex: none;
+  background: linear-gradient(180deg, var(--brand-dark-blue), #4c8482);
+  display: flex; flex-direction: column; padding: 14px 16px;
+  min-height: 100%;
+}
+.sidebar-nav {
+  display: flex; flex-direction: column; gap: 7px;
+  position: sticky; top: 74px;
+}
+.sidebar-item {
+  display: block; width: 100%; text-align: center;
+  padding: 8px 6px; border-radius: 9px;
+  color: #fff; font-size: 14px; font-weight: 700;
+  border: 1px solid transparent;
+  background: var(--brand-dark-brown);
+  transition: background .12s;
+}
+.sidebar-item:hover { background: #4a4030; }
+.sidebar-item.active {
+  background: var(--brand-light-brown);
+  color: var(--brand-dark-blue);
+  border-color: var(--brand-light-brown);
+}
+.sidebar-divider {
+  border: none; border-top: 1px solid rgba(255, 255, 255, .35);
+  margin: 1px 4px;
+}
+
+/* Top bar (new — dark brown with pill submenu buttons) */
+.topbar-v7 {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 20px;
+  background: var(--brand-dark-brown); color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+  position: sticky; top: 0; z-index: 40;
+  flex-wrap: wrap;
+}
+.topbar-v7 .brandwrap {
+  background: #fff; border-radius: 8px; padding: 5px 10px;
+  display: inline-flex; align-items: center;
+}
+.topbar-v7 .brandwrap img { height: 26px; display: block; }
+.topbar-v7 .title {
+  font-weight: 700; font-size: 18px; color: #fff; white-space: nowrap;
+  font-family: var(--serif);
+}
+.topbar-v7 .spacer { flex: 1; }
+.topbar-v7 .submenu {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+}
+.topbar-v7 .submenu button {
+  background: transparent; border: 1px solid rgba(255, 255, 255, .35);
+  color: #fff; padding: 4px 11px; font-size: 12px; font-weight: 600;
+  border-radius: 8px; white-space: nowrap;
+  transition: background .12s, color .12s;
+}
+.topbar-v7 .submenu button:hover { background: rgba(255, 255, 255, .14); }
+.topbar-v7 .submenu button.active {
+  background: var(--brand-light-blue);
+  color: var(--brand-dark-brown);
+  border-color: var(--brand-light-blue);
+}
+.topbar-v7 .icon-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: none; display: grid; place-items: center;
+  background: rgba(255, 255, 255, .1); color: #fff;
+}
+.topbar-v7 .icon-btn:hover { background: rgba(255, 255, 255, .2); }
+.topbar-v7 .avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--brand-light-brown); color: var(--brand-dark-brown);
+  font-weight: 700; display: grid; place-items: center; font-size: 13px;
+}
+
+/* Placeholder card used for "under construction" pages */
+.placeholder-v7 {
+  background: #fff; border-radius: 12px;
+  box-shadow: var(--brand-shadow);
+  padding: 60px 40px; text-align: center;
+  border-left: 3px solid var(--brand-light-blue);
+  border-right: 3px solid var(--brand-light-brown);
+  border-bottom: 3px solid var(--brand-dark-blue);
+  max-width: 720px; margin: 0 auto;
+}
+.placeholder-v7 .tag {
+  display: inline-block; margin-bottom: 16px;
+  font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--brand-dark-blue);
+  background: #eaf6f5; padding: 4px 12px; border-radius: 20px;
+}
+.placeholder-v7 h2 {
+  margin: 0 0 8px; color: var(--brand-dark-brown); font-size: 22px;
+  font-family: var(--serif); font-weight: 400;
+}
+.placeholder-v7 p {
+  margin: 0 auto; color: #8a8474; font-size: 14px;
+  max-width: 460px; line-height: 1.5;
+}
 .page-title {
   font-family: var(--serif);
   font-size: 34px;
