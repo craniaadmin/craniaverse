@@ -40,6 +40,14 @@
 
   --serif: Georgia, "Times New Roman", serif;
   --sans: "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* Client-mockup palette (matches Crania Schools brand guide) */
+  --brand-light-blue:  #A6E2F9;
+  --brand-dark-blue:   #5FA09E;
+  --brand-light-brown: #E0DE85;
+  --brand-dark-brown:  #2E2516;
+  --brand-bg:          #F4F7F8;
+  --brand-shadow:      0 1px 3px rgba(46, 37, 22, .15);
 }
 
 * { box-sizing: border-box; }
