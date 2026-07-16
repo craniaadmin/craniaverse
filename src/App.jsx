@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import TopNav from './components/TopNav'
+import Sidebar from './components/Sidebar'
 import Login from './components/Login'
+import { SUBMENUS } from './data/mockData'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 import Dashboard from './pages/Dashboard'
@@ -15,24 +17,74 @@ import Surveys from './pages/Surveys'
 import CraniaCash from './pages/CraniaCash'
 import Inventory from './pages/Inventory'
 import Contests from './pages/Contests'
-import StaffHub from './pages/StaffHub'
 import StaffInformation from './pages/StaffInformation'
-import Payroll from './pages/Payroll'
 import Forms from './pages/Forms'
-import Accounting from './pages/Accounting'
-import Payments from './pages/Payments'
 import Invoices from './pages/Invoices'
 import Receipts from './pages/Receipts'
 import Placeholder from './pages/Placeholder'
 import { StoreProvider } from './data/store'
 
+// Route table for the v7 layout. Key = `${section}:${sub}`. Missing
+// entries fall through to <Placeholder />.
+//
+// NOTE: Accounting, Payments, Payroll and Staff Hub pages exist in
+// src/pages/ but the client's v7 mockup omits them from the nav.
+// They are intentionally not wired here — restore by adding a route
+// key and importing the component if she asks for them back.
+const ROUTES = {
+  'home:Dashboard':          (nav) => <Dashboard onNavigate={nav} />,
+  'home:Calendar':           () => <CalendarView />,
+  'home:To-Do':              () => <ToDo />,
+
+  'programs:Programs':       () => <Programs />,
+  'programs:Contests':       (nav) => <Contests onNavigate={nav} />,
+
+  'customers:Customers':     (nav) => <Customers onNavigate={nav} />,
+
+  'students:Students':       (nav) => <Students onNavigate={nav} />,
+  'students:Crania Cash':    () => <CraniaCash />,
+
+  'staff:Staff':             () => <StaffInformation />,
+  'staff:Schedules':         () => <Schedules />,
+
+  'operations:Inventory':    () => <Inventory />,
+
+  'financial:Tuition Schedules': () => <FeeSchedule />,
+  'financial:Invoices':      () => <Invoices />,
+  'financial:Receipts':      () => <Receipts />,
+
+  'marketing:Surveys':       () => <Surveys />,
+  'marketing:Calendar':      () => <CalendarView />,
+
+  'forms:All Forms':         () => <Forms />,
+}
+
+// Reverse lookup: given a legacy page label (e.g. "To Do", "Fee
+// Schedules", "Staff Information"), find the (section, sub) tuple
+// so old Dashboard `onNavigate('To Do')` calls still work.
+const LEGACY_ALIAS = {
+  'To Do':              ['home',     'To-Do'],
+  'Fee Schedules':      ['financial','Tuition Schedules'],
+  'Staff Information':  ['staff',    'Staff'],
+}
+
+function resolveNav(target) {
+  // target can be either a bare sub label or [section, sub].
+  if (Array.isArray(target)) return target
+  if (LEGACY_ALIAS[target]) return LEGACY_ALIAS[target]
+  // Otherwise look for the first section whose SUBMENUS contains it.
+  for (const [section, subs] of Object.entries(SUBMENUS)) {
+    if (subs.includes(target)) return [section, target]
+  }
+  return ['home', 'Dashboard']
+}
+
 export default function App() {
   const [authed, setAuthed] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
-  const [page, setPage] = useState('Dashboard')
+  const [section, setSection] = useState('home')
+  const [sub, setSub] = useState('Dashboard')
 
-  // On mount, ask the server whether an existing session cookie is
-  // still valid. If yes, skip the login screen; if no, show it.
   useEffect(() => {
     fetch(`${API_BASE}/api/me`, { credentials: 'include' })
       .then(r => setAuthed(r.ok))
@@ -47,6 +99,28 @@ export default function App() {
     setAuthed(false)
   }
 
+  // Clicking a sidebar section jumps to that section's first submenu.
+  const selectSection = useCallback((sectionId) => {
+    setSection(sectionId)
+    const first = (SUBMENUS[sectionId] || [])[0]
+    if (first) setSub(first)
+  }, [])
+
+  // Passed to child pages so they can jump to another page. Accepts
+  // either a bare label or a [section, sub] tuple.
+  const navigate = useCallback((target) => {
+    const [s, sb] = resolveNav(target)
+    setSection(s)
+    setSub(sb)
+  }, [])
+
+  const rendered = useMemo(() => {
+    const key = `${section}:${sub}`
+    const route = ROUTES[key]
+    if (route) return route(navigate)
+    return <Placeholder title={sub} section={sub && sub !== section ? undefined : undefined} />
+  }, [section, sub, navigate])
+
   if (checkingAuth) {
     return (
       <div style={{ display: 'grid', placeItems: 'center', height: '100vh', color: '#5a6470' }}>
@@ -54,39 +128,16 @@ export default function App() {
       </div>
     )
   }
-  if (!authed) return <Login onSignIn={() => { setAuthed(true); setPage('Dashboard') }} />
-
-  const render = () => {
-    switch (page) {
-      case 'Dashboard': return <Dashboard onNavigate={setPage} />
-      case 'To Do': return <ToDo />
-      case 'Calendar': return <CalendarView />
-      case 'Schedules': return <Schedules />
-      case 'Customers': return <Customers onNavigate={setPage} />
-      case 'Students': return <Students onNavigate={setPage} />
-      case 'Programs': return <Programs />
-      case 'Fee Schedules': return <FeeSchedule />
-      case 'Surveys': return <Surveys />
-      case 'Crania Cash': return <CraniaCash />
-      case 'Inventory': return <Inventory />
-      case 'Contests': return <Contests onNavigate={setPage} />
-      case 'Staff Hub': return <StaffHub />
-      case 'Staff Information': return <StaffInformation />
-      case 'Payroll': return <Payroll />
-      case 'Accounting': return <Accounting />
-      case 'Payments': return <Payments />
-      case 'Invoices': return <Invoices />
-      case 'Receipts': return <Receipts />
-      case 'Forms': return <Forms />
-      default: return <Placeholder title={page} />
-    }
-  }
+  if (!authed) return <Login onSignIn={() => { setAuthed(true); setSection('home'); setSub('Dashboard') }} />
 
   return (
     <StoreProvider>
       <div className="app">
-        <TopNav current={page} onNavigate={setPage} onLogout={logout} />
-        {render()}
+        <TopNav section={section} sub={sub} onSubSelect={setSub} onLogout={logout} />
+        <div className="app-shell">
+          <Sidebar section={section} onSelect={selectSection} />
+          <main className="app-main">{rendered}</main>
+        </div>
       </div>
     </StoreProvider>
   )
