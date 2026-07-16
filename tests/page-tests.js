@@ -1,75 +1,42 @@
-// Headless Chromium tests. The app is a single-page React app with
-// state-based routing (no URLs per page), so we sign in once then
-// click each nav item and verify the page renders cleanly.
-//
-// TopNav uses categorized dropdowns. To reach a page, click its
-// group label first; if the group has only one item, the click goes
-// straight to the page.
+// Headless Chromium tests for the v7 sidebar layout. Signs in
+// once, then for every (section, sub) tuple: clicks the sidebar
+// section, clicks the top-bar submenu pill, and verifies the page
+// renders without uncaught console errors.
 
 import { chromium } from 'playwright'
 import { BASE_URL, PAGE_TIMEOUT_MS } from './config.js'
 import { assert, runTest } from './framework.js'
 
-// Mirrors src/data/mockData.js NAV. If the prod nav changes, this
-// list must change too — tests will fail loudly otherwise.
-// Which nav groups render as a single button (click navigates
-// directly) vs a dropdown (click opens the menu). Mirrors the
-// NAV structure in src/data/mockData.js — keep in sync there.
-const SINGLE_ITEM_GROUPS = new Set(['Students', 'Programs', 'Contests', 'Forms'])
-
-const PAGES = [
-  { group: 'Admin',     item: 'Dashboard'         },
-  { group: 'Admin',     item: 'Calendar'          },
-  { group: 'Admin',     item: 'To Do'             },
-  { group: 'Admin',     item: 'Schedules'         },
-  { group: 'Customers', item: 'Customers'         },
-  { group: 'Customers', item: 'Surveys'           },
-  { group: 'Students',  item: 'Students'          }, // single-item group
-  { group: 'Programs',  item: 'Programs'          }, // single-item group
-  { group: 'Contests',  item: 'Contests'          }, // single-item group
-  { group: 'Staff',     item: 'Staff Information' },
-  { group: 'Staff',     item: 'Staff Hub'         },
-  { group: 'Operations',item: 'Crania Cash'       },
-  { group: 'Operations',item: 'Inventory'         },
-  { group: 'Financial', item: 'Accounting'        },
-  { group: 'Financial', item: 'Fee Schedules'     },
-  { group: 'Financial', item: 'Payroll'           },
-  { group: 'Financial', item: 'Payments'          },
-  { group: 'Financial', item: 'Invoices'          },
-  { group: 'Financial', item: 'Receipts'          },
-  { group: 'Forms',     item: 'Forms'             }, // single-item group
+// Mirrors src/data/mockData.js SUBMENUS — keep in sync there.
+// Order within each section matches the client's mockup.
+const NAV = [
+  { section: 'Home',        subs: ['Dashboard', 'Calendar', 'To-Do', 'Checklists', 'Projects'] },
+  { section: 'Programs',    subs: ['Programs', 'Class Lists', 'Contests', 'Assessments'] },
+  { section: 'Customers',   subs: ['Customers', 'Emergency Contacts'] },
+  { section: 'Students',    subs: ['Students', 'Attendance', 'Comments', 'Crania Cash', 'Logins'] },
+  { section: 'Staff',       subs: ['Staff', 'Schedules', 'Keys'] },
+  { section: 'Operations',  subs: ['Inventory', 'Crania Store', 'IT Accounts'] },
+  { section: 'Financial',   subs: ['Tuition Schedules', 'Invoices', 'Receipts'] },
+  { section: 'Marketing',   subs: ['Marketing', 'Calendar', 'Leads', 'Surveys'] },
+  { section: 'Merchandise', subs: ['Merchandise'] },
+  { section: 'Contacts',    subs: ['Contacts'] },
+  { section: 'Forms',       subs: ['All Forms', 'Submissions', 'Templates', 'Form Builder'] },
+  { section: 'Day School',  subs: ['Day School'] },
 ]
 
-// Click a top-level nav group label. For multi-item groups this
-// opens the dropdown; for single-item groups, the click navigates
-// directly. `expectDropdown` tells us which behavior to wait for.
-async function openGroup(page, label, expectDropdown) {
-  const btn = page.locator(`header.topbar nav.nav .nav-btn`, { hasText: new RegExp(`^${escapeRe(label)}\\s*$`) })
-  const n = await btn.count().catch(() => 0)
-  if (n === 0) return false
-  await btn.first().click({ timeout: 2000 })
-  if (expectDropdown) {
-    // React batches state, so the .dropdown DOM doesn't necessarily
-    // exist the instant click() returns. Wait for it.
-    await page.locator('header.topbar .dropdown').first().waitFor({ state: 'visible', timeout: 2000 })
-  }
-  return true
-}
-
-// Click an item inside an open dropdown. The dropdown <button>s
-// contain only the item label.
-async function clickDropdownItem(page, label) {
-  const it = page.locator(`header.topbar .dropdown button`, { hasText: new RegExp(`^${escapeRe(label)}\\s*$`) })
-  try {
-    await it.first().waitFor({ state: 'visible', timeout: 2000 })
-  } catch {
-    return false
-  }
-  await it.first().click({ timeout: 2000 })
-  return true
-}
-
 function escapeRe(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }
+
+async function clickSidebar(page, label) {
+  const btn = page.locator('nav.sidebar button.sidebar-item', { hasText: new RegExp(`^${escapeRe(label)}$`) })
+  await btn.first().waitFor({ state: 'visible', timeout: 3000 })
+  await btn.first().click({ timeout: 2000 })
+}
+
+async function clickSubmenu(page, label) {
+  const btn = page.locator('header.topbar-v7 .submenu button', { hasText: new RegExp(`^${escapeRe(label)}$`) })
+  await btn.first().waitFor({ state: 'visible', timeout: 3000 })
+  await btn.first().click({ timeout: 2000 })
+}
 
 export async function runPageTests() {
   const results = []
@@ -97,45 +64,38 @@ export async function runPageTests() {
       consoleErrors.length = 0
       const pw = process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || ''
       assert(pw, 'ADMIN_PASSWORD (or TEST_ADMIN_PASSWORD) must be set in server/.env for page tests')
-      // The Login component has one password input. Type into it, then submit.
       const pwInput = page.locator('input[type="password"]').first()
       await pwInput.waitFor({ timeout: 5000 })
       await pwInput.fill(pw)
       await page.getByRole('button', { name: /sign in/i }).click()
-      // After login, TopNav renders with the "Admin" group button.
-      await page.locator('header.topbar nav.nav .nav-btn', { hasText: /^Admin\s*$/ })
+      // After login, the sidebar renders with a "Home" button visible.
+      await page.locator('nav.sidebar button.sidebar-item', { hasText: /^Home$/ })
         .first().waitFor({ timeout: 5000 })
       const errs = consoleErrors.filter(e => !isIgnorableError(e))
       assert(errs.length === 0, `console errors: ${errs.join(' | ')}`)
     }))
 
     // -------- Each page renders --------
-    for (const { group, item } of PAGES) {
-      results.push(await runTest(`Nav: ${group} → ${item}`, async () => {
+    for (const { section, subs } of NAV) {
+      // Open the section once; that auto-navigates to its first sub.
+      results.push(await runTest(`Sidebar: ${section}`, async () => {
         consoleErrors.length = 0
-        // Single-item groups navigate straight on click; multi-item
-        // groups open a dropdown. Bug this replaces: `group === item`
-        // wrongly treated Customers→Customers as single-item because
-        // the item label matches the group label, even though
-        // Customers has {Customers, Surveys} — clicking opened a
-        // dropdown, then the next test toggled it closed and timed
-        // out waiting for it to be visible.
-        const isSingleItem = SINGLE_ITEM_GROUPS.has(group)
-        const opened = await openGroup(page, group, !isSingleItem)
-        assert(opened, `nav group "${group}" not found`)
-
-        if (!isSingleItem) {
-          const clicked = await clickDropdownItem(page, item)
-          assert(clicked, `dropdown item "${item}" not found under "${group}"`)
-        }
-
-        // Verify the page shell renders. .page is the wrapper every
-        // route component renders into.
-        await page.locator('.page, .login-wrap').first().waitFor({ timeout: 5000 })
-
+        await clickSidebar(page, section)
+        await page.locator('.page, .placeholder-v7').first().waitFor({ timeout: 5000 })
         const errs = consoleErrors.filter(e => !isIgnorableError(e))
         assert(errs.length === 0, `console errors: ${errs.join(' | ')}`)
       }))
+
+      // Then walk every sub via the top-bar submenu pills.
+      for (const sub of subs) {
+        results.push(await runTest(`Nav: ${section} → ${sub}`, async () => {
+          consoleErrors.length = 0
+          await clickSubmenu(page, sub)
+          await page.locator('.page, .placeholder-v7').first().waitFor({ timeout: 5000 })
+          const errs = consoleErrors.filter(e => !isIgnorableError(e))
+          assert(errs.length === 0, `console errors: ${errs.join(' | ')}`)
+        }))
+      }
     }
   } catch (err) {
     results.push({
