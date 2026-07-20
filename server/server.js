@@ -696,6 +696,22 @@ app.put('/api/finance', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- IT accounts (singleton payload — passwords manager) --
+// Shape mirrors "crania-it-accounts.json" from the client mockup:
+//   { categories: [{id,name,color}], accounts: [{id,catId,name,url,user,pass,notes,color,cost?,start?,active?}] }
+// TODO: encrypt `pass` fields at rest; currently plaintext inside
+// PocketBase's admin-gated json payload. See loadItAccounts note.
+app.get('/api/it-accounts', wrap(async (_req, res) => res.json(await loadItAccounts())))
+app.put('/api/it-accounts', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    categories: Array.isArray(body.categories) ? body.categories : [],
+    accounts:   Array.isArray(body.accounts)   ? body.accounts   : [],
+  }
+  await saveItAccounts(payload)
+  res.json({ ok: true })
+}))
+
 // ---- projects (kanban board — singleton payload) --------
 // Same shape as the client's "crania-projects.json" export so
 // JSON round-trips cleanly. Whole payload written on every save.
