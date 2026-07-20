@@ -733,6 +733,21 @@ app.put('/api/it-accounts', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- calendar (singleton payload — calendars + events + hidden) ---
+// Shape mirrors "crania-calendar.json" from the client's v18 mockup
+// so JSON export/import round-trips cleanly.
+app.get('/api/calendar', wrap(async (_req, res) => res.json(await loadCalendar())))
+app.put('/api/calendar', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    calendars: Array.isArray(body.calendars) ? body.calendars : [],
+    events:    Array.isArray(body.events)    ? body.events    : [],
+    hidden:    body.hidden && typeof body.hidden === 'object' ? body.hidden : {},
+  }
+  await saveCalendar(payload)
+  res.json({ ok: true })
+}))
+
 // ---- projects (kanban board — singleton payload) --------
 // Same shape as the client's "crania-projects.json" export so
 // JSON round-trips cleanly. Whole payload written on every save.
