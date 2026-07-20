@@ -123,7 +123,9 @@
       "Bash(git commit -m 'Calendar: wire to new /api/calendar singleton \\(10 cals + 180 events seeded\\) *)",
       "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/6-1. CraniaVerse - Inventory v44 [claude-opus-4-8].html\")",
       "Bash(awk 'NR==226 {print \"  <!-- LOGO base64 stripped -->\"; next} {print}' \"/c/Users/hanak/Downloads/6-1. CraniaVerse - Inventory v44 [claude-opus-4-8].html\")",
-      "Bash(git commit -m 'Inventory: rewire to new /api/stock singleton \\(v44 mockup + seeded from JSON\\) *)"
+      "Bash(git commit -m 'Inventory: rewire to new /api/stock singleton \\(v44 mockup + seeded from JSON\\) *)",
+      "Bash(stock)",
+      "Bash(git commit -m 'Crania Store: retail-side inventory wired to new /api/crania-store *)"
     ]
   },
   "hooks": {
