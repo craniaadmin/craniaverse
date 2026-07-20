@@ -42,6 +42,7 @@ import {
   loadItAccounts,    saveItAccounts,
   loadCalendar,      saveCalendar,
   loadStock,         saveStock,
+  loadCraniaStore,   saveCraniaStore,
   loadTodo,          saveTodo,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
