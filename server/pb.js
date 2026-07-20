@@ -483,6 +483,52 @@ export async function saveProjects(payload) {
   }
 }
 
+// ---- calendar (singleton payload — events + calendars + hidden) ---
+// Shape mirrors "crania-calendar.json" from the client's v18 mockup:
+//   { calendars: [{id,name,color}], events: [{id,calId,title,date,allDay,start,end,notes,color?,recur?,exceptions?}], hidden: {} }
+// If the collection row doesn't exist yet, seed with the client's
+// existing board (10 calendars, ~180 events) loaded from
+// server/data/calendar-seed.json. Explicit empty state after that
+// is respected — no re-seeding on refresh.
+let _calendarSeedCache = null
+function getCalendarSeed() {
+  if (_calendarSeedCache) return _calendarSeedCache
+  try {
+    const raw = fs.readFileSync(path.join(__pbDir, 'data', 'calendar-seed.json'), 'utf8')
+    _calendarSeedCache = JSON.parse(raw)
+  } catch (err) {
+    console.error('[calendar] failed to load seed:', err?.message || err)
+    _calendarSeedCache = { calendars: [], events: [], hidden: {} }
+  }
+  return _calendarSeedCache
+}
+
+export async function loadCalendar() {
+  try {
+    const rows = await getFullList('calendar')
+    if (rows.length === 0) return getCalendarSeed()
+    const p = rows[0].payload || {}
+    return {
+      calendars: Array.isArray(p.calendars) ? p.calendars : [],
+      events:    Array.isArray(p.events)    ? p.events    : [],
+      hidden:    p.hidden && typeof p.hidden === 'object' ? p.hidden : {},
+    }
+  } catch (err) {
+    if (err?.status === 404) return getCalendarSeed()
+    throw err
+  }
+}
+
+export async function saveCalendar(payload) {
+  await ensureAuth()
+  const rows = await getFullList('calendar')
+  if (rows.length === 0) {
+    await pb().collection('calendar').create({ payload })
+  } else {
+    await pb().collection('calendar').update(rows[0].id, { payload })
+  }
+}
+
 // ---- IT accounts (singleton payload — passwords manager) --------
 // Shape mirrors "crania-it-accounts.json" from the client's v28
 // mockup so JSON imports/exports round-trip. If the row doesn't
