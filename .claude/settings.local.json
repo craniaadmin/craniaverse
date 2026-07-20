@@ -113,7 +113,8 @@
       "Bash(SESSION_SECRET=some-random-32-plus-char-session-secret-value node -e ' *)",
       "Bash(git commit -m 'IT Accounts: encrypt pass + notes at rest \\(AES-256-GCM\\) *)",
       "Bash(node --check tests/run.js)",
-      "Bash(git commit -m 'Tests: expose last-run summary at public /api/tests/last-run *)"
+      "Bash(git commit -m 'Tests: expose last-run summary at public /api/tests/last-run *)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' 'https://craniaverse.ngrok.app/api/tests/last-run' -H 'ngrok-skip-browser-warning: true')"
     ]
   },
   "hooks": {

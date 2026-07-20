@@ -129,6 +129,9 @@ const PUBLIC_MATCHERS = [
   (m, p) => m === 'POST' && p === '/api/booth-signup',
   (m, p) => m === 'GET'  && /^\/api\/forms\/[^/]+$/.test(p),
   (m, p) => m === 'POST' && /^\/api\/forms\/[^/]+\/submit$/.test(p),
+  // Test-runner status: names + error strings only, no credentials.
+  // Public so the scheduled Claude agent can poll without a stored password.
+  (m, p) => m === 'GET'  && p === '/api/tests/last-run',
 ]
 
 export function isPublicApi(method, pathname) {
