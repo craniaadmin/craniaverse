@@ -20,6 +20,69 @@
 // the migration is lossless and reversible.
 // ============================================================
 import PocketBase from 'pocketbase'
+import crypto from 'crypto'
+
+// ---- IT-accounts symmetric encryption (AES-256-GCM) ---------
+// Passwords + notes for the IT Accounts page are encrypted at rest
+// in the PocketBase payload. The API stays cleartext-in-transit
+// (HTTPS handles the wire). This mitigates DB-leak / backup exposure
+// only; it does NOT prevent someone with a valid admin session
+// from reading passwords over the API.
+//
+// The key is derived by SHA-256 of IT_ACCOUNTS_ENC_KEY (preferred)
+// or SESSION_SECRET (fallback so existing installs work without
+// extra config). Rotate by setting a new key and running a script
+// that walks all records, decrypts with the old key, re-encrypts
+// with the new one — TODO if/when we need it.
+const ENC_ALGO = 'aes-256-gcm'
+const ENC_PREFIX = 'enc:v1:'
+
+function encKey() {
+  const raw = process.env.IT_ACCOUNTS_ENC_KEY || process.env.SESSION_SECRET || ''
+  if (!raw || raw.length < 16) {
+    throw new Error('IT_ACCOUNTS_ENC_KEY or SESSION_SECRET must be set (32+ chars) to encrypt IT-accounts secrets')
+  }
+  return crypto.createHash('sha256').update(raw).digest() // 32 bytes for AES-256
+}
+
+function encryptSecret(plain) {
+  if (plain == null || plain === '') return ''
+  const str = typeof plain === 'string' ? plain : String(plain)
+  // Idempotent: if it's already ciphertext, return as-is so a
+  // load-then-save round-trip doesn't double-encrypt.
+  if (str.startsWith(ENC_PREFIX)) return str
+  const iv = crypto.randomBytes(12)
+  const cipher = crypto.createCipheriv(ENC_ALGO, encKey(), iv)
+  const ct = Buffer.concat([cipher.update(str, 'utf8'), cipher.final()])
+  const tag = cipher.getAuthTag()
+  // Layout: enc:v1:<iv_b64>:<ct||tag_b64>  (tag = last 16 bytes)
+  return ENC_PREFIX + iv.toString('base64') + ':' + Buffer.concat([ct, tag]).toString('base64')
+}
+
+function decryptSecret(stored) {
+  if (stored == null || stored === '') return ''
+  const str = typeof stored === 'string' ? stored : String(stored)
+  // Legacy plaintext (pre-encryption records or the seed) → return
+  // as-is; the next PUT will migrate it to ciphertext transparently.
+  if (!str.startsWith(ENC_PREFIX)) return str
+  try {
+    const rest = str.slice(ENC_PREFIX.length)
+    const idx = rest.indexOf(':')
+    if (idx === -1) return ''
+    const iv = Buffer.from(rest.slice(0, idx), 'base64')
+    const data = Buffer.from(rest.slice(idx + 1), 'base64')
+    if (data.length < 16) return ''
+    const tag = data.slice(-16)
+    const ct = data.slice(0, -16)
+    const decipher = crypto.createDecipheriv(ENC_ALGO, encKey(), iv)
+    decipher.setAuthTag(tag)
+    return decipher.update(ct, undefined, 'utf8') + decipher.final('utf8')
+  } catch (err) {
+    // Wrong key, tampered ciphertext, or corrupted payload.
+    console.error('[itAccounts] decrypt failed for a secret; returning empty')
+    return ''
+  }
+}
 
 // The PocketBase client is created lazily on the first call so that
 // process.env is read AFTER server.js has called dotenv.config().
