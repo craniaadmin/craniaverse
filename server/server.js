@@ -699,8 +699,9 @@ app.put('/api/finance', wrap(async (req, res) => {
 // ---- IT accounts (singleton payload — passwords manager) --
 // Shape mirrors "crania-it-accounts.json" from the client mockup:
 //   { categories: [{id,name,color}], accounts: [{id,catId,name,url,user,pass,notes,color,cost?,start?,active?}] }
-// TODO: encrypt `pass` fields at rest; currently plaintext inside
-// PocketBase's admin-gated json payload. See loadItAccounts note.
+// `pass` and `notes` are encrypted at rest via AES-256-GCM in
+// pb.js (see load/saveItAccounts). API responses are cleartext
+// over HTTPS; encryption mitigates DB-leak / backup exposure only.
 app.get('/api/it-accounts', wrap(async (_req, res) => res.json(await loadItAccounts())))
 app.put('/api/it-accounts', wrap(async (req, res) => {
   const body = req.body || {}
