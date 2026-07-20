@@ -141,6 +141,82 @@ export async function runLogicTests() {
       assert(!restored.json.payments.some(p => p.id === payId), 'payment should be gone after restore')
     }),
 
+    await runTest('Projects round-trip: PUT temp card → GET → restore', async () => {
+      const before = await http('GET', '/api/projects')
+      assert(before.status === 200, `GET status ${before.status}`)
+      const original = before.json
+      assert(original && Array.isArray(original.cards), 'expected projects payload with cards array')
+
+      const tag = `logic-proj-${Date.now()}`
+      const cardId = `card_${tag}`
+      const patched = {
+        ...original,
+        cards: [
+          ...original.cards,
+          {
+            id: cardId, col: 'todo', project: 'PB Test', task: tag, who: '',
+            due: '', comments: [], color: '#5FA09E', days: [], dayDate: '',
+            tags: [], goals: [], created: new Date().toISOString(),
+            archived: false, archivedFrom: '', archivedAt: '',
+          },
+        ],
+      }
+      const put = await http('PUT', '/api/projects', patched)
+      assert(put.status === 200, `PUT status ${put.status}: ${put.text?.slice(0, 200)}`)
+
+      try {
+        const after = await http('GET', '/api/projects')
+        assert(after.status === 200, `GET after status ${after.status}`)
+        const card = after.json.cards.find(c => c.id === cardId)
+        assert(card, `expected card ${cardId} in payload`)
+        assert(card.task === tag, `task mismatch: expected ${tag}, got ${card.task}`)
+      } finally {
+        // Restore the original payload — always, even if assertions above failed.
+        await http('PUT', '/api/projects', original).catch(() => {})
+      }
+
+      const restored = await http('GET', '/api/projects')
+      assert(!restored.json.cards.some(c => c.id === cardId), 'card should be gone after restore')
+    }),
+
+    await runTest('IT accounts round-trip: PUT temp account encrypts+decrypts pass', async () => {
+      const before = await http('GET', '/api/it-accounts')
+      assert(before.status === 200, `GET status ${before.status}`)
+      const original = before.json
+      assert(original && Array.isArray(original.accounts), 'expected it-accounts payload with accounts array')
+
+      const tag = `logic-it-${Date.now()}`
+      const acctId = `acct_${tag}`
+      const secret = `S3cret!${tag}`
+      const catId = original.categories?.[0]?.id || ''
+      const patched = {
+        categories: original.categories,
+        accounts: [
+          ...original.accounts,
+          { id: acctId, catId, name: `PB Test ${tag}`, url: '', user: 'pb-test', pass: secret, notes: '', color: '#EEF3F6' },
+        ],
+      }
+      const put = await http('PUT', '/api/it-accounts', patched)
+      assert(put.status === 200, `PUT status ${put.status}: ${put.text?.slice(0, 200)}`)
+
+      try {
+        const after = await http('GET', '/api/it-accounts')
+        assert(after.status === 200, `GET after status ${after.status}`)
+        const acct = after.json.accounts.find(a => a.id === acctId)
+        assert(acct, `expected account ${acctId} in payload`)
+        // Round-trip through pb.js's AES-256-GCM encrypt-at-rest layer —
+        // the API should hand back cleartext, never the enc:v1:... blob.
+        assert(acct.pass === secret, `pass should decrypt back to original: expected ${secret}, got ${acct.pass}`)
+        assert(!String(acct.pass).startsWith('enc:v1:'), 'pass should not be returned as ciphertext')
+      } finally {
+        // Restore the original payload — always, even if assertions above failed.
+        await http('PUT', '/api/it-accounts', original).catch(() => {})
+      }
+
+      const restored = await http('GET', '/api/it-accounts')
+      assert(!restored.json.accounts.some(a => a.id === acctId), 'account should be gone after restore')
+    }),
+
     await runTest('Inventory round-trip: POST → GET → PUT → DELETE', async () => {
       const tag = `logic-inv-${Date.now()}`
       const created = await http('POST', '/api/inventory', {
