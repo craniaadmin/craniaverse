@@ -334,6 +334,99 @@ input, select, textarea { font-family: inherit; }
 .kb-actions .cancel { background: #eee; color: var(--brand-dark-brown); }
 .kb-actions .del    { background: #fff; color: #c0392b; border: 1px solid #eecfca; margin-right: auto; }
 
+/* ---------------- IT Accounts (password manager) ---------------- */
+.ita-toolbar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  padding: 6px 0 14px; max-width: 980px; margin: 0 auto;
+}
+.ita-toolbar input.ita-search {
+  padding: 8px 11px; border: 1px solid #d5d0c4; border-radius: 8px;
+  font: inherit; font-size: 13px; background: #fff;
+  color: var(--brand-dark-brown); flex: 1; min-width: 170px;
+}
+.ita-toolbar select {
+  padding: 8px 11px; border: 1px solid #d5d0c4; border-radius: 8px;
+  font: inherit; font-size: 13px; background: #fff;
+  color: var(--brand-dark-brown);
+}
+.ita-toolbar button {
+  padding: 6px 12px; border: none; border-radius: 8px; font: inherit;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.ita-toolbar button.clear   { background: transparent; color: var(--brand-dark-blue); text-decoration: underline; padding: 6px 4px; }
+.ita-toolbar button.toggle  { background: var(--brand-light-brown); color: var(--brand-dark-brown); }
+.ita-toolbar button.add-cat { background: var(--brand-light-blue);  color: var(--brand-dark-brown); margin-left: auto; }
+
+.ita-board { display: flex; flex-direction: column; gap: 20px; max-width: 980px; margin: 0 auto; padding: 0 0 24px; }
+.ita-list {
+  background: #fff; border-radius: 12px;
+  padding: 14px 16px; box-shadow: var(--brand-shadow);
+  border-bottom: 3px solid var(--brand-dark-blue);
+  border-left: 3px solid var(--brand-light-blue);
+  border-right: 3px solid var(--brand-light-brown);
+}
+.ita-list-head {
+  display: flex; align-items: center; gap: 8px;
+  margin: -14px -19px 12px; padding: 10px 16px;
+  font-weight: 700; font-size: 15px;
+  border-radius: 12px 12px 0 0; border-bottom: 2px solid #cfcabb;
+  color: var(--brand-dark-brown);
+}
+.ita-list-head .name  { flex: 1; word-break: break-word; }
+.ita-list-head .count { background: #fff; border-radius: 20px; font-size: 12px; padding: 1px 9px; font-weight: 700; }
+.ita-list-head .lbtn  { background: transparent; border: none; padding: 0 4px; font-size: 14px; font-weight: 700; color: #9a948a; cursor: pointer; }
+.ita-list-head .lbtn:hover { color: var(--brand-dark-blue); }
+.ita-list-head .lbtn.del:hover { color: #c0392b; }
+
+.ita-items { display: flex; flex-direction: column; gap: 8px; padding-left: 18px; min-height: 8px; }
+.ita-empty { text-align: center; color: #9aa; font-size: 13px; padding: 10px 4px; }
+
+.ita-acc {
+  background: #EEF3F6; border-radius: 8px; padding: 5px 8px 5px 10px;
+  display: flex; align-items: center; gap: 8px;
+  border-left: 4px solid var(--brand-dark-blue);
+  font-size: 13px; color: var(--brand-dark-brown);
+  position: relative;
+}
+.ita-acc.inactive { opacity: .55; }
+.ita-acc .txt   { flex: 1.1; min-width: 90px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.ita-acc .txt:hover { color: var(--brand-dark-blue); }
+.ita-acc .slot  { flex: 1.2; min-width: 130px; display: flex; align-items: center; gap: 4px; overflow: hidden; font-size: 12.5px; color: #6b6455; }
+.ita-acc .slot .val { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ita-acc .slot.pw .val { font-family: Consolas, Menlo, monospace; letter-spacing: 1px; }
+.ita-acc .slot.pw .val.empty { letter-spacing: 0; font-style: italic; color: #b0aa9b; }
+.ita-acc .slot.cost { flex: none; width: 78px; justify-content: flex-end; font-variant-numeric: tabular-nums; }
+.ita-acc .slot.start { flex: none; width: 92px; justify-content: flex-end; }
+.ita-acc .ibtn {
+  flex: none; background: transparent; border: none; padding: 0;
+  width: 22px; height: 22px; border-radius: 4px; cursor: pointer;
+  color: #c9c3b5; font-size: 12px; font-weight: 700;
+  display: grid; place-items: center;
+}
+.ita-acc .ibtn:hover { color: var(--brand-dark-blue); background: rgba(0,0,0,.04); }
+.ita-acc .ibtn.ok { color: #1e8449; }
+.ita-acc .ibtn.del:hover { background: #fadbd8; color: #922b21; }
+.ita-acc .inactchip {
+  font-size: 11px; border-radius: 6px; padding: 1px 6px;
+  font-weight: 600; background: #eee; color: var(--brand-dark-brown);
+}
+
+.ita-notepop {
+  position: absolute; left: 12px; top: 100%; margin-top: 4px; z-index: 15;
+  background: var(--brand-dark-brown); color: #fff; font-size: 12.5px;
+  line-height: 1.45; padding: 8px 11px; border-radius: 8px;
+  max-width: 340px; white-space: pre-wrap; word-break: break-word;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+}
+
+.ita-add-item {
+  background: transparent; color: var(--brand-dark-blue); border: none;
+  margin-top: 8px; padding: 1px 0 1px 18px; font-size: 20px; line-height: 1.2;
+  font-weight: 800; align-self: flex-start; cursor: pointer;
+}
+
+.ita-nomatch { text-align: center; color: #9a948a; font-size: 14px; padding: 30px; }
+
 /* Placeholder card used for "under construction" pages */
 .placeholder-v7 {
   background: #fff; border-radius: 12px;
