@@ -140,6 +140,13 @@ const collectionSpecs = [
     indexes: [],
   },
   {
+    name: 'calendar',
+    fields: [
+      { name: 'payload', type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: [],
+  },
+  {
     name: 'formSubmissions',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },
