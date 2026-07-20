@@ -522,6 +522,46 @@ export async function saveStock(payload) {
   }
 }
 
+// ---- crania store (singleton — v20 retail mockup) --------
+// Shape mirrors "crania-crania-store.json": same items/log/category
+// metadata as `stock`, plus per-item `tax`, `price` (auto:
+// ceil(cost*(1+tax/100))*10), and `img` (base64 data URL).
+// Separate collection from `stock` so warehouse inventory and
+// retail-store inventory don't collide.
+let _storeSeedCache = null
+function getStoreSeed() {
+  if (_storeSeedCache) return _storeSeedCache
+  try {
+    const raw = fs.readFileSync(path.join(__pbDir, 'data', 'crania-store-seed.json'), 'utf8')
+    _storeSeedCache = JSON.parse(raw)
+  } catch (err) {
+    console.error('[craniaStore] failed to load seed:', err?.message || err)
+    _storeSeedCache = { items: [], log: [], categoryOrder: [], categoryColors: {}, extraSubs: [], subOrder: {}, subColors: {}, colOrder: [] }
+  }
+  return _storeSeedCache
+}
+
+export async function loadCraniaStore() {
+  try {
+    const rows = await getFullList('craniaStore')
+    if (rows.length === 0) return getStoreSeed()
+    return rows[0].payload || { items: [], log: [] }
+  } catch (err) {
+    if (err?.status === 404) return getStoreSeed()
+    throw err
+  }
+}
+
+export async function saveCraniaStore(payload) {
+  await ensureAuth()
+  const rows = await getFullList('craniaStore')
+  if (rows.length === 0) {
+    await pb().collection('craniaStore').create({ payload })
+  } else {
+    await pb().collection('craniaStore').update(rows[0].id, { payload })
+  }
+}
+
 // ---- calendar (singleton payload — events + calendars + hidden) ---
 // Shape mirrors "crania-calendar.json" from the client's v18 mockup:
 //   { calendars: [{id,name,color}], events: [{id,calId,title,date,allDay,start,end,notes,color?,recur?,exceptions?}], hidden: {} }
