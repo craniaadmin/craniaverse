@@ -104,7 +104,8 @@
       "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/1. CraniaVerse - Home v7 [claude-fable-5].html\")",
       "Bash(sort -k2 -n)",
       "Bash(awk 'NR==49 {print \"  <!-- LOGO IMAGE \\(base64, 404KB - stripped for reading\\) -->\"; next} {print}' \"/c/Users/hanak/Downloads/1. CraniaVerse - Home v7 [claude-fable-5].html\")",
-      "Bash(git commit -m 'Redesign: v7 sidebar+topbar mockup layout *)"
+      "Bash(git commit -m 'Redesign: v7 sidebar+topbar mockup layout *)",
+      "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/1-4. CraniaVerse - Projects v20 [claude-fable-5].html\")"
     ]
   },
   "hooks": {

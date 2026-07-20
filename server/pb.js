@@ -338,6 +338,83 @@ export async function saveTodo(payload) {
   }
 }
 
+// ---- projects (kanban board — singleton payload) --------
+// Schema mirrors the "crania-projects.json" file the client's
+// v20 kanban mockup writes to disk, so exports/imports round-trip.
+// If the collection is empty on first load we seed with the client's
+// existing 3-card board (dropped from her local JSON file).
+const PROJECTS_SEED = {
+  cards: [
+    {
+      id: 'mrkvsii538eaz', col: 'daily', project: '', task: 'dsfg', who: '',
+      due: '', comments: [
+        { id: 'mrkvsii53kwtm', date: '2026-07-14', time: '12:44',
+          author: 'asdf', text: 'asdf', read: true },
+      ], color: '#5FA09E', days: [1, 2, 3, 4, 5, 6, 0],
+      dayDate: '2026-07-15', tags: ['sdfg'], goals: [],
+      created: '2026-07-14T16:44:15.149Z',
+      archived: false, archivedFrom: '', archivedAt: '',
+    },
+    {
+      id: 'mrkq0iyhmafe4', col: 'notes', project: '', task: 'asdf', who: '',
+      due: '', comments: [
+        { id: 'mrkq090o7dcjj', date: '2026-07-14', time: '10:02',
+          author: 'eat pototoes', text: 'sam', read: true },
+        { id: 'mrl8266j2swrq', date: '2026-07-14', time: '18:27',
+          author: 'kelly', text: 'eat more potatoes', read: false },
+        { id: 'mrl82i188amm4', date: '2026-07-14', time: '18:27',
+          author: 'john', text: 'and more potatotoes', read: false },
+      ], color: '#5FA09E', days: [], dayDate: '', tags: ['asdf'], goals: [],
+      created: '2026-07-14T14:02:31.289Z',
+      archived: false, archivedFrom: '', archivedAt: '',
+    },
+    {
+      id: 'mrks5uaayam6i', col: 'notes', project: '', task: 'buy chocolate',
+      who: '', due: '', comments: [
+        { id: 'mrks5dd51ku8u', date: '2026-07-14', time: '11:02',
+          author: 'fdg', text: 'sfg', read: false },
+      ], color: '#5FA09E', days: [], dayDate: '', tags: [], goals: [],
+      created: '2026-07-14T15:02:38.482Z',
+      archived: false, archivedFrom: '', archivedAt: '',
+    },
+  ],
+  updatedAt: '2026-07-15T00:15:30.453Z',
+  lastReset: '2026-07-15',
+  lastResetAt: 1784116800000,
+  resetTime: '08:00',
+  lastBackup: '2026-07-15',
+  lastBackupAt: '2026-07-15T13:09:49.623Z',
+  clearGoals: false,
+  clearGoalsTime: '00:00',
+  lastGoalsClear: '2026-07-15',
+  lastGoalsClearAt: 1784088000000,
+  colOrder: ['notes', 'goals', 'daily', 'todo', 'doing', 'done'],
+}
+
+export async function loadProjects() {
+  try {
+    const rows = await getFullList('projects')
+    // No row → first-ever load, seed with the client's existing board.
+    // Once the row exists (even if she then deletes all cards), we
+    // respect what's there — never re-seed automatically.
+    if (rows.length === 0) return PROJECTS_SEED
+    return rows[0].payload || { cards: [], colOrder: ['notes', 'goals', 'daily', 'todo', 'doing', 'done'] }
+  } catch (err) {
+    if (err?.status === 404) return PROJECTS_SEED
+    throw err
+  }
+}
+
+export async function saveProjects(payload) {
+  await ensureAuth()
+  const rows = await getFullList('projects')
+  if (rows.length === 0) {
+    await pb().collection('projects').create({ payload })
+  } else {
+    await pb().collection('projects').update(rows[0].id, { payload })
+  }
+}
+
 // ---- finance (singleton payload with invoices + payments + meta) ---
 const DEFAULT_FINANCE = {
   invoices: [],
