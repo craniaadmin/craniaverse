@@ -154,6 +154,186 @@ input, select, textarea { font-family: inherit; }
   font-weight: 700; display: grid; place-items: center; font-size: 13px;
 }
 
+/* ---------------- Kanban board (Projects page) ---------------- */
+.kanban {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+  padding: 4px 0 24px; align-items: start;
+}
+@media (max-width: 1400px) { .kanban { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px)  { .kanban { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px)  { .kanban { grid-template-columns: 1fr; } }
+.kb-col {
+  background: #EAF0F1; border-radius: 12px; padding: 12px;
+  display: flex; flex-direction: column; min-height: 120px;
+}
+.kb-col.dragover { outline: 2px dashed var(--brand-dark-blue); outline-offset: 2px; }
+.kb-col-head {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  font-weight: 700; padding: 4px 6px; border-radius: 8px;
+  color: var(--brand-dark-brown); font-size: 13px;
+}
+.kb-col-head .count {
+  margin-left: auto; background: #fff; border-radius: 20px; font-size: 12px;
+  padding: 1px 9px; font-weight: 700; color: var(--brand-dark-brown);
+}
+.kb-col.col-todo  .kb-col-head { border-bottom: 3px solid var(--brand-light-blue); }
+.kb-col.col-doing .kb-col-head { border-bottom: 3px solid var(--brand-dark-blue); }
+.kb-col.col-done  .kb-col-head { border-bottom: 3px solid var(--brand-light-brown); }
+.kb-col.col-daily .kb-col-head { border-bottom: 3px solid var(--brand-dark-brown); }
+.kb-col.col-notes .kb-col-head { border-bottom: 3px solid #ffffff; }
+.kb-col.col-goals .kb-col-head { border-bottom: 3px solid #B5BBC0; }
+
+.kb-cards { display: flex; flex-direction: column; gap: 10px; min-height: 40px; flex: 1; }
+.kb-empty { text-align: center; color: #9aa; font-size: 12px; padding: 12px 4px; }
+.kb-card {
+  background: #fff; border-radius: 10px; padding: 11px 12px;
+  box-shadow: var(--brand-shadow); cursor: grab; position: relative;
+  color: var(--brand-dark-brown); font-size: 13px;
+}
+.kb-card.dragging { opacity: .45; }
+.kb-card.slim { padding: 8px 10px; }
+.kb-card .project {
+  font-weight: 600; font-size: 15px; margin-bottom: 3px;
+  padding-right: 44px; word-break: break-word;
+}
+.kb-card .task {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; opacity: .72; margin-bottom: 7px;
+  padding-right: 44px; word-break: break-word;
+}
+.kb-card .meta { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.kb-card .chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 6px; padding: 2px 8px; align-self: flex-start;
+  color: var(--brand-dark-brown);
+}
+.kb-card .chip.who   { background: var(--brand-light-blue); font-weight: 600; }
+.kb-card .chip.due   { background: #eee; }
+.kb-card .chip.due.overdue { background: #fadbd8; color: #922b21; font-weight: 600; }
+.kb-card .chip.due.soon    { background: var(--brand-light-brown); }
+.kb-card .chip.recur { background: #8A9096; color: #fff; font-weight: 600; }
+.kb-card .chip.tag   { background: var(--brand-light-blue); font-weight: 600; }
+.kb-card .cfoot {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  margin-top: 8px; border-top: 1px solid rgba(128,128,128,.28); padding-top: 6px;
+  font-size: 12px; word-break: break-word;
+}
+.kb-card .cfoot .cdate { opacity: .7; }
+.kb-card .kb-x, .kb-card .kb-dup {
+  position: absolute; top: 6px; background: transparent; color: inherit;
+  border: none; width: 20px; height: 20px; padding: 0;
+  border-radius: 4px; cursor: pointer; opacity: .6; font-weight: 700;
+  display: grid; place-items: center;
+}
+.kb-card .kb-x   { right: 6px; }
+.kb-card .kb-dup { right: 30px; opacity: .45; }
+.kb-card .kb-x:hover { background: #fadbd8; color: #922b21; opacity: 1; }
+.kb-card .kb-dup:hover { opacity: 1; }
+.kb-card .unread {
+  background: var(--brand-dark-blue); color: #fff;
+  border-radius: 6px; padding: 1px 7px; font-size: 11px; font-weight: 700;
+}
+
+.kb-goals { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; font-size: 13px; }
+.kb-goals .row { display: flex; align-items: center; gap: 6px; }
+.kb-goals .row .text { flex: 1; word-break: break-word; }
+.kb-goals .row .text.done { text-decoration: line-through; opacity: .55; }
+
+.kb-add {
+  background: transparent; color: var(--brand-dark-blue);
+  border: 1px dashed var(--brand-dark-blue); margin-top: 10px;
+  padding: 7px 10px; font-size: 12px; font-weight: 600; border-radius: 8px;
+}
+
+/* Kanban toolbar */
+.kb-toolbar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  padding: 6px 0 14px;
+}
+.kb-toolbar input.kb-filter {
+  padding: 7px 12px; border-radius: 8px; border: 1px solid #d5d0c4;
+  background: #fff; color: var(--brand-dark-brown); font: inherit;
+  font-size: 13px; width: 240px;
+}
+.kb-toolbar .kb-updated {
+  margin-left: auto; font-size: 11.5px; color: #9a948a;
+}
+
+/* Kanban modal — reuses the v7 brand palette */
+.kb-modal-scrim {
+  position: fixed; inset: 0; background: rgba(46, 37, 22, .45);
+  display: grid; place-items: center; z-index: 200; padding: 16px;
+}
+.kb-modal {
+  background: #fff; border-radius: 14px; padding: 22px;
+  width: 100%; max-width: 560px; max-height: 92vh; overflow: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .3);
+}
+.kb-modal h2 {
+  font-family: var(--serif); font-weight: 400;
+  font-size: 22px; margin-bottom: 16px; color: var(--brand-dark-brown);
+}
+.kb-field { margin-bottom: 14px; }
+.kb-field > label {
+  display: block; font-size: 12.5px; font-weight: 600;
+  margin-bottom: 5px; color: #6b6455;
+}
+.kb-field input, .kb-field textarea, .kb-field select {
+  width: 100%; padding: 9px 11px; border: 1px solid #d5d0c4;
+  border-radius: 8px; font: inherit; background: #fff;
+  color: var(--brand-dark-brown);
+}
+.kb-field textarea { resize: vertical; min-height: 64px; }
+.kb-field input:focus, .kb-field textarea:focus, .kb-field select:focus {
+  outline: none; border-color: var(--brand-dark-blue);
+}
+.kb-daychecks { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-size: 12.5px; }
+.kb-daychecks label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.kb-daychecks .dayall {
+  font-size: 11px; color: var(--brand-dark-blue);
+  text-decoration: underline; cursor: pointer; margin-left: auto;
+}
+.kb-clist {
+  max-height: 240px; overflow: auto; border: 1px solid #d9d5c8;
+  border-radius: 8px; background: #fbfaf5; margin-bottom: 10px;
+}
+.kb-crow {
+  font-size: 13px; display: flex; gap: 8px; align-items: center;
+  padding: 8px 10px; border-bottom: 1px solid #ece8dc;
+}
+.kb-crow:last-child { border-bottom: none; }
+.kb-crow.unread { background: #EAF6F5; border-left: 3px solid var(--brand-dark-blue); }
+.kb-crow .cdate   { color: #8a8474; font-size: 11.5px; white-space: nowrap; }
+.kb-crow .cauthor { color: var(--brand-dark-blue); font-weight: 700; white-space: nowrap; }
+.kb-crow .ctext   { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kb-crow .cdel    { cursor: pointer; color: #c0392b; font-size: 12px; }
+.kb-caddrow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.kb-caddrow input { padding: 8px 10px; font-size: 13px; border: 1px solid #d5d0c4; border-radius: 8px; }
+.kb-caddrow .comment  { flex: 1; min-width: 140px; }
+.kb-caddrow .author   { width: 100px; }
+.kb-caddrow .date     { width: 122px; }
+.kb-caddrow button    {
+  padding: 8px 12px; background: var(--brand-light-brown);
+  color: var(--brand-dark-brown); border: none; border-radius: 8px;
+  font-weight: 600; cursor: pointer;
+}
+.kb-swatches { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.kb-swatch {
+  width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+  border: 2px solid #fff; box-shadow: 0 0 0 1px #ccc;
+}
+.kb-swatch.sel { box-shadow: 0 0 0 2px var(--brand-dark-brown); }
+.kb-actions {
+  display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px;
+}
+.kb-actions button {
+  padding: 8px 14px; border: none; border-radius: 8px; font-weight: 600;
+  cursor: pointer; font: inherit;
+}
+.kb-actions .save   { background: var(--brand-dark-blue); color: #fff; }
+.kb-actions .cancel { background: #eee; color: var(--brand-dark-brown); }
+.kb-actions .del    { background: #fff; color: #c0392b; border: 1px solid #eecfca; margin-right: auto; }
+
 /* Placeholder card used for "under construction" pages */
 .placeholder-v7 {
   background: #fff; border-radius: 12px;
