@@ -415,6 +415,128 @@ export async function saveProjects(payload) {
   }
 }
 
+// ---- IT accounts (singleton payload — passwords manager) --------
+// Shape mirrors "crania-it-accounts.json" from the client's v28
+// mockup so JSON imports/exports round-trip. If the row doesn't
+// exist yet, seed with the 78-account payload she shared.
+//
+// TODO: passwords are stored in cleartext inside the payload —
+// PocketBase gates access to admins-only, but the mockup itself
+// noted "ask Claude for full encryption when you're ready" so we
+// should add symmetric encryption of the .pass field before this
+// leaves internal use.
+const IT_ACCOUNTS_SEED = {
+  categories: [
+    { id: 'mrmex3lwhjwas', name: 'Misc.', color: '#5FA09E' },
+    { id: 'mrmaubyjidc1e', name: 'Email', color: '#5FA09E' },
+    { id: 'mrmf2dir3wu6u', name: 'SAAS', color: '#5FA09E' },
+    { id: 'mrl9p83qi0qq6', name: 'Finance & Payroll' },
+    { id: 'mrl9p83qqy14k', name: 'Tools & Other' },
+    { id: 'mrmfan3lcqjsl', name: 'Contests', color: '#5FA09E' },
+    { id: 'mrmggezdgsc55', name: 'Marketing', color: '#5FA09E' },
+    { id: 'mrl9p83qgda3o', name: 'Social Media' },
+    { id: 'mrmgmb9k27sv3', name: 'Utilities/Phone/Internet', color: '#5FA09E' },
+    { id: 'mrmgo0l3k6uyw', name: 'Suppliers', color: '#5FA09E' },
+    { id: 'mrnsk4elc04ma', name: 'AI', color: '#5FA09E' },
+  ],
+  accounts: [
+    { id: 'mrmgk4zz3ebw0', catId: 'mrl9p83qgda3o', name: 'TikTok',              url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgis81x72fc', catId: 'mrl9p83qgda3o', name: 'Facebook',            url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgjkltaa6h4', catId: 'mrl9p83qgda3o', name: 'Instagram',           url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgjr60122pe', catId: 'mrl9p83qgda3o', name: 'LinkedIn',            url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgk8m0lxx2k', catId: 'mrl9p83qgda3o', name: 'Twitter',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmevqj9m9913', catId: 'mrmex3lwhjwas', name: 'Divi',                url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmevygscdr57', catId: 'mrmex3lwhjwas', name: 'ElevenLabs',          url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmew38sj3lnm', catId: 'mrmex3lwhjwas', name: 'GitHub',              url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmewes4ymx6o', catId: 'mrmex3lwhjwas', name: 'ShareASale',          url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmewj92rlsv6', catId: 'mrmex3lwhjwas', name: 'Tidio',               url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmez14cizjge', catId: 'mrmex3lwhjwas', name: 'Airtable',            url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf2t0jbuasz', catId: 'mrmf2dir3wu6u', name: 'Dropbox',             url: '', user: 'craniaschoolsinc@gmail.com',            pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf2uebhq8us', catId: 'mrmf2dir3wu6u', name: 'Dropbox',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf2uxfwdxtb', catId: 'mrmf2dir3wu6u', name: 'Dropbox',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf4bui891sh', catId: 'mrmaubyjidc1e', name: 'Google',              url: 'craniaschoolsinc@gmail.com', user: '',            pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf4vazfa5tt', catId: 'mrmgmb9k27sv3', name: 'Grasshopper',         url: '', user: 'info@crania-schools.com',              pass: '', notes: 'Phone', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmf5ggb1c7l2', catId: 'mrmaubyjidc1e', name: 'Microsoft/Office',    url: '', user: 'craniaschools@gmail.com',               pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf67qj6c6at', catId: 'mrl9p83qi0qq6', name: 'QBO',                 url: '', user: 'info@crnaia-schools.com',               pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmf6bveh2gj0', catId: 'mrl9p83qi0qq6', name: 'QBO',                 url: '', user: 'boardwalk@crania-schools.com',          pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmf6cne99536', catId: 'mrl9p83qi0qq6', name: 'QBO',                 url: '', user: 'waterlooeast@crania-schools.com',       pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmf6dfhvl6ae', catId: 'mrl9p83qi0qq6', name: 'QBO',                 url: '', user: 'admin@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmf8yd6lncbl', catId: 'mrmf2dir3wu6u', name: 'Shopify',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf96wiix72t', catId: 'mrmf2dir3wu6u', name: 'Wyze',                url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmf9b2yuce1u', catId: 'mrmgmb9k27sv3', name: 'Youmail',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmf9eb6ratj4', catId: 'mrmf2dir3wu6u', name: 'Zoom',                url: '', user: 'admin@crania-schools.com?',             pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgrg266bq2z', catId: 'mrmf2dir3wu6u', name: 'Zoom',                url: '', user: 'boardwalk@crania-schools.com',          pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgrgtzn9hkz', catId: 'mrmf2dir3wu6u', name: 'Zoom',                url: '', user: 'waterlooeast@crania-schools.com',       pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfbvkxdd47b', catId: 'mrmfan3lcqjsl', name: 'Caribou',             url: '', user: 'info@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfbyxepq253', catId: 'mrmfan3lcqjsl', name: 'CEMC',                url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfc1rmh5j4c', catId: 'mrmfan3lcqjsl', name: 'CMS',                 url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfc5vt89dck', catId: 'mrmfan3lcqjsl', name: 'MAA',                 url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfcg3t897o5', catId: 'mrl9p83qqy14k', name: 'BW Computers',        url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfcjxmlncnr', catId: 'mrl9p83qqy14k', name: 'WE Computers',        url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfd3xt1ze7b', catId: 'mrmaubyjidc1e', name: 'Gmail',               url: '', user: 'craniatech@gmail.com',                 pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfd6y1n1lav', catId: 'mrmaubyjidc1e', name: 'Gmail',               url: '', user: 'craniawaterlooeaststudent@gmail.com',   pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfeyhkb38iv', catId: 'mrmaubyjidc1e', name: 'Gmail',               url: '', user: 'craniaboardwalktech@gmail.com',         pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfdz5ti8wxn', catId: 'mrmaubyjidc1e', name: 'Gmail',               url: '', user: 'waterlooeasttech@gmail.com',            pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfeiz4a3g4d', catId: 'mrmaubyjidc1e', name: 'Gmail',               url: '', user: 'brainbookspublisher@gmail.com',         pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfgbxc4f3us', catId: 'mrmaubyjidc1e', name: 'Gmail',               url: '', user: 'craniaschoolsinc@gmail.com',            pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfj85cwhff7', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'admin@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfjcfjzktj8', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'boardwalk@crania-schools.com',          pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmfjqogb12yr', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'waterlooeast@crania-schools.com',       pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmhk0qgnl36u', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'payments@crania-schools.com',           pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmhkkz4jo4rm', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'registrations@crania-schools.com',      pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmhlz7rgiclf', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'ai@crania-schools.com',                 pass: '', notes: 'For online classroom login', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmfkdcf874h9', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'craniawaterlooeasttech@outlook.com',    pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmhmosn8wn2t', catId: 'mrmaubyjidc1e', name: 'Outlook',             url: '', user: 'craniatech@outlook.com',                pass: '', notes: '', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmgh6chylcv7', catId: 'mrmggezdgsc55', name: 'Agorapulse',          url: '', user: 'admin@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmghka9t3ujt', catId: 'mrmggezdgsc55', name: 'bitmoji',             url: '', user: 'admin@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmghtfky73p0', catId: 'mrmggezdgsc55', name: 'Canva',               url: '', user: 'admin@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmghvk88gx4q', catId: 'mrmggezdgsc55', name: 'Canva',               url: 'canva.com', user: 'waterlooeast@crania-schools.com', pass: 'At6+f&@JGmkx7juZ', notes: '', color: '#EEF3F6', cost: 100, start: '2026-07-29', active: true },
+    { id: 'mrmgikg0m86ya', catId: 'mrmggezdgsc55', name: 'Doodly',              url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgj0v4h6g58', catId: 'mrmggezdgsc55', name: 'GoDaddy',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgj8ywyqqkc', catId: 'mrmggezdgsc55', name: 'Google Ads',          url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgjvog4ea5a', catId: 'mrmggezdgsc55', name: 'MailChimp',           url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgkhbzziots', catId: 'mrmggezdgsc55', name: 'Wordpress',           url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgkl3c6jkuz', catId: 'mrmggezdgsc55', name: 'Youtube',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgkwswwa72d', catId: 'mrmf2dir3wu6u', name: 'Grammarly',           url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgl1k7yv6pa', catId: 'mrmf2dir3wu6u', name: 'Spotify',             url: '', user: 'boardwalk@crania-schools.com',          pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgl4q7mt58k', catId: 'mrmf2dir3wu6u', name: 'Spotify',             url: '', user: 'waterlooeast@crania-schools.com',       pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgm09j1fl73', catId: 'mrmf2dir3wu6u', name: 'YogaDownload',        url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgn7dbf49rw', catId: 'mrmgmb9k27sv3', name: 'Freedom Mobile',      url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgurzhipng2', catId: 'mrmgmb9k27sv3', name: 'Bell',                url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmguwpqrl5yr', catId: 'mrmgmb9k27sv3', name: 'Ebox',                url: '', user: '',                                     pass: '', notes: '1-75', color: '#EEF3F6', cost: '', start: '' },
+    { id: 'mrmgpya70261i', catId: 'mrmgo0l3k6uyw', name: 'Alibaba',             url: '', user: 'info@crania-schools.com',              pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgq8umgp8lu', catId: 'mrmgo0l3k6uyw', name: 'Blank Apparel',       url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgqdnc3tuju', catId: 'mrmgo0l3k6uyw', name: 'Entripy',             url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgqljyl59fm', catId: 'mrmgo0l3k6uyw', name: 'Vistaprint',          url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgwdp11h5u8', catId: 'mrmgmb9k27sv3', name: 'Enbridge',            url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgwgi6ucl96', catId: 'mrmgmb9k27sv3', name: 'Enova',               url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmgwo4le85zl', catId: 'mrmgmb9k27sv3', name: 'Rogers',              url: '', user: '',                                     pass: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrmhlu1cksti7', catId: 'mrmaubyjidc1e', name: 'Proton',              url: '', user: 'cschools_ai@proton.me',                pass: '', cost: '', start: '', notes: '', color: '#EEF3F6' },
+    { id: 'mrnskwmxasi48', catId: 'mrnsk4elc04ma', name: 'ChatGPT,',            url: '', user: 'ai@crania-schools.com',                pass: '', cost: '', start: '2026-07-16', active: true, notes: '26 yrs old, name is Mrs. Henderson', color: '#EEF3F6' },
+  ],
+}
+
+export async function loadItAccounts() {
+  try {
+    const rows = await getFullList('itAccounts')
+    if (rows.length === 0) return IT_ACCOUNTS_SEED
+    return rows[0].payload || { categories: [], accounts: [] }
+  } catch (err) {
+    if (err?.status === 404) return IT_ACCOUNTS_SEED
+    throw err
+  }
+}
+
+export async function saveItAccounts(payload) {
+  await ensureAuth()
+  const rows = await getFullList('itAccounts')
+  if (rows.length === 0) {
+    await pb().collection('itAccounts').create({ payload })
+  } else {
+    await pb().collection('itAccounts').update(rows[0].id, { payload })
+  }
+}
+
 // ---- finance (singleton payload with invoices + payments + meta) ---
 const DEFAULT_FINANCE = {
   invoices: [],
