@@ -737,6 +737,26 @@ app.put('/api/it-accounts', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- crania store (singleton — v20 retail mockup) --------
+// Same core shape as /api/stock plus per-item tax, price, img.
+// See loadCraniaStore for details.
+app.get('/api/crania-store', wrap(async (_req, res) => res.json(await loadCraniaStore())))
+app.put('/api/crania-store', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    items:           Array.isArray(body.items) ? body.items : [],
+    log:             Array.isArray(body.log)   ? body.log   : [],
+    categoryOrder:   Array.isArray(body.categoryOrder) ? body.categoryOrder : [],
+    categoryColors:  body.categoryColors && typeof body.categoryColors === 'object' ? body.categoryColors : {},
+    extraSubs:       Array.isArray(body.extraSubs) ? body.extraSubs : [],
+    subOrder:        body.subOrder && typeof body.subOrder === 'object' ? body.subOrder : {},
+    subColors:       body.subColors && typeof body.subColors === 'object' ? body.subColors : {},
+    colOrder:        Array.isArray(body.colOrder) ? body.colOrder : [],
+  }
+  await saveCraniaStore(payload)
+  res.json({ ok: true })
+}))
+
 // ---- stock (singleton payload — v44 inventory mockup) --------
 // Distinct from the legacy /api/inventory routes (per-row).
 app.get('/api/stock', wrap(async (_req, res) => res.json(await loadStock())))
