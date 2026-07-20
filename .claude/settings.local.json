@@ -108,7 +108,8 @@
       "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/1-4. CraniaVerse - Projects v20 [claude-fable-5].html\")",
       "Bash(git commit -m 'Projects: kanban board wired to new /api/projects singleton *)",
       "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/6-3. CraniaVerse - IT Accounts v28 [claude-fable-5].html\")",
-      "Bash(awk 'NR==174 {print \"  <!-- LOGO IMAGE \\(base64, stripped\\) -->\"; next} {print}' \"/c/Users/hanak/Downloads/6-3. CraniaVerse - IT Accounts v28 [claude-fable-5].html\")"
+      "Bash(awk 'NR==174 {print \"  <!-- LOGO IMAGE \\(base64, stripped\\) -->\"; next} {print}' \"/c/Users/hanak/Downloads/6-3. CraniaVerse - IT Accounts v28 [claude-fable-5].html\")",
+      "Bash(git commit -m 'IT Accounts: categorized password manager wired to new /api/it-accounts *)"
     ]
   },
   "hooks": {
