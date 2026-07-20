@@ -483,6 +483,45 @@ export async function saveProjects(payload) {
   }
 }
 
+// ---- stock (singleton payload — v44 inventory mockup) --------
+// Shape mirrors "crania-inventory.json" from the client's v44 mockup:
+//   { items, log, categoryOrder, categoryColors, extraSubs, subOrder, subColors, colOrder, ... }
+// Distinct from the legacy `inventory` collection (per-row, different
+// shape) — that stays untouched so no old data is lost.
+let _stockSeedCache = null
+function getStockSeed() {
+  if (_stockSeedCache) return _stockSeedCache
+  try {
+    const raw = fs.readFileSync(path.join(__pbDir, 'data', 'inventory-seed.json'), 'utf8')
+    _stockSeedCache = JSON.parse(raw)
+  } catch (err) {
+    console.error('[stock] failed to load seed:', err?.message || err)
+    _stockSeedCache = { items: [], log: [], categoryOrder: [], categoryColors: {}, extraSubs: [], subOrder: {}, subColors: {}, colOrder: [] }
+  }
+  return _stockSeedCache
+}
+
+export async function loadStock() {
+  try {
+    const rows = await getFullList('stock')
+    if (rows.length === 0) return getStockSeed()
+    return rows[0].payload || { items: [], log: [] }
+  } catch (err) {
+    if (err?.status === 404) return getStockSeed()
+    throw err
+  }
+}
+
+export async function saveStock(payload) {
+  await ensureAuth()
+  const rows = await getFullList('stock')
+  if (rows.length === 0) {
+    await pb().collection('stock').create({ payload })
+  } else {
+    await pb().collection('stock').update(rows[0].id, { payload })
+  }
+}
+
 // ---- calendar (singleton payload — events + calendars + hidden) ---
 // Shape mirrors "crania-calendar.json" from the client's v18 mockup:
 //   { calendars: [{id,name,color}], events: [{id,calId,title,date,allDay,start,end,notes,color?,recur?,exceptions?}], hidden: {} }
