@@ -427,6 +427,15 @@ input, select, textarea { font-family: inherit; }
 
 .ita-nomatch { text-align: center; color: #9a948a; font-size: 14px; padding: 30px; }
 
+/* Calendar (v18 mockup) — nav arrows */
+.cal-navbtn {
+  background: #fff; border: 1px solid #e2ded2;
+  color: var(--brand-dark-brown); width: 34px; height: 34px;
+  border-radius: 8px; cursor: pointer; display: inline-flex;
+  align-items: center; justify-content: center;
+}
+.cal-navbtn:hover { background: #f4f2ea; }
+
 /* Placeholder card used for "under construction" pages */
 .placeholder-v7 {
   background: #fff; border-radius: 12px;
