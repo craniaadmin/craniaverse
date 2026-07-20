@@ -276,6 +276,25 @@ const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).cat
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
+// ---- test-runner feedback (public) ---------------------
+// Returns the latest continuous-tests summary written by
+// tests/run.js. Public because the payload is just test names
+// and error strings — no credentials, nothing sensitive — and
+// making it public lets the scheduled Claude agent poll it
+// without needing a stored admin password.
+const LAST_RUN_FILE = path.join(__dirname, '..', 'tests', 'logs', 'last-run.json')
+app.get('/api/tests/last-run', wrap(async (_req, res) => {
+  try {
+    const text = fs.readFileSync(LAST_RUN_FILE, 'utf8')
+    res.type('application/json').send(text)
+  } catch (err) {
+    if (err?.code === 'ENOENT') {
+      return res.status(404).json({ error: 'no test run recorded yet' })
+    }
+    throw err
+  }
+}))
+
 const FORM_FILE = path.join(__dirname, '..', 'public', 'registration.html')
 app.get('/register', (_req, res) => res.sendFile(FORM_FILE))
 
