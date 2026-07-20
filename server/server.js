@@ -206,7 +206,9 @@ app.use(cors({
   credentials: true,
   origin: (origin, cb) => cb(null, true), // reflect any origin — we're behind ngrok in prod
 }))
-app.use(express.json({ limit: '1mb' }))
+// 25 MB accommodates PUT /api/crania-store payloads with base64
+// item images. Most requests are far smaller.
+app.use(express.json({ limit: '25mb' }))
 
 // ---- auth: login / logout / me + gate all admin API ---------
 // Public HTML routes (/register, /form/:id, /sign-up, ...) and the
