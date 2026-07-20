@@ -154,6 +154,14 @@ const collectionSpecs = [
     indexes: [],
   },
   {
+    name: 'craniaStore',
+    fields: [
+      // 20 MB — items carry base64 image data URLs.
+      { name: 'payload', type: 'json', required: false, maxSize: 20971520 },
+    ],
+    indexes: [],
+  },
+  {
     name: 'formSubmissions',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },
