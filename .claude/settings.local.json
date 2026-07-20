@@ -115,7 +115,8 @@
       "Bash(node --check tests/run.js)",
       "Bash(git commit -m 'Tests: expose last-run summary at public /api/tests/last-run *)",
       "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' 'https://craniaverse.ngrok.app/api/tests/last-run' -H 'ngrok-skip-browser-warning: true')",
-      "Bash(git commit -m 'Auth: allowlist GET /api/tests/last-run as public *)"
+      "Bash(git commit -m 'Auth: allowlist GET /api/tests/last-run as public *)",
+      "Bash(mkdir -p .claude/agents && ls .claude/agents)"
     ]
   },
   "hooks": {
