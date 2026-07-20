@@ -734,6 +734,25 @@ app.put('/api/it-accounts', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- stock (singleton payload — v44 inventory mockup) --------
+// Distinct from the legacy /api/inventory routes (per-row).
+app.get('/api/stock', wrap(async (_req, res) => res.json(await loadStock())))
+app.put('/api/stock', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    items:           Array.isArray(body.items) ? body.items : [],
+    log:             Array.isArray(body.log)   ? body.log   : [],
+    categoryOrder:   Array.isArray(body.categoryOrder) ? body.categoryOrder : [],
+    categoryColors:  body.categoryColors && typeof body.categoryColors === 'object' ? body.categoryColors : {},
+    extraSubs:       Array.isArray(body.extraSubs) ? body.extraSubs : [],
+    subOrder:        body.subOrder && typeof body.subOrder === 'object' ? body.subOrder : {},
+    subColors:       body.subColors && typeof body.subColors === 'object' ? body.subColors : {},
+    colOrder:        Array.isArray(body.colOrder) ? body.colOrder : [],
+  }
+  await saveStock(payload)
+  res.json({ ok: true })
+}))
+
 // ---- calendar (singleton payload — calendars + events + hidden) ---
 // Shape mirrors "crania-calendar.json" from the client's v18 mockup
 // so JSON export/import round-trips cleanly.
