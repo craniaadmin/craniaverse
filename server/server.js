@@ -696,6 +696,24 @@ app.put('/api/finance', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- test-runner feedback ------------------------------
+// GET /api/tests/last-run returns the latest continuous-tests
+// summary written by tests/run.js. Scheduled Claude agents fetch
+// this over HTTPS instead of shelling into maya-pc, which is how
+// they see fresh failures and prioritize a fix pass.
+const LAST_RUN_FILE = path.join(__dirname, '..', 'tests', 'logs', 'last-run.json')
+app.get('/api/tests/last-run', wrap(async (_req, res) => {
+  try {
+    const text = fs.readFileSync(LAST_RUN_FILE, 'utf8')
+    res.type('application/json').send(text)
+  } catch (err) {
+    if (err?.code === 'ENOENT') {
+      return res.status(404).json({ error: 'no test run recorded yet' })
+    }
+    throw err
+  }
+}))
+
 // ---- IT accounts (singleton payload — passwords manager) --
 // Shape mirrors "crania-it-accounts.json" from the client mockup:
 //   { categories: [{id,name,color}], accounts: [{id,catId,name,url,user,pass,notes,color,cost?,start?,active?}] }
