@@ -1,151 +1,246 @@
-import { useState, useEffect } from 'react'
-import { Plus, X, AlertTriangle, Edit2 } from 'lucide-react'
+// Inventory — v1 ported from the client's v44 mockup.
+// State persists at GET/PUT /api/stock (new singleton). Shape
+// matches crania-inventory.json verbatim so exports round-trip.
+//
+// v1 scope: metrics tiles, search + category + sub + status filters,
+// full table with all columns, add/edit/delete items via modal,
+// quick +/- qty adjust (logged), separate Log view, category/sub
+// colour tint on cells (seeded values used; not editable here yet).
+//
+// Skipped for v1 (round-trips as data, no UI yet): undo/redo, CSV
+// export, bulk edit/delete, drag-reorder categories, backups,
+// per-item colour swatches management.
 
-const LOW_STOCK = 5
-const COMMON_SIZES = ['One Size', 'YXS', 'YS', 'YM', 'YL', 'YXL', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Plus, Minus, Edit2, Trash2, Search, X } from 'lucide-react'
 
-const BLANK = { category: '', name: '', size: null, qty: 0, price: 0, newCategory: '' }
-const BLANK_EDIT = { id: null, category: '', name: '', size: null, qty: 0, price: 0 }
+const API_BASE = import.meta.env?.VITE_API_URL || ''
+const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
 
-function QtyControl({ qty, onChange }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <button
-        onClick={() => onChange(Math.max(0, qty - 1))}
-        style={{
-          width: 28, height: 28, borderRadius: 6, border: '1px solid var(--line)',
-          background: '#f1f3f4', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-          display: 'grid', placeItems: 'center', color: 'var(--ink-soft)',
-        }}>−</button>
-      <span style={{
-        minWidth: 32, textAlign: 'center', fontWeight: 700, fontSize: 15,
-        color: qty <= LOW_STOCK ? '#c62828' : 'var(--ink)',
-      }}>{qty}</span>
-      <button
-        onClick={() => onChange(qty + 1)}
-        style={{
-          width: 28, height: 28, borderRadius: 6, border: '1px solid var(--line)',
-          background: '#f1f3f4', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-          display: 'grid', placeItems: 'center', color: 'var(--ink-soft)',
-        }}>+</button>
-    </div>
-  )
+const DEFAULT_COL_ORDER = ['num', 'name', 'category', 'sub', 'sku', 'qty', 'reorder', 'cost', 'value', 'location', 'status']
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
+
+const money = (n) => {
+  const num = Number(n)
+  if (!Number.isFinite(num)) return ''
+  return '$' + num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+const fmtDateTime = (iso) => {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' }) +
+    ', ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 }
 
-export default function Inventory() {
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState(false)
-  const [editModal, setEditModal] = useState(false)
-  const [form, setForm] = useState(BLANK)
-  const [editForm, setEditForm] = useState(BLANK_EDIT)
-  const API_BASE = import.meta.env?.VITE_API_URL || ''
+// Sub-color keys use a non-standard separator (U+241F in the JSON — "␟").
+// We normalize both directions consistently.
+const SUB_SEP = '␟'
+const subKey = (cat, sub) => `${cat || ''}${SUB_SEP}${sub || ''}`
 
-  useEffect(() => {
-    fetch(`${API_BASE}/api/inventory`)
-      .then(r => r.json())
-      .then(setItems)
-      .catch(err => console.error('Failed to load inventory:', err))
-      .finally(() => setLoading(false))
-  }, [API_BASE])
+function textOn(hex) {
+  const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '')
+  if (!m) return '#2E2516'
+  const n = parseInt(m[1], 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
+  return (r * 299 + g * 587 + b * 114) / 1000 >= 155 ? '#2E2516' : '#ffffff'
+}
+function statusOf(item) {
+  const q = Number(item.qty) || 0
+  const r = Number(item.reorder) || 0
+  if (q <= 0) return 'out'
+  if (q <= r) return 'low'
+  return 'ok'
+}
 
-  const categories = [...new Set(items.map(i => i.category))].sort()
-
-  const updateQty = async (id, qty) => {
-    try {
-      await fetch(`${API_BASE}/api/inventory/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ qty }),
-      })
-      setItems(prev => prev.map(i => i.id === id ? { ...i, qty } : i))
-    } catch (err) {
-      console.error('Failed to update qty:', err)
-    }
-  }
-
-  const deleteItem = async (id) => {
-    try {
-      await fetch(`${API_BASE}/api/inventory/${id}`, { method: 'DELETE' })
-      setItems(prev => prev.filter(i => i.id !== id))
-    } catch (err) {
-      console.error('Failed to delete item:', err)
-    }
-  }
-
-  const openEdit = (item) => {
-    setEditForm({ ...item })
-    setEditModal(true)
-  }
-
-  const saveEdit = async () => {
-    if (!editForm.name.trim()) return
-    try {
-      await fetch(`${API_BASE}/api/inventory/${editForm.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: editForm.name.trim(),
-          size: editForm.size,
-          qty: Number(editForm.qty) || 0,
-          price: Number(editForm.price) || 0,
-        }),
-      })
-      setItems(prev => prev.map(i => i.id === editForm.id ? {
-        ...editForm,
-        name: editForm.name.trim(),
-        qty: Number(editForm.qty) || 0,
-        price: Number(editForm.price) || 0,
-      } : i))
-      setEditModal(false)
-      setEditForm(BLANK_EDIT)
-    } catch (err) {
-      console.error('Failed to save edit:', err)
-    }
-  }
-
-  const save = async () => {
-    if (!form.name.trim() || !form.category.trim()) return
-    const finalCategory = form.newCategory.trim() || form.category
-    try {
-      const res = await fetch(`${API_BASE}/api/inventory`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          category: finalCategory,
-          name: form.name.trim(),
-          size: form.size || null,
-          qty: Number(form.qty) || 0,
-          price: Number(form.price) || 0,
-        }),
-      })
-      const newItem = await res.json()
-      setItems(prev => [...prev, newItem])
-      setModal(false)
-      setForm(BLANK)
-    } catch (err) {
-      console.error('Failed to add item:', err)
-    }
-  }
-
-  const totalItems = items.reduce((s, i) => s + i.qty, 0)
-  const lowStockCount = items.filter(i => i.qty <= LOW_STOCK && i.qty > 0).length
-  const outOfStock = items.filter(i => i.qty === 0).length
-  const totalValue = items.reduce((s, i) => s + i.qty * i.price, 0)
-
-  const grouped = categories.map(cat => {
-    const catItems = items.filter(i => i.category === cat).sort((a, b) => a.name.localeCompare(b.name))
-    const hasSize = catItems.some(i => i.size)
-    return { cat, items: catItems, hasSize }
+// ---------- store hook ----------
+function useStock() {
+  const [data, setData] = useState({
+    items: [], log: [], categoryOrder: [], categoryColors: {},
+    extraSubs: [], subOrder: {}, subColors: {}, colOrder: DEFAULT_COL_ORDER,
   })
+  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState('loading')
+  const saveTimer = useRef(null)
+  const latest = useRef(data); latest.current = data
+
+  const refresh = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/stock`, { headers: HEADERS })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const j = await r.json()
+      setData({
+        items:          Array.isArray(j.items) ? j.items : [],
+        log:            Array.isArray(j.log)   ? j.log   : [],
+        categoryOrder:  Array.isArray(j.categoryOrder) ? j.categoryOrder : [],
+        categoryColors: j.categoryColors || {},
+        extraSubs:      Array.isArray(j.extraSubs) ? j.extraSubs : [],
+        subOrder:       j.subOrder || {},
+        subColors:      j.subColors || {},
+        colOrder:       Array.isArray(j.colOrder) && j.colOrder.length ? j.colOrder : DEFAULT_COL_ORDER,
+      })
+      setStatus('online')
+    } catch {
+      setStatus('offline')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { refresh() }, [refresh])
+
+  const mutate = useCallback((mut) => {
+    setData(prev => {
+      const next = {
+        ...prev,
+        items: [...prev.items], log: [...prev.log],
+        categoryOrder: [...prev.categoryOrder], categoryColors: { ...prev.categoryColors },
+        extraSubs: [...prev.extraSubs], subOrder: { ...prev.subOrder },
+        subColors: { ...prev.subColors }, colOrder: [...prev.colOrder],
+      }
+      mut(next)
+      clearTimeout(saveTimer.current)
+      saveTimer.current = setTimeout(() => {
+        fetch(`${API_BASE}/api/stock`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', ...HEADERS },
+          body: JSON.stringify(latest.current),
+        }).catch(() => {})
+      }, 350)
+      return next
+    })
+  }, [])
+
+  return { data, loading, status, mutate }
+}
+
+// ---------- Inventory page ----------
+export default function Inventory() {
+  const { data, loading, status, mutate } = useStock()
+  const [view, setView]          = useState('inventory') // 'inventory' | 'log'
+  const [query, setQuery]        = useState('')
+  const [catFilter, setCatFilter]     = useState('all')
+  const [subFilter, setSubFilter]     = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [editing, setEditing]    = useState(null) // null | {mode, item}
+
+  const categories = useMemo(() => {
+    const seen = new Set()
+    const out = []
+    for (const c of data.categoryOrder) if (c && !seen.has(c)) { out.push(c); seen.add(c) }
+    for (const it of data.items) if (it.category && !seen.has(it.category)) { out.push(it.category); seen.add(it.category) }
+    return out
+  }, [data.categoryOrder, data.items])
+
+  const subsInCurrentCat = useMemo(() => {
+    if (catFilter === 'all') return []
+    const seen = new Set()
+    const out = []
+    for (const it of data.items) {
+      if (it.category === catFilter && it.sub && !seen.has(it.sub)) { out.push(it.sub); seen.add(it.sub) }
+    }
+    for (const s of data.extraSubs) {
+      if (s.cat === catFilter && s.name && !seen.has(s.name)) { out.push(s.name); seen.add(s.name) }
+    }
+    return out
+  }, [catFilter, data.items, data.extraSubs])
+
+  const filteredItems = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return data.items.filter(it => {
+      if (catFilter !== 'all' && it.category !== catFilter) return false
+      if (subFilter !== 'all' && it.sub !== subFilter) return false
+      if (statusFilter !== 'all' && statusOf(it) !== statusFilter) return false
+      if (!q) return true
+      const hay = [it.num, it.name, it.category, it.sub, it.sku, it.location, it.notes]
+        .map(v => String(v || '').toLowerCase()).join(' ')
+      return hay.includes(q)
+    }).sort((a, b) => {
+      // Sort by num first (natural), then name.
+      const na = (a.num || '').toString(), nb = (b.num || '').toString()
+      if (na && nb && na !== nb) return na.localeCompare(nb, undefined, { numeric: true })
+      return (a.name || '').localeCompare(b.name || '')
+    })
+  }, [data.items, query, catFilter, subFilter, statusFilter])
+
+  const metrics = useMemo(() => {
+    let items = 0, units = 0, low = 0, out = 0, value = 0
+    for (const it of data.items) {
+      items += 1
+      const q = Number(it.qty) || 0
+      const c = Number(it.cost) || 0
+      units += q
+      value += q * c
+      const s = statusOf(it)
+      if (s === 'low') low += 1
+      if (s === 'out') out += 1
+    }
+    return { items, units, low, out, value }
+  }, [data.items])
+
+  // ---- item mutations ----
+  const saveItem = (form) => {
+    mutate(d => {
+      if (editing.mode === 'new') {
+        const newItem = { id: uid(), ...form }
+        d.items.push(newItem)
+        d.log.push({
+          id: uid(), ts: new Date().toISOString(),
+          itemId: newItem.id, itemName: newItem.name,
+          delta: 0, after: Number(newItem.qty) || 0,
+          user: '', note: 'item created',
+        })
+      } else {
+        const i = d.items.findIndex(x => x.id === editing.item.id)
+        if (i !== -1) {
+          const prevQty = Number(d.items[i].qty) || 0
+          const newQty  = Number(form.qty) || 0
+          d.items[i] = { ...d.items[i], ...form }
+          if (newQty !== prevQty) {
+            d.log.push({
+              id: uid(), ts: new Date().toISOString(),
+              itemId: editing.item.id, itemName: form.name || d.items[i].name,
+              delta: newQty - prevQty, after: newQty,
+              user: '', note: 'edited via form',
+            })
+          }
+        }
+      }
+    })
+    setEditing(null)
+  }
+  const deleteItem = (id) => {
+    const it = data.items.find(x => x.id === id)
+    if (!confirm(`Delete "${it?.name || 'this item'}"?`)) return
+    mutate(d => {
+      d.items = d.items.filter(x => x.id !== id)
+      d.log.push({
+        id: uid(), ts: new Date().toISOString(),
+        itemId: id, itemName: it?.name || '',
+        delta: 0, after: 0, user: '', note: 'item deleted',
+      })
+    })
+  }
+  const bumpQty = (id, delta) => {
+    mutate(d => {
+      const i = d.items.findIndex(x => x.id === id)
+      if (i === -1) return
+      const newQty = Math.max(0, (Number(d.items[i].qty) || 0) + delta)
+      d.items[i] = { ...d.items[i], qty: newQty }
+      d.log.push({
+        id: uid(), ts: new Date().toISOString(),
+        itemId: id, itemName: d.items[i].name,
+        delta, after: newQty, user: '',
+        note: delta > 0 ? 'quick +1' : 'quick −1',
+      })
+    })
+  }
 
   if (loading) {
     return (
       <div className="page">
-        <div className="page-head">
-          <h2 className="page-title">Inventory</h2>
-        </div>
-        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)' }}>Loading inventory...</div>
+        <h2 className="page-title">Inventory</h2>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
   }
@@ -154,316 +249,448 @@ export default function Inventory() {
     <div className="page">
       <div className="page-head">
         <h2 className="page-title">Inventory</h2>
-        <button className="icon-btn solid" title="Add item" onClick={() => { setForm(BLANK); setModal(true) }}>
-          <Plus size={22} />
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
+            style={{
+              background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+              padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+            }}
+          >
+            {view === 'log' ? '← Back to Inventory' : '📓 Log'}
+          </button>
+        </div>
       </div>
 
-      {/* Summary strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
-        {[
-          { label: 'Total Units',  value: totalItems,              color: 'var(--ink)' },
-          { label: 'Low Stock',    value: lowStockCount,           color: lowStockCount > 0 ? '#cc7800' : 'var(--ink)' },
-          { label: 'Out of Stock', value: outOfStock,              color: outOfStock > 0 ? '#c62828' : 'var(--ink)' },
-          { label: 'Total Value',  value: `$${totalValue.toLocaleString()}`, color: 'var(--ink)' },
-        ].map(({ label, value, color }) => (
-          <div key={label} style={{
-            background: '#fff', border: '1px solid var(--line)', borderRadius: 10,
-            padding: '14px 18px', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
-          }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 6 }}>{label}</div>
-            <div style={{ fontSize: 26, fontWeight: 800, color }}>{value}</div>
+      {status === 'offline' && (
+        <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
+                      padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
+          Working offline — changes will retry when the server is reachable.
+        </div>
+      )}
+
+      {view === 'inventory' ? (
+        <>
+          {/* Metrics */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+            <MetricTile label="Items"        value={metrics.items} hint={`${metrics.units} units on hand`} />
+            <MetricTile label="Low Stock"    value={metrics.low}   hint="at or below reorder level"
+              color={metrics.low > 0 ? '#8a6a00' : 'var(--ink)'}
+              onClick={() => { setStatusFilter('low');  setSubFilter('all'); setCatFilter('all') }} />
+            <MetricTile label="Out of Stock" value={metrics.out}   hint="needs reordering"
+              color={metrics.out > 0 ? '#a12626' : 'var(--ink)'}
+              onClick={() => { setStatusFilter('out');  setSubFilter('all'); setCatFilter('all') }} />
+            <MetricTile label="Stock Value"  value={money(metrics.value)} hint="on hand × unit cost" />
           </div>
-        ))}
-      </div>
 
-      {/* Category groups */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {grouped.map(({ cat, items: catItems, hasSize }) => (
-          <div key={cat} style={{ background: '#fff', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(20,30,45,.07)' }}>
-            {/* Category header */}
-            <div style={{
-              borderLeft: '5px solid var(--logo-teal)',
-              borderBottom: '1px solid var(--line)',
-              background: '#fafbfc',
-              padding: '12px 18px',
-              display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-              <span style={{ fontWeight: 800, fontSize: 13, letterSpacing: '.6px', textTransform: 'uppercase', color: 'var(--logo-teal)' }}>
-                {cat}
-              </span>
-              <span style={{ background: 'var(--logo-teal)', color: '#fff', borderRadius: 999, fontSize: 11, fontWeight: 700, padding: '2px 8px' }}>
-                {catItems.length}
-              </span>
-              {catItems.some(i => i.qty <= LOW_STOCK) && (
-                <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600, color: '#cc7800' }}>
-                  <AlertTriangle size={13} /> Low stock
-                </span>
-              )}
+          {/* Filters */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: '1 1 220px', maxWidth: 320 }}>
+              <Search size={14} style={{ position: 'absolute', top: 9, left: 10, color: 'var(--muted)' }} />
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search any column…"
+                style={{
+                  width: '100%', padding: '7px 8px 7px 30px', fontSize: 13,
+                  border: '1px solid #d5d0c4', borderRadius: 8, background: '#fff',
+                }}
+              />
             </div>
+            <select value={catFilter} onChange={e => { setCatFilter(e.target.value); setSubFilter('all') }}
+              style={selStyle}>
+              <option value="all">All Categories</option>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <select value={subFilter} onChange={e => setSubFilter(e.target.value)} style={selStyle}
+              disabled={catFilter === 'all'}>
+              <option value="all">All Sub-Categories</option>
+              {subsInCurrentCat.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={selStyle}>
+              <option value="all">All Statuses</option>
+              <option value="ok">In Stock</option>
+              <option value="low">Low Stock</option>
+              <option value="out">Out of Stock</option>
+            </select>
+            {(query || catFilter !== 'all' || subFilter !== 'all' || statusFilter !== 'all') && (
+              <button
+                onClick={() => { setQuery(''); setCatFilter('all'); setSubFilter('all'); setStatusFilter('all') }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--brand-dark-blue)',
+                         textDecoration: 'underline', cursor: 'pointer', fontSize: 13 }}
+              >Clear</button>
+            )}
+            <button
+              onClick={() => setEditing({ mode: 'new', item: null })}
+              style={{
+                marginLeft: 'auto', background: 'var(--brand-light-blue)', color: 'var(--brand-dark-brown)',
+                border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700, borderRadius: 8,
+                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
+              }}
+            >
+              <Plus size={14} /> Add Item
+            </button>
+          </div>
 
-            {/* Items table */}
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0' }}>
+          {/* Table */}
+          <div style={{ background: '#fff', borderRadius: 10, overflow: 'auto',
+                        boxShadow: '0 1px 3px rgba(46,37,22,.15)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ background: '#f5f7f8', borderBottom: '1px solid var(--line)' }}>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'left', padding: '12px 16px' }}>ITEM</th>
-                  {hasSize && <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 80 }}>SIZE</th>}
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 140 }}>QTY</th>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 100 }}>PRICE</th>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'right', padding: '12px 16px', width: 120 }}>VALUE</th>
-                  <th style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 700, textAlign: 'center', padding: '12px 16px', width: 60 }}></th>
+                <tr style={{ background: 'var(--brand-dark-blue)', color: '#fff', textAlign: 'left' }}>
+                  <Th>Item #</Th><Th>Name</Th><Th>Category</Th><Th>Sub-Category</Th><Th>SKU</Th>
+                  <Th align="right">On Hand</Th><Th align="right">Reorder</Th>
+                  <Th align="right">Unit Cost</Th><Th align="right">Value</Th>
+                  <Th>Location</Th><Th align="center">Status</Th><Th></Th>
                 </tr>
               </thead>
               <tbody>
-                {catItems.map((item, idx) => {
-                  const low = item.qty <= LOW_STOCK && item.qty > 0
-                  const out = item.qty === 0
-                  return (
-                    <tr key={item.id} style={{
-                      borderBottom: idx < catItems.length - 1 ? '1px solid var(--line)' : 'none',
-                      opacity: out ? 0.6 : 1,
-                    }}>
-                      <td style={{ padding: '12px 16px' }}>
-                        <div style={{
-                          fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
-                        }}>
-                          {item.name}
-                          {out && <span style={{ fontSize: 11, fontWeight: 700, color: '#c62828', background: '#fde0e0', borderRadius: 4, padding: '2px 7px' }}>OUT</span>}
-                          {low && <span style={{ fontSize: 11, fontWeight: 700, color: '#cc7800', background: '#fffbf0', borderRadius: 4, padding: '2px 7px' }}>LOW</span>}
-                        </div>
-                      </td>
-                      {hasSize && (
-                        <td style={{ padding: '12px 16px', fontSize: 13, textAlign: 'center', color: 'var(--ink-soft)' }}>
-                          {item.size || '—'}
-                        </td>
-                      )}
-                      <td style={{ padding: '12px 16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
-                          <QtyControl qty={item.qty} onChange={qty => updateQty(item.id, qty)} />
-                        </div>
-                      </td>
-                      <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: 'var(--ink-soft)' }}>
-                        ${item.price.toFixed(2)}
-                      </td>
-                      <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: 'var(--ink)' }}>
-                        ${(item.qty * item.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                      <td style={{ padding: '12px 16px', textAlign: 'center', display: 'flex', gap: 4, justifyContent: 'center' }}>
-                        <button onClick={() => openEdit(item)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }} title="Edit item">
-                          <Edit2 size={16} />
-                        </button>
-                        <button onClick={() => deleteItem(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }} title="Delete item">
-                          <X size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
+                {filteredItems.length === 0 && (
+                  <tr><td colSpan={12} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
+                    {data.items.length === 0
+                      ? 'No items yet — click + Add Item to start your inventory.'
+                      : 'No items match your filters.'}
+                  </td></tr>
+                )}
+                {filteredItems.map((it, i) => (
+                  <ItemRow
+                    key={it.id}
+                    item={it}
+                    stripe={i % 2}
+                    catColor={data.categoryColors[it.category]}
+                    subColor={data.subColors[subKey(it.category, it.sub)]}
+                    onEdit={() => setEditing({ mode: 'edit', item: it })}
+                    onDelete={() => deleteItem(it.id)}
+                    onBump={(delta) => bumpQty(it.id, delta)}
+                  />
+                ))}
               </tbody>
             </table>
-            <div style={{ height: 8 }} />
           </div>
-        ))}
+        </>
+      ) : (
+        <LogView log={data.log} />
+      )}
+
+      {editing && (
+        <ItemModal
+          mode={editing.mode}
+          initial={editing.item}
+          categories={categories}
+          extraSubs={data.extraSubs}
+          items={data.items}
+          onClose={() => setEditing(null)}
+          onSave={saveItem}
+          onDelete={editing.mode === 'edit' ? () => { deleteItem(editing.item.id); setEditing(null) } : null}
+        />
+      )}
+    </div>
+  )
+}
+
+// ---------- Small components ----------
+const selStyle = {
+  padding: '7px 10px', fontSize: 13, border: '1px solid #d5d0c4',
+  borderRadius: 8, background: '#fff', color: 'var(--brand-dark-brown)',
+}
+function Th({ children, align = 'left' }) {
+  return <th style={{
+    fontSize: 11, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase',
+    padding: '10px 12px', textAlign: align, whiteSpace: 'nowrap',
+  }}>{children}</th>
+}
+function MetricTile({ label, value, hint, color, onClick }) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: '#fff', border: '1px solid var(--line)', borderRadius: 10,
+        padding: '12px 16px', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
+      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 24, fontWeight: 800, color: color || 'var(--ink)' }}>{value}</div>
+      {hint && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>{hint}</div>}
+    </div>
+  )
+}
+
+// ---------- Row ----------
+function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump }) {
+  const s = statusOf(item)
+  const value = (Number(item.qty) || 0) * (Number(item.cost) || 0)
+  const bg = stripe ? '#fafaf7' : '#fff'
+  return (
+    <tr style={{ background: bg, borderTop: '1px solid #f0ede3' }}>
+      <Td mono>{item.num}</Td>
+      <Td strong onClick={onEdit} style={{ cursor: 'pointer' }}>{item.name}</Td>
+      <Td>
+        <span style={{
+          background: catColor || '#eee', color: textOn(catColor || '#eee'),
+          borderRadius: 5, padding: '2px 8px', fontSize: 12, fontWeight: 600,
+        }}>{item.category || '—'}</span>
+      </Td>
+      <Td>
+        {item.sub ? (
+          <span style={{
+            background: subColor || '#f4f2ea', color: textOn(subColor || '#f4f2ea'),
+            borderRadius: 5, padding: '2px 8px', fontSize: 12,
+          }}>{item.sub}</span>
+        ) : <span style={{ color: 'var(--muted)' }}>—</span>}
+      </Td>
+      <Td muted>{item.sku || '—'}</Td>
+      <Td align="right">
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+          <button onClick={() => onBump(-1)} style={btnMini} title="−1"><Minus size={12} /></button>
+          <span style={{
+            display: 'inline-block', minWidth: 30, textAlign: 'center', fontWeight: 700,
+            color: s === 'out' ? '#a12626' : s === 'low' ? '#8a6a00' : 'inherit',
+          }}>{item.qty || 0}</span>
+          <button onClick={() => onBump(+1)} style={btnMini} title="+1"><Plus size={12} /></button>
+        </div>
+      </Td>
+      <Td align="right" muted>{item.reorder || 0}</Td>
+      <Td align="right" muted>{money(item.cost)}</Td>
+      <Td align="right" strong>{money(value)}</Td>
+      <Td muted>{item.location || '—'}</Td>
+      <Td align="center">
+        <StatusPill status={s} />
+      </Td>
+      <Td align="center">
+        <button onClick={onEdit} title="Edit" style={iconBtn}><Edit2 size={13} /></button>
+        <button onClick={onDelete} title="Delete" style={iconBtn}><Trash2 size={13} /></button>
+      </Td>
+    </tr>
+  )
+}
+function Td({ children, align = 'left', mono, strong, muted, onClick, style }) {
+  return (
+    <td onClick={onClick} style={{
+      padding: '9px 12px', textAlign: align, verticalAlign: 'middle',
+      fontFamily: mono ? 'Consolas, Menlo, monospace' : undefined,
+      fontWeight: strong ? 600 : 400, color: muted ? 'var(--ink-soft)' : 'inherit',
+      whiteSpace: 'nowrap', ...style,
+    }}>{children}</td>
+  )
+}
+const btnMini = {
+  width: 20, height: 20, borderRadius: 4, border: '1px solid #d5d0c4',
+  background: '#fff', color: 'var(--brand-dark-brown)', cursor: 'pointer',
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+}
+const iconBtn = {
+  background: 'transparent', border: 'none', cursor: 'pointer',
+  color: 'var(--ink-soft)', padding: '4px 6px',
+}
+
+function StatusPill({ status }) {
+  const map = {
+    ok:  { label: 'In Stock',     bg: '#dff5e0', fg: '#2b7a2e' },
+    low: { label: 'Low Stock',    bg: '#fff4d6', fg: '#8a6a00' },
+    out: { label: 'Out of Stock', bg: '#fde0e0', fg: '#a12626' },
+  }
+  const s = map[status] || map.ok
+  return (
+    <span style={{
+      display: 'inline-block', padding: '2px 8px', borderRadius: 999,
+      background: s.bg, color: s.fg, fontSize: 11, fontWeight: 700,
+    }}>{s.label}</span>
+  )
+}
+
+// ---------- Item modal ----------
+function ItemModal({ mode, initial, categories, extraSubs, items, onClose, onSave, onDelete }) {
+  const [num,      setNum]      = useState(initial?.num || '')
+  const [name,     setName]     = useState(initial?.name || '')
+  const [category, setCategory] = useState(initial?.category || categories[0] || '')
+  const [sub,      setSub]      = useState(initial?.sub || '')
+  const [sku,      setSku]      = useState(initial?.sku || '')
+  const [location, setLocation] = useState(initial?.location || '')
+  const [qty,      setQty]      = useState(initial?.qty ?? 0)
+  const [reorder,  setReorder]  = useState(initial?.reorder ?? 0)
+  const [cost,     setCost]     = useState(initial?.cost ?? 0)
+  const [notes,    setNotes]    = useState(initial?.notes || '')
+
+  const [newCategory, setNewCategory] = useState('')
+  const [newSub,      setNewSub]      = useState('')
+
+  const catList = useMemo(() => Array.from(new Set([...categories, category].filter(Boolean))), [categories, category])
+  const subsForCat = useMemo(() => {
+    const seen = new Set()
+    const out = []
+    for (const it of items) {
+      if (it.category === category && it.sub && !seen.has(it.sub)) { out.push(it.sub); seen.add(it.sub) }
+    }
+    for (const s of extraSubs) {
+      if (s.cat === category && s.name && !seen.has(s.name)) { out.push(s.name); seen.add(s.name) }
+    }
+    return out
+  }, [items, extraSubs, category])
+
+  const handleSave = () => {
+    if (!name.trim()) { alert('Please enter an item name.'); return }
+    const finalCat = newCategory.trim() || category
+    const finalSub = newSub.trim() || sub
+    if (!finalCat) { alert('Please choose or add a category.'); return }
+    onSave({
+      num: num.trim(),
+      name: name.trim(),
+      category: finalCat,
+      sub: finalSub,
+      sku: sku.trim(),
+      location: location.trim(),
+      qty: Math.max(0, Number(qty) || 0),
+      reorder: Math.max(0, Number(reorder) || 0),
+      cost: Math.max(0, Number(cost) || 0),
+      notes: notes.trim(),
+    })
+  }
+
+  return (
+    <div className="kb-modal-scrim" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="kb-modal" onClick={e => e.stopPropagation()}>
+        <h2>{mode === 'edit' ? 'Edit Item' : 'New Item'}</h2>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div className="kb-field" style={{ flex: '0 0 110px' }}>
+            <label>Item #</label>
+            <input value={num} onChange={e => setNum(e.target.value)} />
+          </div>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>Item Name</label>
+            <input value={name} onChange={e => setName(e.target.value)} autoFocus />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>Category</label>
+            <select value={category} onChange={e => { setCategory(e.target.value); setSub(''); setNewCategory('') }}>
+              {catList.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <input
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+              placeholder="Or type a new category…"
+              style={{ marginTop: 6 }}
+            />
+          </div>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>Sub-Category</label>
+            <select value={sub} onChange={e => { setSub(e.target.value); setNewSub('') }}>
+              <option value="">(none)</option>
+              {subsForCat.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <input
+              value={newSub}
+              onChange={e => setNewSub(e.target.value)}
+              placeholder="Or type a new sub…"
+              style={{ marginTop: 6 }}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>SKU / Code</label>
+            <input value={sku} onChange={e => setSku(e.target.value)} />
+          </div>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>Location</label>
+            <input value={location} onChange={e => setLocation(e.target.value)} />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>On Hand</label>
+            <input type="number" min="0" step="1" value={qty} onChange={e => setQty(e.target.value)} />
+          </div>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>Reorder Level</label>
+            <input type="number" min="0" step="1" value={reorder} onChange={e => setReorder(e.target.value)} />
+          </div>
+          <div className="kb-field" style={{ flex: 1 }}>
+            <label>Unit Cost ($)</label>
+            <input type="number" min="0" step="0.01" value={cost} onChange={e => setCost(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="kb-field">
+          <label>Comments / Notes</label>
+          <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} />
+        </div>
+
+        <div className="kb-actions">
+          {onDelete && <button className="del" onClick={onDelete}>Delete</button>}
+          <button className="cancel" onClick={onClose}>Cancel</button>
+          <button className="save" onClick={handleSave}>Save</button>
+        </div>
       </div>
+    </div>
+  )
+}
 
-      {/* Add Item Modal */}
-      {modal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(15,25,40,.45)',
-          display: 'grid', placeItems: 'center', zIndex: 200, padding: 16,
-        }} onClick={e => e.target === e.currentTarget && setModal(false)}>
-          <div style={{
-            background: '#fff', borderRadius: 16, width: 500, maxWidth: '100%',
-            boxShadow: '0 20px 60px rgba(15,25,40,.2)', overflow: 'hidden',
-          }}>
-            <div style={{
-              background: 'var(--header-blue)', padding: '16px 20px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <span style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>New Item</span>
-              <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: 'var(--ink-soft)' }}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18, maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
-
-              {/* Item Name */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Item Name</label>
-                <input
-                  className="reg-input"
-                  placeholder="e.g. T-Shirt, Tote Bag…"
-                  value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  autoFocus
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Category</label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
-                  {categories.map(cat => (
-                    <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat, newCategory: '' }))} style={{
-                      border: `2px solid ${form.category === cat && !form.newCategory ? 'var(--logo-teal)' : 'var(--line)'}`,
-                      background: form.category === cat && !form.newCategory ? '#5FA09E18' : '#fafbfc',
-                      color: form.category === cat && !form.newCategory ? 'var(--logo-teal)' : 'var(--ink-soft)',
-                      borderRadius: 8, padding: '8px 12px', fontSize: 13,
-                      fontWeight: form.category === cat && !form.newCategory ? 700 : 500, cursor: 'pointer',
-                    }}>{cat}</button>
-                  ))}
-                </div>
-                <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 10 }}>or create new:</div>
-                <input
-                  className="reg-input"
-                  placeholder="New category name"
-                  value={form.newCategory}
-                  onChange={e => setForm(f => ({ ...f, newCategory: e.target.value, category: e.target.value ? e.target.value : f.category }))}
-                />
-              </div>
-
-              {/* Size (optional) */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Size (Optional)</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-                  <button onClick={() => setForm(f => ({ ...f, size: null }))} style={{
-                    border: `2px solid ${!form.size ? 'var(--logo-teal)' : 'var(--line)'}`,
-                    background: !form.size ? '#5FA09E18' : '#fafbfc',
-                    color: !form.size ? 'var(--logo-teal)' : 'var(--ink-soft)',
-                    borderRadius: 7, padding: '6px 12px', fontSize: 13,
-                    fontWeight: !form.size ? 700 : 500, cursor: 'pointer',
-                  }}>None</button>
-                  {COMMON_SIZES.map(sz => (
-                    <button key={sz} onClick={() => setForm(f => ({ ...f, size: sz }))} style={{
-                      border: `2px solid ${form.size === sz ? 'var(--logo-teal)' : 'var(--line)'}`,
-                      background: form.size === sz ? '#5FA09E18' : '#fafbfc',
-                      color: form.size === sz ? 'var(--logo-teal)' : 'var(--ink-soft)',
-                      borderRadius: 7, padding: '6px 12px', fontSize: 13,
-                      fontWeight: form.size === sz ? 700 : 500, cursor: 'pointer',
-                    }}>{sz}</button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Qty + Price */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Qty in Stock</label>
-                  <input
-                    className="reg-input"
-                    type="number" min="0"
-                    placeholder="0"
-                    value={form.qty}
-                    onChange={e => setForm(f => ({ ...f, qty: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Price ($)</label>
-                  <input
-                    className="reg-input"
-                    type="number" min="0" step="0.01"
-                    placeholder="0.00"
-                    value={form.price}
-                    onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div style={{ padding: '0 24px 22px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button className="btn ghost" onClick={() => setModal(false)}>Cancel</button>
-              <button className="btn" onClick={save} disabled={!form.name.trim() || !(form.category || form.newCategory)} style={{ opacity: (form.name.trim() && (form.category || form.newCategory)) ? 1 : 0.45 }}>
-                Add Item
-              </button>
-            </div>
-          </div>
+// ---------- Log view ----------
+function LogView({ log }) {
+  const [search, setSearch] = useState('')
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    return [...log]
+      .sort((a, b) => (b.ts || '').localeCompare(a.ts || ''))
+      .filter(row => !q || [row.itemName, row.user, row.note].join(' ').toLowerCase().includes(q))
+  }, [log, search])
+  return (
+    <div style={{ background: '#fff', borderRadius: 10, boxShadow: '0 1px 3px rgba(46,37,22,.15)' }}>
+      <div style={{ padding: '12px 14px', borderBottom: '1px solid #f0ede3',
+                    background: '#fffbef', display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <strong style={{ flex: '0 0 auto', fontSize: 13 }}>
+          Stock-Change Log — {filtered.length} entr{filtered.length === 1 ? 'y' : 'ies'}
+        </strong>
+        <div style={{ flex: 1 }} />
+        <div style={{ position: 'relative', minWidth: 220 }}>
+          <Search size={14} style={{ position: 'absolute', top: 9, left: 10, color: 'var(--muted)' }} />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search the log…"
+            style={{ width: 250, padding: '7px 8px 7px 30px', fontSize: 13,
+                     border: '1px solid #d5d0c4', borderRadius: 8, background: '#fff' }}
+          />
         </div>
-      )}
-
-      {/* Edit Item Modal */}
-      {editModal && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(15,25,40,.45)',
-          display: 'grid', placeItems: 'center', zIndex: 200, padding: 16,
-        }} onClick={e => e.target === e.currentTarget && setEditModal(false)}>
-          <div style={{
-            background: '#fff', borderRadius: 16, width: 500, maxWidth: '100%',
-            boxShadow: '0 20px 60px rgba(15,25,40,.2)', overflow: 'hidden',
-          }}>
-            <div style={{
-              background: 'var(--header-blue)', padding: '16px 20px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-              <span style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 700 }}>Edit Item</span>
-              <button onClick={() => setEditModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', color: 'var(--ink-soft)' }}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={{ padding: '22px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-
-              {/* Item Name */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Item Name</label>
-                <input
-                  className="reg-input"
-                  value={editForm.name}
-                  onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                  autoFocus
-                />
-              </div>
-
-              {/* Size (only if item has size) */}
-              {editForm.size !== null && (
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Size</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
-                    {COMMON_SIZES.map(sz => (
-                      <button key={sz} onClick={() => setEditForm(f => ({ ...f, size: sz }))} style={{
-                        border: `2px solid ${editForm.size === sz ? 'var(--logo-teal)' : 'var(--line)'}`,
-                        background: editForm.size === sz ? '#5FA09E18' : '#fafbfc',
-                        color: editForm.size === sz ? 'var(--logo-teal)' : 'var(--ink-soft)',
-                        borderRadius: 7, padding: '6px 12px', fontSize: 13,
-                        fontWeight: editForm.size === sz ? 700 : 500, cursor: 'pointer',
-                      }}>{sz}</button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Qty + Price */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Qty in Stock</label>
-                  <input
-                    className="reg-input"
-                    type="number" min="0"
-                    value={editForm.qty}
-                    onChange={e => setEditForm(f => ({ ...f, qty: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--ink-soft)', marginBottom: 7, letterSpacing: '.4px', textTransform: 'uppercase' }}>Price ($)</label>
-                  <input
-                    className="reg-input"
-                    type="number" min="0" step="0.01"
-                    value={editForm.price}
-                    onChange={e => setEditForm(f => ({ ...f, price: e.target.value }))}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div style={{ padding: '0 24px 22px', display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button className="btn ghost" onClick={() => setEditModal(false)}>Cancel</button>
-              <button className="btn" onClick={saveEdit} disabled={!editForm.name.trim()} style={{ opacity: editForm.name.trim() ? 1 : 0.45 }}>
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+        <thead>
+          <tr style={{ background: 'var(--brand-dark-blue)', color: '#fff', textAlign: 'left' }}>
+            <Th>When</Th><Th>Item</Th><Th align="center">Change</Th>
+            <Th align="center">On Hand After</Th><Th>Who</Th><Th>Reason</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {filtered.length === 0 && (
+            <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>
+              No log entries.
+            </td></tr>
+          )}
+          {filtered.map((row, i) => {
+            const d = Number(row.delta) || 0
+            return (
+              <tr key={row.id} style={{ background: i % 2 ? '#fafaf7' : '#fff', borderTop: '1px solid #f0ede3' }}>
+                <Td muted>{fmtDateTime(row.ts)}</Td>
+                <Td strong>{row.itemName || '—'}</Td>
+                <Td align="center" style={{
+                  color: d > 0 ? '#2b7a2e' : d < 0 ? '#a12626' : 'var(--muted)',
+                  fontWeight: 700,
+                }}>{d > 0 ? '+' + d : d}</Td>
+                <Td align="center">{row.after ?? 0}</Td>
+                <Td muted>{row.user || '—'}</Td>
+                <Td muted>{row.note || '—'}</Td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
     </div>
   )
 }
