@@ -695,6 +695,32 @@ app.put('/api/finance', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- projects (kanban board — singleton payload) --------
+// Same shape as the client's "crania-projects.json" export so
+// JSON round-trips cleanly. Whole payload written on every save.
+app.get('/api/projects', wrap(async (_req, res) => res.json(await loadProjects())))
+app.put('/api/projects', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    cards:            Array.isArray(body.cards) ? body.cards : [],
+    updatedAt:        body.updatedAt || new Date().toISOString(),
+    lastReset:        body.lastReset || null,
+    lastResetAt:      body.lastResetAt || null,
+    resetTime:        body.resetTime || '08:00',
+    lastBackup:       body.lastBackup || null,
+    lastBackupAt:     body.lastBackupAt || null,
+    clearGoals:       !!body.clearGoals,
+    clearGoalsTime:   body.clearGoalsTime || '00:00',
+    lastGoalsClear:   body.lastGoalsClear || null,
+    lastGoalsClearAt: body.lastGoalsClearAt || null,
+    colOrder:         Array.isArray(body.colOrder) && body.colOrder.length
+                        ? body.colOrder
+                        : ['notes', 'goals', 'daily', 'todo', 'doing', 'done'],
+  }
+  await saveProjects(payload)
+  res.json({ ok: true })
+}))
+
 // ---- forms (custom form builder) ------------------------
 // A "form" is a definition: title + ordered field list. Anyone
 // with the form's shareable URL (/form/:slug) can submit it, and
