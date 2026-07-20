@@ -22,6 +22,7 @@ import Forms from './pages/Forms'
 import Invoices from './pages/Invoices'
 import Receipts from './pages/Receipts'
 import Projects from './pages/Projects'
+import ITAccounts from './pages/ITAccounts'
 import Placeholder from './pages/Placeholder'
 import { StoreProvider } from './data/store'
 
