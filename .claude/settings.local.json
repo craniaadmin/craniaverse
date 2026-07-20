@@ -119,7 +119,8 @@
       "Bash(mkdir -p .claude/agents && ls .claude/agents)",
       "Bash(git commit -m 'agents: add test-writer subagent for on-demand test authoring *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000/api/health)",
-      "Bash(mkdir -p server/data && cp \"/c/Users/hanak/Downloads/crania-calendar.json\" server/data/calendar-seed.json && wc -l server/data/calendar-seed.json && head -3 server/data/calendar-seed.json)"
+      "Bash(mkdir -p server/data && cp \"/c/Users/hanak/Downloads/crania-calendar.json\" server/data/calendar-seed.json && wc -l server/data/calendar-seed.json && head -3 server/data/calendar-seed.json)",
+      "Bash(git commit -m 'Calendar: wire to new /api/calendar singleton \\(10 cals + 180 events seeded\\) *)"
     ]
   },
   "hooks": {
