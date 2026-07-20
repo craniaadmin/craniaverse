@@ -8,7 +8,9 @@ import { runApiTests } from './api-tests.js'
 import { runPageTests } from './page-tests.js'
 import { runLogicTests } from './logic-tests.js'
 import { writeLog, sendFailureEmail } from './utils/notify.js'
-import { BASE_URL } from './config.js'
+import { BASE_URL, LOG_DIR } from './config.js'
+import fs from 'fs'
+import path from 'path'
 
 const started = Date.now()
 console.log(`[tests] starting against ${BASE_URL}`)
