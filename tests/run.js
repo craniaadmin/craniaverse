@@ -42,6 +42,27 @@ for (const [label, fn] of [
 const summary = summarize(all)
 writeLog(summary)
 
+// Also write a stable, machine-readable snapshot of THIS run to
+// tests/logs/last-run.json. The server exposes it via
+// GET /api/tests/last-run so the daily agent can see fresh
+// failures without needing to shell into maya-pc or grep logs.
+try {
+  fs.mkdirSync(LOG_DIR, { recursive: true })
+  const snapshot = {
+    ranAt: new Date().toISOString(),
+    baseUrl: BASE_URL,
+    total: summary.total,
+    passed: summary.passed,
+    failed: summary.failed,
+    failures: summary.results
+      .filter(r => !r.passed)
+      .map(r => ({ name: r.name, error: r.error, ms: r.ms })),
+  }
+  fs.writeFileSync(path.join(LOG_DIR, 'last-run.json'), JSON.stringify(snapshot, null, 2))
+} catch (err) {
+  console.error('[tests] failed to write last-run.json:', err?.message || err)
+}
+
 if (summary.failed > 0) {
   console.error('\n[tests] FAILURES:')
   for (const r of summary.results.filter(x => !x.passed)) {
