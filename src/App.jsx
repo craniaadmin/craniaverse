@@ -21,6 +21,7 @@ import StaffInformation from './pages/StaffInformation'
 import Forms from './pages/Forms'
 import Invoices from './pages/Invoices'
 import Receipts from './pages/Receipts'
+import Projects from './pages/Projects'
 import Placeholder from './pages/Placeholder'
 import { StoreProvider } from './data/store'
 
