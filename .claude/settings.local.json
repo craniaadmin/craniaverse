@@ -111,7 +111,8 @@
       "Bash(awk 'NR==174 {print \"  <!-- LOGO IMAGE \\(base64, stripped\\) -->\"; next} {print}' \"/c/Users/hanak/Downloads/6-3. CraniaVerse - IT Accounts v28 [claude-fable-5].html\")",
       "Bash(git commit -m 'IT Accounts: categorized password manager wired to new /api/it-accounts *)",
       "Bash(SESSION_SECRET=some-random-32-plus-char-session-secret-value node -e ' *)",
-      "Bash(git commit -m 'IT Accounts: encrypt pass + notes at rest \\(AES-256-GCM\\) *)"
+      "Bash(git commit -m 'IT Accounts: encrypt pass + notes at rest \\(AES-256-GCM\\) *)",
+      "Bash(node --check tests/run.js)"
     ]
   },
   "hooks": {
