@@ -51,6 +51,7 @@ const ROUTES = {
   'staff:Schedules':         () => <Schedules />,
 
   'operations:Inventory':    () => <Inventory />,
+  'operations:IT Accounts':  () => <ITAccounts />,
 
   'financial:Tuition Schedules': () => <FeeSchedule />,
   'financial:Invoices':      () => <Invoices />,
