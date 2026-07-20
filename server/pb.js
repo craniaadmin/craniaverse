@@ -21,6 +21,11 @@
 // ============================================================
 import PocketBase from 'pocketbase'
 import crypto from 'crypto'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __pbDir = path.dirname(fileURLToPath(import.meta.url))
 
 // ---- IT-accounts symmetric encryption (AES-256-GCM) ---------
 // Passwords + notes for the IT Accounts page are encrypted at rest

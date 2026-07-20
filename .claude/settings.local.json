@@ -117,7 +117,9 @@
       "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' 'https://craniaverse.ngrok.app/api/tests/last-run' -H 'ngrok-skip-browser-warning: true')",
       "Bash(git commit -m 'Auth: allowlist GET /api/tests/last-run as public *)",
       "Bash(mkdir -p .claude/agents && ls .claude/agents)",
-      "Bash(git commit -m 'agents: add test-writer subagent for on-demand test authoring *)"
+      "Bash(git commit -m 'agents: add test-writer subagent for on-demand test authoring *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4000/api/health)",
+      "Bash(mkdir -p server/data && cp \"/c/Users/hanak/Downloads/crania-calendar.json\" server/data/calendar-seed.json && wc -l server/data/calendar-seed.json && head -3 server/data/calendar-seed.json)"
     ]
   },
   "hooks": {
