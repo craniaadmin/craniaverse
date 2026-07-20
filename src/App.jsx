@@ -36,6 +36,7 @@ const ROUTES = {
   'home:Dashboard':          (nav) => <Dashboard onNavigate={nav} />,
   'home:Calendar':           () => <CalendarView />,
   'home:To-Do':              () => <ToDo />,
+  'home:Projects':           () => <Projects />,
 
   'programs:Programs':       () => <Programs />,
   'programs:Contests':       (nav) => <Contests onNavigate={nav} />,
