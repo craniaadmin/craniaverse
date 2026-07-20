@@ -104,6 +104,35 @@ export async function runApiTests() {
       assert(Array.isArray(json), 'expected array response')
     }),
 
+    await runTest('GET /api/projects returns {cards, colOrder}', async () => {
+      const { status, json } = await authedJson('/api/projects')
+      assertEq(status, 200, 'status')
+      assert(json && typeof json === 'object', 'expected object response')
+      assert(Array.isArray(json.cards), 'expected cards array')
+      assert(Array.isArray(json.colOrder), 'expected colOrder array')
+    }),
+
+    await runTest('GET /api/it-accounts returns {categories, accounts}', async () => {
+      const { status, json } = await authedJson('/api/it-accounts')
+      assertEq(status, 200, 'status')
+      assert(json && typeof json === 'object', 'expected object response')
+      assert(Array.isArray(json.categories), 'expected categories array')
+      assert(Array.isArray(json.accounts), 'expected accounts array')
+    }),
+
+    await runTest('GET /api/tests/last-run is public and returns a snapshot or 404', async () => {
+      // No auth cookie — this route is on the public allowlist so the
+      // scheduled agent can poll it without a stored admin password.
+      const { status, json } = await fetchJson('/api/tests/last-run')
+      assert(status === 200 || status === 404, `expected 200 or 404, got ${status}`)
+      if (status === 200) {
+        assert(json && typeof json.total === 'number', `expected {total} in snapshot, got ${JSON.stringify(json)}`)
+        assert(Array.isArray(json.failures), 'expected failures array in snapshot')
+      } else {
+        assert(json?.error, 'expected {error} on 404')
+      }
+    }),
+
     await runTest('Unknown route returns 404', async () => {
       // Hit it authenticated so a 401 doesn't mask the 404.
       const r = await authedFetch('/api/definitely-not-a-real-route-' + Date.now())
