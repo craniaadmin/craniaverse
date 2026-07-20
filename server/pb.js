@@ -579,24 +579,59 @@ const IT_ACCOUNTS_SEED = {
   ],
 }
 
+// Decrypt every account's sensitive fields on read; encrypt them on
+// write. Both `pass` and `notes` are treated as secrets since notes
+// commonly holds 2FA codes / security-question answers per the
+// mockup's own labeling.
+const SECRET_FIELDS = ['pass', 'notes']
+
+function decryptAccounts(accounts) {
+  return (accounts || []).map(a => {
+    const out = { ...a }
+    for (const f of SECRET_FIELDS) if (out[f] != null) out[f] = decryptSecret(out[f])
+    return out
+  })
+}
+function encryptAccounts(accounts) {
+  return (accounts || []).map(a => {
+    const out = { ...a }
+    for (const f of SECRET_FIELDS) if (out[f] != null) out[f] = encryptSecret(out[f])
+    return out
+  })
+}
+
 export async function loadItAccounts() {
   try {
     const rows = await getFullList('itAccounts')
-    if (rows.length === 0) return IT_ACCOUNTS_SEED
-    return rows[0].payload || { categories: [], accounts: [] }
+    const raw = rows.length === 0
+      ? IT_ACCOUNTS_SEED
+      : (rows[0].payload || { categories: [], accounts: [] })
+    return {
+      categories: Array.isArray(raw.categories) ? raw.categories : [],
+      accounts:   decryptAccounts(raw.accounts),
+    }
   } catch (err) {
-    if (err?.status === 404) return IT_ACCOUNTS_SEED
+    if (err?.status === 404) {
+      return {
+        categories: IT_ACCOUNTS_SEED.categories,
+        accounts:   decryptAccounts(IT_ACCOUNTS_SEED.accounts),
+      }
+    }
     throw err
   }
 }
 
 export async function saveItAccounts(payload) {
   await ensureAuth()
+  const encPayload = {
+    categories: Array.isArray(payload?.categories) ? payload.categories : [],
+    accounts:   encryptAccounts(payload?.accounts),
+  }
   const rows = await getFullList('itAccounts')
   if (rows.length === 0) {
-    await pb().collection('itAccounts').create({ payload })
+    await pb().collection('itAccounts').create({ payload: encPayload })
   } else {
-    await pb().collection('itAccounts').update(rows[0].id, { payload })
+    await pb().collection('itAccounts').update(rows[0].id, { payload: encPayload })
   }
 }
 
