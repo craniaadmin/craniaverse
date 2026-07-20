@@ -38,6 +38,7 @@ import {
   loadStaffBoard,    saveStaffBoard,
   loadInventory,     saveInventory,
   loadFinance,       saveFinance,
+  loadProjects,      saveProjects,
   loadTodo,          saveTodo,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
