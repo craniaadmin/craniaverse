@@ -52,6 +52,7 @@ const ROUTES = {
   'staff:Schedules':         () => <Schedules />,
 
   'operations:Inventory':    () => <Inventory />,
+  'operations:Crania Store': () => <CraniaStore />,
   'operations:IT Accounts':  () => <ITAccounts />,
 
   'financial:Tuition Schedules': () => <FeeSchedule />,
