@@ -41,6 +41,7 @@ import {
   loadProjects,      saveProjects,
   loadItAccounts,    saveItAccounts,
   loadCalendar,      saveCalendar,
+  loadStock,         saveStock,
   loadTodo,          saveTodo,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
