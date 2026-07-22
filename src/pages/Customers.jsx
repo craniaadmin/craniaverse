@@ -3,7 +3,7 @@ import { useStore } from '../data/store'
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
-function CustomerList({ onSelect }) {
+function CustomerList({ onSelect, onAdd }) {
   const { records } = useStore()
   const [search, setSearch] = useState('')
 
@@ -48,12 +48,22 @@ function CustomerList({ onSelect }) {
 
   return (
     <div className="page" style={{ paddingBottom: 40 }}>
-      <h2 className="page-title">Customers</h2>
+      <div className="page-head" style={{ marginBottom: 0 }}>
+        <h2 className="page-title" style={{ marginBottom: 0 }}>Customers</h2>
+        <button
+          onClick={onAdd}
+          style={{
+            background: 'var(--logo-teal)', color: '#fff', border: 'none',
+            padding: '7px 14px', fontSize: 13, fontWeight: 700, borderRadius: 8,
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
+          }}
+        >+ Add Family</button>
+      </div>
 
       {/* Search bar */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        background: 'var(--logo-teal)', borderRadius: '10px 10px 0 0', padding: '14px 20px',
+        background: 'var(--logo-teal)', borderRadius: '10px 10px 0 0', padding: '14px 20px', marginTop: 14,
       }}>
         <svg width="18" height="18" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2.2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
@@ -270,7 +280,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange }) {
   )
 }
 
-function CustomerDetail({ recordId, onBack, onSelectRecord }) {
+function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDelete }) {
   const { records, updateCustomerField, updateStudentField } = useStore()
   const selected = records.find(r => r.id === recordId) || records[0]
 
@@ -375,7 +385,16 @@ function CustomerDetail({ recordId, onBack, onSelectRecord }) {
         All Customers
       </button>
 
-      <h2 className="page-title" style={{ marginTop: 0, marginBottom: 20 }}>Customers</h2>
+      <div className="page-head" style={{ marginBottom: 20 }}>
+        <h2 className="page-title" style={{ marginTop: 0, marginBottom: 0 }}>Customers</h2>
+        <button
+          onClick={() => onDelete(selected)}
+          style={{
+            background: 'transparent', color: '#c62828', border: '1px solid #c62828',
+            padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+          }}
+        >Delete Student</button>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 22 }}>
         <Column title="Guardian 1" data={guardian1} onChange={(k, v) => updateCustField('guardian1', k, v)} />
@@ -405,6 +424,13 @@ function CustomerDetail({ recordId, onBack, onSelectRecord }) {
                 </div>
               )
             })}
+            <div
+              onClick={() => onAddSibling(selected)}
+              style={{
+                cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'var(--logo-teal)',
+                padding: '4px 8px', marginTop: 2,
+              }}
+            >+ Add Sibling</div>
           </div>
           {Object.entries(student).map(([k, v]) => (
             <Field key={k} label={k} value={v} readOnly={['Current Age'].includes(k)} highlightEmail={false} onChange={val => updateCustField('student', k, val)} />
@@ -470,7 +496,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord }) {
 // ─── Root: switches between list and detail ────────────────────────────────
 
 export default function Customers() {
-  const { select } = useStore()
+  const { records, select, addRegistration, deleteRegistration } = useStore()
   const [detailId, setDetailId] = useState(null)
 
   const handleSelect = (id) => {
@@ -478,9 +504,63 @@ export default function Customers() {
     setDetailId(id)
   }
 
-  if (detailId) {
-    return <CustomerDetail recordId={detailId} onBack={() => setDetailId(null)} onSelectRecord={setDetailId} />
+  const handleAdd = async () => {
+    try {
+      const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student' })
+      if (id) setDetailId(id)
+    } catch (err) {
+      alert('Could not add family: ' + err.message)
+    }
   }
 
-  return <CustomerList onSelect={handleSelect} />
+  // Adds a second (or third...) child under the same guardians/emergency
+  // contact as an existing family, so it groups as a sibling automatically.
+  const handleAddSibling = async (record) => {
+    try {
+      const g1 = record.customer?.guardian1 || {}
+      const g2 = record.customer?.guardian2 || {}
+      const em = record.customer?.emergency || {}
+      const id = await addRegistration({
+        studentFirstName: 'New', studentLastName: 'Student',
+        g1FirstName: g1['First Name'], g1LastName: g1['Last Name'], g1Relationship: g1['Relationship'],
+        g1PhoneHome: g1['Phone (Home)'], g1PhoneMobile: g1['Phone (Mobile)'], g1Email: g1['Email'],
+        g1Address1: g1['Street Address'], g1Address2: g1['Unit'], g1City: g1['City'],
+        g1Province: g1['Province'], g1Postal: g1['Postal Code'], g1Occupation: g1['Occupation'],
+        g2FirstName: g2['First Name'], g2LastName: g2['Last Name'], g2Relationship: g2['Relationship'],
+        g2PhoneHome: g2['Phone (Home)'], g2PhoneMobile: g2['Phone (Mobile)'], g2Email: g2['Email'],
+        g2Address1: g2['Street Address'], g2Address2: g2['Unit'], g2City: g2['City'],
+        g2Province: g2['Province'], g2Postal: g2['Postal Code'], g2Occupation: g2['Occupation'],
+        emFirstName: em['First Name'], emLastName: em['Last Name'], emRelationship: em['Relationship'],
+        emPhone: em['Phone (Mobile)'], emEmail: em['Email'],
+      })
+      if (id) setDetailId(id)
+    } catch (err) {
+      alert('Could not add sibling: ' + err.message)
+    }
+  }
+
+  const handleDelete = async (record) => {
+    const name = `${record.student?.firstName || ''} ${record.student?.lastName || ''}`.trim() || 'this student'
+    if (!confirm(`Delete ${name}? This also removes their linked customer/guardian info. This can't be undone.`)) return
+    try {
+      await deleteRegistration(record.id)
+      // Jump to a remaining sibling if there is one, else back to the list.
+      const g1 = record.customer?.guardian1
+      const sibling = g1 && records.find(r =>
+        r.id !== record.id &&
+        r.customer?.guardian1?.['First Name'] === g1['First Name'] &&
+        r.customer?.guardian1?.['Last Name'] === g1['Last Name'] &&
+        r.customer?.guardian1?.['Email'] === g1['Email'])
+      setDetailId(sibling ? sibling.id : null)
+    } catch (err) {
+      alert('Could not delete: ' + err.message)
+    }
+  }
+
+  if (detailId) {
+    return <CustomerDetail recordId={detailId} onBack={() => setDetailId(null)} onSelectRecord={setDetailId}
+      onAddSibling={handleAddSibling} onDelete={handleDelete} />
+  }
+
+  return <CustomerList onSelect={handleSelect} onAdd={handleAdd} />
 }

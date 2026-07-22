@@ -225,8 +225,9 @@ export function StoreProvider({ children }) {
     updateCustomerField,
     addCashEntry,
     updateRules,
-    // Add a registration via the API (used by the public form at /register).
-    // Returns the new record's id and selects it. Throws if the API fails.
+    // Add a registration via the API (used by the public form at /register,
+    // and by the "+ Add" buttons on Students/Customers). Returns the new
+    // record's id and selects it. Throws if the API fails.
     addRegistration: async (form) => {
       const res = await fetch(ENDPOINT, {
         method: 'POST',
@@ -241,6 +242,16 @@ export function StoreProvider({ children }) {
       await refresh()
       if (record && record.id) setSelectedId(record.id)
       return record && record.id
+    },
+    // Permanently removes a registration (student + linked customer info).
+    // Used by the delete actions on Students/Customers.
+    deleteRegistration: async (id) => {
+      const res = await fetch(`${ENDPOINT}/${id}`, {
+        method: 'DELETE',
+        headers: { 'ngrok-skip-browser-warning': 'true' },
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      await refresh()
     },
   }), [records, selectedId, status, rules, staff, programs, refresh, updateCraniaCash, updateStudentField, updateCustomerField, addCashEntry, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms])
 

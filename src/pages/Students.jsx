@@ -391,7 +391,7 @@ function CommentsSection({ studentId, initialPrograms }) {
 
 // ── Student list view ──────────────────────────────────────────────────────
 
-function StudentList({ onSelect }) {
+function StudentList({ onSelect, onAdd, onDelete }) {
   const { records } = useStore()
   const [search, setSearch] = useState('')
 
@@ -416,12 +416,22 @@ function StudentList({ onSelect }) {
 
   return (
     <div className="page" style={{ paddingBottom: 40 }}>
-      <h2 className="page-title">Students</h2>
+      <div className="page-head" style={{ marginBottom: 0 }}>
+        <h2 className="page-title" style={{ marginBottom: 0 }}>Students</h2>
+        <button
+          onClick={onAdd}
+          style={{
+            background: 'var(--logo-teal)', color: '#fff', border: 'none',
+            padding: '7px 14px', fontSize: 13, fontWeight: 700, borderRadius: 8,
+            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
+          }}
+        >+ Add Student</button>
+      </div>
 
       {/* Search bar */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 12,
-        background: 'var(--logo-teal)', borderRadius: '10px 10px 0 0', padding: '14px 20px',
+        background: 'var(--logo-teal)', borderRadius: '10px 10px 0 0', padding: '14px 20px', marginTop: 14,
       }}>
         <svg width="18" height="18" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2.2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
@@ -442,11 +452,11 @@ function StudentList({ onSelect }) {
       <div style={{ border: '2px solid var(--logo-teal)', borderTop: 'none', borderRadius: '0 0 10px 10px', overflow: 'hidden', background: '#fff' }}>
         {/* Header */}
         <div style={{
-          display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2.4fr',
+          display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2fr 40px',
           background: '#3d8e90', padding: '11px 20px',
           borderBottom: '1px solid rgba(255,255,255,.15)',
         }}>
-          {['Name', 'Login', 'Grade', 'Medical', 'Crania Cash', 'Classes'].map(h => (
+          {['Name', 'Login', 'Grade', 'Medical', 'Crania Cash', 'Classes', ''].map(h => (
             <div key={h} style={{ color: '#fff', fontWeight: 700, fontSize: 13, letterSpacing: '.2px' }}>{h}</div>
           ))}
         </div>
@@ -459,7 +469,7 @@ function StudentList({ onSelect }) {
         ) : (
           filtered.map((r, i) => (
             <div key={r.id} onClick={() => onSelect(r.id)} style={{
-              display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2.4fr',
+              display: 'grid', gridTemplateColumns: '1.6fr 1fr 0.6fr 1.2fr 0.8fr 2fr 40px',
               padding: '13px 20px', alignItems: 'center',
               borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
               background: i % 2 === 0 ? '#fff' : '#fafbfb',
@@ -474,6 +484,17 @@ function StudentList({ onSelect }) {
               <div style={{ fontSize: 13 }}>{r.student.craniaCash ?? '—'}</div>
               <div style={{ fontSize: 13, color: 'var(--ink-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {getClasses(r)}
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onDelete(r) }}
+                  title="Delete student"
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4 }}
+                >
+                  <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
               </div>
             </div>
           ))
@@ -498,7 +519,7 @@ function generatePassword(firstName, lastName) {
   return `${name}${first}${second}${suffix}`
 }
 
-function StudentDetail({ recordId, onBack, onNavigate }) {
+function StudentDetail({ recordId, onBack, onNavigate, onDelete }) {
   const { records, updateStudentField } = useStore()
   const API_BASE = import.meta.env?.VITE_API_URL || ''
   const record = records.find(r => r.id === recordId) || records[0]
@@ -559,9 +580,18 @@ function StudentDetail({ recordId, onBack, onNavigate }) {
         All Students
       </button>
 
-      <h2 className="page-title" style={{ marginTop: 0 }}>
-        {studentFields.firstName} {studentFields.lastName}
-      </h2>
+      <div className="page-head" style={{ marginBottom: 20 }}>
+        <h2 className="page-title" style={{ marginBottom: 0, marginTop: 0 }}>
+          {studentFields.firstName} {studentFields.lastName}
+        </h2>
+        <button
+          onClick={() => onDelete(record)}
+          style={{
+            background: 'transparent', color: '#c62828', border: '1px solid #c62828',
+            padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+          }}
+        >Delete Student</button>
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.2fr 1.1fr 1fr 0.7fr', gap: 20 }}>
         {/* Student info */}
@@ -657,7 +687,7 @@ function StudentDetail({ recordId, onBack, onNavigate }) {
 // ── Root: switches between list and detail ─────────────────────────────────
 
 export default function Students({ onNavigate }) {
-  const { select } = useStore()
+  const { select, addRegistration, deleteRegistration } = useStore()
   const [detailId, setDetailId] = useState(null)
 
   const handleSelect = (id) => {
@@ -665,9 +695,30 @@ export default function Students({ onNavigate }) {
     setDetailId(id)
   }
 
-  if (detailId) {
-    return <StudentDetail recordId={detailId} onBack={() => setDetailId(null)} onNavigate={onNavigate} />
+  const handleAdd = async () => {
+    try {
+      const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student' })
+      if (id) setDetailId(id)
+    } catch (err) {
+      alert('Could not add student: ' + err.message)
+    }
   }
 
-  return <StudentList onSelect={handleSelect} />
+  const handleDelete = async (record) => {
+    const name = `${record.student?.firstName || ''} ${record.student?.lastName || ''}`.trim() || 'this student'
+    if (!confirm(`Delete ${name}? This also removes their linked customer/guardian info. This can't be undone.`)) return
+    try {
+      await deleteRegistration(record.id)
+      if (detailId === record.id) setDetailId(null)
+    } catch (err) {
+      alert('Could not delete: ' + err.message)
+    }
+  }
+
+  if (detailId) {
+    return <StudentDetail recordId={detailId} onBack={() => setDetailId(null)} onNavigate={onNavigate}
+      onDelete={handleDelete} />
+  }
+
+  return <StudentList onSelect={handleSelect} onAdd={handleAdd} onDelete={handleDelete} />
 }
