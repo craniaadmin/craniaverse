@@ -434,31 +434,50 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   })
 
   // ---------- Render ----------
+  // Title tracks the current view so the loading placeholder and the
+  // real page-head agree with the outer sidebar/top-bar labels.
+  const pageTitle = view === 'checklists' ? 'Checklists' : 'To Do'
+
   if (loading) {
     return (
       <div className="page">
-        <div className="page-head"><h2 className="page-title">To Do</h2></div>
+        <div className="page-head"><h2 className="page-title">{pageTitle}</h2></div>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
   }
 
+  // Action buttons on the right of the page-head — matches the pattern
+  // used in Inventory / Crania Store / Calendar. The View toggle that
+  // used to live here was a duplicate of the outer top-bar submenu
+  // (Home → To-Do / Checklists) and has been removed.
   return (
     <div className="page tdroot">
       <style>{CSS}</style>
 
-      <div className="toolbar">
-        <div style={{ fontWeight: 700, fontSize: 16, letterSpacing: '.3px' }}>To Do</div>
-        <div className="spacer" />
-        <button className={'navbtn' + (view === 'todo' ? ' navactive' : '')} onClick={() => setView('todo')}>To-Do</button>
-        <button className={'navbtn' + (view === 'checklists' ? ' navactive' : '')} onClick={() => setView('checklists')}>Checklists</button>
+      <div className="page-head">
+        <h2 className="page-title">{pageTitle}</h2>
         {view === 'todo' && (
-          <>
-            <button className="lightbtn" onClick={() => openName(null)}>+ Add list</button>
-            <button className="hidedone" title="Show/hide completed" onClick={() => setHideDone(v => !v)}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => openName(null)}
+              style={{
+                background: 'var(--brand-light-blue)', color: 'var(--brand-dark-brown)',
+                border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700,
+                borderRadius: 8, cursor: 'pointer',
+              }}
+            >+ Add list</button>
+            <button
+              onClick={() => setHideDone(v => !v)}
+              title="Show/hide completed"
+              style={{
+                background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+                padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+              }}
+            >
               {hideDone ? 'Show done' : 'Hide done'}
             </button>
-          </>
+          </div>
         )}
       </div>
 
