@@ -37,11 +37,54 @@ const isContest = (p) =>
   (p.title || '').toUpperCase().includes('CONTEST') ||
   (p.category || '').toUpperCase().includes('CONTEST')
 
-function load(key, fallback) {
-  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback } catch { return fallback }
-}
-function save(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)) } catch { /* ignore */ }
+// ---- store hook (server-backed, debounced PUT) ----
+function useContests() {
+  const [data, setData] = useState({ extras: {}, manual: [], hidden: [] })
+  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState('loading') // 'loading' | 'online' | 'offline'
+  const saveTimer = useRef(null)
+  const latest = useRef(data)
+  latest.current = data
+
+  useEffect(() => {
+    let alive = true
+    fetch(`${API_BASE}/api/contests`, { headers: HEADERS })
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
+      .then(j => {
+        if (!alive) return
+        setData({
+          extras: j.extras && typeof j.extras === 'object' ? j.extras : {},
+          manual: Array.isArray(j.manual) ? j.manual : [],
+          hidden: Array.isArray(j.hidden) ? j.hidden : [],
+        })
+        setStatus('online')
+      })
+      .catch(() => alive && setStatus('offline'))
+      .finally(() => alive && setLoading(false))
+    return () => { alive = false }
+  }, [])
+
+  const mutate = useCallback((mut) => {
+    setData(prev => {
+      const next = {
+        extras: { ...prev.extras },
+        manual: [...prev.manual],
+        hidden: [...prev.hidden],
+      }
+      mut(next)
+      clearTimeout(saveTimer.current)
+      saveTimer.current = setTimeout(() => {
+        fetch(`${API_BASE}/api/contests`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', ...HEADERS },
+          body: JSON.stringify(latest.current),
+        }).catch(() => {})
+      }, 350)
+      return next
+    })
+  }, [])
+
+  return { data, loading, status, mutate }
 }
 
 // Cell-editor input styling — flat, invisible until focus so the
