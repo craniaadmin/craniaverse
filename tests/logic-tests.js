@@ -27,6 +27,20 @@ async function http(method, path, body) {
 export async function runLogicTests() {
   return [
     await runTest('Registration round-trip: POST → GET → DELETE', async () => {
+      // Self-healing sweep: delete ANY leftover PB-Test records from
+      // earlier runs before we start, so a single failed cleanup can
+      // never accumulate junk in the live Students/Customers lists.
+      // Records are matched on the fixed 'PB-Test' first name the test
+      // always uses, so real families are never touched.
+      const before = await http('GET', '/api/registrations')
+      if (Array.isArray(before.json)) {
+        const stale = before.json.filter(r =>
+          String(r.student?.firstName || '').trim() === 'PB-Test')
+        for (const r of stale) {
+          await http('DELETE', `/api/registrations/${r.id}`).catch(() => {})
+        }
+      }
+
       const tag = `test-${Date.now()}`
       const created = await http('POST', '/api/registrations', {
         studentFirstName:  'PB-Test',

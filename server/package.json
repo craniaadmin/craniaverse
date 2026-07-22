@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "pb-setup": "node scripts/pb-setup.js"
+    "pb-setup": "node scripts/pb-setup.js",
+    "cleanup-test-records": "node scripts/cleanup-test-records.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",

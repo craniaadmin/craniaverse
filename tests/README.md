@@ -10,10 +10,30 @@ SendGrid + `TEST_NOTIFY_EMAIL` are configured).
 - **api-tests.js** — every `/api/*` endpoint returns the expected shape
   (registrations, staff, programs, rules, staff-board, comments, health,
   unknown-route 404).
-- **logic-tests.js** — full round-trips: POST a fake registration,
-  verify it appears in GET, DELETE it, verify it's gone. Plus a cash-
-  entry round-trip and a programs shape check. Every test cleans up
-  after itself.
+- **logic-tests.js** — full round-trips: POST a fake registration
+  (named `PB-Test <tag>`), verify it appears in GET, DELETE it, verify
+  it's gone. Plus a cash-entry round-trip and a programs shape check.
+  Every test cleans up after itself, and the registration test also
+  **self-heals**: it deletes any leftover `PB-Test` records at the
+  start of each run, so an interrupted or failed cleanup can never
+  accumulate junk in the live Students/Customers lists.
+
+## Cleaning up leftover test records
+
+If the live database has accumulated old `PB-Test …` registrations
+(e.g. from before the self-healing fix), sweep them directly against
+PocketBase — run on maya-pc where PocketBase lives:
+
+```powershell
+cd C:\Users\CraniaVerse\craniaverse\server
+npm run cleanup-test-records          # dry run — lists what would be deleted
+npm run cleanup-test-records -- --apply   # actually delete them
+```
+
+It only matches registrations whose student first name is exactly
+`PB-Test`, so real families are never touched. (The next scheduled test
+run would also sweep these automatically, but this gives an immediate,
+inspectable purge.)
 - **page-tests.js** — Playwright headless Chromium signs in, then
   clicks each top-nav item and verifies the page renders with no
   uncaught console errors.
