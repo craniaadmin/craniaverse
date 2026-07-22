@@ -125,7 +125,10 @@
       "Bash(awk 'NR==226 {print \"  <!-- LOGO base64 stripped -->\"; next} {print}' \"/c/Users/hanak/Downloads/6-1. CraniaVerse - Inventory v44 [claude-opus-4-8].html\")",
       "Bash(git commit -m 'Inventory: rewire to new /api/stock singleton \\(v44 mockup + seeded from JSON\\) *)",
       "Bash(stock)",
-      "Bash(git commit -m 'Crania Store: retail-side inventory wired to new /api/crania-store *)"
+      "Bash(git commit -m 'Crania Store: retail-side inventory wired to new /api/crania-store *)",
+      "Bash(node --check tests/api-tests.js)",
+      "Bash(node --check tests/logic-tests.js)",
+      "Bash(curl -s -m 3 -o /dev/null -w \"health check: %{http_code}\\\\n\" http://localhost:4000/api/health)"
     ]
   },
   "hooks": {

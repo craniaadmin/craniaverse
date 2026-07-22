@@ -183,11 +183,17 @@ const uiConfirm = (message) => new Promise((res) => {
 })
 
 // ============ Component ============
-export default function ToDo() {
+// `initialView` + `onNavigate` come from App.jsx so the outer sidebar
+// top-bar controls which view we start in (Home → To-Do vs Home →
+// Checklists), and the ChecklistsView "Add to To-Do now" button can
+// jump back to the To-Do view through the same outer nav rather than
+// via a duplicate in-page tab bar.
+export default function ToDo({ initialView = 'todo', onNavigate }) {
   const [state, setState] = useState({ lists: [], items: [], checklists: [] })
   const [loading, setLoading] = useState(true)
   const [hideDone, setHideDone] = useState(false)
-  const [view, setView] = useState('todo') // 'todo' | 'checklists'
+  const [view, setView] = useState(initialView) // 'todo' | 'checklists'
+  useEffect(() => { setView(initialView) }, [initialView])
   const [filterText, setFilterText] = useState('')
   const [filterPri, setFilterPri] = useState('all')
   const [filterDue, setFilterDue] = useState('all')
