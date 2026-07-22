@@ -1,17 +1,16 @@
-// Contests — restyled to match the Home-section pages (Projects,
-// Calendar, ToDo, Inventory, Crania Store): page-head with title +
-// action button, filter toolbar, dark-blue table header, striped
-// rows, status pills, and the shared brand palette.
-//
-// Data flow is unchanged from the previous version: contest programs
-// (from useStore()) auto-populate as rows, and manual rows can be
+// Contests — server-backed via GET/PUT /api/contests (singleton
+// payload: extras + manual + hidden). Contest programs from
+// useStore().programs auto-populate as rows; manual rows can be
 // added on top. Program-derived rows can be "hidden" (not deleted).
-// State persists in localStorage. Server persistence can be layered
-// on later using the same pattern as Projects / Calendar.
+// Debounced PUT on every mutation, same pattern as Projects /
+// Calendar / IT Accounts / Crania Store.
 
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Plus, Search, Trash2, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
+
+const API_BASE = import.meta.env?.VITE_API_URL || ''
+const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
 
 const STATUSES = ['Waiting', 'Submitted', 'Complete', 'Cancelled']
 
