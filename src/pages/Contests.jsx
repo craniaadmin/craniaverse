@@ -52,11 +52,41 @@ function useContests() {
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then(j => {
         if (!alive) return
-        setData({
-          extras: j.extras && typeof j.extras === 'object' ? j.extras : {},
-          manual: Array.isArray(j.manual) ? j.manual : [],
-          hidden: Array.isArray(j.hidden) ? j.hidden : [],
-        })
+        let extras = j.extras && typeof j.extras === 'object' ? j.extras : {}
+        let manual = Array.isArray(j.manual) ? j.manual : []
+        let hidden = Array.isArray(j.hidden) ? j.hidden : []
+
+        // One-shot migration from the pre-server localStorage store.
+        // If the server has nothing yet but the browser has old rows,
+        // upload them and clear localStorage so we don't run twice.
+        const serverEmpty = Object.keys(extras).length === 0 && manual.length === 0 && hidden.length === 0
+        if (serverEmpty) {
+          const lsExtras = tryLoad('contests-extras', {})
+          const lsManual = tryLoad('contests-manual', [])
+          const lsHidden = tryLoad('contests-hidden', [])
+          const lsAny =
+            (lsExtras && Object.keys(lsExtras).length) ||
+            (Array.isArray(lsManual) && lsManual.length) ||
+            (Array.isArray(lsHidden) && lsHidden.length)
+          if (lsAny) {
+            extras = lsExtras || {}
+            manual = Array.isArray(lsManual) ? lsManual : []
+            hidden = Array.isArray(lsHidden) ? lsHidden : []
+            fetch(`${API_BASE}/api/contests`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', ...HEADERS },
+              body: JSON.stringify({ extras, manual, hidden }),
+            }).then(() => {
+              try {
+                localStorage.removeItem('contests-extras')
+                localStorage.removeItem('contests-manual')
+                localStorage.removeItem('contests-hidden')
+              } catch { /* ignore */ }
+            }).catch(() => {})
+          }
+        }
+
+        setData({ extras, manual, hidden })
         setStatus('online')
       })
       .catch(() => alive && setStatus('offline'))
