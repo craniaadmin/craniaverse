@@ -97,36 +97,37 @@ const cellInput = {
 
 export default function Contests({ onNavigate }) {
   const { programs } = useStore()
-  const [extras, setExtras] = useState(() => load('contests-extras', {}))
-  const [manual, setManual] = useState(() => load('contests-manual', []))
-  const [hidden, setHidden] = useState(() => load('contests-hidden', []))
+  const { data, loading, status: fetchStatus, mutate } = useContests()
+  const { extras, manual, hidden } = data
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
 
   const updateExtra = (id, key, val) =>
-    setExtras(prev => { const next = { ...prev, [id]: { ...prev[id], [key]: val } }; save('contests-extras', next); return next })
+    mutate(d => {
+      d.extras = { ...d.extras, [id]: { ...(d.extras[id] || {}), [key]: val } }
+    })
 
   const updateManual = (id, key, val) =>
-    setManual(prev => { const next = prev.map(r => r.id === id ? { ...r, [key]: val } : r); save('contests-manual', next); return next })
+    mutate(d => {
+      d.manual = d.manual.map(r => r.id === id ? { ...r, [key]: val } : r)
+    })
 
   const deleteRow = (row) => {
     if (!confirm(`Remove "${row.contest || row.org || 'this row'}" from the list?`)) return
     if (row.fromProgram) {
-      setHidden(prev => { const next = [...prev, row.id]; save('contests-hidden', next); return next })
+      mutate(d => { if (!d.hidden.includes(row.id)) d.hidden.push(row.id) })
     } else {
-      setManual(prev => { const next = prev.filter(r => r.id !== row.id); save('contests-manual', next); return next })
+      mutate(d => { d.manual = d.manual.filter(r => r.id !== row.id) })
     }
   }
 
   const addRow = () => {
     const id = 'manual-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
-    setManual(prev => {
-      const next = [...prev, {
+    mutate(d => {
+      d.manual.push({
         id, org: '', contest: '', regDeadline: '', contestDate: '',
         numOrdered: '', status: 'Waiting',
-      }]
-      save('contests-manual', next)
-      return next
+      })
     })
   }
 
