@@ -501,7 +501,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       {view === 'checklists' && <ChecklistsView
         state={state} setState={setState}
         askConfirm={askConfirm}
-        onGoToTodo={() => setView('todo')}
+        onGoToTodo={() => onNavigate ? onNavigate('To-Do') : setView('todo')}
       />}
 
       {itemModal && <ItemModal
