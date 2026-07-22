@@ -7,10 +7,15 @@ function CustomerList({ onSelect, onAdd }) {
   const { records } = useStore()
   const [search, setSearch] = useState('')
 
-  // Group records by family (guardian1 name + email as key)
+  // Group records by family (guardian1 name + email as key). A record
+  // whose guardian1 has no name AND no email has no family identity yet
+  // (e.g. a just-added blank student), so it must stand on its own —
+  // keyed by its record id — rather than collapsing together with every
+  // other guardian-less record into one giant fake "family".
   const grouped = records.reduce((acc, r) => {
-    const g1 = r.customer?.guardian1
-    const parentKey = g1 ? `${g1['First Name']} ${g1['Last Name']} ${g1['Email']}`.trim().toLowerCase() : `unknown-${r.id}`
+    const g1 = r.customer?.guardian1 || {}
+    const identity = `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
+    const parentKey = identity || `unknown-${r.id}`
     if (!acc[parentKey]) acc[parentKey] = []
     acc[parentKey].push(r)
     return acc
@@ -284,15 +289,19 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
   const { records, updateCustomerField, updateStudentField } = useStore()
   const selected = records.find(r => r.id === recordId) || records[0]
 
-  // Find all siblings (same parents)
-  const siblings = records.filter(r => {
-    const sameParent = (
-      r.customer?.guardian1?.['First Name'] === selected.customer?.guardian1?.['First Name'] &&
-      r.customer?.guardian1?.['Last Name'] === selected.customer?.guardian1?.['Last Name'] &&
-      r.customer?.guardian1?.['Email'] === selected.customer?.guardian1?.['Email']
-    )
-    return sameParent
-  }).sort((a, b) => (a.student.firstName || '').localeCompare(b.student.firstName || '', undefined, { sensitivity: 'base' }))
+  // Find all siblings (same guardian1 identity). If this record's
+  // guardian1 has no name/email yet (a just-added blank student), it has
+  // no family identity — so it's a family of one, not a sibling of every
+  // other guardian-less record. Match on a normalized identity string.
+  const guardianIdentity = (r) => {
+    const g1 = r.customer?.guardian1 || {}
+    return `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
+  }
+  const selectedIdentity = guardianIdentity(selected)
+  const siblings = (selectedIdentity
+    ? records.filter(r => guardianIdentity(r) === selectedIdentity)
+    : [selected]
+  ).sort((a, b) => (a.student.firstName || '').localeCompare(b.student.firstName || '', undefined, { sensitivity: 'base' }))
 
   const siblingIdx = siblings.findIndex(s => s.id === recordId)
 
@@ -545,12 +554,15 @@ export default function Customers() {
     try {
       await deleteRegistration(record.id)
       // Jump to a remaining sibling if there is one, else back to the list.
-      const g1 = record.customer?.guardian1
-      const sibling = g1 && records.find(r =>
-        r.id !== record.id &&
-        r.customer?.guardian1?.['First Name'] === g1['First Name'] &&
-        r.customer?.guardian1?.['Last Name'] === g1['Last Name'] &&
-        r.customer?.guardian1?.['Email'] === g1['Email'])
+      // Only match on a real guardian identity — a blank student has none,
+      // so it should return to the list rather than jump to another blank.
+      const g1 = record.customer?.guardian1 || {}
+      const identity = `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
+      const sibling = identity && records.find(r => {
+        if (r.id === record.id) return false
+        const rg1 = r.customer?.guardian1 || {}
+        return `${rg1['First Name'] || ''} ${rg1['Last Name'] || ''} ${rg1['Email'] || ''}`.trim().toLowerCase() === identity
+      })
       setDetailId(sibling ? sibling.id : null)
     } catch (err) {
       alert('Could not delete: ' + err.message)
