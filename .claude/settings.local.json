@@ -131,7 +131,13 @@
       "Bash(curl -s -m 3 -o /dev/null -w \"health check: %{http_code}\\\\n\" http://localhost:4000/api/health)",
       "Bash(git commit -m 'ToDo: drop duplicate in-page tab bar, use page-head like other pages *)",
       "Bash(git commit -m 'Contests: restyle to match Home-section UI *)",
-      "Bash(git commit -m 'Contests: server-backed via /api/contests singleton *)"
+      "Bash(git commit -m 'Contests: server-backed via /api/contests singleton *)",
+      "Bash(git clean *)",
+      "Bash(git reset *)",
+      "Bash(git restore *)",
+      "Bash(node scripts/cleanup-test-records.js)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(node --check server/scripts/cleanup-test-records.js)"
     ]
   },
   "hooks": {
