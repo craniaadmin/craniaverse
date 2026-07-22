@@ -562,6 +562,40 @@ export async function saveCraniaStore(payload) {
   }
 }
 
+// ---- contests (singleton — per-program extras + manual rows) --
+// Payload matches the Contests page's shape:
+//   { extras: {[rowKey]: {...fields}}, manual: [{id, ...fields}], hidden: [rowKey] }
+// Empty defaults so first-ever load is safe; there's no seed file
+// because the Contests page derives most rows from useStore().programs
+// on the client.
+const CONTESTS_DEFAULT = { extras: {}, manual: [], hidden: [] }
+
+export async function loadContests() {
+  try {
+    const rows = await getFullList('contests')
+    if (rows.length === 0) return CONTESTS_DEFAULT
+    const p = rows[0].payload || {}
+    return {
+      extras: p.extras && typeof p.extras === 'object' ? p.extras : {},
+      manual: Array.isArray(p.manual) ? p.manual : [],
+      hidden: Array.isArray(p.hidden) ? p.hidden : [],
+    }
+  } catch (err) {
+    if (err?.status === 404) return CONTESTS_DEFAULT
+    throw err
+  }
+}
+
+export async function saveContests(payload) {
+  await ensureAuth()
+  const rows = await getFullList('contests')
+  if (rows.length === 0) {
+    await pb().collection('contests').create({ payload })
+  } else {
+    await pb().collection('contests').update(rows[0].id, { payload })
+  }
+}
+
 // ---- calendar (singleton payload — events + calendars + hidden) ---
 // Shape mirrors "crania-calendar.json" from the client's v18 mockup:
 //   { calendars: [{id,name,color}], events: [{id,calId,title,date,allDay,start,end,notes,color?,recur?,exceptions?}], hidden: {} }
