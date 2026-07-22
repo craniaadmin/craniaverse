@@ -37,6 +37,11 @@ const isContest = (p) =>
   (p.title || '').toUpperCase().includes('CONTEST') ||
   (p.category || '').toUpperCase().includes('CONTEST')
 
+// Used only by the one-shot localStorage migration in useContests.
+function tryLoad(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback } catch { return fallback }
+}
+
 // ---- store hook (server-backed, debounced PUT) ----
 function useContests() {
   const [data, setData] = useState({ extras: {}, manual: [], hidden: [] })
