@@ -43,6 +43,7 @@ const ROUTES = {
   'home:Projects':           () => <Projects />,
 
   'programs:Programs':       () => <Programs />,
+  'programs:Class Lists':    (nav) => <ClassLists onNavigate={nav} />,
   'programs:Contests':       (nav) => <Contests onNavigate={nav} />,
 
   'customers:Customers':     (nav) => <Customers onNavigate={nav} />,
