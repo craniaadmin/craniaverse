@@ -37,7 +37,8 @@ import { StoreProvider } from './data/store'
 const ROUTES = {
   'home:Dashboard':          (nav) => <Dashboard onNavigate={nav} />,
   'home:Calendar':           () => <CalendarView />,
-  'home:To-Do':              () => <ToDo />,
+  'home:To-Do':              (nav) => <ToDo initialView="todo" onNavigate={nav} />,
+  'home:Checklists':         (nav) => <ToDo initialView="checklists" onNavigate={nav} />,
   'home:Projects':           () => <Projects />,
 
   'programs:Programs':       () => <Programs />,
