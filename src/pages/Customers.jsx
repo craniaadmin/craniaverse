@@ -515,7 +515,7 @@ export default function Customers() {
 
   const handleAdd = async () => {
     try {
-      const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student' })
+      const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student', forceNew: true })
       if (id) setDetailId(id)
     } catch (err) {
       alert('Could not add family: ' + err.message)
@@ -530,7 +530,7 @@ export default function Customers() {
       const g2 = record.customer?.guardian2 || {}
       const em = record.customer?.emergency || {}
       const id = await addRegistration({
-        studentFirstName: 'New', studentLastName: 'Student',
+        studentFirstName: 'New', studentLastName: 'Student', forceNew: true,
         g1FirstName: g1['First Name'], g1LastName: g1['Last Name'], g1Relationship: g1['Relationship'],
         g1PhoneHome: g1['Phone (Home)'], g1PhoneMobile: g1['Phone (Mobile)'], g1Email: g1['Email'],
         g1Address1: g1['Street Address'], g1Address2: g1['Unit'], g1City: g1['City'],

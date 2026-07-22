@@ -697,7 +697,7 @@ export default function Students({ onNavigate }) {
 
   const handleAdd = async () => {
     try {
-      const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student' })
+      const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student', forceNew: true })
       if (id) setDetailId(id)
     } catch (err) {
       alert('Could not add student: ' + err.message)

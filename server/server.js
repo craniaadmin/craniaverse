@@ -330,31 +330,41 @@ app.get('/api/registrations', wrap(async (_req, res) => {
 
 // Shared helper: take a per-student form, save it (creating or merging into
 // an existing record) and return the resulting record. Mutates `records`.
-function processStudentForm(records, perStudentForm) {
+//
+// The merge-into-existing behavior exists for the public registration form,
+// where the same student may register for multiple programs and we want one
+// record per student. But it matches on name alone when there's no email
+// (see below), so it's WRONG for the admin "+ Add Student / Family" buttons:
+// every blank add is named "New Student", so a second add would merge into
+// the first instead of creating a distinct family. Callers that always want
+// a fresh record pass `forceNew`.
+function processStudentForm(records, perStudentForm, forceNew = false) {
   const record = registrationToRecord(perStudentForm)
 
-  const norm = (s) => String(s || '').trim().toLowerCase()
-  const key = {
-    fn: norm(perStudentForm.studentFirstName),
-    ln: norm(perStudentForm.studentLastName),
-    em: norm(perStudentForm.studentEmail),
-  }
-  const existing = records.find((r) => {
-    const rfn = norm(r.student?.firstName)
-    const rln = norm(r.student?.lastName)
-    const rem = norm(r.student?.email)
-    if (rfn !== key.fn || rln !== key.ln) return false
-    if (key.em && rem) return key.em === rem
-    return true
-  })
+  if (!forceNew) {
+    const norm = (s) => String(s || '').trim().toLowerCase()
+    const key = {
+      fn: norm(perStudentForm.studentFirstName),
+      ln: norm(perStudentForm.studentLastName),
+      em: norm(perStudentForm.studentEmail),
+    }
+    const existing = records.find((r) => {
+      const rfn = norm(r.student?.firstName)
+      const rln = norm(r.student?.lastName)
+      const rem = norm(r.student?.email)
+      if (rfn !== key.fn || rln !== key.ln) return false
+      if (key.em && rem) return key.em === rem
+      return true
+    })
 
-  if (existing) {
-    const sigOf = (p) => `${p.program || ''}|${p.schedule || ''}|${p.platform || ''}`.toLowerCase()
-    const existingSigs = new Set((existing.programs || []).map(sigOf))
-    const newPrograms = (record.programs || []).filter((p) => !existingSigs.has(sigOf(p)))
-    existing.programs = [...(existing.programs || []), ...newPrograms]
-    console.log(`[registration] ~ merged ${newPrograms.length} program(s) into ${existing.displayName} (${existing.id})`)
-    return existing
+    if (existing) {
+      const sigOf = (p) => `${p.program || ''}|${p.schedule || ''}|${p.platform || ''}`.toLowerCase()
+      const existingSigs = new Set((existing.programs || []).map(sigOf))
+      const newPrograms = (record.programs || []).filter((p) => !existingSigs.has(sigOf(p)))
+      existing.programs = [...(existing.programs || []), ...newPrograms]
+      console.log(`[registration] ~ merged ${newPrograms.length} program(s) into ${existing.displayName} (${existing.id})`)
+      return existing
+    }
   }
 
   records.push(record)
@@ -395,8 +405,13 @@ app.post('/api/registrations', wrap(async (req, res) => {
   if (!String(form.studentFirstName || '').trim() || !String(form.studentLastName || '').trim()) {
     return res.status(400).json({ error: 'studentFirstName and studentLastName are required' })
   }
+  // Admin "+ Add" buttons pass forceNew so repeated blank adds each become
+  // a distinct record/family rather than merging by name. Strip it before
+  // it's stored as part of the record's `registration` snapshot.
+  const forceNew = form.forceNew === true
+  delete form.forceNew
   const records = await getRegistrations()
-  const record = processStudentForm(records, form)
+  const record = processStudentForm(records, form, forceNew)
   await commitRegistrations(records)
   sendRegistrationEmails(form, record).catch(() => {})
   res.status(record === records[records.length - 1] ? 201 : 200).json(record)
