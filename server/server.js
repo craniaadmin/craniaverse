@@ -777,6 +777,23 @@ app.put('/api/stock', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- contests (singleton — per-program extras + manual rows) --
+// Shape:
+//   { extras: {[rowKey]: {org, contest, regDeadline, contestDate, numOrdered, status}},
+//     manual: [{id, org, contest, regDeadline, contestDate, numOrdered, status}],
+//     hidden: [rowKey] }
+app.get('/api/contests', wrap(async (_req, res) => res.json(await loadContests())))
+app.put('/api/contests', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    extras: body.extras && typeof body.extras === 'object' ? body.extras : {},
+    manual: Array.isArray(body.manual) ? body.manual : [],
+    hidden: Array.isArray(body.hidden) ? body.hidden : [],
+  }
+  await saveContests(payload)
+  res.json({ ok: true })
+}))
+
 // ---- calendar (singleton payload — calendars + events + hidden) ---
 // Shape mirrors "crania-calendar.json" from the client's v18 mockup
 // so JSON export/import round-trips cleanly.
