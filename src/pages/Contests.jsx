@@ -184,6 +184,15 @@ export default function Contests({ onNavigate }) {
   const update = (row, key, val) =>
     row.fromProgram ? updateExtra(row.id, key, val) : updateManual(row.id, key, val)
 
+  if (loading) {
+    return (
+      <div className="page">
+        <h2 className="page-title">Contests</h2>
+        <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
+      </div>
+    )
+  }
+
   return (
     <div className="page">
       <div className="page-head">
@@ -199,6 +208,13 @@ export default function Contests({ onNavigate }) {
           <Plus size={14} /> Add Row
         </button>
       </div>
+
+      {fetchStatus === 'offline' && (
+        <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
+                      padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
+          Working offline — changes will retry when the server is reachable.
+        </div>
+      )}
 
       {/* Metrics — click a status tile to filter */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
