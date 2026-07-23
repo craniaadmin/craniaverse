@@ -104,8 +104,13 @@ function CommentsSection({ studentId, initialPrograms }) {
       .then((r) => r.json())
       .then((data) => {
         const loaded = {}
-        ;(initialPrograms || []).forEach((p, i) => {
-          const key = `${p.year}|${p.program}`
+        // Index against the SAME deduped array used for the rendered
+        // tabs (dedupedPrograms), not the raw initialPrograms prop —
+        // otherwise tab index i here could point at a different
+        // program than tab index i on screen once duplicates are
+        // collapsed.
+        dedupedPrograms.forEach((p, i) => {
+          const key = tabKeyOf(p)
           // Autopopulate day+date columns from registered schedule if no saved comments exist
           loaded[i] = data[key] || buildScheduledRows(p)
         })
