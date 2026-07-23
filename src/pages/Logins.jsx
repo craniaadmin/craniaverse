@@ -24,7 +24,7 @@ function useLoginRows() {
       .map((r) => ({
         id: r.id,
         name: studentName(r) || '—',
-        grade: r.student?.grade || '',
+        email: r.student?.email || '',
         username: usernameFor(r.student?.firstName, r.student?.lastName),
         password: generatePassword(r.student?.firstName, r.student?.lastName),
       }))
