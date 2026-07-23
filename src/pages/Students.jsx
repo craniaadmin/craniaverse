@@ -1,6 +1,11 @@
 ﻿import { useState, useEffect, useCallback, useRef } from 'react'
 import { useStore } from '../data/store'
 import { programs as craniaProgramList } from '../data/mockData'
+import {
+  ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS,
+  termStartDate, fmtScheduledDate, TERM_WEEKS,
+  buildScheduledRows as buildScheduledRowsShared, tabKeyOf,
+} from '../data/scheduleUtils'
 
 const PROGRAM_LIST = craniaProgramList.map((p) => p.title)
 
