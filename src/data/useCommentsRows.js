@@ -33,12 +33,16 @@ export function useCommentsRows() {
   const realRecords = useMemo(() => records.filter(r => r.id !== 'seed'), [records])
 
   // Populate rowsByTab for every (student, program) tab once the bulk
-  // fetch and the store's records/programs are all available. Additive
-  // only — never overwrites a composite that's already loaded, so a
-  // later store poll (every 15s) can pick up newly-added students
-  // without clobbering edits made locally in the meantime.
+  // fetch, the store's records/programs, AND the real calendar week
+  // dates are all available. Waiting on weekDates matters: if we
+  // autopopulated a never-touched tab before the calendar loaded,
+  // we'd cache flat-cadence (wrong) dates permanently, since this
+  // effect never overwrites a composite that's already loaded.
+  // Additive only — so a later store poll (every 15s) can pick up
+  // newly-added students without clobbering edits made in the
+  // meantime.
   useEffect(() => {
-    if (bulk == null || realRecords.length === 0) return
+    if (bulk == null || weeksLoading || realRecords.length === 0) return
     setRowsByTab(prev => {
       let changed = false
       const next = { ...prev }
@@ -49,13 +53,13 @@ export function useCommentsRows() {
           const composite = `${rec.id}::${key}`
           if (next[composite]) continue
           const saved = bulk[rec.id]?.[key]
-          next[composite] = (saved && saved.length) ? saved : buildScheduledRows(prog, allPrograms)
+          next[composite] = (saved && saved.length) ? saved : buildScheduledRows(prog, allPrograms, weekDates)
           changed = true
         }
       }
       return changed ? next : prev
     })
-  }, [bulk, realRecords, allPrograms])
+  }, [bulk, weeksLoading, weekDates, realRecords, allPrograms])
 
   const persist = useCallback((studentId, tabKey, rows) => {
     const composite = `${studentId}::${tabKey}`
