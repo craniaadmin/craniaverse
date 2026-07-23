@@ -464,6 +464,13 @@ app.put('/api/registrations/:id/craniaCash', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// Bulk read for the cross-student Attendance / Comments pages — same
+// `comments` collection as the per-student route below, just
+// unfiltered. Shape: { [studentId]: { [tabKey]: rows[] } }.
+app.get('/api/comments', wrap(async (_req, res) => {
+  res.json(await loadComments())
+}))
+
 app.get('/api/comments/:studentId', wrap(async (req, res) => {
   const all = await loadComments()
   res.json(all[req.params.studentId] || {})
