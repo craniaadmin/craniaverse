@@ -47,10 +47,12 @@ const ROUTES = {
   'programs:Class Lists':    (nav) => <ClassLists onNavigate={nav} />,
   'programs:Contests':       (nav) => <Contests onNavigate={nav} />,
 
-  'customers:Customers':     (nav) => <Customers onNavigate={nav} />,
+  'customers:Customers':     (nav, recId, clearRecId) =>
+    <Customers onNavigate={nav} initialRecordId={recId} onConsumeInitialRecord={clearRecId} />,
   'customers:Emergency Contacts': (nav) => <EmergencyContacts onNavigate={nav} />,
 
-  'students:Students':       (nav) => <Students onNavigate={nav} />,
+  'students:Students':       (nav, recId, clearRecId) =>
+    <Students onNavigate={nav} initialRecordId={recId} onConsumeInitialRecord={clearRecId} />,
   'students:Crania Cash':    () => <CraniaCash />,
 
   'staff:Staff':             () => <StaffInformation />,
