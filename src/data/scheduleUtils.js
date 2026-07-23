@@ -1,10 +1,11 @@
 // Shared lesson-row / schedule-autopopulation logic used by the
-// Students detail page's Comments tab AND the standalone Attendance /
-// Comments pages. Kept as one pure module so all three surfaces build
-// the exact same lessonNo/day/date sequence for a given (program, year)
-// tab — there is no separate storage for attendance/comments; every
-// surface reads and writes the same PocketBase `comments` collection
-// row, keyed by `${studentId}` + `${year}|${program}`.
+// Students detail page's Comments tab, the standalone Attendance /
+// Comments pages, AND the server (registration-migration defaults).
+// Pure JS, no React/DOM — safe to import from both Vite and Node.
+//
+// There is no separate storage for attendance/comments; every surface
+// reads and writes the same PocketBase `comments` collection row,
+// keyed by `${studentId}` + `${year}|${program}`.
 
 export const ATTEND_STYLE = {
   P: { background: '#c8e6c9', color: '#2e7d32' },
@@ -22,7 +23,27 @@ export const EMPTY_ROW = (n) => ({
 })
 
 export const DEFAULT_ROWS = () => Array.from({ length: 7 }, (_, j) => EMPTY_ROW(j + 1))
-export const ACADEMIC_YEARS = ['24_25', '25_26', '26_27', '23_24', '22_23']
+
+// The "YY_YY" academic year that's current right now, e.g. "26_27".
+// School years run Sept–June; we treat July/Aug as already belonging
+// to the upcoming year (that's when registration for the new year
+// happens), so this never needs a manual bump each September like the
+// hardcoded '25_26' strings it replaces did.
+export function currentAcademicYear(now = new Date()) {
+  const y = now.getFullYear()
+  const startYear = now.getMonth() >= 6 ? y : y - 1 // getMonth() 6 = July (0-indexed)
+  return `${String(startYear).slice(-2)}_${String(startYear + 1).slice(-2)}`
+}
+
+// A handful of years around the current one, current year first, for
+// year-picker dropdowns (e.g. Students.jsx "add program tab").
+export function academicYearOptions(now = new Date()) {
+  const y = now.getFullYear()
+  const startYear = now.getMonth() >= 6 ? y : y - 1
+  const label = (s) => `${String(s).slice(-2)}_${String(s + 1).slice(-2)}`
+  return [0, -1, -2, 1, -3].map(off => label(startYear + off))
+}
+export const ACADEMIC_YEARS = academicYearOptions()
 
 const DAY_IDX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
 
@@ -39,6 +60,9 @@ export function parseSchedule(schedule) {
 
 // Pick a sensible "term start" — anchor by the tab's academic year
 // (e.g. "25_26" → Sep 1, 2025). Falls back to today if unparseable.
+// Only used as a FALLBACK when real calendar week-dates aren't
+// available (e.g. offline) — see weekDatesFromCalendarEvents below
+// for the normal, calendar-accurate path.
 export function termStartDate(yearStr) {
   const m = String(yearStr || '').match(/^(\d{2})/)
   if (m) {
@@ -59,7 +83,8 @@ export function fmtScheduledDate(d) {
 
 export const TERM_WEEKS = 35 // standard Crania school year length
 
-// Cadence: how many calendar days between week-cycles.
+// Cadence: how many calendar days between week-cycles. Only used by
+// the fallback flat-cadence generator (no real calendar available).
 export function cadenceWeekStep(programInfo) {
   if (!programInfo) return 7
   const period = String(programInfo.period || '').toLowerCase()
@@ -68,7 +93,46 @@ export function cadenceWeekStep(programInfo) {
   return 7 // default: weekly
 }
 
-// Build N lesson rows with day + date prefilled from the schedule slots.
+// ---------- Calendar-accurate week dates ----------
+// Pull the real Monday-of-instructional-week dates out of a Calendar
+// page's "Week 1".."Week N" markers for one calendar (normally the
+// "Afterschool" calendar). These already skip Thanksgiving, Winter
+// Break, March Break, etc. — the actual closures — instead of
+// assuming a flat 7-day cadence between lessons.
+// Returns a 1-indexed array: weekDates[1] = ISO date of Week 1's Monday.
+export function weekDatesFromCalendarEvents(events, calendarId) {
+  const weeks = (events || [])
+    .filter(e => e.calId === calendarId && /^Week\s+\d+$/i.test(e.title || ''))
+    .map(e => ({ n: Number(e.title.replace(/\D/g, '')), date: e.date }))
+    .filter(w => w.n >= 1 && w.date)
+  const arr = []
+  for (const w of weeks) arr[w.n] = w.date
+  return arr
+}
+
+// Build N lesson rows with day + date computed from real calendar
+// week-dates (preferred). Stops early (padding with blank rows) if
+// `count` exceeds the number of weeks the calendar actually defines,
+// rather than guessing dates past the end of the school year.
+export function generateScheduledRowsFromWeeks(slots, weekDates, count) {
+  if (!slots.length || !weekDates || weekDates.length <= 1) return null // caller should fall back
+  const rows = []
+  for (let i = 0; i < count; i++) {
+    const slot = slots[i % slots.length]
+    const weekNo = Math.floor(i / slots.length) + 1
+    const mondayIso = weekDates[weekNo]
+    if (!mondayIso) { rows.push(EMPTY_ROW(i + 1)); continue }
+    const monday = new Date(mondayIso + 'T00:00:00')
+    const slotDayIdx = DAY_IDX[slot.day] ?? 1
+    const offset = (slotDayIdx - 1 + 7) % 7 // days after Monday (Monday=1)
+    const d = new Date(monday)
+    d.setDate(d.getDate() + offset)
+    rows.push({ ...EMPTY_ROW(i + 1), day: slot.day, date: fmtScheduledDate(d) })
+  }
+  return rows
+}
+
+// Flat-cadence fallback (no calendar data available, e.g. offline).
 export function generateScheduledRows(slots, startDate, count, weekStep) {
   if (!slots.length) return Array.from({ length: count }, (_, j) => EMPTY_ROW(j + 1))
   const rows = []
@@ -94,13 +158,23 @@ export function programInfoFor(prog, allPrograms) {
 
 // Build the autopopulated rows for a tab (used when no saved comments
 // exist yet). Default count = sessions/period × 35 weeks.
-export function buildScheduledRows(prog, allPrograms, count) {
+// `weekDates` (optional) = real calendar week-dates from
+// weekDatesFromCalendarEvents — when supplied, lesson dates land on
+// the actual instructional weeks (skipping real breaks) instead of a
+// flat 7-day guess anchored at Sept 1.
+export function buildScheduledRows(prog, allPrograms, weekDates, count) {
   const slots = parseSchedule(prog && prog.schedule)
-  const start = termStartDate(prog && prog.year)
   const info = programInfoFor(prog, allPrograms)
-  const step = cadenceWeekStep(info)
   const perWeek = slots.length || Number(info && info.sessions) || 1
   const total = count != null ? count : perWeek * TERM_WEEKS
+
+  const fromCalendar = generateScheduledRowsFromWeeks(slots, weekDates, total)
+  if (fromCalendar) return fromCalendar
+
+  // Fallback: flat cadence anchored at the tab's year (only when the
+  // calendar hasn't loaded yet, e.g. first paint or offline).
+  const start = termStartDate(prog && prog.year)
+  const step = cadenceWeekStep(info)
   return generateScheduledRows(slots, start, total, step)
 }
 
