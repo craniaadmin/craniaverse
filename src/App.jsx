@@ -74,7 +74,7 @@ const ROUTES = {
   'financial:Receipts':      () => <Receipts />,
 
   'marketing:Surveys':       () => <Surveys />,
-  'marketing:Calendar':      () => <CalendarView />,
+  'marketing:Calendar':      () => <MarketingCalendar />,
 
   'forms:All Forms':         () => <Forms />,
 }
