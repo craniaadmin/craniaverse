@@ -6,6 +6,7 @@ import {
   buildScheduledRows as buildScheduledRowsShared, dedupeProgramTabs, tabKeyOf,
 } from '../data/scheduleUtils'
 import { useAfterschoolWeeks } from '../data/useAfterschoolWeeks'
+import { usernameFor, generatePassword } from '../data/loginUtils'
 
 const PROGRAM_LIST = craniaProgramList.map((p) => p.title)
 
