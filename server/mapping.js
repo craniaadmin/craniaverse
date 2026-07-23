@@ -8,6 +8,7 @@
 // This mirrors src/data/store.jsx so the admin app can drop the
 // records straight into its pages with no extra transformation.
 // ============================================================
+import { currentAcademicYear } from '../src/data/scheduleUtils.js'
 
 export function ageFromDob(dob) {
   if (!dob) return ''
