@@ -129,11 +129,11 @@ export default function EmergencyContacts({ onNavigate }) {
 
       {/* Metrics */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
-        <MetricTile label="Contacts on File" value={withContact.length} hint="families with a contact" />
-        <MetricTile label="Families" value={familyCount} hint="total customer families" />
+        <MetricTile label="Contacts on File" value={withContact.length} hint="customers with a contact" />
+        <MetricTile label="Customers" value={familyCount} hint="total customers" />
         <MetricTile label="Students Covered" value={studentsCovered} hint="have an emergency contact" />
         <MetricTile label="Missing Contact" value={missing.length}
-          color={missing.length > 0 ? '#a12626' : 'var(--ink)'} hint="families with no contact" />
+          color={missing.length > 0 ? '#a12626' : 'var(--ink)'} hint="customers with no contact" />
       </div>
 
       {/* Toolbar */}
