@@ -1166,6 +1166,14 @@ app.put('/api/leads', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- contacts (singleton payload — business/vendor directory) ---
+app.get('/api/contacts', wrap(async (_req, res) => res.json(await loadContacts())))
+app.put('/api/contacts', wrap(async (req, res) => {
+  const body = req.body || {}
+  await saveContacts({ contacts: Array.isArray(body.contacts) ? body.contacts : [] })
+  res.json({ ok: true })
+}))
+
 // Error handler — any thrown error from a wrap()-ed handler lands here
 app.use((err, _req, res, _next) => {
   console.error('[api error]', err?.response || err?.message || err)
