@@ -102,8 +102,7 @@ export function useCommentsRows() {
     const out = []
     for (const rec of realRecords) {
       const studentName = `${rec.student?.firstName || ''} ${rec.student?.lastName || ''}`.trim() || '—'
-      for (const prog of rec.programs || []) {
-        if (!prog.program) continue
+      for (const prog of dedupeProgramTabs(rec.programs)) {
         const key = tabKeyOf(prog)
         const composite = `${rec.id}::${key}`
         const rows = rowsByTab[composite] || []
