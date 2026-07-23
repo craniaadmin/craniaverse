@@ -95,7 +95,7 @@ export default function Attendance({ onNavigate }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 16 }}>
         <MetricTile label="Lessons Logged" value={metrics.total} hint={`${studentCount} students`} />
         <MetricTile label="Present" value={metrics.present} color="#2b7a2e"
-          hint={metrics.marked ? undefined : `${metrics.presentPct}% of marked`} />
+          hint={`${metrics.presentPct}% of marked lessons`} />
         <MetricTile label="Late" value={metrics.late} color={metrics.late > 0 ? '#8a6a00' : 'var(--ink)'} />
         <MetricTile label="Absent" value={metrics.absent} color={metrics.absent > 0 ? '#a12626' : 'var(--ink)'} />
         <MetricTile label="Unmarked" value={metrics.unmarked}
