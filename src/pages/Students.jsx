@@ -34,113 +34,20 @@ function SField({ label, value, variant, readOnly, onChange }) {
 }
 
 // ── Comments section ───────────────────────────────────────────────────────
-
-const ATTEND_STYLE = {
-  P: { background: '#c8e6c9', color: '#2e7d32' },
-  L: { background: '#fff9c4', color: '#f57f17' },
-  E: { background: '#dcedc8', color: '#558b2f' },
-  A: { background: '#ffcdd2', color: '#c62828' },
-}
-
-const EMPTY_ROW = (n) => ({
-  lessonNo: n, day: '', date: '', attendance: '', uniform: '',
-  lessonPlan: '', homeworkCompleted: '', performance: '',
-  behaviour: '', homeworkAssigned: '', parentComm: '', teacher: '',
-})
-
-const DEFAULT_ROWS = () => Array.from({ length: 7 }, (_, j) => EMPTY_ROW(j + 1))
-const ACADEMIC_YEARS = ['24_25', '25_26', '26_27', '23_24', '22_23']
-
-// ── Schedule autopopulation ────────────────────────────────────────────────
-const DAY_IDX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
-
-// Parse "Mon 4:30 pm, Wed 5:30 pm" → [{day:'Mon', time:'4:30 pm'}, ...]
-function parseSchedule(schedule) {
-  if (!schedule) return []
-  return String(schedule).split(',').map(s => {
-    const m = s.trim().match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)\b\s*(.*)$/i)
-    if (!m) return null
-    const day = m[1].charAt(0).toUpperCase() + m[1].slice(1, 3).toLowerCase()
-    return { day, time: (m[2] || '').trim() }
-  }).filter(Boolean)
-}
-
-// Pick a sensible "term start" — anchor by the tab's academic year (e.g. "25_26" → Sep 1, 2025).
-// Fall back to today if the year is unparseable.
-function termStartDate(yearStr) {
-  const m = String(yearStr || '').match(/^(\d{2})/)
-  if (m) {
-    const yy = parseInt(m[1], 10)
-    const yyyy = yy >= 70 ? 1900 + yy : 2000 + yy
-    return new Date(yyyy, 8, 1) // Sept 1 of the start year
-  }
-  return new Date()
-}
-
-// ISO YYYY-MM-DD — this is what <input type="date"> expects as its value.
-function fmtScheduledDate(d) {
-  const yyyy = d.getFullYear()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${yyyy}-${mm}-${dd}`
-}
-
-const TERM_WEEKS = 35 // standard Crania school year length
-
-// Cadence: how many calendar days between week-cycles.
-//   sessions=1 /week → 7
-//   sessions=1 /2-weeks (biweekly) → 14
-//   sessions=1 /month → 30 (approx)
-// We always cycle through `slots` first within a week, then advance by `weekStep`.
-function cadenceWeekStep(programInfo) {
-  if (!programInfo) return 7
-  const period = String(programInfo.period || '').toLowerCase()
-  if (period.includes('month')) return 30
-  if (period.includes('2-week') || period.includes('biweek') || period.includes('bi-week')) return 14
-  return 7 // default: weekly
-}
-
-// Build N lesson rows with day + date prefilled from the schedule slots.
-function generateScheduledRows(slots, startDate, count, weekStep) {
-  if (!slots.length) return Array.from({ length: count }, (_, j) => EMPTY_ROW(j + 1))
-  const rows = []
-  const startDayIdx = startDate.getDay()
-  for (let i = 0; i < count; i++) {
-    const slot = slots[i % slots.length]
-    const cycleIdx = Math.floor(i / slots.length)
-    const slotDayIdx = DAY_IDX[slot.day] ?? 1
-    const dayOffset = (slotDayIdx - startDayIdx + 7) % 7
-    const d = new Date(startDate)
-    d.setDate(d.getDate() + dayOffset + cycleIdx * weekStep)
-    rows.push({ ...EMPTY_ROW(i + 1), day: slot.day, date: fmtScheduledDate(d) })
-  }
-  return rows
-}
+// ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS, and the whole
+// schedule-autopopulation toolkit now live in ../data/scheduleUtils so
+// the standalone Attendance / Comments pages build identical rows for
+// a given tab — all three surfaces read and write the same
+// PocketBase `comments` row, so there is nothing to keep in sync here.
 
 function CommentsSection({ studentId, initialPrograms }) {
   const { rules, addCashEntry, programs: allPrograms } = useStore()
   const [programs, setPrograms] = useState(initialPrograms || [])
 
-  // Look up cadence info (sessions/period) for the tab's program by title.
-  const programInfoFor = useCallback((prog) => {
-    if (!prog || !prog.program) return null
-    const title = String(prog.program).toUpperCase().trim()
-    return (allPrograms || []).find(p => String(p.title || '').toUpperCase().trim() === title) || null
-  }, [allPrograms])
-
   // Build the autopopulated rows for a tab (used when no saved comments exist yet).
   // Default count = sessions/period × 35 weeks. Caller can override (e.g. for "+ Add row").
-  const buildScheduledRows = useCallback((prog, count) => {
-    const slots = parseSchedule(prog && prog.schedule)
-    const start = termStartDate(prog && prog.year)
-    const info = programInfoFor(prog)
-    const step = cadenceWeekStep(info)
-    // Prefer the actual number of registered slots (e.g. FLEX DOUBLE = 2) since the
-    // student may have picked fewer than the program's max sessions/week.
-    const perWeek = slots.length || Number(info && info.sessions) || 1
-    const total = count != null ? count : perWeek * TERM_WEEKS
-    return generateScheduledRows(slots, start, total, step)
-  }, [programInfoFor])
+  const buildScheduledRows = useCallback((prog, count) =>
+    buildScheduledRowsShared(prog, allPrograms, count), [allPrograms])
   const [activeTab, setActiveTab] = useState(0)
   const [rows, setRows] = useState({})
   const [saveStatus, setSaveStatus] = useState({})
