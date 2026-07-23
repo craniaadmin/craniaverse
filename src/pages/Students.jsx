@@ -347,10 +347,7 @@ function StudentList({ onSelect, onAdd, onDelete }) {
       return first !== 0 ? first : (a.student.lastName || '').localeCompare(b.student.lastName || '', undefined, opts)
     })
 
-  const getLogin = (r) =>
-    r.student.firstName && r.student.lastName
-      ? `${r.student.firstName.toLowerCase()}${r.student.lastName.toLowerCase()}`
-      : '—'
+  const getLogin = (r) => usernameFor(r.student.firstName, r.student.lastName) || '—'
 
   const getClasses = (r) =>
     Array.from(new Set((r.programs || []).map(p => p.program).filter(Boolean))).join(', ') || '—'
