@@ -168,14 +168,13 @@ export default function EmergencyContacts({ onNavigate }) {
               <Th>Relationship</Th>
               <Th>Phone</Th>
               <Th>Email</Th>
-              <Th>Family</Th>
+              <Th>Customer</Th>
               <Th>Students</Th>
-              <Th></Th>
             </tr>
           </thead>
           <tbody>
             {visible.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
+              <tr><td colSpan={6} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
                 {withContact.length === 0
                   ? 'No emergency contacts on file yet — they come from the registration form and can be edited on the Customers page.'
                   : 'No emergency contacts match your search.'}
@@ -201,17 +200,22 @@ export default function EmergencyContacts({ onNavigate }) {
                         </span>
                       : <span style={{ color: 'var(--muted)' }}>—</span>}
                   </td>
-                  <td style={{ padding: '8px 12px', color: 'var(--ink-soft)' }}>{fam.customerName}</td>
-                  <td style={{ padding: '8px 12px', color: 'var(--ink-soft)' }}>
-                    {fam.students.map((s) => studentName(s)).join(', ')}
+                  <td style={{ padding: '8px 12px' }}>
+                    <NameLink
+                      title="Open this customer"
+                      onClick={() => onNavigate && onNavigate('Customers', fam.linkId)}
+                    >{fam.customerName}</NameLink>
                   </td>
-                  <td style={{ padding: '8px 12px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => onNavigate && onNavigate('Customers')}
-                      title="View / edit in Customers"
-                      style={{ background: 'transparent', border: 'none', cursor: 'pointer',
-                               color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex' }}
-                    ><ExternalLink size={13} /></button>
+                  <td style={{ padding: '8px 12px' }}>
+                    {fam.students.map((s, j) => (
+                      <span key={s.id}>
+                        <NameLink
+                          title="Open this student"
+                          onClick={() => onNavigate && onNavigate('Students', s.id)}
+                        >{studentName(s)}</NameLink>
+                        {j < fam.students.length - 1 && <span style={{ color: 'var(--ink-soft)' }}>, </span>}
+                      </span>
+                    ))}
                   </td>
                 </tr>
               )
@@ -228,7 +232,7 @@ export default function EmergencyContacts({ onNavigate }) {
             <h3 style={{ margin: 0, fontSize: 15, color: '#a12626' }}>Missing Emergency Contact</h3>
           </div>
           <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10 }}>
-            These families have no emergency contact on file. Add one on the Customers page.
+            These customers have no emergency contact on file. Add one on the Customers page.
           </div>
           <div style={{ background: '#fff', borderRadius: 10, overflow: 'hidden', boxShadow: 'var(--brand-shadow)' }}>
             {visibleMissing.map((fam, i) => (
@@ -237,17 +241,24 @@ export default function EmergencyContacts({ onNavigate }) {
                 borderTop: i > 0 ? '1px solid #f0ede3' : 'none',
               }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--ink)' }}>{fam.customerName}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13 }}>
+                    <NameLink
+                      title="Open this customer"
+                      onClick={() => onNavigate && onNavigate('Customers', fam.linkId)}
+                    >{fam.customerName}</NameLink>
+                  </div>
                   <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
-                    {fam.students.map((s) => studentName(s)).join(', ')}
+                    {fam.students.map((s, j) => (
+                      <span key={s.id}>
+                        <NameLink
+                          title="Open this student"
+                          onClick={() => onNavigate && onNavigate('Students', s.id)}
+                        >{studentName(s)}</NameLink>
+                        {j < fam.students.length - 1 && <span>, </span>}
+                      </span>
+                    ))}
                   </div>
                 </div>
-                <button
-                  onClick={() => onNavigate && onNavigate('Customers')}
-                  title="Add contact in Customers"
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer',
-                           color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex' }}
-                ><ExternalLink size={13} /></button>
               </div>
             ))}
           </div>
