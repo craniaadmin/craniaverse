@@ -291,6 +291,40 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   }
   useEffect(() => { if (!loading && view === 'todo') runChecklists() }, [view, loading])
 
+  // ---------- Export CSV (current view's data) ----------
+  const exportCsv = () => {
+    const stamp = isoLocal(new Date())
+    if (view === 'checklists') {
+      const rows = [['Checklist', 'List', 'Frequency', 'Active', 'Entries']]
+      for (const cl of state.checklists) {
+        const list = state.lists.find(l => l.id === cl.listId)
+        rows.push([
+          cl.name || '',
+          list?.name || '',
+          cl.freq || 'daily',
+          cl.active === false ? 'No' : 'Yes',
+          (cl.entries || []).filter(Boolean).join(' | '),
+        ])
+      }
+      downloadCsv(`crania-checklists-${stamp}.csv`, rows)
+    } else {
+      const rows = [['List', 'Task', 'Priority', 'Due Date', 'Done', 'Notes']]
+      for (const list of state.lists) {
+        for (const it of state.items.filter(i => i.listId === list.id)) {
+          rows.push([
+            list.name || '',
+            it.text || '',
+            PRI_LABEL[it.priority || 'low'] || it.priority || '',
+            it.due || '',
+            it.done ? 'Yes' : 'No',
+            it.notes || '',
+          ])
+        }
+      }
+      downloadCsv(`crania-todo-${stamp}.csv`, rows)
+    }
+  }
+
   // ---------- Filters ----------
   const filtersActive = () => !!(filterText || filterPri !== 'all' || filterDue !== 'all')
   const matchFilters = (it) => {
