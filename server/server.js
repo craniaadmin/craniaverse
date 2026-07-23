@@ -1055,6 +1055,93 @@ app.delete('/api/forms/:formId/submissions/:subId', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- surveys (multi-survey builder) ----------------------
+// A "survey" is title + intro + an ordered list of questions
+// (radio/checkbox/textarea/stars). Unlike Forms there's no public
+// URL — surveys are taken inside the admin app itself (staff hands a
+// tablet to the family), so every route here sits behind the normal
+// auth gate like the rest of /api.
+app.get('/api/surveys', wrap(async (_req, res) => res.json(await getSurveys())))
+
+app.get('/api/surveys/:id', wrap(async (req, res) => {
+  const survey = (await getSurveys()).find(s => String(s.id) === String(req.params.id))
+  if (!survey) return res.status(404).json({ error: 'not found' })
+  res.json(survey)
+}))
+
+app.post('/api/surveys', wrap(async (req, res) => {
+  const surveys = await getSurveys()
+  const id = 'survey-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7)
+  const record = {
+    id,
+    title:     String(req.body.title || 'Untitled Survey').trim(),
+    intro:     String(req.body.intro || '').trim(),
+    questions: Array.isArray(req.body.questions) ? req.body.questions : [],
+    createdAt: new Date().toISOString(),
+  }
+  surveys.push(record)
+  await commitSurveys(surveys)
+  res.status(201).json(record)
+}))
+
+app.put('/api/surveys/:id', wrap(async (req, res) => {
+  const surveys = await getSurveys()
+  const idx = surveys.findIndex((s) => String(s.id) === String(req.params.id))
+  if (idx === -1) return res.status(404).json({ error: 'not found' })
+  const current = surveys[idx]
+  surveys[idx] = {
+    ...current,
+    title:     req.body.title !== undefined ? String(req.body.title).trim() : current.title,
+    intro:     req.body.intro !== undefined ? String(req.body.intro).trim() : current.intro,
+    questions: Array.isArray(req.body.questions) ? req.body.questions : current.questions,
+  }
+  await commitSurveys(surveys)
+  res.json(surveys[idx])
+}))
+
+app.delete('/api/surveys/:id', wrap(async (req, res) => {
+  const surveys = await getSurveys()
+  const next = surveys.filter((s) => String(s.id) !== String(req.params.id))
+  await commitSurveys(next)
+  await deleteSurveySubmissionsForSurvey(String(req.params.id))
+  res.json({ deleted: surveys.length - next.length })
+}))
+
+app.post('/api/surveys/:id/submit', wrap(async (req, res) => {
+  const survey = (await getSurveys()).find(s => String(s.id) === String(req.params.id))
+  if (!survey) return res.status(404).json({ error: 'survey not found' })
+
+  const answers = (req.body && typeof req.body.answers === 'object') ? req.body.answers : {}
+  for (const q of survey.questions || []) {
+    if (q.required) {
+      const v = answers[q.id]
+      const empty = v === undefined || v === null || v === '' ||
+                    (Array.isArray(v) && v.length === 0)
+      if (empty) return res.status(400).json({ error: `Missing required question: ${q.text || q.id}` })
+    }
+  }
+
+  const submission = {
+    id:          'subv-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7),
+    surveyId:    String(survey.id),
+    answers,
+    submittedAt: new Date().toISOString(),
+  }
+  await createSurveySubmission(submission)
+  res.status(201).json({ ok: true, id: submission.id })
+}))
+
+app.get('/api/surveys/:id/submissions', wrap(async (req, res) => {
+  const subs = await loadSurveySubmissions(String(req.params.id))
+  subs.sort((a, b) => (b.submittedAt || '').localeCompare(a.submittedAt || ''))
+  res.json(subs)
+}))
+
+app.delete('/api/surveys/:surveyId/submissions/:subId', wrap(async (req, res) => {
+  await deleteSurveySubmission(String(req.params.subId))
+  res.json({ ok: true })
+}))
+
 // Error handler — any thrown error from a wrap()-ed handler lands here
 app.use((err, _req, res, _next) => {
   console.error('[api error]', err?.response || err?.message || err)
