@@ -59,6 +59,7 @@ const ROUTES = {
   'students:Attendance':     (nav) => <Attendance onNavigate={nav} />,
   'students:Comments':       (nav) => <Comments onNavigate={nav} />,
   'students:Crania Cash':    () => <CraniaCash />,
+  'students:Logins':         (nav) => <Logins onNavigate={nav} />,
 
   'staff:Staff':             () => <StaffInformation />,
   'staff:Schedules':         () => <Schedules />,
