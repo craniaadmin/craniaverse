@@ -93,8 +93,9 @@ function CommentsSection({ studentId, initialPrograms }) {
     if (!studentId) return
     flushPending(studentIdRef.current)
     studentIdRef.current = studentId
-    setPrograms(initialPrograms || [])
-    programsRef.current = initialPrograms || []
+    const dedupedPrograms = dedupeProgramTabs(initialPrograms)
+    setPrograms(dedupedPrograms)
+    programsRef.current = dedupedPrograms
     setActiveTab(0)
     setSaveStatus({})
     setRows({})
