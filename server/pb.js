@@ -310,9 +310,10 @@ export async function loadComments() {
 export async function saveCommentsForTab(studentId, tabKey, rowsArray) {
   await ensureAuth()
   let existing = null
+  const esc = (s) => String(s).replace(/"/g, '\\"')
   try {
     existing = await pb().collection('comments').getFirstListItem(
-      `studentId="${studentId}" && tabKey="${tabKey}"`
+      `studentId="${esc(studentId)}" && tabKey="${esc(tabKey)}"`
     )
   } catch (err) {
     if (err?.status !== 404) throw err
