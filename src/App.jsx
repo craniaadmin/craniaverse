@@ -97,6 +97,11 @@ export default function App() {
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [section, setSection] = useState('home')
   const [sub, setSub] = useState('Dashboard')
+  // Set alongside a navigate() call that targets a specific record (e.g.
+  // "open this student" from Emergency Contacts). Consumed once by the
+  // destination page's initialRecordId effect, then cleared — so a plain
+  // sidebar click back into the same page later doesn't reopen it.
+  const [pendingRecordId, setPendingRecordId] = useState(null)
 
   useEffect(() => {
     fetch(`${API_BASE}/api/me`, { credentials: 'include' })
