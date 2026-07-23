@@ -736,6 +736,35 @@ export async function saveLeads(payload) {
   }
 }
 
+// ---- contacts (singleton payload — business/vendor directory) --
+// Standalone address book for people/companies outside the school
+// (suppliers, contractors, partner schools, professional services).
+// Separate from Customers (families), Staff (employees), and
+// Emergency Contacts (derived from registrations) on purpose.
+const CONTACTS_DEFAULT = { contacts: [] }
+
+export async function loadContacts() {
+  try {
+    const rows = await getFullList('contacts')
+    if (rows.length === 0) return CONTACTS_DEFAULT
+    const p = rows[0].payload || {}
+    return { contacts: Array.isArray(p.contacts) ? p.contacts : [] }
+  } catch (err) {
+    if (err?.status === 404) return CONTACTS_DEFAULT
+    throw err
+  }
+}
+
+export async function saveContacts(payload) {
+  await ensureAuth()
+  const rows = await getFullList('contacts')
+  if (rows.length === 0) {
+    await pb().collection('contacts').create({ payload })
+  } else {
+    await pb().collection('contacts').update(rows[0].id, { payload })
+  }
+}
+
 // ---- IT accounts (singleton payload — passwords manager) --------
 // Shape mirrors "crania-it-accounts.json" from the client's v28
 // mockup so JSON imports/exports round-trip. If the row doesn't
