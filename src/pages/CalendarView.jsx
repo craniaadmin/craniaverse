@@ -46,7 +46,10 @@ function textOn(hex) {
 }
 
 // ---------- store hook ----------
-function useCalendar() {
+// `apiPath` lets this same component back a second, fully independent
+// event store (see MarketingCalendar.jsx) — different endpoint, no
+// data ever shared with the operations Calendar.
+function useCalendar(apiPath) {
   const [data, setData]     = useState({ calendars: [], events: [], hidden: {} })
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState('loading')
@@ -56,7 +59,7 @@ function useCalendar() {
 
   const refresh = useCallback(async () => {
     try {
-      const r = await fetch(`${API_BASE}/api/calendar`, { headers: HEADERS })
+      const r = await fetch(`${API_BASE}${apiPath}`, { headers: HEADERS })
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const j = await r.json()
       setData({
@@ -70,7 +73,7 @@ function useCalendar() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [apiPath])
 
   useEffect(() => { refresh() }, [refresh])
 
@@ -80,7 +83,7 @@ function useCalendar() {
       mut(next)
       clearTimeout(saveTimer.current)
       saveTimer.current = setTimeout(() => {
-        fetch(`${API_BASE}/api/calendar`, {
+        fetch(`${API_BASE}${apiPath}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', ...HEADERS },
           body: JSON.stringify(latest.current),
@@ -88,7 +91,7 @@ function useCalendar() {
       }, 350)
       return next
     })
-  }, [])
+  }, [apiPath])
 
   return { data, loading, status, mutate }
 }
