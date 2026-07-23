@@ -73,7 +73,8 @@ const checklistDue = (cl) => {
 // ---------- CSV export ----------
 const csvCell = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'
 function downloadCsv(filename, rows) {
-  const text = '﻿' + rows.map(r => r.map(csvCell).join(',')).join('\r\n')
+  const BOM = '﻿' // so Excel opens the file as UTF-8 instead of guessing
+  const text = BOM + rows.map(r => r.map(csvCell).join(',')).join('\r\n')
   const blob = new Blob([text], { type: 'text/csv;charset=utf-8' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
