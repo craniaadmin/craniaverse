@@ -150,7 +150,9 @@
       "Bash(node scratch-test.mjs)",
       "Bash(node --check server/scripts/fix-academic-year-2026-27.js)",
       "Bash(node scratch-dedup-test.mjs)",
-      "Bash(rm scratch-dedup-test.mjs)"
+      "Bash(rm scratch-dedup-test.mjs)",
+      "Bash(curl -s -m 3 http://127.0.0.1:8090/api/health)",
+      "Bash(curl -sv -m 3 http://127.0.0.1:8090/api/health)"
     ]
   },
   "hooks": {

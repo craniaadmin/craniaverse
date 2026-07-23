@@ -178,26 +178,46 @@ export function buildScheduledRows(prog, allPrograms, weekDates, count) {
   return generateScheduledRows(slots, start, total, step)
 }
 
-export const tabKeyOf = (prog) => `${prog.year}|${prog.program}`
+// Base key is year|program, same as before — this keeps the common
+// case (one tab per program) reading/writing the same PocketBase row
+// it always has. When a student has more than one tab for the same
+// (year, program) with a DIFFERENT schedule — e.g. a Double course
+// registered for two timeslots, "Mon 4:30 pm" and "Wed 5:30 pm" —
+// dedupeProgramTabs tags the later ones with a `__slot` so they get
+// their own distinct key (`base#2`, `base#3`, ...) instead of
+// colliding with the first tab's storage row.
+export const tabKeyOf = (prog) => {
+  const base = `${prog.year}|${prog.program}`
+  return prog && prog.__slot ? `${base}#${prog.__slot}` : base
+}
 
 // A registration can end up with the exact same (year, program) tab
-// listed twice — e.g. a double-submit when adding a program, or a
-// duplicate import. Both entries produce the identical tabKeyOf(),
-// so they'd read/write the SAME PocketBase comments row: every
-// surface that lists a student's tabs (their own page, Attendance,
-// Comments) must dedupe with this before rendering, or you get two
-// "different-looking" rows that are secretly the same row — editing
-// one instantly mirrors into the other because there's only one
-// underlying array in memory, not two.
+// listed more than once for two different reasons:
+//  1. A genuine duplicate — e.g. a double-submit when adding a
+//     program — where the schedule (or lack of one) is identical.
+//     These should collapse to one tab, or editing one would silently
+//     mirror into a "phantom" identical twin.
+//  2. A legitimate second registration for the same program at a
+//     DIFFERENT timeslot — e.g. a Double course registered for both
+//     "Mon 4:30 pm" and "Wed 5:30 pm". These are two real tabs and
+//     must both survive, each with its own PocketBase comments row
+//     (see tabKeyOf above) so editing one never touches the other.
+// We tell the two apart by comparing the `schedule` string: identical
+// schedule -> true duplicate (drop it); different schedule -> keep it,
+// tagged with a slot suffix so its tabKey doesn't collide.
 export function dedupeProgramTabs(programs) {
-  const seen = new Set()
+  const seenSchedules = new Map() // base key -> Set of schedule signatures already kept
   const out = []
   for (const p of programs || []) {
     if (!p || !p.program) continue
-    const key = tabKeyOf(p)
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(p)
+    const base = `${p.year}|${p.program}`
+    const sig = String(p.schedule || '').trim().toLowerCase()
+    const seenSet = seenSchedules.get(base) || new Set()
+    if (seenSet.has(sig)) continue // true duplicate (same or same-blank schedule) — drop
+    const slot = seenSet.size // 0 for the first tab kept under this base key, 1 for the next distinct one, etc.
+    seenSet.add(sig)
+    seenSchedules.set(base, seenSet)
+    out.push(slot > 0 ? { ...p, __slot: slot + 1 } : p)
   }
   return out
 }
