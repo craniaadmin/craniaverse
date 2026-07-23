@@ -215,6 +215,13 @@ const collectionSpecs = [
     ],
     indexes: [],
   },
+  {
+    name: 'contacts',
+    fields: [
+      { name: 'payload', type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: [],
+  },
 ]
 
 async function ensureCollection(spec) {
