@@ -74,6 +74,7 @@ const ROUTES = {
   'financial:Invoices':      () => <Invoices />,
   'financial:Receipts':      () => <Receipts />,
 
+  'marketing:Marketing':     () => <Marketing />,
   'marketing:Surveys':       () => <Surveys />,
   'marketing:Calendar':      () => <MarketingCalendar />,
 
