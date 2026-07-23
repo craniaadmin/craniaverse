@@ -3,14 +3,17 @@
 // /api/registrations). Each registration carries a customer.emergency
 // block; this page pulls those out, groups them by family (same
 // guardian1 identity used on the Customers page), and lists which
-// students each contact covers. Families missing an emergency contact
+// students each contact covers. Customers missing an emergency contact
 // are surfaced separately so the gap is visible.
 //
-// Editing lives on the Customers page (this links there), so there's no
-// write path here — it's purely a live, filtered view of server data.
+// Editing lives on the Customers page. Clicking a customer name jumps
+// straight to that customer's detail view there; clicking a student
+// name jumps to that student's detail view on the Students page. There
+// is no write path here — it's purely a live, filtered view of server
+// data plus navigation shortcuts.
 
 import { useMemo, useState } from 'react'
-import { Search, Phone, Mail, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Search, Phone, Mail, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
 
 // A family's identity = normalized guardian1 name + email. A record with
