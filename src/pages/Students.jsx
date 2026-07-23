@@ -686,7 +686,7 @@ function StudentDetail({ recordId, onBack, onNavigate, onDelete }) {
 
 // ── Root: switches between list and detail ─────────────────────────────────
 
-export default function Students({ onNavigate }) {
+export default function Students({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
   const { select, addRegistration, deleteRegistration } = useStore()
   const [detailId, setDetailId] = useState(null)
 
@@ -694,6 +694,15 @@ export default function Students({ onNavigate }) {
     select(id)
     setDetailId(id)
   }
+
+  // Opened via onNavigate('Students', recordId) from another page (e.g.
+  // Emergency Contacts) — jump straight to that student's detail view.
+  useEffect(() => {
+    if (initialRecordId) {
+      handleSelect(initialRecordId)
+      onConsumeInitialRecord && onConsumeInitialRecord()
+    }
+  }, [initialRecordId])
 
   const handleAdd = async () => {
     try {
