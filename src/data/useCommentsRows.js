@@ -121,7 +121,7 @@ export function useCommentsRows() {
 
   return {
     flatRows, updateRow, updateRowFields,
-    loading, status: fetchStatus === 'offline' ? 'offline' : storeStatus,
+    loading: loading || weeksLoading, status: fetchStatus === 'offline' ? 'offline' : storeStatus,
     studentCount: realRecords.length,
   }
 }
