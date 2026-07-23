@@ -95,7 +95,7 @@ export default function Logins({ onNavigate }) {
           <thead>
             <tr style={{ background: 'var(--brand-dark-blue)', color: '#fff', textAlign: 'left' }}>
               <Th>Student</Th>
-              <Th>Grade</Th>
+              <Th>Email</Th>
               <Th>Username</Th>
               <Th>Password</Th>
             </tr>
