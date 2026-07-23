@@ -140,7 +140,8 @@
       "Bash(node --check server/scripts/cleanup-test-records.js)",
       "Bash(node --check src/pages/EmergencyContacts.jsx)",
       "Bash(awk '{print NR, length\\($0\\)}' \"/c/Users/hanak/Downloads/CraniaVerse To Do v43 [claude-opus-4-8].html\")",
-      "Bash(awk 'NR==134 {print \" <!-- LOGO stripped -->\"; next} {print}' \"/c/Users/hanak/Downloads/CraniaVerse To Do v43 [claude-opus-4-8].html\")"
+      "Bash(awk 'NR==134 {print \" <!-- LOGO stripped -->\"; next} {print}' \"/c/Users/hanak/Downloads/CraniaVerse To Do v43 [claude-opus-4-8].html\")",
+      "Bash(grep -n '\\\\${prog.year}|\\\\${prog.program}\\\\|\\\\${p.year}|\\\\${p.program}' src/pages/Students.jsx)"
     ]
   },
   "hooks": {

@@ -3,8 +3,7 @@ import { useStore } from '../data/store'
 import { programs as craniaProgramList } from '../data/mockData'
 import {
   ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS,
-  termStartDate, fmtScheduledDate, TERM_WEEKS,
-  buildScheduledRows as buildScheduledRowsShared, tabKeyOf,
+  buildScheduledRows as buildScheduledRowsShared,
 } from '../data/scheduleUtils'
 
 const PROGRAM_LIST = craniaProgramList.map((p) => p.title)
