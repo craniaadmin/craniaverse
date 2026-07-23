@@ -48,6 +48,7 @@ const ROUTES = {
   'programs:Contests':       (nav) => <Contests onNavigate={nav} />,
 
   'customers:Customers':     (nav) => <Customers onNavigate={nav} />,
+  'customers:Emergency Contacts': (nav) => <EmergencyContacts onNavigate={nav} />,
 
   'students:Students':       (nav) => <Students onNavigate={nav} />,
   'students:Crania Cash':    () => <CraniaCash />,
