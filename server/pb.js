@@ -1033,3 +1033,76 @@ export async function deleteSubmissionsForForm(formId) {
     await pb().collection('formSubmissions').delete(row.id)
   }
 }
+
+// ---- surveys (definitions) -------------------------------
+// Same shape/pattern as forms above: a survey is title + intro text +
+// an ordered list of questions (radio/checkbox/textarea/stars). Taken
+// inside the admin app itself (no public URL, unlike Forms) — a staff
+// member hands a tablet to the family, matching how the original
+// single hardcoded Family Feedback Survey worked.
+export async function loadSurveys() {
+  const rows = await getFullList('surveys')
+  return rows.map(r => r.payload || {})
+}
+
+export async function saveSurveys(surveys) {
+  await ensureAuth()
+  const existing = await getFullList('surveys')
+  const byRecordId = new Map(existing.map(r => [r.recordId, r]))
+  const incomingIds = new Set(surveys.map(s => String(s.id)))
+
+  for (const survey of surveys) {
+    const recordId = String(survey.id)
+    const data = { recordId, payload: { ...survey } }
+    const found = byRecordId.get(recordId)
+    if (found) {
+      await pb().collection('surveys').update(found.id, data)
+    } else {
+      await pb().collection('surveys').create(data)
+    }
+  }
+  for (const row of existing) {
+    if (!incomingIds.has(row.recordId)) {
+      await pb().collection('surveys').delete(row.id)
+    }
+  }
+}
+
+// ---- survey submissions -----------------------------------
+export async function loadSurveySubmissions(surveyId = null) {
+  await ensureAuth()
+  const filter = surveyId ? { filter: `surveyId="${String(surveyId).replace(/"/g, '\\"')}"` } : {}
+  const rows = await pb().collection('surveySubmissions').getFullList({ batch: 200, ...filter })
+  return rows.map(r => r.payload || {})
+}
+
+export async function createSurveySubmission(sub) {
+  await ensureAuth()
+  await pb().collection('surveySubmissions').create({
+    recordId: String(sub.id),
+    surveyId: String(sub.surveyId),
+    payload:  { ...sub },
+  })
+}
+
+export async function deleteSurveySubmission(id) {
+  await ensureAuth()
+  try {
+    const row = await pb().collection('surveySubmissions')
+      .getFirstListItem(`recordId="${String(id).replace(/"/g, '\\"')}"`)
+    await pb().collection('surveySubmissions').delete(row.id)
+  } catch (err) {
+    if (err?.status !== 404) throw err
+  }
+}
+
+export async function deleteSurveySubmissionsForSurvey(surveyId) {
+  await ensureAuth()
+  const rows = await pb().collection('surveySubmissions').getFullList({
+    batch: 200,
+    filter: `surveyId="${String(surveyId).replace(/"/g, '\\"')}"`,
+  })
+  for (const row of rows) {
+    await pb().collection('surveySubmissions').delete(row.id)
+  }
+}
