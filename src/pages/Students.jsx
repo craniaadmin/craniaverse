@@ -572,7 +572,7 @@ function StudentDetail({ recordId, onBack, onNavigate, onDelete }) {
           <div className="field-row">
             <label>Username:</label>
             <div className="field-val">
-              {studentFields.firstName && studentFields.lastName ? `${studentFields.firstName.toLowerCase()}${studentFields.lastName.toLowerCase()}` : '—'}
+              {usernameFor(studentFields.firstName, studentFields.lastName) || '—'}
             </div>
           </div>
           <div className="field-row">
