@@ -505,28 +505,46 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
 
       <div className="page-head">
         <h2 className="page-title">{pageTitle}</h2>
-        {view === 'todo' && (
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              onClick={() => openName(null)}
-              style={{
-                background: 'var(--brand-light-blue)', color: 'var(--brand-dark-brown)',
-                border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700,
-                borderRadius: 8, cursor: 'pointer',
-              }}
-            >+ Add list</button>
-            <button
-              onClick={() => setHideDone(v => !v)}
-              title="Show/hide completed"
-              style={{
-                background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
-                padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
-              }}
-            >
-              {hideDone ? 'Show done' : 'Hide done'}
-            </button>
-          </div>
-        )}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {view === 'todo' && (
+            <>
+              <button
+                onClick={() => openName(null)}
+                style={{
+                  background: 'var(--brand-light-blue)', color: 'var(--brand-dark-brown)',
+                  border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700,
+                  borderRadius: 8, cursor: 'pointer',
+                }}
+              >+ Add list</button>
+              <button
+                onClick={() => setHideDone(v => !v)}
+                title="Show/hide completed"
+                style={{
+                  background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+                  padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+                }}
+              >
+                {hideDone ? 'Show done' : 'Hide done'}
+              </button>
+            </>
+          )}
+          <button
+            onClick={exportCsv}
+            title={view === 'checklists' ? 'Download all checklists as a CSV file' : 'Download all to-do items as a CSV file'}
+            style={{
+              background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+              padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+            }}
+          >⤓ Export CSV</button>
+          <button
+            onClick={() => setSettingsOpen(true)}
+            title="Settings"
+            style={{
+              background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+              padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+            }}
+          >⚙ Settings</button>
+        </div>
       </div>
 
       {view === 'todo' && <TodoView
