@@ -81,6 +81,8 @@ const ROUTES = {
   'marketing:Surveys':       () => <Surveys />,
   'marketing:Calendar':      () => <MarketingCalendar />,
 
+  'contacts:Contacts':       () => <Contacts />,
+
   'forms:All Forms':         () => <Forms />,
 }
 
