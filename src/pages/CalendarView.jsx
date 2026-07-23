@@ -251,7 +251,7 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">Calendar</h2>
+        <h2 className="page-title">{title}</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
