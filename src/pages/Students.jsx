@@ -183,7 +183,7 @@ function CommentsSection({ studentId, initialPrograms }) {
     setRows((r) => ({ ...r, [next.length - 1]: buildScheduledRows(newProg) }))
     setActiveTab(next.length - 1)
     setAddingTab(false)
-    setNewTab({ year: '25_26', program: '' })
+    setNewTab({ year: currentAcademicYear(), program: '' })
     fetch(`${API_BASE}/api/registrations/${studentId}/programs`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json', ...HEADERS },
       body: JSON.stringify(next),
