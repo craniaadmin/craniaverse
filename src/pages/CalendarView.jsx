@@ -261,7 +261,7 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
 
   return (
     <div className="page">
-      <h2 className="page-title">Calendar</h2>
+      <h2 className="page-title">{title}</h2>
 
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
