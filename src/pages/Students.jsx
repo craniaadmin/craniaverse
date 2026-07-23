@@ -2,9 +2,10 @@
 import { useStore } from '../data/store'
 import { programs as craniaProgramList } from '../data/mockData'
 import {
-  ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS,
+  ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS, currentAcademicYear,
   buildScheduledRows as buildScheduledRowsShared,
 } from '../data/scheduleUtils'
+import { useAfterschoolWeeks } from '../data/useAfterschoolWeeks'
 
 const PROGRAM_LIST = craniaProgramList.map((p) => p.title)
 
