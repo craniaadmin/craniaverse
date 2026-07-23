@@ -111,7 +111,7 @@ export default function Logins({ onNavigate }) {
                 <td style={{ padding: '8px 12px', fontWeight: 600 }}>
                   <NameLink onClick={() => onNavigate && onNavigate('Students', r.id)}>{r.name}</NameLink>
                 </td>
-                <td style={{ padding: '8px 12px', color: 'var(--ink-soft)' }}>{r.grade || '—'}</td>
+                <td style={{ padding: '8px 12px', color: 'var(--ink-soft)' }}>{r.email || '—'}</td>
                 <td style={{ padding: '8px 12px' }}>
                   <CopyableValue value={r.username} mono />
                 </td>
