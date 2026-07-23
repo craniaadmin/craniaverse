@@ -209,6 +209,21 @@ async function commitForms(forms) {
   await saveForms(forms)
 }
 
+async function getSurveys() {
+  if (cache.surveys) return cache.surveys
+  let surveys = await loadSurveys()
+  if (surveys.length === 0) {
+    surveys = [DEFAULT_SURVEY]
+    await saveSurveys(surveys)
+  }
+  cache.surveys = surveys
+  return cache.surveys
+}
+async function commitSurveys(surveys) {
+  cache.surveys = surveys
+  await saveSurveys(surveys)
+}
+
 // ---- registrations: one-time migration of legacy records ---
 // Earlier records may be missing the programs / cashLog
 // fields. Pull all records, patch in-memory, and write back
