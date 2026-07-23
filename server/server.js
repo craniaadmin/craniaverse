@@ -67,6 +67,41 @@ const DEFAULT_RULES = [
   { id: 'no-shirt', reason: 'No Shirt', delta: -5 },
 ]
 
+// The original hardcoded Family Feedback Survey, now the first-class
+// "built-in" survey row — still editable/deletable like any other,
+// but always present on first boot so nothing is lost by moving to a
+// multi-survey model.
+const DEFAULT_SURVEY = {
+  id: 'survey-family-feedback',
+  title: 'Family Feedback Survey',
+  intro: 'Dear Parents,\n\nThank you for taking the time to fill out this survey. We value your opinion! Complete your responses by February 28, 2025 to be entered into a draw for $100 OFF your next month (if contact information is provided; draw date Mar 1, 2025).\n\nThis survey is fully anonymous and personal data is completely optional. The survey should take approximately three (3) minutes to fill out, and we thank you again for taking the time out of your day.\n\nResponses will be used to enhance your experience at Crania Schools and may be used for Crania Schools publications.\n\nWith gratitude,\nCrania Schools',
+  questions: [
+    { id: 'q2', type: 'radio', text: 'What is your age?',
+      options: ['<30', '31–40', '41–50', '>50', 'Prefer not to answer'] },
+    { id: 'q3', type: 'radio', text: 'What is your approximate average household income?',
+      options: ['< $50,000', '$50,000 – $74,999', '$75,000 – $99,999', '$100,000 – $124,999', '$125,000 – $149,999', '> $150,000', 'Prefer not to answer'] },
+    { id: 'q4', type: 'checkbox', text: 'What program(s) is your child enrolled in at Crania Schools?', note: 'Select all that apply.',
+      options: ['Flex Math', 'Flex English', 'Math Enrichment', 'Teknokids (Robotics)', 'Teknokids (Coding)', 'Piano', 'Private Lessons (Math)', 'Private Lessons (Robotics)', 'Private Lessons (Coding)', 'Not attending any programs at the moment'] },
+    { id: 'q5', type: 'radio', text: 'As a previous, current, or future customer of Crania Schools, my expectations have:',
+      options: ['Been Exceeded', 'Been Met', 'Almost Been Met', 'Been Somewhat Met', 'Not Been Met'] },
+    { id: 'q6', type: 'radio', text: 'I believe the cost of Crania Schools is:',
+      options: ['Below Average', 'Average', 'Above Average'] },
+    { id: 'q7', type: 'radio', text: 'The value I receive from Crania Schools:',
+      options: ['Is Above My Expectations', 'Meets My Expectations', 'Is Below My Expectations'] },
+    { id: 'q8', type: 'radio', text: 'The schedule/hours offered by Crania Schools are:',
+      options: ['Very Convenient', 'Moderately Convenient', 'Neither Convenient nor Inconvenient', 'Moderately Inconvenient', 'Very Inconvenient'] },
+    { id: 'q9', type: 'radio', text: 'The location of Crania Schools is:',
+      options: ['Very Convenient', 'Moderately Convenient', 'Neither Convenient nor Inconvenient', 'Moderately Inconvenient', 'Very Inconvenient'] },
+    { id: 'q10', type: 'radio', text: 'I am _________ with the quality of the Crania Schools facility.',
+      options: ['Very Satisfied', 'Moderately Satisfied', 'Neither Satisfied nor Dissatisfied', 'Moderately Dissatisfied', 'Very Dissatisfied'] },
+    { id: 'q11', type: 'radio', text: 'The attitude of the teachers at Crania Schools is:',
+      options: ['Great', 'Good', 'Fair'] },
+    { id: 'q12', type: 'textarea', text: 'Please share some comments about your overall experience, or any other thoughts you may have regarding Crania Schools:' },
+    { id: 'q13', type: 'stars', text: 'How would you rate Crania Schools overall?', required: true },
+  ],
+  createdAt: new Date(0).toISOString(),
+}
+
 const DEFAULT_STAFF = [
   {
     id: 'staff-tas',
