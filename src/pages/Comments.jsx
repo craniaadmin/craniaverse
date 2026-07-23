@@ -1,20 +1,29 @@
-// Comments — a cross-student feed over the same lesson rows shown at
-// the bottom of each Student's own page. No separate storage: this
-// page reads/writes the same PocketBase `comments` collection via
-// useCommentsRows(), so editing a lesson's notes here immediately
-// shows up on that student's own page, and vice versa.
+// Comments — a cross-student view over the same lesson rows shown at
+// the bottom of each Student's own page (Comments tab). No separate
+// storage: this page reads/writes the same PocketBase `comments`
+// collection via useCommentsRows(), so editing a lesson's notes here
+// immediately shows up on that student's own page, and vice versa.
+//
+// Same spreadsheet-style table as the Student page's own Comments
+// tab (Lesson #, Day, Date, Lesson Plan, Homework Completed,
+// Performance, Behaviour, Homework Assigned, Parent Communication,
+// Teacher) plus Student + Program columns since this view spans
+// everyone — minus Attendance and Uniform, which live on the
+// Attendance page. Cells are directly editable, matching the
+// Attendance page's format (dark-blue header, striped rows, inline
+// controls — no separate edit modal).
 import { useMemo, useState } from 'react'
-import { Search, Edit2 } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useCommentsRows } from '../data/useCommentsRows'
 
 const COMMENT_FIELDS = [
-  { key: 'lessonPlan',         label: 'Lesson Plan' },
-  { key: 'homeworkCompleted',  label: 'Homework Completed' },
-  { key: 'performance',        label: 'Performance' },
-  { key: 'behaviour',          label: 'Behaviour' },
-  { key: 'homeworkAssigned',   label: 'Homework Assigned' },
-  { key: 'parentComm',         label: 'Parent Communication' },
-  { key: 'teacher',            label: 'Teacher' },
+  { key: 'lessonPlan',        label: 'Lesson Plan',          width: 180 },
+  { key: 'homeworkCompleted', label: 'Homework Completed',   width: 150 },
+  { key: 'performance',       label: 'Performance',          width: 160 },
+  { key: 'behaviour',         label: 'Behaviour',            width: 150 },
+  { key: 'homeworkAssigned',  label: 'Homework Assigned',    width: 150 },
+  { key: 'parentComm',        label: 'Parent Communication', width: 160 },
+  { key: 'teacher',           label: 'Teacher',              width: 110 },
 ]
 
 const hasNotes = (row) => COMMENT_FIELDS.some(f => (row[f.key] || '').trim())
@@ -23,7 +32,7 @@ function fmtDate(iso) {
   if (!iso) return '—'
   const d = new Date(iso + 'T00:00:00')
   if (Number.isNaN(d.getTime())) return iso
-  return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
 const daysAgo = (iso) => {
@@ -33,11 +42,10 @@ const daysAgo = (iso) => {
 }
 
 export default function Comments({ onNavigate }) {
-  const { flatRows, updateRowFields, loading, status, studentCount } = useCommentsRows()
+  const { flatRows, updateRow, loading, status, studentCount } = useCommentsRows()
   const [search, setSearch] = useState('')
   const [programFilter, setProgramFilter] = useState('all')
   const [showBlank, setShowBlank] = useState(false)
-  const [editing, setEditing] = useState(null) // the flat row entry being edited
 
   const programs = useMemo(() => {
     const seen = new Set()
@@ -49,7 +57,6 @@ export default function Comments({ onNavigate }) {
   }, [flatRows])
 
   const dated = useMemo(() => flatRows.filter(r => r.row.date), [flatRows])
-
   const withNotes = useMemo(() => dated.filter(r => hasNotes(r.row)), [dated])
 
   const visible = useMemo(() => {
@@ -132,105 +139,63 @@ export default function Comments({ onNavigate }) {
         )}
       </div>
 
-      {/* Feed */}
-      {visible.length === 0 ? (
-        <div style={{ background: '#fff', borderRadius: 10, boxShadow: 'var(--brand-shadow)', padding: 40, textAlign: 'center', color: 'var(--muted)' }}>
-          {withNotes.length === 0
-            ? 'No comments yet — they appear here once a teacher logs notes on a lesson.'
-            : 'No entries match your filters.'}
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {visible.map(r => (
-            <CommentCard
-              key={`${r.studentId}::${r.tabKey}::${r.rowIdx}`}
-              entry={r}
-              onOpenStudent={() => onNavigate && onNavigate('Students', r.studentId)}
-              onEdit={() => setEditing(r)}
-            />
-          ))}
-        </div>
-      )}
-
-      {editing && (
-        <EditModal
-          entry={editing}
-          onClose={() => setEditing(null)}
-          onSave={(patch) => {
-            updateRowFields(editing.studentId, editing.tabKey, editing.rowIdx, patch)
-            setEditing(null)
-          }}
-        />
-      )}
-    </div>
-  )
-}
-
-// ---------- Card ----------
-function CommentCard({ entry, onOpenStudent, onEdit }) {
-  const { row } = entry
-  const filled = COMMENT_FIELDS.filter(f => (row[f.key] || '').trim())
-  return (
-    <div style={{ background: '#fff', borderRadius: 10, boxShadow: 'var(--brand-shadow)', padding: '14px 16px' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: filled.length ? 10 : 0 }}>
-        <NameLink onClick={onOpenStudent}>{entry.studentName}</NameLink>
-        <span style={{ color: 'var(--ink-soft)', fontSize: 13 }}>{entry.program}</span>
-        <span style={{ color: 'var(--muted)', fontSize: 12 }}>{fmtDate(row.date)} · Lesson {row.lessonNo}</span>
-        <div style={{ flex: 1 }} />
-        <button
-          onClick={onEdit}
-          title="Edit notes"
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', padding: 4, display: 'inline-flex' }}
-        ><Edit2 size={14} /></button>
-      </div>
-      {filled.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '6px 20px' }}>
-          {filled.map(f => (
-            <div key={f.key} style={{ fontSize: 13 }}>
-              <span style={{ fontWeight: 700, color: 'var(--ink-soft)' }}>{f.label}: </span>
-              <span style={{ color: 'var(--ink)' }}>{row[f.key]}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      {filled.length === 0 && (
-        <div style={{ fontSize: 13, color: 'var(--muted)', fontStyle: 'italic' }}>No notes yet — click the pencil to add some.</div>
-      )}
-    </div>
-  )
-}
-
-// ---------- Edit modal ----------
-function EditModal({ entry, onClose, onSave }) {
-  const [draft, setDraft] = useState(() => {
-    const out = {}
-    for (const f of COMMENT_FIELDS) out[f.key] = entry.row[f.key] || ''
-    return out
-  })
-
-  return (
-    <div className="kb-modal-scrim" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kb-modal" onClick={e => e.stopPropagation()}>
-        <h2>{entry.studentName} — {entry.program}</h2>
-        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: -10, marginBottom: 16 }}>
-          {fmtDate(entry.row.date)} · Lesson {entry.row.lessonNo}
-        </div>
-
-        {COMMENT_FIELDS.map(f => (
-          <div className="kb-field" key={f.key}>
-            <label>{f.label}</label>
-            <textarea
-              rows={f.key === 'lessonPlan' || f.key === 'performance' ? 3 : 2}
-              value={draft[f.key]}
-              onChange={e => setDraft(d => ({ ...d, [f.key]: e.target.value }))}
-            />
-          </div>
-        ))}
-
-        <div className="kb-actions">
-          <button className="cancel" onClick={onClose}>Cancel</button>
-          <button className="save" onClick={() => onSave(draft)}>Save</button>
-        </div>
+      {/* Table */}
+      <div style={{ background: '#fff', borderRadius: 10, overflow: 'auto', boxShadow: 'var(--brand-shadow)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: 140 }} />
+            <col style={{ width: 150 }} />
+            <col style={{ width: 60 }} />
+            <col style={{ width: 90 }} />
+            {COMMENT_FIELDS.map(f => <col key={f.key} style={{ width: f.width }} />)}
+          </colgroup>
+          <thead>
+            <tr style={{ background: 'var(--brand-dark-blue)', color: '#fff', textAlign: 'left' }}>
+              <Th>Student</Th>
+              <Th>Program</Th>
+              <Th align="center">Lesson</Th>
+              <Th>Date</Th>
+              {COMMENT_FIELDS.map(f => <Th key={f.key}>{f.label}</Th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {visible.length === 0 && (
+              <tr><td colSpan={4 + COMMENT_FIELDS.length} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
+                {withNotes.length === 0
+                  ? 'No comments yet — they appear here once a teacher logs notes on a lesson.'
+                  : 'No entries match your filters.'}
+              </td></tr>
+            )}
+            {visible.map((r, i) => (
+              <tr key={`${r.studentId}::${r.tabKey}::${r.rowIdx}`} style={{ borderTop: '1px solid #f0ede3', background: i % 2 ? '#fafaf7' : '#fff' }}>
+                <td style={{ padding: '8px 12px', verticalAlign: 'top' }}>
+                  <NameLink onClick={() => onNavigate && onNavigate('Students', r.studentId)}>{r.studentName}</NameLink>
+                </td>
+                <td style={{ padding: '8px 12px', verticalAlign: 'top', color: 'var(--ink-soft)' }}>{r.program}</td>
+                <td style={{ padding: '8px 12px', verticalAlign: 'top', textAlign: 'center', color: 'var(--ink-soft)' }}>{r.row.lessonNo}</td>
+                <td style={{ padding: '8px 12px', verticalAlign: 'top', color: 'var(--ink-soft)', whiteSpace: 'nowrap' }}>
+                  {fmtDate(r.row.date)}<br /><span style={{ fontSize: 11 }}>{r.row.day}</span>
+                </td>
+                {COMMENT_FIELDS.map(f => (
+                  <td key={f.key} style={{ padding: '2px' }}>
+                    <textarea
+                      value={r.row[f.key] || ''}
+                      onChange={e => updateRow(r.studentId, r.tabKey, r.rowIdx, f.key, e.target.value)}
+                      rows={Math.max(2, (r.row[f.key] || '').split('\n').length)}
+                      style={{
+                        width: '100%', minHeight: 40, border: '1px solid transparent', outline: 'none',
+                        resize: 'vertical', fontFamily: 'inherit', fontSize: 12.5, background: 'transparent',
+                        padding: '6px 8px', borderRadius: 6, color: 'var(--ink)',
+                      }}
+                      onFocus={e => { e.target.style.borderColor = '#d5d0c4'; e.target.style.background = '#fff' }}
+                      onBlur={e => { e.target.style.borderColor = 'transparent'; e.target.style.background = 'transparent' }}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
@@ -240,6 +205,13 @@ function EditModal({ entry, onClose, onSave }) {
 const selStyle = {
   padding: '7px 10px', fontSize: 13, border: '1px solid #d5d0c4',
   borderRadius: 8, background: '#fff', color: 'var(--brand-dark-brown)',
+}
+
+function Th({ children, align = 'left' }) {
+  return <th style={{
+    fontSize: 11, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase',
+    padding: '10px 12px', textAlign: align, whiteSpace: 'nowrap',
+  }}>{children}</th>
 }
 
 function MetricTile({ label, value, hint }) {
@@ -260,7 +232,7 @@ function NameLink({ children, onClick }) {
     <span
       onClick={onClick}
       style={{
-        color: 'var(--brand-dark-blue)', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+        color: 'var(--brand-dark-blue)', fontWeight: 600, cursor: 'pointer',
         textDecoration: 'underline', textDecorationColor: 'transparent',
       }}
       onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = 'var(--brand-dark-blue)' }}
