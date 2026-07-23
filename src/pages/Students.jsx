@@ -188,6 +188,18 @@ function CommentsSection({ studentId, initialPrograms }) {
   const addProgram = () => {
     if (!newTab.program) return
     const newProg = { year: newTab.year, program: newTab.program }
+    // Guard against creating a second tab that's a duplicate of one
+    // already there — both would read/write the identical PocketBase
+    // comments row (same tabKeyOf()), producing two tabs that
+    // silently mirror each other's edits instead of one real tab.
+    const dupIdx = programs.findIndex((p) => tabKeyOf(p) === tabKeyOf(newProg))
+    if (dupIdx !== -1) {
+      setActiveTab(dupIdx)
+      setAddingTab(false)
+      setNewTab({ year: currentAcademicYear(), program: '' })
+      alert(`${newProg.program} (${newProg.year}) already has a tab for this student — switched to it instead of creating a duplicate.`)
+      return
+    }
     const next = [...programs, newProg]
     programsRef.current = next
     setPrograms(next)
