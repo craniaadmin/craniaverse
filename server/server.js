@@ -42,6 +42,7 @@ import {
   loadProjects,      saveProjects,
   loadItAccounts,    saveItAccounts,
   loadCalendar,      saveCalendar,
+  loadMarketingCalendar, saveMarketingCalendar,
   loadStock,         saveStock,
   loadCraniaStore,   saveCraniaStore,
   loadContests,      saveContests,
