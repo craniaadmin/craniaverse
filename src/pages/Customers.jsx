@@ -504,7 +504,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
 
 // ─── Root: switches between list and detail ────────────────────────────────
 
-export default function Customers() {
+export default function Customers({ initialRecordId, onConsumeInitialRecord }) {
   const { records, select, addRegistration, deleteRegistration } = useStore()
   const [detailId, setDetailId] = useState(null)
 
@@ -512,6 +512,15 @@ export default function Customers() {
     select(id)
     setDetailId(id)
   }
+
+  // Opened via onNavigate('Customers', recordId) from another page (e.g.
+  // Emergency Contacts) — jump straight to that customer's detail view.
+  useEffect(() => {
+    if (initialRecordId) {
+      handleSelect(initialRecordId)
+      onConsumeInitialRecord && onConsumeInitialRecord()
+    }
+  }, [initialRecordId])
 
   const handleAdd = async () => {
     try {
