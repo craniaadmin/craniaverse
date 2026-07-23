@@ -468,10 +468,17 @@ app.post('/api/registrations', wrap(async (req, res) => {
   // it's stored as part of the record's `registration` snapshot.
   const forceNew = form.forceNew === true
   delete form.forceNew
+  // The Leads page's "Convert to Customer" action also creates a record
+  // through this same route, but the family never submitted a real
+  // registration — sending them a "registration confirmation" email
+  // would be wrong. internalNoEmail opts a caller out of that send;
+  // it's never set by the public registration form.
+  const skipEmail = form.internalNoEmail === true
+  delete form.internalNoEmail
   const records = await getRegistrations()
   const record = processStudentForm(records, form, forceNew)
   await commitRegistrations(records)
-  sendRegistrationEmails(form, record).catch(() => {})
+  if (!skipEmail) sendRegistrationEmails(form, record).catch(() => {})
   res.status(record === records[records.length - 1] ? 201 : 200).json(record)
 }))
 
