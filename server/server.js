@@ -101,6 +101,7 @@ const cache = {
   rules:         null,
   inventory:     null,
   forms:         null,
+  surveys:       null,
 }
 
 async function getRegistrations() {
