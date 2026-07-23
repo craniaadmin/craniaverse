@@ -42,17 +42,21 @@ function SField({ label, value, variant, readOnly, onChange }) {
 
 function CommentsSection({ studentId, initialPrograms }) {
   const { rules, addCashEntry, programs: allPrograms } = useStore()
+  const { weekDates } = useAfterschoolWeeks()
   const [programs, setPrograms] = useState(initialPrograms || [])
 
   // Build the autopopulated rows for a tab (used when no saved comments exist yet).
   // Default count = sessions/period × 35 weeks. Caller can override (e.g. for "+ Add row").
+  // `weekDates` comes from the live Calendar's Afterschool "Week N" markers so
+  // lesson dates land on real instructional weeks (breaks correctly skipped)
+  // instead of a flat 7-day guess.
   const buildScheduledRows = useCallback((prog, count) =>
-    buildScheduledRowsShared(prog, allPrograms, count), [allPrograms])
+    buildScheduledRowsShared(prog, allPrograms, weekDates, count), [allPrograms, weekDates])
   const [activeTab, setActiveTab] = useState(0)
   const [rows, setRows] = useState({})
   const [saveStatus, setSaveStatus] = useState({})
   const [addingTab, setAddingTab] = useState(false)
-  const [newTab, setNewTab] = useState({ year: '25_26', program: '' })
+  const [newTab, setNewTab] = useState({ year: currentAcademicYear(), program: '' })
   const saveTimer = useRef({})
   const programsRef = useRef(programs)
   const rowsRef = useRef(rows)
