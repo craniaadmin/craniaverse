@@ -3,7 +3,7 @@ import { useStore } from '../data/store'
 import { programs as craniaProgramList } from '../data/mockData'
 import {
   ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS, currentAcademicYear,
-  buildScheduledRows as buildScheduledRowsShared,
+  buildScheduledRows as buildScheduledRowsShared, dedupeProgramTabs, tabKeyOf,
 } from '../data/scheduleUtils'
 import { useAfterschoolWeeks } from '../data/useAfterschoolWeeks'
 
