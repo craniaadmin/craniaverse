@@ -125,19 +125,24 @@ export default function App() {
   }, [])
 
   // Passed to child pages so they can jump to another page. Accepts
-  // either a bare label or a [section, sub] tuple.
-  const navigate = useCallback((target) => {
+  // either a bare label or a [section, sub] tuple, plus an optional
+  // recordId so pages can open directly to a specific record (used by
+  // Emergency Contacts to jump straight to a student or customer).
+  const navigate = useCallback((target, recordId = null) => {
     const [s, sb] = resolveNav(target)
     setSection(s)
     setSub(sb)
+    setPendingRecordId(recordId)
   }, [])
+
+  const clearPendingRecordId = useCallback(() => setPendingRecordId(null), [])
 
   const rendered = useMemo(() => {
     const key = `${section}:${sub}`
     const route = ROUTES[key]
-    if (route) return route(navigate)
+    if (route) return route(navigate, pendingRecordId, clearPendingRecordId)
     return <Placeholder title={sub} />
-  }, [section, sub, navigate])
+  }, [section, sub, navigate, pendingRecordId, clearPendingRecordId])
 
   if (checkingAuth) {
     return (
