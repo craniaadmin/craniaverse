@@ -686,6 +686,56 @@ export async function saveMarketingCalendar(payload) {
   }
 }
 
+// ---- campaigns (singleton payload — marketing campaign tracker) --
+const CAMPAIGNS_DEFAULT = { campaigns: [] }
+
+export async function loadCampaigns() {
+  try {
+    const rows = await getFullList('campaigns')
+    if (rows.length === 0) return CAMPAIGNS_DEFAULT
+    const p = rows[0].payload || {}
+    return { campaigns: Array.isArray(p.campaigns) ? p.campaigns : [] }
+  } catch (err) {
+    if (err?.status === 404) return CAMPAIGNS_DEFAULT
+    throw err
+  }
+}
+
+export async function saveCampaigns(payload) {
+  await ensureAuth()
+  const rows = await getFullList('campaigns')
+  if (rows.length === 0) {
+    await pb().collection('campaigns').create({ payload })
+  } else {
+    await pb().collection('campaigns').update(rows[0].id, { payload })
+  }
+}
+
+// ---- leads (singleton payload — marketing CRM pipeline) --
+const LEADS_DEFAULT = { leads: [] }
+
+export async function loadLeads() {
+  try {
+    const rows = await getFullList('leads')
+    if (rows.length === 0) return LEADS_DEFAULT
+    const p = rows[0].payload || {}
+    return { leads: Array.isArray(p.leads) ? p.leads : [] }
+  } catch (err) {
+    if (err?.status === 404) return LEADS_DEFAULT
+    throw err
+  }
+}
+
+export async function saveLeads(payload) {
+  await ensureAuth()
+  const rows = await getFullList('leads')
+  if (rows.length === 0) {
+    await pb().collection('leads').create({ payload })
+  } else {
+    await pb().collection('leads').update(rows[0].id, { payload })
+  }
+}
+
 // ---- IT accounts (singleton payload — passwords manager) --------
 // Shape mirrors "crania-it-accounts.json" from the client's v28
 // mockup so JSON imports/exports round-trip. If the row doesn't
