@@ -76,6 +76,7 @@ const ROUTES = {
   'financial:Receipts':      () => <Receipts />,
 
   'marketing:Marketing':     () => <Marketing />,
+  'marketing:Leads':         (nav) => <Leads onNavigate={nav} />,
   'marketing:Surveys':       () => <Surveys />,
   'marketing:Calendar':      () => <MarketingCalendar />,
 
