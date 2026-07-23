@@ -7,7 +7,7 @@
 // sync automatically — there's only one copy of the data.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from './store'
-import { buildScheduledRows, tabKeyOf } from './scheduleUtils'
+import { buildScheduledRows, tabKeyOf, dedupeProgramTabs } from './scheduleUtils'
 import { useAfterschoolWeeks } from './useAfterschoolWeeks'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
