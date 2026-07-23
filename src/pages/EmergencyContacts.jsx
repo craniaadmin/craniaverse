@@ -268,6 +268,25 @@ export default function EmergencyContacts({ onNavigate }) {
   )
 }
 
+// Clickable name — used for the Customer and Students columns so a
+// click jumps straight to that record's detail view on its own page,
+// instead of a separate icon-button.
+function NameLink({ children, onClick, title }) {
+  if (!children || children === '—') return <span style={{ color: 'var(--muted)' }}>—</span>
+  return (
+    <span
+      onClick={onClick}
+      title={title}
+      style={{
+        color: 'var(--brand-dark-blue)', fontWeight: 600, cursor: 'pointer',
+        textDecoration: 'underline', textDecorationColor: 'transparent',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = 'var(--brand-dark-blue)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = 'transparent' }}
+    >{children}</span>
+  )
+}
+
 function Th({ children }) {
   return <th style={{
     fontSize: 11, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase',
