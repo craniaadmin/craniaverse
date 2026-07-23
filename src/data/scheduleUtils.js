@@ -179,3 +179,25 @@ export function buildScheduledRows(prog, allPrograms, weekDates, count) {
 }
 
 export const tabKeyOf = (prog) => `${prog.year}|${prog.program}`
+
+// A registration can end up with the exact same (year, program) tab
+// listed twice — e.g. a double-submit when adding a program, or a
+// duplicate import. Both entries produce the identical tabKeyOf(),
+// so they'd read/write the SAME PocketBase comments row: every
+// surface that lists a student's tabs (their own page, Attendance,
+// Comments) must dedupe with this before rendering, or you get two
+// "different-looking" rows that are secretly the same row — editing
+// one instantly mirrors into the other because there's only one
+// underlying array in memory, not two.
+export function dedupeProgramTabs(programs) {
+  const seen = new Set()
+  const out = []
+  for (const p of programs || []) {
+    if (!p || !p.program) continue
+    const key = tabKeyOf(p)
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(p)
+  }
+  return out
+}
