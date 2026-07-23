@@ -51,6 +51,11 @@ import {
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
   deleteSubmission,  deleteSubmissionsForForm,
+  loadSurveys,       saveSurveys,
+  loadSurveySubmissions,   createSurveySubmission,
+  deleteSurveySubmission,  deleteSurveySubmissionsForSurvey,
+  loadCampaigns,     saveCampaigns,
+  loadLeads,         saveLeads,
 } from './pb.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
