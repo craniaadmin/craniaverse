@@ -833,6 +833,22 @@ app.put('/api/calendar', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- marketing calendar (singleton payload — fully independent) ---
+// Same shape as /api/calendar above but its own PocketBase collection
+// (see loadMarketingCalendar/saveMarketingCalendar in pb.js) — no
+// events are ever shared with the operations Calendar.
+app.get('/api/marketing-calendar', wrap(async (_req, res) => res.json(await loadMarketingCalendar())))
+app.put('/api/marketing-calendar', wrap(async (req, res) => {
+  const body = req.body || {}
+  const payload = {
+    calendars: Array.isArray(body.calendars) ? body.calendars : [],
+    events:    Array.isArray(body.events)    ? body.events    : [],
+    hidden:    body.hidden && typeof body.hidden === 'object' ? body.hidden : {},
+  }
+  await saveMarketingCalendar(payload)
+  res.json({ ok: true })
+}))
+
 // ---- projects (kanban board — singleton payload) --------
 // Same shape as the client's "crania-projects.json" export so
 // JSON round-trips cleanly. Whole payload written on every save.
