@@ -174,8 +174,8 @@ function expandEvents(events, rangeStart, rangeEnd) {
 }
 
 // ---------- Main page ----------
-export default function CalendarView() {
-  const { data, loading, status, mutate } = useCalendar()
+export default function CalendarView({ apiPath = '/api/calendar', title = 'Calendar' }) {
+  const { data, loading, status, mutate } = useCalendar(apiPath)
   const [cur, setCur] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
   const [editingEvent, setEditingEvent]       = useState(null) // null | { mode, event, date? }
   const [editingCalendar, setEditingCalendar] = useState(null) // null | { mode, cal }
