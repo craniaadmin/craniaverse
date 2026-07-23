@@ -172,19 +172,19 @@ export function makeSeedRecord() {
         payment: 'Overdue',
       },
       {
-        active: true, status: 'Late Start', year: '25_26', program: 'MATH ENRICHMENT LEVEL 4',
+        active: true, status: 'Late Start', year: currentAcademicYear(), program: 'MATH ENRICHMENT LEVEL 4',
         rate: '$279', rateUnit: '/month',
         fees: { reg: 'paid', mat: 'paid', aug: '', sep: 'paid', oct: 'paid', nov: 'paid', dec: 'paid', jan: 'paid', feb: 'paid', mar: 'paid', apr: 'paid', may: 'paid', jun: 'paid', jul: '' },
         payment: 'Paid',
       },
       {
-        active: false, status: 'On-Hold', year: '25_26', program: 'MATH CONTEST CLUB',
+        active: false, status: 'On-Hold', year: currentAcademicYear(), program: 'MATH CONTEST CLUB',
         rate: '$279', rateUnit: '/month',
         fees: { reg: 'paid', mat: 'paid', aug: '', sep: 'paid', oct: 'paid', nov: 'paid', dec: 'paid', jan: 'paid', feb: 'paid', mar: 'paid', apr: 'paid', may: 'paid', jun: '', jul: '' },
         payment: 'Paid',
       },
       {
-        active: false, status: 'Cancelled', year: '25_26', program: 'CROCHET CLUB',
+        active: false, status: 'Cancelled', year: currentAcademicYear(), program: 'CROCHET CLUB',
         rate: '$10', rateUnit: '/lesson',
         fees: { reg: 'pending', mat: 'paid', aug: '', sep: '', oct: '', nov: '', dec: '', jan: '', feb: '', mar: '', apr: '', may: '', jun: '', jul: '' },
         payment: 'Pending',
