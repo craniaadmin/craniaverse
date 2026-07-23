@@ -643,6 +643,49 @@ export async function saveCalendar(payload) {
   }
 }
 
+// ---- marketing calendar (singleton payload — fully independent) --
+// Same shape as the operations calendar above, but its own
+// PocketBase collection: no events, categories, or visibility state
+// is ever shared with the real school Calendar. Seeded with a small
+// starter set of marketing-flavoured categories on first load only.
+const MARKETING_CALENDAR_SEED = {
+  calendars: [
+    { id: 'mkt-social',   name: 'Social Media',    color: '#A6E2F9' },
+    { id: 'mkt-email',    name: 'Email Campaigns', color: '#5FA09E' },
+    { id: 'mkt-ads',      name: 'Advertising',     color: '#E0DE85' },
+    { id: 'mkt-promo',    name: 'Promotions/Events', color: '#20BAB5' },
+    { id: 'mkt-blog',     name: 'Blog/Content',    color: '#8C9294' },
+  ],
+  events: [],
+  hidden: {},
+}
+
+export async function loadMarketingCalendar() {
+  try {
+    const rows = await getFullList('marketingCalendar')
+    if (rows.length === 0) return MARKETING_CALENDAR_SEED
+    const p = rows[0].payload || {}
+    return {
+      calendars: Array.isArray(p.calendars) ? p.calendars : [],
+      events:    Array.isArray(p.events)    ? p.events    : [],
+      hidden:    p.hidden && typeof p.hidden === 'object' ? p.hidden : {},
+    }
+  } catch (err) {
+    if (err?.status === 404) return MARKETING_CALENDAR_SEED
+    throw err
+  }
+}
+
+export async function saveMarketingCalendar(payload) {
+  await ensureAuth()
+  const rows = await getFullList('marketingCalendar')
+  if (rows.length === 0) {
+    await pb().collection('marketingCalendar').create({ payload })
+  } else {
+    await pb().collection('marketingCalendar').update(rows[0].id, { payload })
+  }
+}
+
 // ---- IT accounts (singleton payload — passwords manager) --------
 // Shape mirrors "crania-it-accounts.json" from the client's v28
 // mockup so JSON imports/exports round-trip. If the row doesn't
