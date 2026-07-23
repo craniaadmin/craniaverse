@@ -1142,6 +1142,22 @@ app.delete('/api/surveys/:surveyId/submissions/:subId', wrap(async (req, res) =>
   res.json({ ok: true })
 }))
 
+// ---- campaigns (singleton payload — marketing campaign tracker) ---
+app.get('/api/campaigns', wrap(async (_req, res) => res.json(await loadCampaigns())))
+app.put('/api/campaigns', wrap(async (req, res) => {
+  const body = req.body || {}
+  await saveCampaigns({ campaigns: Array.isArray(body.campaigns) ? body.campaigns : [] })
+  res.json({ ok: true })
+}))
+
+// ---- leads (singleton payload — marketing CRM pipeline) ---
+app.get('/api/leads', wrap(async (_req, res) => res.json(await loadLeads())))
+app.put('/api/leads', wrap(async (req, res) => {
+  const body = req.body || {}
+  await saveLeads({ leads: Array.isArray(body.leads) ? body.leads : [] })
+  res.json({ ok: true })
+}))
+
 // Error handler — any thrown error from a wrap()-ed handler lands here
 app.use((err, _req, res, _next) => {
   console.error('[api error]', err?.response || err?.message || err)
