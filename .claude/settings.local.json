@@ -148,7 +148,9 @@
       "Bash(node -e \"import\\('./server/mapping.js'\\).then\\(m => console.log\\('mapping.js loads OK, currentAcademicYear via seed:', m.makeSeedRecord\\(\\).programs.find\\(p=>p.status==='Late Start'\\).year\\)\\)\")",
       "Bash(node --experimental-vm-modules -e ' *)",
       "Bash(node scratch-test.mjs)",
-      "Bash(node --check server/scripts/fix-academic-year-2026-27.js)"
+      "Bash(node --check server/scripts/fix-academic-year-2026-27.js)",
+      "Bash(node scratch-dedup-test.mjs)",
+      "Bash(rm scratch-dedup-test.mjs)"
     ]
   },
   "hooks": {
