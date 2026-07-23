@@ -177,7 +177,7 @@ async function migrateRegistrations() {
   records.forEach((r) => {
     if (!Array.isArray(r.programs)) {
       r.programs = r.registration?.program
-        ? [{ year: '25_26', program: r.registration.program }]
+        ? [{ year: currentAcademicYear(), program: r.registration.program }]
         : []
       changed = true
     }
