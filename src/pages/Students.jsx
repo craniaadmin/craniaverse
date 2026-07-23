@@ -43,7 +43,13 @@ function SField({ label, value, variant, readOnly, onChange }) {
 function CommentsSection({ studentId, initialPrograms }) {
   const { rules, addCashEntry, programs: allPrograms } = useStore()
   const { weekDates } = useAfterschoolWeeks()
-  const [programs, setPrograms] = useState(initialPrograms || [])
+  // Dedupe here so a registration that ended up with the same
+  // (year, program) tab listed twice — e.g. a double-submit when
+  // adding a program — only ever shows ONE tab. Both entries would
+  // read/write the identical PocketBase comments row anyway (same
+  // tabKeyOf()), so showing two tabs was always cosmetic duplication,
+  // not two independent records.
+  const [programs, setPrograms] = useState(() => dedupeProgramTabs(initialPrograms))
 
   // Build the autopopulated rows for a tab (used when no saved comments exist yet).
   // Default count = sessions/period × 35 weeks. Caller can override (e.g. for "+ Add row").
