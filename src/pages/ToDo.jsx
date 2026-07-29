@@ -1257,6 +1257,14 @@ function ChecklistsView({
           schedule (daily / weekly / monthly / custom) — editing a schedule moves the
           item that's already on the board instead of duplicating it.
         </p>
+        <button
+          onClick={addChecklist}
+          style={{
+            background: 'var(--light-blue)', color: 'var(--dark-brown)',
+            border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700,
+            borderRadius: 8, cursor: 'pointer', flexShrink: 0,
+          }}
+        >+ Add Checklist</button>
       </div>
       {checklists.map(cl => {
         const headStyle = cl.color && cl.color.toLowerCase() !== '#ffffff' ? { background: cl.color } : undefined
