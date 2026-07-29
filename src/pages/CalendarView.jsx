@@ -325,7 +325,7 @@ const CSS = `
 .calroot .card.todo-card{border-top:3px solid var(--dark-blue);}
 
 /* header / toolbar */
-.calroot .toolbar{display:flex;align-items:center;gap:8px;padding:10px 14px;flex-wrap:wrap;background:#fff;border-radius:10px;box-shadow:var(--shadow);margin-bottom:12px;}
+.calroot .toolbar{display:flex;align-items:center;gap:8px;padding:0;flex-wrap:wrap;margin-bottom:12px;}
 .calroot .nav-btn{background:none;border:1px solid #d5d0c4;width:32px;height:32px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--dark-brown);}
 .calroot .nav-btn:hover{background:#f4f2ea;}
 .calroot .today-btn{background:var(--light-brown);color:var(--dark-brown);border:none;padding:7px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;}
