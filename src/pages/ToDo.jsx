@@ -1646,7 +1646,7 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
         )}
       </div>
       <div className="field sect">
-        <label>Checklists</label>
+        <div className="sect-title">Checklists</div>
         <div className="hint">
           Checklist items are added to your To-Do list automatically
           on their schedule. Force a refresh now if needed.
