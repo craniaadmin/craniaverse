@@ -1,10 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
 const PRI_LABEL = { low: 'Low', med: 'Medium', high: 'High' }
-const DEFAULT_ITEM_BG = '#EEF3F6'
-const PASTELS = ['#EEF3F6', '#FFFFFF', '#FBDDE4', '#FCE6D2', '#FBF3CE', '#E8F3C2', '#DEF2DE', '#BEEBE8', '#D8ECF8', '#CAD6F2', '#E7DEF5', '#E2CDA0']
+const OLD_ITEM_BG = '#EEF3F6'
+const DEFAULT_ITEM_BG = '#F1F3F4' // keep in step with --pill in the stylesheet
+const PASTELS = [
+  '#F1F3F4','#FFFFFF','#FBDDE4','#FCE6D2','#FBF3CE','#E8F3C2',
+  '#DEF2DE','#BEEBE8','#D8ECF8','#CAD6F2','#E7DEF5','#E2CDA0',
+  '#A6E2F9','#5FA09E','#E0DE85','#2E2516',
+]
 const LIST_PALETTE = PASTELS
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
@@ -52,11 +57,6 @@ const isoWeekKey = (d) => {
 }
 
 // ---------- Per-entry checklist scheduling ----------
-// Each checklist ENTRY carries its own schedule now (freq/customDays/
-// monthMode/etc + its own `active` + its own `lastKey`) instead of
-// the whole checklist sharing one schedule. This is what lets a
-// checklist mix a daily item with a monthly one, and lets each item
-// be toggled off individually.
 const monthlyTarget = (en, now) => {
   const y = now.getFullYear(), m = now.getMonth()
   const dim = new Date(y, m + 1, 0).getDate()
@@ -73,10 +73,6 @@ const monthlyTarget = (en, now) => {
   return Math.min(Math.max(1, Number(en.monthDate) || 1), dim)
 }
 
-// The "period" this entry is currently in — regenerating never
-// touches an item from a DIFFERENT period, which is what lets an
-// undone yesterday's daily item stay on the board today instead of
-// being silently replaced.
 function checklistKey(en) {
   const d = new Date()
   if (en.freq === 'weekly') return isoWeekKey(d)
@@ -137,10 +133,6 @@ const blankEntry = (listId) => ({
   monthMode: 'date', monthDate: 1, monthWeek: 1, monthWeekday: 1, lastKey: '',
 })
 
-// Migrate old data on load: legacy checklists stored `entries` as a
-// plain array of strings sharing one schedule for the whole
-// checklist. Turn each string into a full entry object, inheriting
-// the checklist's old schedule as that entry's own.
 function normalizeChecklist(cl) {
   const entries = (cl.entries || []).map((e) => {
     if (typeof e === 'string') {
@@ -168,10 +160,24 @@ function normalizeChecklist(cl) {
   return { ...cl, active: cl.active !== false, entries }
 }
 
+// ---------- Sort items (priority ▸ due date ▸ original order; completed last) ----------
+function sortItems(arr) {
+  const rank = { high: 0, med: 1, low: 2 }
+  return arr.map((it, i) => [it, i]).sort((a, b) => {
+    const da = a[0].done ? 1 : 0, db = b[0].done ? 1 : 0; if (da !== db) return da - db
+    const ra = (a[0].priority in rank) ? rank[a[0].priority] : 2
+    const rb = (b[0].priority in rank) ? rank[b[0].priority] : 2
+    if (ra !== rb) return ra - rb
+    const ea = a[0].due || '', eb = b[0].due || ''
+    if (ea && eb) { if (ea !== eb) return ea < eb ? -1 : 1 } else if (ea && !eb) return -1; else if (!ea && eb) return 1
+    return a[1] - b[1]
+  }).map(x => x[0])
+}
+
 // ---------- CSV export ----------
 const csvCell = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'
 function downloadCsv(filename, rows) {
-  const BOM = '﻿' // so Excel opens the file as UTF-8 instead of guessing
+  const BOM = '﻿'
   const text = BOM + rows.map(r => r.map(csvCell).join(',')).join('\r\n')
   const blob = new Blob([text], { type: 'text/csv;charset=utf-8' })
   const a = document.createElement('a')
@@ -181,20 +187,15 @@ function downloadCsv(filename, rows) {
   setTimeout(() => URL.revokeObjectURL(a.href), 5000)
 }
 
-// ---------- CSS (scoped-ish via unique class prefixes) ----------
+// ---------- CSS ----------
 const CSS = `
-.tdroot{--dark-blue:#5FA09E;--light-blue:#A6E2F9;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--card:#FFFFFF;--tshadow:0 1px 3px rgba(46,37,22,.15);
+.tdroot{--pill:#F1F3F4;--dark-blue:#5FA09E;--light-blue:#A6E2F9;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--card:#FFFFFF;--tshadow:0 1px 3px rgba(46,37,22,.15);
   color:var(--dark-brown);}
-.tdroot .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px 16px;background:var(--dark-brown);color:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.2);}
-.tdroot .toolbar .spacer{flex:1}
-.tdroot .navbtn{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:filter .15s;}
-.tdroot .navbtn:hover{filter:brightness(1.08)}
-.tdroot .navbtn.navactive{background:var(--light-blue);color:var(--dark-brown);border-color:var(--light-blue)}
-.tdroot .primbtn{background:var(--dark-blue);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:filter .15s;}
-.tdroot .primbtn:hover{filter:brightness(1.08)}
-.tdroot .lightbtn{background:var(--light-blue);color:var(--dark-brown);border:none;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:filter .15s;}
-.tdroot .lightbtn:hover{filter:brightness(1.08)}
-.tdroot .hidedone{background:var(--light-brown);color:var(--dark-brown);border:none;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;}
+
+.tdroot .undorow{max-width:860px;margin:0 auto 8px;padding:0 4px;display:flex;gap:6px;align-items:center;}
+.tdroot .undobtn{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:4px 10px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;}
+.tdroot .undobtn:hover:not(:disabled){background:#f4f2ea}
+.tdroot .undobtn:disabled{opacity:.4;cursor:default}
 
 .tdroot .filters{max-width:860px;margin:0 auto 12px;padding:0 4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .tdroot .filters input,.tdroot .filters select{padding:8px 11px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;background:#fff;color:var(--dark-brown);}
@@ -207,19 +208,22 @@ const CSS = `
 .tdroot .list-head{display:flex;align-items:center;gap:8px;margin:-14px -19px 12px;padding:10px 16px;font-weight:700;font-size:16px;border-radius:12px 12px 0 0;border-bottom:2px solid #cfcabb;}
 .tdroot .list-head .name{flex:1;word-break:break-word;cursor:text;}
 .tdroot .list-head .count{background:#fff;border-radius:20px;font-size:12px;padding:1px 9px;font-weight:700;color:var(--dark-brown);}
+.tdroot .list-head .lsort{background:none;border:none;color:#9a948a;padding:0 4px;font-size:14px;line-height:1;font-weight:700;cursor:pointer;}
+.tdroot .list-head .lsort:hover{color:var(--dark-blue);}
 .tdroot .list-head .lmove{background:none;border:none;color:#9a948a;padding:0 2px;font-size:13px;line-height:1;font-weight:700;cursor:pointer;}
 .tdroot .list-head .lmove:hover{color:var(--dark-blue);}
 .tdroot .list-head .lx{background:none;border:none;color:#9a948a;padding:0 4px;font-size:15px;font-weight:700;line-height:1;cursor:pointer;}
 .tdroot .list-head .lx:hover{color:#c0392b;}
 .tdroot .list-head .dhandle{cursor:grab;color:#9a948a;font-size:14px;}
+.tdroot .list-head.darkbg .name,.tdroot .list-head.darkbg .dhandle,.tdroot .list-head.darkbg .lmove,.tdroot .list-head.darkbg .lsort,.tdroot .list-head.darkbg .lx{color:#fff;}
 .tdroot .items{display:flex;flex-direction:column;gap:8px;min-height:8px;padding-left:18px;}
-.tdroot .add-item{background:transparent;color:var(--light-blue);border:none;margin-top:8px;padding:1px 0;font-size:20px;line-height:1.2;font-weight:800;cursor:pointer;text-align:left;}
+.tdroot .add-item{background:transparent;color:var(--light-blue);border:none;margin-top:8px;padding:1px 0 1px 18px;font-size:20px;line-height:1.2;font-weight:800;cursor:pointer;text-align:left;align-self:flex-start;}
 .tdroot .empty-hint{text-align:center;color:#9aa;font-size:13px;padding:10px 4px;}
 .tdroot .todo.dragging,.tdroot .list.dragging{opacity:.45}
 .tdroot .list.list-over{outline:2px dashed var(--dark-blue);outline-offset:3px}
 .tdroot .items.items-over{outline:2px dashed var(--dark-blue);outline-offset:2px;border-radius:8px}
 
-.tdroot .todo{background:#EEF3F6;border-radius:8px;padding:5px 8px 5px 10px;display:flex;align-items:center;gap:9px;border-left:4px solid var(--dark-blue);position:relative;}
+.tdroot .todo{background:var(--pill);border-radius:8px;padding:5px 8px 5px 10px;display:flex;align-items:center;gap:9px;border-left:4px solid var(--dark-blue);position:relative;}
 .tdroot .todo .dhandle{cursor:grab;color:#9a948a;font-size:14px;flex:none;line-height:1;}
 .tdroot .todo .notemark{flex:none;font-size:12px;cursor:default;}
 .tdroot .todo .notepop{position:absolute;left:12px;top:100%;margin-top:4px;z-index:15;background:var(--dark-brown);color:#fff;font-size:12.5px;line-height:1.45;padding:8px 11px;border-radius:8px;max-width:340px;white-space:pre-wrap;word-break:break-word;box-shadow:0 8px 24px rgba(0,0,0,.28);display:none;}
@@ -227,6 +231,7 @@ const CSS = `
 .tdroot .todo.p-high{border-left-color:#c0392b;}
 .tdroot .todo.p-med{border-left-color:var(--light-brown);}
 .tdroot .todo.p-low{border-left-color:var(--light-blue);}
+.tdroot .todo.done{border-left-color:#e2ded2;}
 .tdroot .todo input[type=checkbox]{width:16px;height:16px;flex:none;cursor:pointer;accent-color:var(--dark-blue);}
 .tdroot .todo .txt{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
 .tdroot .todo.done .txt{text-decoration:line-through;color:#9a948a;}
@@ -237,14 +242,21 @@ const CSS = `
 .tdroot .chip.due{background:#eee;color:var(--dark-brown);}
 .tdroot .chip.due.overdue{background:#fadbd8;color:#922b21;}
 .tdroot .chip.due.soon{background:var(--light-brown);color:var(--dark-brown);}
-.tdroot .todo .dueslot{flex:none;width:74px;display:flex;align-items:center;}
+.tdroot .todo .dueslot{flex:none;width:108px;display:flex;align-items:center;justify-content:flex-end;}
 .tdroot .todo .prislot{flex:none;width:74px;display:flex;justify-content:center;align-items:center;}
 .tdroot .todo .x{flex:none;background:none;border:none;color:#c9c3b5;padding:0;font-size:15px;line-height:1;width:18px;height:18px;border-radius:4px;font-weight:700;cursor:pointer;}
+.tdroot .todo .dup{flex:none;background:none;border:none;color:#c9c3b5;padding:0;font-size:13px;line-height:1;width:18px;height:18px;border-radius:4px;font-weight:700;cursor:pointer;}
+.tdroot .todo .dup:hover{color:var(--dark-blue);}
 .tdroot .todo .x:hover{background:#fadbd8;color:#922b21;}
+.tdroot .todo.darkbg .txt,.tdroot .todo.darkbg .dhandle,.tdroot .todo.darkbg .x,.tdroot .todo.darkbg .dup{color:#fff;}
 
 /* modal */
 .tdroot .overlay{position:fixed;inset:0;background:rgba(46,37,22,.45);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
-.tdroot .modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:420px;box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.tdroot .modal{background:#fff;border-radius:14px;padding:22px;width:100%;max-width:420px;box-shadow:0 12px 40px rgba(0,0,0,.3);max-height:92vh;overflow:auto;}
+.tdroot .modal::-webkit-scrollbar{width:10px}
+.tdroot .modal::-webkit-scrollbar-thumb{background:#cfcabb;border-radius:8px;border:3px solid #fff}
+.tdroot .modal::-webkit-scrollbar-thumb:hover{background:#b8b2a2}
+.tdroot .modal::-webkit-scrollbar-track{background:transparent;margin:16px 0}
 .tdroot .modal h2{font-size:18px;margin:0 0 16px;color:var(--dark-brown);}
 .tdroot .field{margin-bottom:14px;}
 .tdroot .field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;color:#6b6455;}
@@ -255,11 +267,21 @@ const CSS = `
 .tdroot .modal-actions button{border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;font:inherit;background:var(--dark-blue);color:#fff;}
 .tdroot .modal-actions button.cancel{background:#eee;color:var(--dark-brown);}
 .tdroot .modal-actions button.danger{background:#c0392b;color:#fff;}
+.tdroot .modal-actions .btn-del{background:#fff;color:#c0392b;border:1px solid #eecfca;margin-right:auto;}
 .tdroot .swatches{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
 .tdroot .swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #d8d3c6;}
 .tdroot .swatch.sel{box-shadow:0 0 0 2px var(--dark-brown);}
 .tdroot input[type=color]{width:38px;height:26px;border:1px solid #d5d0c4;border-radius:6px;padding:0;cursor:pointer;background:none;}
 .tdroot .nomatch{text-align:center;color:#9a948a;font-size:14px;padding:30px;}
+
+/* context menu */
+.tdroot .ctxmenu{position:fixed;z-index:300;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:6px;display:flex;flex-direction:column;min-width:150px;}
+.tdroot .ctxmenu button{background:none;border:none;color:var(--dark-brown);text-align:left;padding:8px 12px;border-radius:6px;font-weight:500;cursor:pointer;font:inherit;}
+.tdroot .ctxmenu button:hover{background:#f4f2ea;}
+.tdroot .ctxmenu button.ctx-danger{color:#c0392b;}
+
+/* footer */
+.tdroot .td-footer{text-align:center;font-size:12px;color:#9a948a;padding:16px 0 4px;}
 
 /* checklists view */
 .tdroot .cl-wrap{max-width:820px;margin:0 auto;}
@@ -267,14 +289,17 @@ const CSS = `
 .tdroot .cltoprow{display:flex;gap:12px;align-items:center;margin-bottom:16px;}
 .tdroot .clcard{background:#fff;border-radius:12px 12px 0 0;padding:14px 16px;box-shadow:var(--tshadow);margin-bottom:16px;border-left:3px solid var(--light-blue);border-right:3px solid var(--light-brown);border-bottom:3px solid var(--dark-blue);}
 .tdroot .clcard.inactive{opacity:.55;}
-.tdroot .clhead{display:flex;gap:8px;align-items:center;margin:-14px -19px 12px;padding:10px 16px;border-radius:12px 12px 0 0;}
+.tdroot .clhead{display:flex;gap:8px;align-items:center;margin:-14px -19px 12px;padding:10px 16px;border-radius:12px 12px 0 0;border-bottom:2px solid #cfcabb;cursor:pointer;}
+.tdroot .clhead .count{background:#fff;border-radius:20px;font-size:12px;padding:1px 9px;font-weight:700;color:var(--dark-brown);flex:none;}
 .tdroot .clhead.darkhead{color:#fff;}
+.tdroot .clhead.darkhead .clname,.tdroot .clhead.darkhead .clactive,.tdroot .clhead.darkhead .clhandle,.tdroot .clhead.darkhead .clmove,.tdroot .clhead.darkhead .cldel{color:#fff;}
 .tdroot .clname{flex:1;padding:8px 10px;border:none;border-radius:8px;font:inherit;font-weight:700;font-size:15px;background:transparent;color:inherit;cursor:pointer;}
 .tdroot .clcustwrap,.tdroot .clmonthwrap,.tdroot .clweekwrap{font-size:12px;color:#6b6455;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-wrap:wrap;}
 .tdroot .clmonthwrap select,.tdroot .clmonthwrap input,.tdroot .clcustwrap select,.tdroot .clcustwrap input,.tdroot .clweekwrap select{padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12px;}
 .tdroot .clcustom{width:52px;padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;}
 .tdroot .clactive{font-size:12px;color:#6b6455;display:flex;align-items:center;gap:4px;white-space:nowrap;}
 .tdroot .clactive input{width:15px;height:15px;}
+.tdroot .clhandle{cursor:grab;color:#b8b2a2;font-size:14px;}
 .tdroot .cldel{background:none;border:none;color:inherit;opacity:.55;font-size:18px;padding:0 6px;font-weight:700;cursor:pointer;}
 .tdroot .cldel:hover{color:#c0392b;opacity:1;}
 .tdroot .clmove{background:none;border:none;color:inherit;opacity:.55;padding:0 2px;font-size:13px;line-height:1;font-weight:700;cursor:pointer;}
@@ -303,32 +328,87 @@ const CSS = `
 `
 
 // ============ Component ============
-// `initialView` + `onNavigate` come from App.jsx so the outer sidebar
-// top-bar controls which view we start in (Home → To-Do vs Home →
-// Checklists), and the ChecklistsView "Add to To-Do now" button can
-// jump back to the To-Do view through the same outer nav rather than
-// via a duplicate in-page tab bar.
 export default function ToDo({ initialView = 'todo', onNavigate }) {
-  const [state, setState] = useState({ lists: [], items: [], checklists: [], _migPri: false })
+  const [state, setState] = useState({ lists: [], items: [], checklists: [], _migPri: false, _migBg: false })
   const [loading, setLoading] = useState(true)
-  const [hideDone, setHideDone] = useState(false)
-  const [view, setView] = useState(initialView) // 'todo' | 'checklists'
+  const [hideDone, setHideDone] = useState(true) // completed items hidden by default
+  const [view, setView] = useState(initialView)
   useEffect(() => { setView(initialView) }, [initialView])
   const [filterText, setFilterText] = useState('')
   const [filterPri, setFilterPri] = useState('all')
   const [filterDue, setFilterDue] = useState('all')
   const [settingsOpen, setSettingsOpen] = useState(false)
 
+  // Undo/redo
+  const undoStack = useRef([])
+  const redoStack = useRef([])
+  const histBase = useRef(null)
+  const [undoLen, setUndoLen] = useState(0) // just to trigger re-render of button state
+  const [redoLen, setRedoLen] = useState(0)
+
+  const recordHistory = useCallback((s) => {
+    const cur = JSON.stringify(s)
+    if (histBase.current === null) { histBase.current = cur; return }
+    if (cur !== histBase.current) {
+      undoStack.current.push(histBase.current)
+      if (undoStack.current.length > 100) undoStack.current.shift()
+      redoStack.current = []
+      histBase.current = cur
+      setUndoLen(undoStack.current.length)
+      setRedoLen(0)
+    }
+  }, [])
+
+  const undo = useCallback(() => {
+    if (!undoStack.current.length) return
+    redoStack.current.push(JSON.stringify(stateRef.current))
+    const prev = undoStack.current.pop()
+    histBase.current = prev
+    const parsed = JSON.parse(prev)
+    skipNextSave.current = true
+    setState(parsed)
+    setUndoLen(undoStack.current.length)
+    setRedoLen(redoStack.current.length)
+    // Manually save after undo
+    fetch(`${API_BASE}/api/todo`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: prev,
+    }).catch(err => console.error('Failed to save todos:', err))
+  }, [])
+
+  const redo = useCallback(() => {
+    if (!redoStack.current.length) return
+    undoStack.current.push(JSON.stringify(stateRef.current))
+    const next = redoStack.current.pop()
+    histBase.current = next
+    const parsed = JSON.parse(next)
+    skipNextSave.current = true
+    setState(parsed)
+    setUndoLen(undoStack.current.length)
+    setRedoLen(redoStack.current.length)
+    fetch(`${API_BASE}/api/todo`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: next,
+    }).catch(err => console.error('Failed to save todos:', err))
+  }, [])
+
   // Modals
-  const [itemModal, setItemModal] = useState(null) // { editId, listId }
+  const [itemModal, setItemModal] = useState(null)
   const [itemDraft, setItemDraft] = useState({ text: '', listId: '', priority: 'low', due: '', notes: '', color: DEFAULT_ITEM_BG })
-  const [nameModal, setNameModal] = useState(null) // { mode: 'list'|'checklist', renameId }
+  const [nameModal, setNameModal] = useState(null)
   const [nameDraft, setNameDraft] = useState({ name: '', color: '#FFFFFF' })
-  const [confirmModal, setConfirmModal] = useState(null) // { msg, onOk }
+  const [confirmModal, setConfirmModal] = useState(null)
+
+  // Context menu state
+  const [ctxMenu, setCtxMenu] = useState(null) // { x, y, itemId }
 
   // Drag state
   const dragItemId = useRef(null)
   const dragListId = useRef(null)
+
+  // Keep a ref to current state for undo/redo
+  const stateRef = useRef(state)
+  useEffect(() => { stateRef.current = state }, [state])
 
   // Fetch on mount
   useEffect(() => {
@@ -341,9 +421,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         if (lists.length === 0) {
           lists = [{ id: uid(), name: 'To Do' }, { id: uid(), name: 'This Week' }]
         }
-        // Stale items from the old per-checklist (not per-entry) model
-        // have a checklistId but no entryId — nothing manages their
-        // lifecycle under the new model, so drop them once.
         items = items.filter(i => !(i.checklistId && !i.entryId))
         let migPri = !!s?._migPri
         if (!migPri) {
@@ -353,7 +430,16 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
           }))
           migPri = true
         }
-        setState({ lists, items, checklists, _migPri: migPri })
+        // Migrate old card background colour
+        let migBg = !!s?._migBg
+        if (!migBg) {
+          items = items.map(i => (i.color || '').toUpperCase() === OLD_ITEM_BG.toUpperCase() ? { ...i, color: DEFAULT_ITEM_BG } : i)
+          lists = lists.map(l => (l.color || '').toUpperCase() === OLD_ITEM_BG.toUpperCase() ? { ...l, color: DEFAULT_ITEM_BG } : l)
+          migBg = true
+        }
+        const loaded = { lists, items, checklists, _migPri: migPri, _migBg: migBg }
+        setState(loaded)
+        histBase.current = JSON.stringify(loaded)
       })
       .catch(err => console.error('Failed to load todos:', err))
       .finally(() => setLoading(false))
@@ -361,10 +447,11 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
 
   // Debounced save on any state change.
   const saveTimer = useRef(null)
-  const skipNextSave = useRef(true) // skip the initial mount load
+  const skipNextSave = useRef(true)
   useEffect(() => {
     if (loading) return
     if (skipNextSave.current) { skipNextSave.current = false; return }
+    recordHistory(state)
     clearTimeout(saveTimer.current)
     saveTimer.current = setTimeout(() => {
       fetch(`${API_BASE}/api/todo`, {
@@ -374,12 +461,9 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       }).catch(err => console.error('Failed to save todos:', err))
     }, 400)
     return () => clearTimeout(saveTimer.current)
-  }, [state, loading])
+  }, [state, loading, recordHistory])
 
-  // ---------- Checklist auto-run when the todo view opens ----------
-  // Per entry, not per checklist: only creates an item when that
-  // SPECIFIC entry's current period doesn't already have one, so an
-  // undone item from a prior period is never silently replaced.
+  // ---------- Checklist auto-run ----------
   const runChecklists = () => {
     setState((s) => {
       let changed = false
@@ -414,9 +498,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   }
   useEffect(() => { if (!loading && view === 'todo') runChecklists() }, [view, loading])
 
-  // "Add to To-Do Now": pull every active entry's current-period item
-  // in immediately, bypassing the schedule check — but still never
-  // duplicates an item that's already been pulled.
+  // "Add to To-Do Now"
   const forcePull = (checklistId) => {
     setState((s) => {
       const cl = (s.checklists || []).find(c => c.id === checklistId)
@@ -446,7 +528,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     setTimeout(() => (onNavigate ? onNavigate('To-Do') : setView('todo')), 30)
   }
 
-  // ---------- Export CSV (current view's data) ----------
+  // ---------- Export CSV ----------
   const exportCsv = () => {
     const stamp = isoLocal(new Date())
     if (view === 'checklists') {
@@ -467,12 +549,9 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       for (const list of state.lists) {
         for (const it of state.items.filter(i => i.listId === list.id)) {
           rows.push([
-            list.name || '',
-            it.text || '',
+            list.name || '', it.text || '',
             PRI_LABEL[it.priority || 'low'] || it.priority || '',
-            it.due || '',
-            it.done ? 'Yes' : 'No',
-            it.notes || '',
+            it.due || '', it.done ? 'Yes' : 'No', it.notes || '',
           ])
         }
       }
@@ -498,6 +577,20 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   // ---------- Mutations ----------
   const toggleDone = (id) => setState(s => ({ ...s, items: s.items.map(i => i.id === id ? { ...i, done: !i.done } : i) }))
   const deleteItem = (id) => setState(s => ({ ...s, items: s.items.filter(i => i.id !== id) }))
+  const duplicateItem = (id) => setState(s => {
+    const idx = s.items.findIndex(i => i.id === id)
+    if (idx < 0) return s
+    const copy = { ...s.items[idx], id: uid(), done: false }
+    delete copy.checklistId; delete copy.entryId; delete copy.periodKey
+    const items = [...s.items]
+    items.splice(idx + 1, 0, copy)
+    return { ...s, items }
+  })
+  const sortListNow = (listId) => setState(s => {
+    const mine = s.items.filter(i => i.listId === listId)
+    const sorted = sortItems(mine)
+    return { ...s, items: [...s.items.filter(i => i.listId !== listId), ...sorted] }
+  })
   const moveList = (id, dir) => setState(s => {
     const i = s.lists.findIndex(l => l.id === id); const j = i + dir
     if (i < 0 || j < 0 || j >= s.lists.length) return s
@@ -600,7 +693,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     closeItem()
   }
 
-  // ---------- Name modal (add/rename list OR checklist) ----------
+  // ---------- Name modal ----------
   const openName = (id) => {
     const list = id ? state.lists.find(l => l.id === id) : null
     setNameModal({ mode: 'list', renameId: id || null })
@@ -698,11 +791,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     items: s.items.filter(i => i.entryId !== entryId),
   }))
 
-  // Fields that don't affect scheduling (text/note/priority/listId/
-  // active) apply directly and, if this entry already has a pulled
-  // item for the current period, sync straight into it too — so
-  // editing a checklist entry updates the to-do that's already on the
-  // board instead of only affecting the next time it's regenerated.
   const updateEntrySimple = (checklistId, entryId, patch) => setState(s => {
     const cl = s.checklists.find(c => c.id === checklistId)
     const en = cl?.entries.find(e => e.id === entryId)
@@ -727,7 +815,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   })
   const setEntryText = (checklistId, entryId, text) => {
     updateEntrySimple(checklistId, entryId, { text })
-    // If nothing has been pulled for this entry yet, try pulling it in now.
     setTimeout(runChecklists, 0)
   }
   const setEntryActive = (checklistId, entryId, active) => setState(s => {
@@ -738,9 +825,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     return { ...s, checklists, items }
   })
 
-  // Fields that DO affect scheduling: migrate the already-pulled item
-  // (if any, and not done) to the new period instead of duplicating
-  // it, matching rescheduleEntry() in the source mockup.
   const updateEntrySchedule = (checklistId, entryId, patch) => setState(s => {
     const cl = s.checklists.find(c => c.id === checklistId)
     const en = cl?.entries.find(e => e.id === entryId)
@@ -765,7 +849,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         items = items.filter(i => i.id !== pulled.id)
       }
     } else if (pulled) {
-      // Already completed this period — leave it as history.
       if (checklistDue(nextEn)) finalEn = { ...nextEn, lastKey: checklistKey(nextEn) }
     }
     const checklists = s.checklists.map(c => c.id === checklistId
@@ -781,20 +864,38 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   // ---------- Keyboard ----------
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'Escape') { closeItem(); closeName(); if (confirmModal) closeConfirm(false) }
+      if (e.key === 'Escape') {
+        closeItem(); closeName(); setCtxMenu(null)
+        if (confirmModal) closeConfirm(false)
+      }
       if (e.key === 'Enter') {
         if (itemModal) saveItem()
         else if (nameModal) saveName()
+      }
+      // Undo/redo (Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y)
+      if ((e.ctrlKey || e.metaKey) && !e.target?.closest('input,textarea,select')) {
+        const k = e.key.toLowerCase()
+        if (k === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo() }
+        else if (k === 'y') { e.preventDefault(); redo() }
       }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   })
 
+  // Close context menu on any click
+  useEffect(() => {
+    const close = () => setCtxMenu(null)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [])
+
   // ---------- Render ----------
-  // Title tracks the current view so the loading placeholder and the
-  // real page-head agree with the outer sidebar/top-bar labels.
   const pageTitle = view === 'checklists' ? 'Checklists' : 'To Do'
+
+  // Compute counts for footer
+  const totalItems = (state.items || []).length
+  let shownItems = 0
 
   if (loading) {
     return (
@@ -805,10 +906,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     )
   }
 
-  // Action buttons on the right of the page-head — matches the pattern
-  // used in Inventory / Crania Store / Calendar. The View toggle that
-  // used to live here was a duplicate of the outer top-bar submenu
-  // (Home → To-Do / Checklists) and has been removed.
   return (
     <div className="page tdroot">
       <style>{CSS}</style>
@@ -830,11 +927,11 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
                 onClick={() => setHideDone(v => !v)}
                 title="Show/hide completed"
                 style={{
-                  background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+                  background: '#E0DE85', border: 'none', color: 'var(--brand-dark-brown)',
                   padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
                 }}
               >
-                {hideDone ? 'Show done' : 'Hide done'}
+                {hideDone ? 'Show Done' : 'Hide Done'}
               </button>
             </>
           )}
@@ -863,8 +960,14 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
               background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
               padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
             }}
-          >⚙ Settings</button>
+          >⚙</button>
         </div>
+      </div>
+
+      {/* Undo/Redo row */}
+      <div className="undorow">
+        <button className="undobtn" title="Undo (Ctrl+Z)" disabled={undoLen === 0} onClick={undo}>↶ Undo</button>
+        <button className="undobtn" title="Redo (Ctrl+Shift+Z)" disabled={redoLen === 0} onClick={redo}>↷</button>
       </div>
 
       {view === 'todo' && <TodoView
@@ -874,7 +977,8 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         filterPri={filterPri} setFilterPri={setFilterPri}
         filterDue={filterDue} setFilterDue={setFilterDue}
         filtersActive={filtersActive} matchFilters={matchFilters}
-        toggleDone={toggleDone} deleteItem={deleteItem}
+        toggleDone={toggleDone} deleteItem={deleteItem} duplicateItem={duplicateItem}
+        sortListNow={sortListNow}
         openItem={openItem} openName={openName}
         moveList={moveList}
         askConfirm={askConfirm} deleteList={deleteList}
@@ -882,6 +986,8 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         onItemsDragOver={onItemsDragOver} onItemsDragLeave={onItemsDragLeave} onItemsDrop={onItemsDrop}
         onListDragStart={onListDragStart} onListDragEnd={onListDragEnd}
         onListDragOver={onListDragOver} onListDragLeave={onListDragLeave} onListDrop={onListDrop}
+        ctxMenu={ctxMenu} setCtxMenu={setCtxMenu}
+        onShownCount={(n) => { shownItems = n }}
       />}
 
       {view === 'checklists' && <ChecklistsView
@@ -907,6 +1013,12 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         lists={state.lists}
         draft={itemDraft} setDraft={setItemDraft}
         onCancel={closeItem} onSave={saveItem}
+        onDelete={itemModal.editId ? async () => {
+          const it = state.items.find(i => i.id === itemModal.editId)
+          if (await askConfirm(`Delete "${it?.text || 'this to-do'}"?`)) {
+            deleteItem(itemModal.editId); closeItem()
+          }
+        } : null}
       />}
 
       {nameModal && <NameModal
@@ -914,6 +1026,25 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         renaming={!!nameModal.renameId}
         draft={nameDraft} setDraft={setNameDraft}
         onCancel={closeName} onSave={saveName}
+        onDelete={nameModal.renameId ? async () => {
+          if (nameModal.mode === 'checklist') {
+            const cl = state.checklists.find(c => c.id === nameModal.renameId)
+            if (cl && await askConfirm(`Delete checklist "${cl.name || ''}"?`)) {
+              setState(s => ({
+                ...s,
+                checklists: s.checklists.filter(c => c.id !== nameModal.renameId),
+                items: s.items.filter(i => i.checklistId !== nameModal.renameId),
+              }))
+              closeName()
+            }
+          } else {
+            const list = state.lists.find(l => l.id === nameModal.renameId)
+            const n = state.items.filter(i => i.listId === nameModal.renameId).length
+            if (await askConfirm(`Delete the list "${list?.name || ''}"${n ? ` and its ${n} to-do${n > 1 ? 's' : ''}` : ''}?`)) {
+              deleteList(nameModal.renameId); closeName()
+            }
+          }
+        } : null}
       />}
 
       {confirmModal && (
@@ -958,18 +1089,22 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
 function TodoView({
   state, hideDone, filterText, setFilterText, filterPri, setFilterPri,
   filterDue, setFilterDue, filtersActive, matchFilters,
-  toggleDone, deleteItem, openItem, openName, moveList,
+  toggleDone, deleteItem, duplicateItem, sortListNow,
+  openItem, openName, moveList,
   askConfirm, deleteList,
   onItemDragStart, onItemDragEnd, onItemsDragOver, onItemsDragLeave, onItemsDrop,
   onListDragStart, onListDragEnd, onListDragOver, onListDragLeave, onListDrop,
+  ctxMenu, setCtxMenu,
 }) {
   const clearFilters = () => { setFilterText(''); setFilterPri('all'); setFilterDue('all') }
   const renderedLists = []
+  let totalShown = 0
   for (const list of state.lists) {
     let items = state.items.filter(i => i.listId === list.id)
     if (hideDone) items = items.filter(i => !i.done)
     items = items.filter(matchFilters)
     if (filtersActive() && items.length === 0) continue
+    totalShown += items.length
     renderedLists.push({ list, items })
   }
 
@@ -981,6 +1116,12 @@ function TodoView({
   const handleDeleteItem = async (it) => {
     if (await askConfirm(`Delete "${it.text}"?`)) deleteItem(it.id)
   }
+
+  const footerText = (() => {
+    const total = (state.items || []).length
+    const shown = totalShown
+    return `CraniaVerse · To-Do · Count=${shown}` + (shown !== total ? ` of ${total}` : '')
+  })()
 
   return (
     <>
@@ -1012,7 +1153,9 @@ function TodoView({
         {renderedLists.length === 0 && filtersActive() && (
           <div className="nomatch">No to-dos match your filters.</div>
         )}
-        {renderedLists.map(({ list, items }) => (
+        {renderedLists.map(({ list, items }) => {
+          const headDark = list.color && list.color.toLowerCase() !== '#ffffff' && isDarkColor(list.color)
+          return (
           <div
             key={list.id}
             className="list"
@@ -1024,12 +1167,13 @@ function TodoView({
             onDrop={(e) => onListDrop(e, list.id)}
           >
             <div
-              className="list-head"
+              className={'list-head' + (headDark ? ' darkbg' : '')}
               style={list.color && list.color.toLowerCase() !== '#ffffff' ? { background: list.color } : undefined}
             >
               <span className="dhandle" title="Drag to reorder">⠿</span>
               <span className="name" title="Click to rename" onClick={() => openName(list.id)}>{list.name}</span>
               <span className="count">{items.length}</span>
+              <button className="lsort" title="Sort by priority then due date" onClick={() => sortListNow(list.id)}>⇅</button>
               <button className="lmove" title="Move list up" onClick={() => moveList(list.id, -1)}>▲</button>
               <button className="lmove" title="Move list down" onClick={() => moveList(list.id, 1)}>▼</button>
               <button className="lx" title="Delete list" onClick={() => handleDeleteList(list)}>×</button>
@@ -1042,18 +1186,25 @@ function TodoView({
               onDrop={(e) => onItemsDrop(e, list.id)}
             >
               {items.map(it => {
-                const dc = dueClass(it.due)
+                const dc = it.done ? '' : dueClass(it.due)
+                const itemDark = isDarkColor(it.color || DEFAULT_ITEM_BG)
                 return (
                   <div
                     key={it.id}
                     className={
                       'todo p-' + (it.priority || 'low') +
-                      (it.done ? ' done' : '')
+                      (it.done ? ' done' : '') +
+                      (itemDark ? ' darkbg' : '')
                     }
                     draggable
                     data-id={it.id}
                     onDragStart={(e) => onItemDragStart(e, it.id)}
                     onDragEnd={onItemDragEnd}
+                    onDoubleClick={(e) => { if (!e.target.closest('input,button')) openItem(it.id) }}
+                    onContextMenu={(e) => {
+                      e.preventDefault(); e.stopPropagation()
+                      setCtxMenu({ x: e.pageX, y: e.pageY, itemId: it.id })
+                    }}
                     style={{ background: it.color || DEFAULT_ITEM_BG }}
                   >
                     <span className="dhandle" title="Drag to reorder">⠿</span>
@@ -1065,11 +1216,19 @@ function TodoView({
                     <span className="txt" onClick={() => openItem(it.id)}>{it.text}</span>
                     {it.notes && <span className="notemark" title="Has notes — hover to read">💬</span>}
                     <span className="prislot">
-                      <span className={'chip pri-' + (it.priority || 'low')}>{PRI_LABEL[it.priority || 'low']}</span>
+                      {!it.done && <span className={'chip pri-' + (it.priority || 'low')}>{PRI_LABEL[it.priority || 'low']}</span>}
                     </span>
                     <span className="dueslot">
-                      {it.due && <span className={'chip due ' + dc}>{fmtDue(it.due)}</span>}
+                      {it.due && !it.done && (
+                        <span
+                          className={'chip due ' + dc}
+                          title={dc === 'overdue' ? 'Overdue since ' + fmtDue(it.due) : ''}
+                        >
+                          {dc === 'overdue' ? 'Overdue · ' + fmtDue(it.due) : fmtDue(it.due)}
+                        </span>
+                      )}
                     </span>
+                    <button className="dup" title="Duplicate" onClick={() => duplicateItem(it.id)}>⧉</button>
                     <button className="x" title="Delete" onClick={() => handleDeleteItem(it)}>×</button>
                     {it.notes && <div className="notepop">{it.notes}</div>}
                   </div>
@@ -1079,8 +1238,27 @@ function TodoView({
 
             <button className="add-item" title="Add to-do" onClick={() => openItem(null, list.id)}>+</button>
           </div>
-        ))}
+        )})}
       </div>
+
+      <div className="td-footer">{footerText}</div>
+
+      {/* Context menu */}
+      {ctxMenu && (
+        <div
+          className="ctxmenu"
+          style={{ left: ctxMenu.x, top: ctxMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button onClick={() => { openItem(ctxMenu.itemId); setCtxMenu(null) }}>Edit</button>
+          <button onClick={() => { duplicateItem(ctxMenu.itemId); setCtxMenu(null) }}>Duplicate</button>
+          <button className="ctx-danger" onClick={async () => {
+            const it = state.items.find(i => i.id === ctxMenu.itemId)
+            if (it && await askConfirm(`Delete "${it.text}"?`)) deleteItem(ctxMenu.itemId)
+            setCtxMenu(null)
+          }}>Delete</button>
+        </div>
+      )}
     </>
   )
 }
@@ -1092,6 +1270,11 @@ function ChecklistsView({
   setEntryText, updateEntrySimple, setEntryActive, updateEntrySchedule, forcePull,
 }) {
   const checklists = state.checklists || []
+
+  const footerText = (() => {
+    const n = checklists.reduce((s, cl) => s + (cl.entries || []).filter(e => e.text).length, 0)
+    return `CraniaVerse · Checklists · Count=${n}`
+  })()
 
   return (
     <div className="cl-wrap">
@@ -1108,7 +1291,9 @@ function ChecklistsView({
         return (
           <div key={cl.id} className={'clcard' + (cl.active === false ? ' inactive' : '')}>
             <div className={'clhead' + (darkHead ? ' darkhead' : '')} style={headStyle}>
+              <span className="clhandle" title="Drag to reorder">⠿</span>
               <span className="clname" title="Click to rename or recolour" onClick={() => openChecklistEdit(cl.id)}>{cl.name}</span>
+              <span className="count">{(cl.entries || []).filter(e => e.text).length}</span>
               <label className="clactive">
                 <input type="checkbox" checked={cl.active !== false} onChange={e => updateChecklistActive(cl.id, e.target.checked)} /> Active
               </label>
@@ -1152,6 +1337,7 @@ function ChecklistsView({
           No checklists yet — click "+ Add checklist" above to create one.
         </div>
       )}
+      <div className="td-footer">{footerText}</div>
     </div>
   )
 }
@@ -1262,13 +1448,13 @@ function ChecklistEntryRow({
 }
 
 // ---------------------- Item modal ----------------------
-function ItemModal({ editing, lists, draft, setDraft, onCancel, onSave }) {
+function ItemModal({ editing, lists, draft, setDraft, onCancel, onSave, onDelete }) {
   return (
     <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
       <div className="modal">
-        <h2>{editing ? 'Edit to-do' : 'New to-do'}</h2>
+        <h2>{editing ? 'Edit To-Do' : 'New To-Do'}</h2>
         <div className="field">
-          <label>To-do</label>
+          <label>To-Do</label>
           <input
             type="text" placeholder="e.g. Email the parents" autoFocus
             value={draft.text} onChange={e => setDraft(d => ({ ...d, text: e.target.value }))}
@@ -1283,22 +1469,24 @@ function ItemModal({ editing, lists, draft, setDraft, onCancel, onSave }) {
         <div className="field">
           <label>Priority</label>
           <select value={draft.priority} onChange={e => setDraft(d => ({ ...d, priority: e.target.value }))}>
-            <option value="low">Low</option><option value="med">Medium</option><option value="high">High</option>
+            <option value="high" style={{ background: '#fadbd8', color: '#922b21' }}>High</option>
+            <option value="med" style={{ background: '#E0DE85', color: '#2E2516' }}>Medium</option>
+            <option value="low" style={{ background: '#A6E2F9', color: '#2E2516' }}>Low</option>
           </select>
         </div>
         <div className="field">
-          <label>Due date</label>
+          <label>Due Date</label>
           <input type="date" value={draft.due} onChange={e => setDraft(d => ({ ...d, due: e.target.value }))} />
         </div>
         <div className="field">
-          <label>Comments / notes</label>
+          <label>Comments / Notes</label>
           <textarea
             rows={3} placeholder="Any details… (shown when you hover the to-do)"
             value={draft.notes} onChange={e => setDraft(d => ({ ...d, notes: e.target.value }))}
           />
         </div>
         <div className="field">
-          <label>Card colour</label>
+          <label>Card Colour</label>
           <ColorSwatches
             value={draft.color}
             palette={PASTELS}
@@ -1306,6 +1494,7 @@ function ItemModal({ editing, lists, draft, setDraft, onCancel, onSave }) {
           />
         </div>
         <div className="modal-actions">
+          {onDelete && <button className="btn-del" onClick={onDelete}>Delete</button>}
           <button className="cancel" onClick={onCancel}>Cancel</button>
           <button onClick={onSave}>Save</button>
         </div>
@@ -1315,21 +1504,21 @@ function ItemModal({ editing, lists, draft, setDraft, onCancel, onSave }) {
 }
 
 // ---------------------- Name modal (list OR checklist) ----------------------
-function NameModal({ mode, renaming, draft, setDraft, onCancel, onSave }) {
+function NameModal({ mode, renaming, draft, setDraft, onCancel, onSave, onDelete }) {
   const isChecklist = mode === 'checklist'
   return (
     <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
       <div className="modal" style={{ maxWidth: 360 }}>
-        <h2>{isChecklist ? 'Edit checklist' : (renaming ? 'Rename list' : 'New list')}</h2>
+        <h2>{isChecklist ? 'Edit Checklist' : (renaming ? 'Rename List' : 'New List')}</h2>
         <div className="field">
-          <label>{isChecklist ? 'Checklist name' : 'List name'}</label>
+          <label>{isChecklist ? 'Checklist Name' : 'List Name'}</label>
           <input
             type="text" placeholder="e.g. Work" autoFocus
             value={draft.name} onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
           />
         </div>
         <div className="field">
-          <label>{isChecklist ? 'Checklist colour' : 'List colour'}</label>
+          <label>{isChecklist ? 'Checklist Colour' : 'List Colour'}</label>
           <ColorSwatches
             value={draft.color}
             palette={LIST_PALETTE}
@@ -1337,6 +1526,7 @@ function NameModal({ mode, renaming, draft, setDraft, onCancel, onSave }) {
           />
         </div>
         <div className="modal-actions">
+          {onDelete && <button className="btn-del" onClick={onDelete}>Delete</button>}
           <button className="cancel" onClick={onCancel}>Cancel</button>
           <button onClick={onSave}>Save</button>
         </div>
