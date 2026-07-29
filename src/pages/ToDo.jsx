@@ -1238,7 +1238,7 @@ function TodoView({
 
 // ---------------------- ChecklistsView subcomponent ----------------------
 function ChecklistsView({
-  state, askConfirm, openChecklistEdit, updateChecklistActive, moveChecklist, deleteChecklist,
+  state, addChecklist, askConfirm, openChecklistEdit, updateChecklistActive, moveChecklist, deleteChecklist,
   addEntry, duplicateEntry, moveEntry, removeEntry,
   setEntryText, updateEntrySimple, setEntryActive, updateEntrySchedule, forcePull,
 }) {
