@@ -477,6 +477,32 @@ export default function Programs() {
   )
 }
 
+// Small square icon button, sized to actually fit inside a 26px table
+// row (the shared .icon-btn class is a fixed 42px circle meant for
+// standalone toolbar buttons — using it here was clipping against the
+// row and the scrollbar). Hover fills a light tint of `hoverColor` so
+// edit vs. delete are visually distinct at a glance.
+function RowIconButton({ children, title, onClick, hoverColor }) {
+  const [hover, setHover] = useState(false)
+  return (
+    <button
+      title={title}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        width: 24, height: 24, display: 'grid', placeItems: 'center',
+        border: 'none', borderRadius: 6, cursor: 'pointer', padding: 0,
+        background: hover ? `${hoverColor}1A` : 'transparent',
+        color: hover ? hoverColor : 'var(--ink-soft)',
+        transition: 'background .12s, color .12s',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 function MetricTile({ label, value, hint, color }) {
   return (
     <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 10, padding: '12px 16px', boxShadow: '0 1px 3px rgba(20,30,45,.06)' }}>
