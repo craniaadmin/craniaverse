@@ -23,6 +23,7 @@ const COLUMN_LABELS = {
   qty: 'On Hand', reorder: 'Reorder', cost: 'Unit Cost', value: 'Value',
   location: 'Location', status: 'Status',
 }
+const COL_ALIGN = { qty: 'right', reorder: 'right', cost: 'right', value: 'right', status: 'center' }
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
