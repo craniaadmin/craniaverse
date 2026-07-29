@@ -58,6 +58,7 @@ function useStock() {
   const [data, setData] = useState({
     items: [], log: [], categoryOrder: [], categoryColors: {},
     extraSubs: [], subOrder: {}, subColors: {}, colOrder: DEFAULT_COL_ORDER,
+    hiddenCols: {}, groupBy: false,
   })
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState('loading')
