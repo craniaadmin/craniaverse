@@ -532,6 +532,12 @@ input, select, textarea { font-family: inherit; }
   display: grid; place-items: center; font-size: 15px;
 }
 
+/* ---------------- App footer (per module, per Visual Design Rules §12) ---------------- */
+.app-footer {
+  text-align: center; font-size: 12px; color: #9A948A;
+  padding: 16px; background: none; border: none;
+}
+
 /* ---------------- Footer band ---------------- */
 .footer-band {
   background: var(--footer-dark); color: #fff;
