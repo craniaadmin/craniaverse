@@ -392,7 +392,7 @@ export async function saveInventory(items) {
 }
 
 // ---- todo (singleton payload with lists + items + checklists) ---
-const DEFAULT_TODO = { lists: [], items: [], checklists: [] }
+const DEFAULT_TODO = { lists: [], items: [], checklists: [], _migPri: false }
 
 export async function loadTodo() {
   const rows = await getFullList('todo')
@@ -402,6 +402,7 @@ export async function loadTodo() {
     lists:      Array.isArray(p.lists) ? p.lists : [],
     items:      Array.isArray(p.items) ? p.items : [],
     checklists: Array.isArray(p.checklists) ? p.checklists : [],
+    _migPri:    !!p._migPri,
   }
 }
 
