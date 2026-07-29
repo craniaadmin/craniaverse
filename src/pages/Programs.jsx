@@ -449,13 +449,13 @@ export default function Programs() {
               ))}
             </div>
 
-            <div style={{ ...CELL_BOX, background: 'transparent', justifyContent: 'center', gap: 4 }}>
-              <button className="icon-btn" title="Edit program" onClick={() => editProgram(i)} style={{ padding: 4 }}>
+            <div style={{ ...CELL_BOX, background: 'transparent', justifyContent: 'center', gap: 6 }}>
+              <RowIconButton title="Edit program" onClick={() => editProgram(i)} hoverColor="var(--brand-dark-blue)">
                 <Edit2 size={14} />
-              </button>
-              <button className="icon-btn" title="Delete program" onClick={() => deleteProgram(i)} style={{ padding: 4 }}>
+              </RowIconButton>
+              <RowIconButton title="Delete program" onClick={() => deleteProgram(i)} hoverColor="#c0392b">
                 <Trash2 size={14} />
-              </button>
+              </RowIconButton>
             </div>
           </div>
         )
