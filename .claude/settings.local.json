@@ -152,7 +152,8 @@
       "Bash(node scratch-dedup-test.mjs)",
       "Bash(rm scratch-dedup-test.mjs)",
       "Bash(curl -s -m 3 http://127.0.0.1:8090/api/health)",
-      "Bash(curl -sv -m 3 http://127.0.0.1:8090/api/health)"
+      "Bash(curl -sv -m 3 http://127.0.0.1:8090/api/health)",
+      "Bash(powershell -Command \"\\(Get-Content 'C:\\\\Users\\\\hanak\\\\Downloads\\\\2-1. CraniaVerse - Programs v47 [claude-opus-5] - has bugs.html' | Measure-Object -Line\\).Lines\")"
     ]
   },
   "hooks": {
