@@ -1560,10 +1560,10 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
   const [restoreOpen, setRestoreOpen] = useState(false)
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target) && !restoreOpen) onClose() }
-    setTimeout(() => document.addEventListener('click', handler), 0)
-    return () => document.removeEventListener('click', handler)
-  }, [onClose, restoreOpen])
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
+  }, [onClose])
 
   useEffect(() => {
     fetch(`${API_BASE}/api/todo/backups`)
