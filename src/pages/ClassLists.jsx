@@ -192,7 +192,7 @@ export default function ClassLists({ onNavigate }) {
     next.has(key) ? next.delete(key) : next.add(key)
     return next
   })
-  const expandAll = () => setExpanded(new Set(visible.map((c) => c.program.title + c.program.number)))
+  const expandAll = () => setExpanded(new Set(visible.map((c) => c.program.title + c.program.number + c.program.location)))
   const collapseAll = () => setExpanded(new Set())
 
   return (
@@ -263,7 +263,7 @@ export default function ClassLists({ onNavigate }) {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {visible.map((c) => {
-            const key = c.program.title + c.program.number
+            const key = c.program.title + c.program.number + c.program.location
             const isOpen = expanded.has(key)
             const capacity = c.sessions.reduce((sum, s) => sum + (s.offering.spots != null ? s.offering.spots : 0), 0)
             const hasCapacity = c.sessions.some((s) => s.offering.spots != null)
