@@ -284,7 +284,7 @@ const CSS = `
 .tdroot .settings-popover{position:fixed;top:118px;right:max(16px,calc(50% - 430px));z-index:290;background:#fff;border:1px solid #e2ded2;border-radius:14px;box-shadow:0 12px 40px rgba(46,37,22,.22);padding:0;width:300px;text-align:left;box-sizing:border-box;overflow:hidden;}
 .tdroot .settings-popover .sp-section{padding:16px 18px;border-bottom:1px solid #ece8dc;}
 .tdroot .settings-popover .sp-section:last-child{border-bottom:none;}
-.tdroot .settings-popover .sp-section.sp-alt{background:#f7f5f0;}
+.tdroot .settings-popover .sp-section{background:#f7f5f0;}
 .tdroot .settings-popover .sp-title{font-weight:700;font-size:13px;color:var(--dark-brown);margin:0 0 6px;display:flex;align-items:center;gap:6px;}
 .tdroot .settings-popover .sp-title .sp-icon{font-size:15px;}
 .tdroot .settings-popover .sp-hint{font-size:11.5px;color:#9a948a;line-height:1.45;margin:0 0 10px;}
