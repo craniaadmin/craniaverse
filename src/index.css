@@ -2,36 +2,36 @@
    CraniaVerse — Design System
    ============================================================ */
 :root {
-  --header-blue: #c2e7f8;
-  --header-blue-soft: #d8f0fa;
-  --logo-teal: #4f9ea0;
-  --card-teal: #6fa8a8;
-  --card-teal-dark: #5b9494;
-  --btn-teal: #2c7a7b;
-  --btn-teal-hover: #246364;
-  --footer-dark: #2e2a23;
+  --header-blue: #A6E2F9;
+  --header-blue-soft: #D8ECF8;
+  --logo-teal: #5FA09E;
+  --card-teal: #5FA09E;
+  --card-teal-dark: #4c8987;
+  --btn-teal: #5FA09E;
+  --btn-teal-hover: #4c8987;
+  --footer-dark: #2E2516;
 
-  --ink: #1f2733;
-  --ink-soft: #5b6573;
-  --muted: #8b95a3;
-  --line: #e3e8ec;
-  --field-bg: #ececec;
-  --field-bg-soft: #f1f3f4;
-  --page-bg: #f7f8f9;
+  --ink: #2E2516;
+  --ink-soft: #6B6455;
+  --muted: #9A948A;
+  --line: #D5D0C4;
+  --field-bg: #EEF3F6;
+  --field-bg-soft: #EEF3F6;
+  --page-bg: #F4F7F8;
   --white: #ffffff;
 
-  --pri-red: #f6b0b0;
-  --pri-red-soft: #fbdada;
-  --pri-yellow: #f6e3a1;
-  --pri-yellow-soft: #fcf4d4;
-  --pri-green: #cfe6b4;
-  --pri-green-soft: #e7f2d9;
-  --pri-blue: #aedcef;
-  --pri-blue-soft: #d8f0fa;
+  --pri-red: #FADBD8;
+  --pri-red-soft: #FADBD8;
+  --pri-yellow: #E0DE85;
+  --pri-yellow-soft: #F2F1C7;
+  --pri-green: #DEF2DE;
+  --pri-green-soft: #DEF2DE;
+  --pri-blue: #A6E2F9;
+  --pri-blue-soft: #D8ECF8;
 
-  --danger: #ff1f1f;
-  --highlight-yellow: #e9e79c;
-  --link: #c0392b;
+  --danger: #C0392B;
+  --highlight-yellow: #E0DE85;
+  --link: #C0392B;
 
   --radius: 10px;
   --radius-sm: 7px;
