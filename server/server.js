@@ -861,6 +861,8 @@ app.put('/api/stock', wrap(async (req, res) => {
     subOrder:        body.subOrder && typeof body.subOrder === 'object' ? body.subOrder : {},
     subColors:       body.subColors && typeof body.subColors === 'object' ? body.subColors : {},
     colOrder:        Array.isArray(body.colOrder) ? body.colOrder : [],
+    hiddenCols:      body.hiddenCols && typeof body.hiddenCols === 'object' ? body.hiddenCols : {},
+    groupBy:         !!body.groupBy,
   }
   await saveStock(payload)
   res.json({ ok: true })
