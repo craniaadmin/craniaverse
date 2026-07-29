@@ -12,12 +12,17 @@
 // per-item colour swatches management.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Plus, Minus, Edit2, Trash2, Search, X } from 'lucide-react'
+import { Plus, Minus, Edit2, Trash2, Search, X, Eye, Download } from 'lucide-react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
 
 const DEFAULT_COL_ORDER = ['num', 'name', 'category', 'sub', 'sku', 'qty', 'reorder', 'cost', 'value', 'location', 'status']
+const COLUMN_LABELS = {
+  num: 'Item #', name: 'Name', category: 'Category', sub: 'Sub-Category', sku: 'SKU',
+  qty: 'On Hand', reorder: 'Reorder', cost: 'Unit Cost', value: 'Value',
+  location: 'Location', status: 'Status',
+}
 
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
