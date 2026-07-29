@@ -345,7 +345,7 @@ export default function Programs() {
         <div style={HEAD_STYLE}>Fees</div>
         <div style={HEAD_STYLE}>Location</div>
         <div style={HEAD_STYLE}>Offerings</div>
-        <div style={HEAD_STYLE}></div>
+        <div style={{ ...HEAD_STYLE, background: 'transparent', color: 'var(--muted)', justifyContent: 'center' }}>Edit</div>
       </div>
 
       {visible.length === 0 && (
