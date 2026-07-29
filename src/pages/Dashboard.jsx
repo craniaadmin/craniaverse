@@ -232,7 +232,7 @@ export default function Dashboard({ onNavigate }) {
                     <RadialBar background dataKey="value" cornerRadius={8} />
                   </RadialBarChart>
                 </ResponsiveContainer>
-                <div style={{ position: 'absolute', left: 0, right: 0, bottom: 18, textAlign: 'center', fontSize: 26, fontWeight: 800, color: '#20304a' }}>
+                <div style={{ position: 'absolute', left: 0, right: 0, bottom: 18, textAlign: 'center', fontSize: 26, fontWeight: 800, color: '#2E2516' }}>
                   {money(monthRevenue)}
                 </div>
               </div>
