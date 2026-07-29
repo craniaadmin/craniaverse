@@ -1656,7 +1656,7 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
           </div>
         )}
       </div>
-      <div className="sp-section sp-alt">
+      <div className="sp-section">
         <div className="sp-title"><span className="sp-icon">🔄</span> Checklists</div>
         <p className="sp-hint">
           Checklist items are added to your To-Do list automatically
