@@ -14,11 +14,20 @@ const normHex = (v) => {
   if (/^#?[0-9a-fA-F]{3}$/.test(v)) { const h = v.replace('#', ''); return '#' + h[0]+h[0]+h[1]+h[1]+h[2]+h[2] }
   return null
 }
+const isDarkColor = (hex) => {
+  if (!hex) return false
+  let h = String(hex).replace('#', '')
+  if (h.length === 3) h = h.split('').map(c => c + c).join('')
+  if (h.length < 6) return false
+  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16)
+  return (0.299 * r + 0.587 * g + 0.114 * b) < 150
+}
 
 const isoLocal = (d) => {
   const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), da = String(d.getDate()).padStart(2,'0')
   return `${y}-${m}-${da}`
 }
+const dayNum = (d) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000)
 const dueClass = (due) => {
   if (!due) return ''
   const t = new Date(); t.setHours(0,0,0,0)
@@ -41,19 +50,19 @@ const isoWeekKey = (d) => {
   const week = 1 + Math.round(((t - firstThu) / 86400000 - 3 + ((firstThu.getUTCDay() + 6) % 7)) / 7)
   return t.getUTCFullYear() + '-W' + String(week).padStart(2, '0')
 }
-const checklistKey = (cl) => {
-  const d = new Date()
-  if (cl.freq === 'weekly') return isoWeekKey(d)
-  if (cl.freq === 'monthly') return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
-  if (cl.freq === 'custom') { const n = Math.max(1, Number(cl.customDays) || 1); return 'C' + n + '-' + Math.floor(Date.now() / 86400000 / n) }
-  return isoLocal(d)
-}
-const monthlyTarget = (cl, now) => {
+
+// ---------- Per-entry checklist scheduling ----------
+// Each checklist ENTRY carries its own schedule now (freq/customDays/
+// monthMode/etc + its own `active` + its own `lastKey`) instead of
+// the whole checklist sharing one schedule. This is what lets a
+// checklist mix a daily item with a monthly one, and lets each item
+// be toggled off individually.
+const monthlyTarget = (en, now) => {
   const y = now.getFullYear(), m = now.getMonth()
   const dim = new Date(y, m + 1, 0).getDate()
-  if (cl.monthMode === 'weekday') {
-    const wd = Number(cl.monthWeekday || 0)
-    const nth = cl.monthWeek || 1
+  if (en.monthMode === 'weekday') {
+    const wd = Number(en.monthWeekday || 0)
+    const nth = en.monthWeek || 1
     if (nth === 'last') { let d = dim; while (new Date(y, m, d).getDay() !== wd) d--; return d }
     let count = 0
     for (let d = 1; d <= dim; d++) {
@@ -61,13 +70,102 @@ const monthlyTarget = (cl, now) => {
     }
     return dim
   }
-  return Math.min(Math.max(1, Number(cl.monthDate) || 1), dim)
+  return Math.min(Math.max(1, Number(en.monthDate) || 1), dim)
 }
-const checklistDue = (cl) => {
+
+// The "period" this entry is currently in — regenerating never
+// touches an item from a DIFFERENT period, which is what lets an
+// undone yesterday's daily item stay on the board today instead of
+// being silently replaced.
+function checklistKey(en) {
+  const d = new Date()
+  if (en.freq === 'weekly') return isoWeekKey(d)
+  if (en.freq === 'monthly') return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+  if (en.freq === 'custom') {
+    if (en.customMode === 'on') return 'ON-' + (en.customStart || '')
+    const n = Math.max(1, Number(en.customDays) || 1)
+    const t = dayNum(d)
+    const st = en.customStart ? dayNum(new Date(en.customStart + 'T00:00:00')) : t
+    return 'C' + n + '-' + st + '-' + Math.floor((t - st) / n)
+  }
+  return isoLocal(d)
+}
+
+function checklistDue(en) {
   const now = new Date()
-  if (cl.lastKey === checklistKey(cl)) return false
-  if (cl.freq === 'monthly') return now.getDate() >= monthlyTarget(cl, now)
+  if (en.lastKey === checklistKey(en)) return false
+  if (en.freq === 'weekly') {
+    const wd = Number(en.weekDay)
+    const t = isNaN(wd) ? 1 : wd
+    return ((now.getDay() + 6) % 7) >= ((t + 6) % 7)
+  }
+  if (en.freq === 'monthly') return now.getDate() >= monthlyTarget(en, now)
+  if (en.freq === 'custom' && en.customStart) {
+    if (dayNum(now) < dayNum(new Date(en.customStart + 'T00:00:00'))) return false
+  }
   return true
+}
+
+function entryDue(en) {
+  const now = new Date()
+  if (en.freq === 'weekly') {
+    const wd = Number(en.weekDay)
+    const t = isNaN(wd) ? 1 : wd
+    const todayOrd = (now.getDay() + 6) % 7, tOrd = (t + 6) % 7
+    const d = new Date(now); d.setDate(now.getDate() + (tOrd - todayOrd))
+    return isoLocal(d)
+  }
+  if (en.freq === 'monthly') {
+    const day = monthlyTarget(en, now)
+    return isoLocal(new Date(now.getFullYear(), now.getMonth(), day))
+  }
+  if (en.freq === 'custom' && en.customMode === 'on') return en.customStart || isoLocal(now)
+  if (en.freq === 'custom' && en.customStart) {
+    const n = Math.max(1, Number(en.customDays) || 1)
+    const t = dayNum(now)
+    const st = dayNum(new Date(en.customStart + 'T00:00:00'))
+    const idx = Math.max(0, Math.floor((t - st) / n))
+    const dd = new Date((st + idx * n) * 86400000)
+    return isoLocal(new Date(dd.getUTCFullYear(), dd.getUTCMonth(), dd.getUTCDate()))
+  }
+  return isoLocal(now)
+}
+
+const blankEntry = (listId) => ({
+  id: uid(), text: '', note: '', listId: listId || '', priority: 'high', active: true,
+  freq: 'daily', customDays: 1, customMode: 'every', customStart: '', weekDay: 1,
+  monthMode: 'date', monthDate: 1, monthWeek: 1, monthWeekday: 1, lastKey: '',
+})
+
+// Migrate old data on load: legacy checklists stored `entries` as a
+// plain array of strings sharing one schedule for the whole
+// checklist. Turn each string into a full entry object, inheriting
+// the checklist's old schedule as that entry's own.
+function normalizeChecklist(cl) {
+  const entries = (cl.entries || []).map((e) => {
+    if (typeof e === 'string') {
+      return { ...blankEntry(cl.listId), text: e, freq: cl.freq || 'daily', customDays: cl.customDays || 1,
+        monthMode: cl.monthMode || 'date', monthDate: cl.monthDate || 1, monthWeek: cl.monthWeek || 1,
+        monthWeekday: cl.monthWeekday !== undefined ? cl.monthWeekday : 1 }
+    }
+    return {
+      id: e.id || uid(), text: e.text || '', note: e.note || '',
+      listId: e.listId || cl.listId || '',
+      priority: e.priority || 'high',
+      active: e.active !== false,
+      freq: e.freq || cl.freq || 'daily',
+      customDays: e.customDays || cl.customDays || 1,
+      customMode: e.customMode || 'every',
+      customStart: e.customStart || '',
+      weekDay: e.weekDay !== undefined ? e.weekDay : 1,
+      monthMode: e.monthMode || cl.monthMode || 'date',
+      monthDate: e.monthDate || cl.monthDate || 1,
+      monthWeek: e.monthWeek || cl.monthWeek || 1,
+      monthWeekday: e.monthWeekday !== undefined ? e.monthWeekday : (cl.monthWeekday !== undefined ? cl.monthWeekday : 1),
+      lastKey: e.lastKey || '',
+    }
+  })
+  return { ...cl, active: cl.active !== false, entries }
 }
 
 // ---------- CSV export ----------
@@ -164,36 +262,45 @@ const CSS = `
 .tdroot .nomatch{text-align:center;color:#9a948a;font-size:14px;padding:30px;}
 
 /* checklists view */
-.tdroot .cl-wrap{max-width:720px;margin:0 auto;}
-.tdroot .clhint{font-size:13px;color:#6b6455;margin-bottom:16px;line-height:1.5;}
+.tdroot .cl-wrap{max-width:820px;margin:0 auto;}
+.tdroot .clhint{font-size:13px;color:#6b6455;margin-bottom:0;line-height:1.5;flex:1;}
+.tdroot .cltoprow{display:flex;gap:12px;align-items:center;margin-bottom:16px;}
 .tdroot .clcard{background:#fff;border-radius:12px 12px 0 0;padding:14px 16px;box-shadow:var(--tshadow);margin-bottom:16px;border-left:3px solid var(--light-blue);border-right:3px solid var(--light-brown);border-bottom:3px solid var(--dark-blue);}
 .tdroot .clcard.inactive{opacity:.55;}
-.tdroot .clhead{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
-.tdroot .clname{flex:1;padding:8px 10px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;font-weight:600;}
-.tdroot .clfreq{padding:8px 10px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;background:#fff;}
-.tdroot .clcustwrap,.tdroot .clmonthwrap{font-size:12px;color:#6b6455;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-wrap:wrap;}
-.tdroot .clmonthwrap select,.tdroot .clmonthwrap input{padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12px;}
+.tdroot .clhead{display:flex;gap:8px;align-items:center;margin:-14px -19px 12px;padding:10px 16px;border-radius:12px 12px 0 0;}
+.tdroot .clhead.darkhead{color:#fff;}
+.tdroot .clname{flex:1;padding:8px 10px;border:none;border-radius:8px;font:inherit;font-weight:700;font-size:15px;background:transparent;color:inherit;cursor:pointer;}
+.tdroot .clcustwrap,.tdroot .clmonthwrap,.tdroot .clweekwrap{font-size:12px;color:#6b6455;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-wrap:wrap;}
+.tdroot .clmonthwrap select,.tdroot .clmonthwrap input,.tdroot .clcustwrap select,.tdroot .clcustwrap input,.tdroot .clweekwrap select{padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12px;}
 .tdroot .clcustom{width:52px;padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;}
 .tdroot .clactive{font-size:12px;color:#6b6455;display:flex;align-items:center;gap:4px;white-space:nowrap;}
 .tdroot .clactive input{width:15px;height:15px;}
-.tdroot .cldel{background:none;border:none;color:#c9c3b5;font-size:18px;padding:0 6px;font-weight:700;cursor:pointer;}
-.tdroot .cldel:hover{color:#c0392b;}
-.tdroot .clentries{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;padding-left:8px;}
-.tdroot .clentry{display:flex;gap:6px;align-items:center;}
-.tdroot .clentry input{flex:1;padding:7px 9px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;}
-.tdroot .clentdel{background:none;border:none;color:#c9c3b5;font-size:15px;padding:0 6px;font-weight:700;cursor:pointer;}
+.tdroot .cldel{background:none;border:none;color:inherit;opacity:.55;font-size:18px;padding:0 6px;font-weight:700;cursor:pointer;}
+.tdroot .cldel:hover{color:#c0392b;opacity:1;}
+.tdroot .clmove{background:none;border:none;color:inherit;opacity:.55;padding:0 2px;font-size:13px;line-height:1;font-weight:700;cursor:pointer;}
+.tdroot .clmove:hover{opacity:1;}
+.tdroot .clentries{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.tdroot .clentry{background:#fbfaf5;border:1px solid #ece8dc;border-radius:8px;padding:8px 10px;}
+.tdroot .clentry.inactive{opacity:.55;}
+.tdroot .clentrow1{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.tdroot .clenttext{flex:1 1 160px;min-width:120px;padding:7px 9px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;font-size:13px;}
+.tdroot .clentnote{flex:1 1 140px;min-width:100px;padding:7px 9px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;font-size:13px;color:#6b6455;}
+.tdroot .clentfreq{padding:7px 8px;border:1px solid #d5d0c4;border-radius:8px;font:inherit;font-size:12.5px;background:#fff;}
+.tdroot .clentmove{background:none;border:none;color:#9a948a;padding:0 1px;font-size:11px;line-height:1;font-weight:700;cursor:pointer;}
+.tdroot .clentmove:hover{color:var(--dark-blue);}
+.tdroot .clentdup,.tdroot .clentdel{background:none;border:none;color:#c9c3b5;font-size:15px;padding:0 5px;font-weight:700;cursor:pointer;}
+.tdroot .clentdup:hover{color:var(--dark-blue);}
 .tdroot .clentdel:hover{color:#c0392b;}
+.tdroot .clentrow2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;}
+.tdroot .clentlistwrap{color:#6b6455;display:inline-flex;align-items:center;gap:4px;}
+.tdroot .clentlist{padding:6px 8px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12px;background:#fff;}
+.tdroot .clentpri{padding:4px 8px;border:none;border-radius:6px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;}
+.tdroot .clentactive{display:flex;align-items:center;gap:4px;color:#6b6455;white-space:nowrap;}
+.tdroot .clentactive input{width:14px;height:14px;}
 .tdroot .clactions{display:flex;gap:8px;align-items:center;}
 .tdroot .clactions .cladd{background:transparent;color:var(--light-blue);border:none;font-size:22px;font-weight:800;padding:0 10px;line-height:1;cursor:pointer;}
 .tdroot .clrun{margin-left:auto;background:var(--light-brown);color:var(--dark-brown);border:none;padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;}
-.tdroot .clentbox{color:#b8b2a2;font-size:16px;flex:none;line-height:1;}
 `
-
-const uiConfirm = (message) => new Promise((res) => {
-  // Simple browser confirm — matches the modal behavior enough for now.
-  // Custom modal below handles the "Delete" cases via state.
-  res(window.confirm(message))
-})
 
 // ============ Component ============
 // `initialView` + `onNavigate` come from App.jsx so the outer sidebar
@@ -202,7 +309,7 @@ const uiConfirm = (message) => new Promise((res) => {
 // jump back to the To-Do view through the same outer nav rather than
 // via a duplicate in-page tab bar.
 export default function ToDo({ initialView = 'todo', onNavigate }) {
-  const [state, setState] = useState({ lists: [], items: [], checklists: [] })
+  const [state, setState] = useState({ lists: [], items: [], checklists: [], _migPri: false })
   const [loading, setLoading] = useState(true)
   const [hideDone, setHideDone] = useState(false)
   const [view, setView] = useState(initialView) // 'todo' | 'checklists'
@@ -215,7 +322,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   // Modals
   const [itemModal, setItemModal] = useState(null) // { editId, listId }
   const [itemDraft, setItemDraft] = useState({ text: '', listId: '', priority: 'low', due: '', notes: '', color: DEFAULT_ITEM_BG })
-  const [nameModal, setNameModal] = useState(null) // { renameId }
+  const [nameModal, setNameModal] = useState(null) // { mode: 'list'|'checklist', renameId }
   const [nameDraft, setNameDraft] = useState({ name: '', color: '#FFFFFF' })
   const [confirmModal, setConfirmModal] = useState(null) // { msg, onOk }
 
@@ -228,15 +335,25 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     fetch(`${API_BASE}/api/todo`)
       .then(r => r.json())
       .then((s) => {
-        const next = {
-          lists:      Array.isArray(s?.lists) ? s.lists : [],
-          items:      Array.isArray(s?.items) ? s.items : [],
-          checklists: Array.isArray(s?.checklists) ? s.checklists : [],
+        let lists = Array.isArray(s?.lists) ? s.lists : []
+        let items = Array.isArray(s?.items) ? s.items : []
+        let checklists = (Array.isArray(s?.checklists) ? s.checklists : []).map(normalizeChecklist)
+        if (lists.length === 0) {
+          lists = [{ id: uid(), name: 'To Do' }, { id: uid(), name: 'This Week' }]
         }
-        if (next.lists.length === 0) {
-          next.lists = [{ id: uid(), name: 'To Do' }, { id: uid(), name: 'This Week' }]
+        // Stale items from the old per-checklist (not per-entry) model
+        // have a checklistId but no entryId — nothing manages their
+        // lifecycle under the new model, so drop them once.
+        items = items.filter(i => !(i.checklistId && !i.entryId))
+        let migPri = !!s?._migPri
+        if (!migPri) {
+          checklists = checklists.map(cl => ({
+            ...cl,
+            entries: cl.entries.map(en => (!en.priority || en.priority === 'low') ? { ...en, priority: 'high' } : en),
+          }))
+          migPri = true
         }
-        setState(next)
+        setState({ lists, items, checklists, _migPri: migPri })
       })
       .catch(err => console.error('Failed to load todos:', err))
       .finally(() => setLoading(false))
@@ -260,51 +377,89 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   }, [state, loading])
 
   // ---------- Checklist auto-run when the todo view opens ----------
+  // Per entry, not per checklist: only creates an item when that
+  // SPECIFIC entry's current period doesn't already have one, so an
+  // undone item from a prior period is never silently replaced.
   const runChecklists = () => {
     setState((s) => {
       let changed = false
-      const nextChecklists = (s.checklists || []).map(cl => ({ ...cl }))
       let nextItems = [...s.items]
-      let nextLists = [...s.lists]
-      for (const cl of nextChecklists) {
-        if (cl.active === false) continue
-        if (!checklistDue(cl)) continue
+      const nextLists = [...s.lists]
+      const nextChecklists = (s.checklists || []).map(cl => {
+        if (cl.active === false) return cl
         let list = nextLists.find(l => l.id === cl.listId)
-        if (!list) { list = { id: uid(), name: cl.name || 'Checklist' }; nextLists.push(list); cl.listId = list.id }
-        else if (cl.name) { list.name = cl.name }
-        nextItems = nextItems.filter(i => i.checklistId !== cl.id)
-        for (const txt of (cl.entries || [])) {
-          if (txt && txt.trim()) {
-            nextItems.push({
-              id: uid(), listId: list.id, text: txt.trim(),
-              priority: 'low', due: '', done: false,
-              color: DEFAULT_ITEM_BG, notes: '', checklistId: cl.id,
-            })
-          }
-        }
-        cl.lastKey = checklistKey(cl)
-        changed = true
-      }
+        if (!list) { list = nextLists[0] || { id: uid(), name: 'To Do' }; if (!nextLists.includes(list)) nextLists.push(list) }
+        const nextEntries = cl.entries.map(en => {
+          if (en.active === false) return en
+          if (!checklistDue(en)) return en
+          const curKey = checklistKey(en)
+          const existing = nextItems.find(i => i.entryId === en.id && i.periodKey === curKey)
+          if (existing) { changed = true; return { ...en, lastKey: curKey } }
+          const txt = (en.text || '').trim()
+          if (!txt) return en
+          const tl = nextLists.find(l => l.id === en.listId) || list
+          nextItems = [{
+            id: uid(), listId: tl.id, text: txt, priority: en.priority || 'high',
+            due: entryDue(en), done: false, color: DEFAULT_ITEM_BG, notes: en.note || '',
+            checklistId: cl.id, entryId: en.id, periodKey: curKey,
+          }, ...nextItems]
+          changed = true
+          return { ...en, lastKey: curKey }
+        })
+        return { ...cl, entries: nextEntries }
+      })
       if (!changed) return s
       return { ...s, lists: nextLists, items: nextItems, checklists: nextChecklists }
     })
   }
   useEffect(() => { if (!loading && view === 'todo') runChecklists() }, [view, loading])
 
+  // "Add to To-Do Now": pull every active entry's current-period item
+  // in immediately, bypassing the schedule check — but still never
+  // duplicates an item that's already been pulled.
+  const forcePull = (checklistId) => {
+    setState((s) => {
+      const cl = (s.checklists || []).find(c => c.id === checklistId)
+      if (!cl) return s
+      let nextItems = [...s.items]
+      const list = s.lists.find(l => l.id === cl.listId) || s.lists[0]
+      const nextEntries = cl.entries.map(en => {
+        if (en.active === false) return en
+        const curKey = checklistKey(en)
+        const existing = nextItems.find(i => i.entryId === en.id && i.periodKey === curKey)
+        if (existing) return { ...en, lastKey: curKey }
+        const txt = (en.text || '').trim()
+        if (!txt) return en
+        const tl = s.lists.find(l => l.id === en.listId) || list
+        nextItems = [{
+          id: uid(), listId: tl.id, text: txt, priority: en.priority || 'high',
+          due: entryDue(en), done: false, color: DEFAULT_ITEM_BG, notes: en.note || '',
+          checklistId: cl.id, entryId: en.id, periodKey: curKey,
+        }, ...nextItems]
+        return { ...en, lastKey: curKey }
+      })
+      return {
+        ...s, items: nextItems,
+        checklists: s.checklists.map(c => c.id === checklistId ? { ...c, entries: nextEntries } : c),
+      }
+    })
+    setTimeout(() => (onNavigate ? onNavigate('To-Do') : setView('todo')), 30)
+  }
+
   // ---------- Export CSV (current view's data) ----------
   const exportCsv = () => {
     const stamp = isoLocal(new Date())
     if (view === 'checklists') {
-      const rows = [['Checklist', 'List', 'Frequency', 'Active', 'Entries']]
+      const rows = [['Checklist', 'List', 'Entry', 'Frequency', 'Active', 'Priority']]
       for (const cl of state.checklists) {
-        const list = state.lists.find(l => l.id === cl.listId)
-        rows.push([
-          cl.name || '',
-          list?.name || '',
-          cl.freq || 'daily',
-          cl.active === false ? 'No' : 'Yes',
-          (cl.entries || []).filter(Boolean).join(' | '),
-        ])
+        for (const en of cl.entries) {
+          const list = state.lists.find(l => l.id === en.listId)
+          rows.push([
+            cl.name || '', list?.name || '', en.text || '',
+            en.freq || 'daily', en.active === false ? 'No' : 'Yes',
+            PRI_LABEL[en.priority || 'high'] || en.priority || '',
+          ])
+        }
       }
       downloadCsv(`crania-checklists-${stamp}.csv`, rows)
     } else {
@@ -445,17 +600,26 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     closeItem()
   }
 
-  // ---------- Name (add/rename list) modal ----------
+  // ---------- Name modal (add/rename list OR checklist) ----------
   const openName = (id) => {
     const list = id ? state.lists.find(l => l.id === id) : null
-    setNameModal({ renameId: id || null })
+    setNameModal({ mode: 'list', renameId: id || null })
     setNameDraft({ name: list?.name || '', color: list?.color || '#FFFFFF' })
+  }
+  const openChecklistEdit = (id) => {
+    const cl = state.checklists.find(c => c.id === id)
+    if (!cl) return
+    setNameModal({ mode: 'checklist', renameId: id })
+    setNameDraft({ name: cl.name || '', color: cl.color || '#FFFFFF' })
   }
   const closeName = () => setNameModal(null)
   const saveName = () => {
     const name = nameDraft.name.trim()
     if (!name) return
     setState(s => {
+      if (nameModal.mode === 'checklist') {
+        return { ...s, checklists: s.checklists.map(c => c.id === nameModal.renameId ? { ...c, name, color: nameDraft.color } : c) }
+      }
       if (nameModal.renameId) {
         return { ...s, lists: s.lists.map(l => l.id === nameModal.renameId ? { ...l, name, color: nameDraft.color } : l) }
       }
@@ -463,6 +627,155 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     })
     closeName()
   }
+
+  // ---------- Checklist mutations ----------
+  const addChecklist = () => setState(s => {
+    const listId = s.lists[0]?.id || ''
+    return {
+      ...s,
+      checklists: [...(s.checklists || []), {
+        id: uid(), name: 'New Checklist', listId, active: true, color: '',
+        entries: [blankEntry(listId)],
+      }],
+    }
+  })
+  const updateChecklistActive = (id, active) => setState(s => ({
+    ...s,
+    checklists: s.checklists.map(cl => cl.id === id
+      ? { ...cl, active, entries: active ? cl.entries.map(en => ({ ...en, lastKey: '' })) : cl.entries }
+      : cl),
+    items: active ? s.items : s.items.filter(i => i.checklistId !== id),
+  }))
+  const moveChecklist = (id, dir) => setState(s => {
+    const i = s.checklists.findIndex(c => c.id === id); const j = i + dir
+    if (i < 0 || j < 0 || j >= s.checklists.length) return s
+    const next = [...s.checklists]; [next[i], next[j]] = [next[j], next[i]]
+    return { ...s, checklists: next }
+  })
+  const deleteChecklist = async (cl) => {
+    if (!(await askConfirm(`Delete checklist "${cl.name || ''}"?`))) return
+    setState(s => ({
+      ...s,
+      checklists: s.checklists.filter(c => c.id !== cl.id),
+      items: s.items.filter(i => i.checklistId !== cl.id),
+    }))
+  }
+
+  // ---------- Entry mutations ----------
+  const addEntry = (checklistId) => setState(s => ({
+    ...s,
+    checklists: s.checklists.map(cl => cl.id === checklistId
+      ? { ...cl, entries: [...cl.entries, blankEntry(cl.listId)] }
+      : cl),
+  }))
+  const duplicateEntry = (checklistId, entryId) => setState(s => ({
+    ...s,
+    checklists: s.checklists.map(cl => {
+      if (cl.id !== checklistId) return cl
+      const idx = cl.entries.findIndex(en => en.id === entryId)
+      if (idx < 0) return cl
+      const copy = { ...cl.entries[idx], id: uid(), lastKey: '' }
+      const entries = [...cl.entries]
+      entries.splice(idx + 1, 0, copy)
+      return { ...cl, entries }
+    }),
+  }))
+  const moveEntry = (checklistId, entryId, dir) => setState(s => ({
+    ...s,
+    checklists: s.checklists.map(cl => {
+      if (cl.id !== checklistId) return cl
+      const i = cl.entries.findIndex(en => en.id === entryId); const j = i + dir
+      if (i < 0 || j < 0 || j >= cl.entries.length) return cl
+      const entries = [...cl.entries]; [entries[i], entries[j]] = [entries[j], entries[i]]
+      return { ...cl, entries }
+    }),
+  }))
+  const removeEntry = (checklistId, entryId) => setState(s => ({
+    ...s,
+    checklists: s.checklists.map(cl => cl.id === checklistId
+      ? { ...cl, entries: cl.entries.filter(en => en.id !== entryId) }
+      : cl),
+    items: s.items.filter(i => i.entryId !== entryId),
+  }))
+
+  // Fields that don't affect scheduling (text/note/priority/listId/
+  // active) apply directly and, if this entry already has a pulled
+  // item for the current period, sync straight into it too — so
+  // editing a checklist entry updates the to-do that's already on the
+  // board instead of only affecting the next time it's regenerated.
+  const updateEntrySimple = (checklistId, entryId, patch) => setState(s => {
+    const cl = s.checklists.find(c => c.id === checklistId)
+    const en = cl?.entries.find(e => e.id === entryId)
+    if (!en) return s
+    const nextEn = { ...en, ...patch }
+    let items = s.items
+    const pulled = items.find(i => i.entryId === entryId && i.periodKey === checklistKey(en))
+    if (pulled) {
+      const itemPatch = {}
+      if ('text' in patch) { const t = patch.text.trim(); if (t) itemPatch.text = t }
+      if ('note' in patch) itemPatch.notes = patch.note
+      if ('priority' in patch) itemPatch.priority = patch.priority
+      if ('listId' in patch && s.lists.some(l => l.id === patch.listId)) itemPatch.listId = patch.listId
+      if (Object.keys(itemPatch).length) {
+        items = items.map(i => i.id === pulled.id ? { ...i, ...itemPatch } : i)
+      }
+    } else if ('active' in patch === false && 'text' in patch && patch.text.trim()) {
+      // Text just became non-empty on a never-pulled entry — pull it in right away
+      // rather than waiting for the next natural due check.
+    }
+    const checklists = s.checklists.map(c => c.id === checklistId
+      ? { ...c, entries: c.entries.map(e => e.id === entryId ? nextEn : e) }
+      : c)
+    return { ...s, checklists, items }
+  })
+  const setEntryText = (checklistId, entryId, text) => {
+    updateEntrySimple(checklistId, entryId, { text })
+    // If nothing has been pulled for this entry yet, try pulling it in now.
+    setTimeout(runChecklists, 0)
+  }
+  const setEntryActive = (checklistId, entryId, active) => setState(s => {
+    const checklists = s.checklists.map(cl => cl.id === checklistId
+      ? { ...cl, entries: cl.entries.map(en => en.id === entryId ? { ...en, active, lastKey: active ? '' : en.lastKey } : en) }
+      : cl)
+    const items = active ? s.items : s.items.filter(i => i.entryId !== entryId)
+    return { ...s, checklists, items }
+  })
+
+  // Fields that DO affect scheduling: migrate the already-pulled item
+  // (if any, and not done) to the new period instead of duplicating
+  // it, matching rescheduleEntry() in the source mockup.
+  const updateEntrySchedule = (checklistId, entryId, patch) => setState(s => {
+    const cl = s.checklists.find(c => c.id === checklistId)
+    const en = cl?.entries.find(e => e.id === entryId)
+    if (!en) return s
+    const prevKey = (en.lastKey && en.lastKey === checklistKey(en)) ? en.lastKey : null
+    const nextEn = { ...en, ...patch, lastKey: '' }
+
+    let items = s.items
+    const pulled = prevKey ? items.find(i => i.entryId === entryId && i.periodKey === prevKey) : null
+    let finalEn = nextEn
+    if (pulled && !pulled.done) {
+      if (checklistDue(nextEn)) {
+        const nk = checklistKey(nextEn)
+        const dup = items.find(i => i.entryId === entryId && i.periodKey === nk && i.id !== pulled.id)
+        if (dup) {
+          items = items.filter(i => i.id !== pulled.id)
+        } else {
+          items = items.map(i => i.id === pulled.id ? { ...i, periodKey: nk, due: entryDue(nextEn) } : i)
+        }
+        finalEn = { ...nextEn, lastKey: nk }
+      } else {
+        items = items.filter(i => i.id !== pulled.id)
+      }
+    } else if (pulled) {
+      // Already completed this period — leave it as history.
+      if (checklistDue(nextEn)) finalEn = { ...nextEn, lastKey: checklistKey(nextEn) }
+    }
+    const checklists = s.checklists.map(c => c.id === checklistId
+      ? { ...c, entries: c.entries.map(e => e.id === entryId ? finalEn : e) }
+      : c)
+    return { ...s, checklists, items }
+  })
 
   // ---------- Confirm modal ----------
   const askConfirm = (msg) => new Promise(res => setConfirmModal({ msg, resolve: res }))
@@ -528,6 +841,16 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
               </button>
             </>
           )}
+          {view === 'checklists' && (
+            <button
+              onClick={addChecklist}
+              style={{
+                background: 'var(--brand-light-blue)', color: 'var(--brand-dark-brown)',
+                border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700,
+                borderRadius: 8, cursor: 'pointer',
+              }}
+            >+ Add checklist</button>
+          )}
           <button
             onClick={exportCsv}
             title={view === 'checklists' ? 'Download all checklists as a CSV file' : 'Download all to-do items as a CSV file'}
@@ -565,9 +888,21 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       />}
 
       {view === 'checklists' && <ChecklistsView
-        state={state} setState={setState}
+        state={state}
         askConfirm={askConfirm}
-        onGoToTodo={() => onNavigate ? onNavigate('To-Do') : setView('todo')}
+        openChecklistEdit={openChecklistEdit}
+        updateChecklistActive={updateChecklistActive}
+        moveChecklist={moveChecklist}
+        deleteChecklist={deleteChecklist}
+        addEntry={addEntry}
+        duplicateEntry={duplicateEntry}
+        moveEntry={moveEntry}
+        removeEntry={removeEntry}
+        setEntryText={setEntryText}
+        updateEntrySimple={updateEntrySimple}
+        setEntryActive={setEntryActive}
+        updateEntrySchedule={updateEntrySchedule}
+        forcePull={forcePull}
       />}
 
       {itemModal && <ItemModal
@@ -578,6 +913,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       />}
 
       {nameModal && <NameModal
+        mode={nameModal.mode}
         renaming={!!nameModal.renameId}
         draft={nameDraft} setDraft={setNameDraft}
         onCancel={closeName} onSave={saveName}
@@ -600,9 +936,9 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
           <div className="modal" style={{ maxWidth: 380 }}>
             <h2>Settings</h2>
             <div style={{ fontSize: 13, color: '#6b6455', lineHeight: 1.5, marginBottom: 16 }}>
-              Checklist items are added to your To-Do list automatically — daily,
-              weekly, or monthly, based on each checklist's own schedule (set when
-              you create or edit it under Checklists).
+              Checklist items are added to your To-Do list automatically — each item
+              on its own schedule (daily, weekly, monthly, or custom), set when you
+              create or edit it under Checklists.
             </div>
             <button
               onClick={() => { runChecklists(); setSettingsOpen(false) }}
@@ -753,161 +1089,177 @@ function TodoView({
 }
 
 // ---------------------- ChecklistsView subcomponent ----------------------
-function ChecklistsView({ state, setState, askConfirm, onGoToTodo }) {
-  const updateCl = (id, patch) => setState(s => ({
-    ...s,
-    checklists: (s.checklists || []).map(cl => cl.id === id ? { ...cl, ...patch } : cl),
-  }))
-  const deleteCl = async (cl) => {
-    if (await askConfirm(`Delete checklist "${cl.name || ''}"?`)) {
-      setState(s => ({
-        ...s,
-        checklists: s.checklists.filter(x => x.id !== cl.id),
-        items: s.items.filter(i => i.checklistId !== cl.id),
-      }))
-    }
-  }
-  const updateEntry = (id, idx, val) => setState(s => ({
-    ...s,
-    checklists: s.checklists.map(cl => cl.id === id
-      ? { ...cl, entries: (cl.entries || []).map((t, i) => i === idx ? val : t) }
-      : cl),
-  }))
-  const removeEntry = (id, idx) => setState(s => ({
-    ...s,
-    checklists: s.checklists.map(cl => cl.id === id
-      ? { ...cl, entries: (cl.entries || []).filter((_, i) => i !== idx) }
-      : cl),
-  }))
-  const addEntry = (id) => setState(s => ({
-    ...s,
-    checklists: s.checklists.map(cl => cl.id === id
-      ? { ...cl, entries: [...(cl.entries || []), ''] }
-      : cl),
-  }))
-  const runNow = (id) => {
-    updateCl(id, { lastKey: '' })
-    setTimeout(onGoToTodo, 30) // switch view; the todo view's effect re-runs checklists
-  }
-  const addChecklist = () => setState(s => ({
-    ...s,
-    checklists: [...(s.checklists || []), {
-      id: uid(), name: 'New checklist', freq: 'daily', entries: [''],
-      lastKey: '', active: true, customDays: 1,
-      monthMode: 'date', monthDate: 1, monthWeek: 1, monthWeekday: 1,
-    }],
-  }))
-
+function ChecklistsView({
+  state, askConfirm, openChecklistEdit, updateChecklistActive, moveChecklist, deleteChecklist,
+  addEntry, duplicateEntry, moveEntry, removeEntry,
+  setEntryText, updateEntrySimple, setEntryActive, updateEntrySchedule, forcePull,
+}) {
   const checklists = state.checklists || []
 
   return (
     <div className="cl-wrap">
-      <p className="clhint">
-        Checklists auto-add their items to your To-Do each day, week, or month.
-        Edits apply next period — or press "Add to To-Do now."
-      </p>
-      {checklists.map(cl => (
-        <div key={cl.id} className={'clcard' + (cl.active === false ? ' inactive' : '')}>
-          <div className="clhead">
-            <input
-              className="clname"
-              value={cl.name || ''}
-              placeholder="Checklist name"
-              onChange={e => updateCl(cl.id, { name: e.target.value })}
-            />
-            <select
-              className="clfreq"
-              value={cl.freq || 'daily'}
-              onChange={e => updateCl(cl.id, { freq: e.target.value, lastKey: '' })}
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="custom">Custom</option>
-            </select>
+      <div className="cltoprow">
+        <p className="clhint">
+          Each checklist adds its items to a chosen To-Do list, each item on its own
+          schedule (daily / weekly / monthly / custom) — editing a schedule moves the
+          item that's already on the board instead of duplicating it.
+        </p>
+      </div>
+      {checklists.map(cl => {
+        const headStyle = cl.color && cl.color.toLowerCase() !== '#ffffff' ? { background: cl.color } : undefined
+        const darkHead = cl.color ? isDarkColor(cl.color) : false
+        return (
+          <div key={cl.id} className={'clcard' + (cl.active === false ? ' inactive' : '')}>
+            <div className={'clhead' + (darkHead ? ' darkhead' : '')} style={headStyle}>
+              <span className="clname" title="Click to rename or recolour" onClick={() => openChecklistEdit(cl.id)}>{cl.name}</span>
+              <label className="clactive">
+                <input type="checkbox" checked={cl.active !== false} onChange={e => updateChecklistActive(cl.id, e.target.checked)} /> Active
+              </label>
+              <button className="clmove" title="Move up" onClick={() => moveChecklist(cl.id, -1)}>▲</button>
+              <button className="clmove" title="Move down" onClick={() => moveChecklist(cl.id, 1)}>▼</button>
+              <button className="cldel" title="Delete checklist" onClick={() => deleteChecklist(cl)}>×</button>
+            </div>
 
-            {cl.freq === 'custom' && (
-              <span className="clcustwrap">every
-                <input
-                  type="number" className="clcustom" min="1"
-                  value={Number(cl.customDays) || 1}
-                  onChange={e => updateCl(cl.id, { customDays: Math.max(1, Number(e.target.value) || 1), lastKey: '' })}
-                /> days
-              </span>
-            )}
-
-            {cl.freq === 'monthly' && (
-              <span className="clmonthwrap">on
-                <select
-                  value={cl.monthMode === 'weekday' ? 'weekday' : 'date'}
-                  onChange={e => updateCl(cl.id, { monthMode: e.target.value, lastKey: '' })}
-                >
-                  <option value="date">the date</option>
-                  <option value="weekday">the</option>
-                </select>
-                {cl.monthMode !== 'weekday' && (
-                  <input
-                    type="number" min="1" max="31"
-                    value={Number(cl.monthDate) || 1}
-                    style={{ width: 54 }}
-                    onChange={e => updateCl(cl.id, { monthDate: Math.min(31, Math.max(1, Number(e.target.value) || 1)), lastKey: '' })}
-                  />
-                )}
-                {cl.monthMode === 'weekday' && (
-                  <>
-                    <select
-                      value={String(cl.monthWeek || '1')}
-                      onChange={e => updateCl(cl.id, { monthWeek: e.target.value, lastKey: '' })}
-                    >
-                      <option value="1">1st</option><option value="2">2nd</option>
-                      <option value="3">3rd</option><option value="4">4th</option>
-                      <option value="last">last</option>
-                    </select>
-                    <select
-                      value={String(cl.monthWeekday ?? 1)}
-                      onChange={e => updateCl(cl.id, { monthWeekday: Number(e.target.value), lastKey: '' })}
-                    >
-                      <option value="1">Mon</option><option value="2">Tue</option>
-                      <option value="3">Wed</option><option value="4">Thu</option>
-                      <option value="5">Fri</option><option value="6">Sat</option>
-                      <option value="0">Sun</option>
-                    </select>
-                  </>
-                )}
-              </span>
-            )}
-
-            <label className="clactive">
-              <input
-                type="checkbox"
-                checked={cl.active !== false}
-                onChange={e => updateCl(cl.id, { active: e.target.checked, lastKey: e.target.checked ? '' : cl.lastKey })}
-              /> Active
-            </label>
-            <button className="cldel" title="Delete checklist" onClick={() => deleteCl(cl)}>×</button>
-          </div>
-
-          <div className="clentries">
-            {(cl.entries || []).map((txt, idx) => (
-              <div key={idx} className="clentry">
-                <span className="clentbox">☐</span>
-                <input
-                  value={txt}
-                  placeholder={`Item ${idx + 1}`}
-                  onChange={e => updateEntry(cl.id, idx, e.target.value)}
+            <div className="clentries">
+              {cl.entries.map((en, idx) => (
+                <ChecklistEntryRow
+                  key={en.id}
+                  entry={en}
+                  index={idx}
+                  isFirst={idx === 0}
+                  isLast={idx === cl.entries.length - 1}
+                  lists={state.lists}
+                  onText={(v) => setEntryText(cl.id, en.id, v)}
+                  onNote={(v) => updateEntrySimple(cl.id, en.id, { note: v })}
+                  onPriority={(v) => updateEntrySimple(cl.id, en.id, { priority: v })}
+                  onListId={(v) => updateEntrySimple(cl.id, en.id, { listId: v })}
+                  onActive={(v) => setEntryActive(cl.id, en.id, v)}
+                  onSchedule={(patch) => updateEntrySchedule(cl.id, en.id, patch)}
+                  onMoveUp={() => moveEntry(cl.id, en.id, -1)}
+                  onMoveDown={() => moveEntry(cl.id, en.id, 1)}
+                  onDuplicate={() => duplicateEntry(cl.id, en.id)}
+                  onRemove={() => removeEntry(cl.id, en.id)}
                 />
-                <button className="clentdel" title="Remove" onClick={() => removeEntry(cl.id, idx)}>×</button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          <div className="clactions">
-            <button className="cladd" title="Add item" onClick={() => addEntry(cl.id)}>+</button>
-            <button className="clrun" onClick={() => runNow(cl.id)}>Add to To-Do now</button>
+            <div className="clactions">
+              <button className="cladd" title="Add item" onClick={() => addEntry(cl.id)}>+</button>
+              <button className="clrun" onClick={() => forcePull(cl.id)}>Add to To-Do Now</button>
+            </div>
           </div>
+        )
+      })}
+      {checklists.length === 0 && (
+        <div style={{ textAlign: 'center', color: '#9a948a', fontSize: 13, padding: '20px 0' }}>
+          No checklists yet — click "+ Add checklist" above to create one.
         </div>
-      ))}
-      <button className="lightbtn" onClick={addChecklist} style={{ marginTop: 4 }}>+ Add checklist</button>
+      )}
+    </div>
+  )
+}
+
+const WEEKDAY_OPTIONS = [
+  [1, 'Mon'], [2, 'Tue'], [3, 'Wed'], [4, 'Thu'], [5, 'Fri'], [6, 'Sat'], [0, 'Sun'],
+]
+
+function ChecklistEntryRow({
+  entry: en, index, isFirst, isLast, lists,
+  onText, onNote, onPriority, onListId, onActive, onSchedule,
+  onMoveUp, onMoveDown, onDuplicate, onRemove,
+}) {
+  return (
+    <div className={'clentry' + (en.active === false ? ' inactive' : '')}>
+      <div className="clentrow1">
+        <button className="clentmove" title="Up" disabled={isFirst} onClick={onMoveUp} style={{ opacity: isFirst ? 0.3 : 1 }}>▲</button>
+        <button className="clentmove" title="Down" disabled={isLast} onClick={onMoveDown} style={{ opacity: isLast ? 0.3 : 1 }}>▼</button>
+        <input className="clenttext" value={en.text} placeholder={`Item ${index + 1}`} onChange={e => onText(e.target.value)} />
+        <input className="clentnote" value={en.note} placeholder="comment (optional)" onChange={e => onNote(e.target.value)} />
+        <select className="clentfreq" value={en.freq} onChange={e => onSchedule({ freq: e.target.value })}>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom</option>
+        </select>
+
+        {en.freq === 'weekly' && (
+          <span className="clweekwrap">on
+            <select value={String(en.weekDay ?? 1)} onChange={e => onSchedule({ weekDay: Number(e.target.value) })}>
+              {WEEKDAY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+            </select>
+          </span>
+        )}
+
+        {en.freq === 'monthly' && (
+          <span className="clmonthwrap">on
+            <select value={en.monthMode === 'weekday' ? 'weekday' : 'date'} onChange={e => onSchedule({ monthMode: e.target.value })}>
+              <option value="date">the date</option>
+              <option value="weekday">the</option>
+            </select>
+            {en.monthMode !== 'weekday' && (
+              <input type="number" min="1" max="31" style={{ width: 50 }}
+                value={Number(en.monthDate) || 1}
+                onChange={e => onSchedule({ monthDate: Math.min(31, Math.max(1, Number(e.target.value) || 1)) })} />
+            )}
+            {en.monthMode === 'weekday' && (
+              <>
+                <select value={String(en.monthWeek || '1')} onChange={e => onSchedule({ monthWeek: e.target.value })}>
+                  <option value="1">1st</option><option value="2">2nd</option>
+                  <option value="3">3rd</option><option value="4">4th</option>
+                  <option value="last">last</option>
+                </select>
+                <select value={String(en.monthWeekday ?? 1)} onChange={e => onSchedule({ monthWeekday: Number(e.target.value) })}>
+                  {WEEKDAY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+              </>
+            )}
+          </span>
+        )}
+
+        {en.freq === 'custom' && (
+          <span className="clcustwrap">
+            <select value={en.customMode === 'on' ? 'on' : 'every'} onChange={e => onSchedule({ customMode: e.target.value })}>
+              <option value="every">every</option>
+              <option value="on">once on</option>
+            </select>
+            {en.customMode !== 'on' && (
+              <>
+                <input type="number" className="clcustom" min="1" value={Number(en.customDays) || 1}
+                  onChange={e => onSchedule({ customDays: Math.max(1, Number(e.target.value) || 1) })} />
+                days from
+              </>
+            )}
+            <input type="date" value={en.customStart || ''} onChange={e => onSchedule({ customStart: e.target.value })} />
+          </span>
+        )}
+
+        <button className="clentdup" title="Duplicate" onClick={onDuplicate}>⧉</button>
+        <button className="clentdel" title="Remove" onClick={onRemove}>×</button>
+      </div>
+      <div className="clentrow2">
+        <span className="clentlistwrap">→
+          <select className="clentlist" value={en.listId} onChange={e => onListId(e.target.value)}>
+            {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select>
+        </span>
+        <select
+          className={'clentpri pri-' + (en.priority || 'high')}
+          value={en.priority || 'high'}
+          onChange={e => onPriority(e.target.value)}
+          style={
+            (en.priority || 'high') === 'high' ? { background: '#fadbd8', color: '#922b21' } :
+            en.priority === 'med' ? { background: '#E0DE85', color: '#2E2516' } :
+            { background: '#A6E2F9', color: '#2E2516' }
+          }
+        >
+          <option value="high">High</option>
+          <option value="med">Med</option>
+          <option value="low">Low</option>
+        </select>
+        <label className="clentactive">
+          <input type="checkbox" checked={en.active !== false} onChange={e => onActive(e.target.checked)} /> Active
+        </label>
+      </div>
     </div>
   )
 }
@@ -965,21 +1317,22 @@ function ItemModal({ editing, lists, draft, setDraft, onCancel, onSave }) {
   )
 }
 
-// ---------------------- Name modal ----------------------
-function NameModal({ renaming, draft, setDraft, onCancel, onSave }) {
+// ---------------------- Name modal (list OR checklist) ----------------------
+function NameModal({ mode, renaming, draft, setDraft, onCancel, onSave }) {
+  const isChecklist = mode === 'checklist'
   return (
     <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}>
       <div className="modal" style={{ maxWidth: 360 }}>
-        <h2>{renaming ? 'Rename list' : 'New list'}</h2>
+        <h2>{isChecklist ? 'Edit checklist' : (renaming ? 'Rename list' : 'New list')}</h2>
         <div className="field">
-          <label>List name</label>
+          <label>{isChecklist ? 'Checklist name' : 'List name'}</label>
           <input
             type="text" placeholder="e.g. Work" autoFocus
             value={draft.name} onChange={e => setDraft(d => ({ ...d, name: e.target.value }))}
           />
         </div>
         <div className="field">
-          <label>List colour</label>
+          <label>{isChecklist ? 'Checklist colour' : 'List colour'}</label>
           <ColorSwatches
             value={draft.color}
             palette={LIST_PALETTE}
