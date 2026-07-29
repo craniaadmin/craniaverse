@@ -79,6 +79,8 @@ function useStock() {
         subOrder:       j.subOrder || {},
         subColors:      j.subColors || {},
         colOrder:       Array.isArray(j.colOrder) && j.colOrder.length ? j.colOrder : DEFAULT_COL_ORDER,
+        hiddenCols:     j.hiddenCols || {},
+        groupBy:        !!j.groupBy,
       })
       setStatus('online')
     } catch {
