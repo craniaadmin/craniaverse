@@ -100,6 +100,7 @@ function useStock() {
         categoryOrder: [...prev.categoryOrder], categoryColors: { ...prev.categoryColors },
         extraSubs: [...prev.extraSubs], subOrder: { ...prev.subOrder },
         subColors: { ...prev.subColors }, colOrder: [...prev.colOrder],
+        hiddenCols: { ...prev.hiddenCols }, groupBy: prev.groupBy,
       }
       mut(next)
       clearTimeout(saveTimer.current)
