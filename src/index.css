@@ -77,7 +77,7 @@ input, select, textarea { font-family: inherit; }
 /* Sidebar (left) — dark-teal gradient with dark-brown pill buttons */
 .sidebar {
   width: 170px; flex: none;
-  background: var(--brand-light-blue);
+  background: var(--brand-dark-blue);
   display: flex; flex-direction: column; padding: 14px 16px;
   min-height: 100%;
 }
