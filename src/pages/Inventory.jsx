@@ -289,7 +289,51 @@ export default function Inventory() {
     <div className="page">
       <div className="page-head">
         <h2 className="page-title">Inventory</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
+          {view === 'inventory' && (
+            <>
+              <button
+                onClick={() => setColsOpen(v => !v)}
+                title="Choose which columns are shown"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+                  padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+                }}
+              ><Eye size={14} /> Columns</button>
+              {colsOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', right: 88, marginTop: 4, zIndex: 10,
+                  background: '#fff', border: '1px solid var(--line)', borderRadius: 8,
+                  boxShadow: '0 4px 12px rgba(0,0,0,.1)', padding: '8px 4px', minWidth: 170,
+                }}>
+                  {data.colOrder.map(key => (
+                    <label key={key} style={{
+                      display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
+                      fontSize: 13, cursor: 'pointer', fontWeight: 500,
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={!data.hiddenCols[key]}
+                        onChange={() => toggleColHidden(key)}
+                        style={{ accentColor: 'var(--logo-teal)' }}
+                      />
+                      {COLUMN_LABELS[key] || key}
+                    </label>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={exportCsv}
+                title="Download the currently-filtered items as a CSV file"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+                  padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+                }}
+              ><Download size={14} /> Export CSV</button>
+            </>
+          )}
           <button
             onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
             style={{
