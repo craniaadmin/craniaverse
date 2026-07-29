@@ -16,12 +16,28 @@ try {
   )
   console.log('auth ok')
 
-  // Test 1: list
+  // Test 1a: list with no options
+  try {
+    const rows = await pb.collection('todo_backups').getFullList()
+    console.log('list (no opts) ok, count:', rows.length)
+  } catch (e) {
+    console.error('list (no opts) FAILED:', e.status, e.message)
+  }
+
+  // Test 1b: list with sort
   try {
     const rows = await pb.collection('todo_backups').getFullList({ sort: '-created' })
-    console.log('list ok, count:', rows.length)
+    console.log('list (sort) ok, count:', rows.length)
   } catch (e) {
-    console.error('list FAILED:', e.status, e.message, e.data, e.originalError?.message)
+    console.error('list (sort) FAILED:', e.status, e.message)
+  }
+
+  // Test 1c: getList paginated
+  try {
+    const page = await pb.collection('todo_backups').getList(1, 50)
+    console.log('getList ok, count:', page.totalItems)
+  } catch (e) {
+    console.error('getList FAILED:', e.status, e.message)
   }
 
   // Test 2: create minimal
