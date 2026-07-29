@@ -1044,7 +1044,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
 
 // ---------------------- TodoView subcomponent ----------------------
 function TodoView({
-  state, hideDone, filterText, setFilterText, filterPri, setFilterPri,
+  state, hideDone, setHideDone, filterText, setFilterText, filterPri, setFilterPri,
   filterDue, setFilterDue, filtersActive, matchFilters,
   toggleDone, deleteItem, duplicateItem, sortListNow,
   openItem, openName, moveList,
