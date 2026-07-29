@@ -786,6 +786,7 @@ app.put('/api/todo', wrap(async (req, res) => {
     items:      Array.isArray(body.items) ? body.items : [],
     checklists: Array.isArray(body.checklists) ? body.checklists : [],
     _migPri:    !!body._migPri,
+    _migBg:     !!body._migBg,
   }
   await saveTodo(payload)
   res.json({ ok: true })
