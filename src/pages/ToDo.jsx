@@ -1100,7 +1100,7 @@ function TodoView({
   const renderedLists = []
   let totalShown = 0
   for (const list of state.lists) {
-    let items = state.items.filter(i => i.listId === list.id)
+    let items = sortItems(state.items.filter(i => i.listId === list.id))
     if (hideDone) items = items.filter(i => !i.done)
     items = items.filter(matchFilters)
     if (filtersActive() && items.length === 0) continue
