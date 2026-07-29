@@ -275,8 +275,8 @@ export default function Dashboard({ onNavigate }) {
               <ResponsiveContainer>
                 <LineChart data={regTrend} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
                   <CartesianGrid vertical={false} stroke="#eef1f3" />
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#8b95a3' }} interval={0} angle={-30} textAnchor="end" height={48} />
-                  <YAxis tick={{ fontSize: 11, fill: '#8b95a3' }} allowDecimals={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#9A948A' }} interval={0} angle={-30} textAnchor="end" height={48} />
+                  <YAxis tick={{ fontSize: 11, fill: '#9A948A' }} allowDecimals={false} />
                   <Tooltip />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                   <Line type="monotone" dataKey="Registrations" stroke="#5FA09E" strokeWidth={3} dot={{ r: 3 }} />
