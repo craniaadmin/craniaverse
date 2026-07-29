@@ -1619,35 +1619,35 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
     : backups === null ? 'Loading…' : 'No backups yet'
 
   return (
-    <div className="settings-popover" ref={ref} onClick={(e) => e.stopPropagation()}>
-      <div className="field sect">
-        <div className="sect-title">Backups</div>
-        <div className="hint">
+    <div className="settings-popover" ref={ref} onMouseDown={(e) => e.stopPropagation()}>
+      <div className="sp-card">
+        <div className="sp-card-title">Backups</div>
+        <div className="sp-hint">
           Snapshots are saved to the database (last 14 kept).
           Back up before big changes, or restore to roll back.
         </div>
-        <div className="bkline">{lastLine}</div>
-        <div className="bkbtns">
-          <button type="button" className="small" disabled={busy} onClick={backupNow}>
+        <div className="sp-meta">{lastLine}</div>
+        <div className="sp-btnrow">
+          <button type="button" className="sp-btn" disabled={busy} onClick={backupNow}>
             {busy ? 'Saving…' : 'Back Up Now'}
           </button>
-          <button type="button" className="small" disabled={busy} onClick={() => setRestoreOpen(v => !v)}>
+          <button type="button" className="sp-btn" disabled={busy} onClick={() => setRestoreOpen(v => !v)}>
             Restore{restoreOpen ? ' ▾' : '…'}
           </button>
         </div>
         {restoreOpen && backups && (
-          <div className="restore-list">
+          <div className="sp-restore-list">
             {backups.length === 0 && (
               <div style={{ color: '#9a948a', padding: '10px 12px', textAlign: 'center', fontSize: 12 }}>
                 No backups yet — click Back Up Now to create one.
               </div>
             )}
             {backups.map(b => (
-              <div key={b.id} className="restore-row">
-                <span className="rlabel">
+              <div key={b.id} className="sp-restore-row">
+                <span className="sp-rlabel">
                   {b.label || new Date(b.created).toLocaleString()}
                 </span>
-                <button type="button" className="small" disabled={busy} onClick={() => doRestore(b.id)}>
+                <button type="button" className="sp-btn" disabled={busy} onClick={() => doRestore(b.id)}>
                   Restore
                 </button>
               </div>
@@ -1655,13 +1655,13 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
           </div>
         )}
       </div>
-      <div className="field sect">
-        <div className="sect-title">Checklists</div>
-        <div className="hint">
+      <div className="sp-card">
+        <div className="sp-card-title">Checklists</div>
+        <div className="sp-hint">
           Checklist items are added to your To-Do list automatically
           on their schedule. Force a refresh now if needed.
         </div>
-        <button type="button" className="small" onClick={() => { runChecklists(); onClose() }}>Run Checklists Now</button>
+        <button type="button" className="sp-btn" onClick={() => { runChecklists(); onClose() }}>Run Checklists Now</button>
       </div>
     </div>
   )
