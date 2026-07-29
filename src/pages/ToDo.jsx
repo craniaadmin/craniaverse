@@ -1611,7 +1611,7 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
   return (
     <div className="settings-popover" ref={ref} onClick={(e) => e.stopPropagation()}>
       <div className="field sect">
-        <label>Backups</label>
+        <div className="sect-title">Backups</div>
         <div className="hint">
           Snapshots are saved to the database (last 14 kept).
           Back up before big changes, or restore to roll back.
