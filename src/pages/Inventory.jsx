@@ -245,6 +245,37 @@ export default function Inventory() {
     })
   }
 
+  // ---- column visibility ----
+  const [colsOpen, setColsOpen] = useState(false)
+  const toggleColHidden = (key) => {
+    mutate(d => {
+      d.hiddenCols = { ...d.hiddenCols }
+      if (d.hiddenCols[key]) delete d.hiddenCols[key]
+      else d.hiddenCols[key] = true
+    })
+  }
+  const visibleCols = data.colOrder.filter(k => !data.hiddenCols[k])
+
+  // ---- CSV export ----
+  const exportCsv = () => {
+    const header = ['Item #', 'Name', 'Category', 'Sub-Category', 'SKU', 'On Hand', 'Reorder', 'Unit Cost', 'Value', 'Location', 'Status']
+    const rows = filteredItems.map(it => {
+      const value = (Number(it.qty) || 0) * (Number(it.cost) || 0)
+      return [it.num, it.name, it.category, it.sub, it.sku, it.qty || 0, it.reorder || 0, it.cost || 0, value.toFixed(2), it.location, statusOf(it)]
+    })
+    const csv = [header, ...rows].map(row => row.map(cell => {
+      const str = cell == null ? '' : String(cell)
+      return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str
+    }).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'crania-inventory.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) {
     return (
       <div className="page">
