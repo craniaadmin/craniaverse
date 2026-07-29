@@ -1104,6 +1104,22 @@ function TodoView({
           <option value="nodue">No due date</option>
         </select>
         <button className="clearf" onClick={clearFilters}>Clear</button>
+        <button
+          onClick={() => setHideDone(v => !v)}
+          title="Show/hide completed"
+          style={{
+            background: '#E0DE85', border: 'none', color: 'var(--dark-brown)',
+            padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+          }}
+        >{hideDone ? 'Show Done' : 'Hide Done'}</button>
+        <button
+          onClick={() => openName(null)}
+          style={{
+            background: 'var(--light-blue)', color: 'var(--dark-brown)',
+            border: 'none', padding: '6px 12px', fontSize: 13, fontWeight: 700,
+            borderRadius: 8, cursor: 'pointer', marginLeft: 'auto',
+          }}
+        >+ Add List</button>
       </div>
 
       <div className="board">
