@@ -173,7 +173,10 @@ export default function App() {
         <TopNav section={section} sub={sub} onSubSelect={setSub} onLogout={logout} />
         <div className="app-shell">
           <Sidebar section={section} onSelect={selectSection} />
-          <main className="app-main">{rendered}</main>
+          <main className="app-main">
+            {rendered}
+            <div className="app-footer">CraniaVerse · {sub}</div>
+          </main>
         </div>
       </div>
     </StoreProvider>
