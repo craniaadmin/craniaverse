@@ -928,7 +928,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
 
       {view === 'todo' && <TodoView
         state={state}
-        hideDone={hideDone}
+        hideDone={hideDone} setHideDone={setHideDone}
         filterText={filterText} setFilterText={setFilterText}
         filterPri={filterPri} setFilterPri={setFilterPri}
         filterDue={filterDue} setFilterDue={setFilterDue}
