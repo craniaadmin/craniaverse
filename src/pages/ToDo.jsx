@@ -719,9 +719,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       if (Object.keys(itemPatch).length) {
         items = items.map(i => i.id === pulled.id ? { ...i, ...itemPatch } : i)
       }
-    } else if ('active' in patch === false && 'text' in patch && patch.text.trim()) {
-      // Text just became non-empty on a never-pulled entry — pull it in right away
-      // rather than waiting for the next natural due check.
     }
     const checklists = s.checklists.map(c => c.id === checklistId
       ? { ...c, entries: c.entries.map(e => e.id === entryId ? nextEn : e) }
