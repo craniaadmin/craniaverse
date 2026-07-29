@@ -154,7 +154,8 @@
       "Bash(curl -s -m 3 http://127.0.0.1:8090/api/health)",
       "Bash(curl -sv -m 3 http://127.0.0.1:8090/api/health)",
       "Bash(powershell -Command \"\\(Get-Content 'C:\\\\Users\\\\hanak\\\\Downloads\\\\2-1. CraniaVerse - Programs v47 [claude-opus-5] - has bugs.html' | Measure-Object -Line\\).Lines\")",
-      "Bash(node \"/c/Users/hanak/AppData/Local/Temp/claude/C--Users-hanak-OneDrive-Documents-UW-Biomedical-Engineering-2023-2028-3A-Co-op-Crania-craniaverse-updated-craniaverse/9c248e10-c916-45d8-9058-68b3efb03bb7/scratchpad/transform-programs.mjs\")"
+      "Bash(node \"/c/Users/hanak/AppData/Local/Temp/claude/C--Users-hanak-OneDrive-Documents-UW-Biomedical-Engineering-2023-2028-3A-Co-op-Crania-craniaverse-updated-craniaverse/9c248e10-c916-45d8-9058-68b3efb03bb7/scratchpad/transform-programs.mjs\")",
+      "Bash(node --check server/scripts/reimport-programs.js)"
     ]
   },
   "hooks": {

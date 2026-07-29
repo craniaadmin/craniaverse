@@ -69,16 +69,37 @@ function useClassLists() {
   return useMemo(() => {
     const realRecords = records.filter((r) => r.id !== 'seed')
 
+    // The same program title can have more than one row — one per
+    // location (Boardwalk, Waterloo East, ...), each with its own
+    // offerings. Keying this map by title alone would let the last
+    // location's row silently shadow every earlier one, so students
+    // registered at "the other" location would either attribute to
+    // the wrong location's roster or vanish from theirs entirely.
+    // Keep every location's row as a candidate, then route each
+    // student to whichever one's offerings actually match their
+    // schedule text (falling back to the first candidate when no
+    // offering matches, same as the single-location case always did).
     const classes = programs.map((p) => ({ program: p, roster: [] }))
-    const byTitle = new Map(classes.map((c) => [norm(c.program.title), c]))
+    const byTitle = new Map() // norm(title) -> class wrapper[]
+    for (const c of classes) {
+      const key = norm(c.program.title)
+      if (!byTitle.has(key)) byTitle.set(key, [])
+      byTitle.get(key).push(c)
+    }
     const unlistedByTitle = new Map()
 
     for (const r of realRecords) {
       for (const entry of (r.programs || [])) {
         if (!entry.program) continue
         const row = { record: r, entry }
-        const cls = byTitle.get(norm(entry.program))
-        if (cls) {
+        const candidates = byTitle.get(norm(entry.program))
+        if (candidates && candidates.length > 0) {
+          let cls = candidates[0]
+          if (candidates.length > 1) {
+            const matched = candidates.find((c) =>
+              matchOffering(entry.schedule, (c.program.offerings || []).filter((o) => o.active !== false)))
+            if (matched) cls = matched
+          }
           cls.roster.push(row)
         } else {
           const key = entry.program
