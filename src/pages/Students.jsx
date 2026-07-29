@@ -262,7 +262,7 @@ function CommentsSection({ studentId, initialPrograms }) {
               <option value="">— select program —</option>
               {PROGRAM_LIST.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
-            <button onClick={addProgram} style={{ fontSize: 11, padding: '2px 8px', cursor: 'pointer', background: '#2c7a7b', color: '#fff', border: 'none', borderRadius: 4 }}>Add</button>
+            <button onClick={addProgram} style={{ fontSize: 11, padding: '2px 8px', cursor: 'pointer', background: '#5FA09E', color: '#fff', border: 'none', borderRadius: 4 }}>Add</button>
             <button onClick={() => setAddingTab(false)} style={{ fontSize: 11, padding: '2px 6px', cursor: 'pointer', background: 'none', border: '1px solid #ccc', borderRadius: 4 }}>✕</button>
           </div>
         ) : (
@@ -594,7 +594,7 @@ function StudentDetail({ recordId, onBack, onNavigate, onDelete }) {
         <div>
           <div className="panel-teal-head">Crania Cash</div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 46, fontWeight: 800, color: '#2c7a7b', cursor: 'pointer' }}
+            <div style={{ fontSize: 46, fontWeight: 800, color: '#5FA09E', cursor: 'pointer' }}
               onClick={() => onNavigate('Crania Cash')}>
               {studentFields.craniaCash}
             </div>

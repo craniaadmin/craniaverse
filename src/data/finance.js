@@ -61,12 +61,12 @@ export function invoiceStatus(invoice, payments, now = new Date()) {
 }
 
 export const STATUS_STYLE = {
-  draft:   { label: 'Draft',    bg: '#eef1f4', fg: '#5b6573' },
+  draft:   { label: 'Draft',    bg: '#eef1f4', fg: '#6B6455' },
   sent:    { label: 'Sent',     bg: '#e4f2fb', fg: '#1c6ea4' },
   partial: { label: 'Partial',  bg: '#fff4d6', fg: '#8a6a00' },
   paid:    { label: 'Paid',     bg: '#dff5e0', fg: '#2b7a2e' },
   overdue: { label: 'Overdue',  bg: '#fde0e0', fg: '#a12626' },
-  void:    { label: 'Void',     bg: '#f3f3f3', fg: '#8b95a3' },
+  void:    { label: 'Void',     bg: '#f3f3f3', fg: '#9A948A' },
 }
 
 // Fetches once, then PUTs the whole payload on any change.

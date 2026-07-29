@@ -369,7 +369,7 @@ export default function FeeSchedule() {
       </div>
 
       <div className="fs-strip-labels">
-        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink, #1f2733)' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--ink, #2E2516)' }}>
           {schedule.weeksPerYear}-Weeks Per Year
         </div>
         <div style={{ fontSize: 13, color: '#5a6470' }}>
@@ -571,7 +571,7 @@ function ReadRow({ label, value }) {
 
 // ---------- CSS ----------
 const CSS = `
-.fs-root{--fs-teal:#5FA09E;--fs-blue:#B6DEF0;--fs-gold:#DEDA75;--fs-ink:#1f2733;--fs-line:#e2e5e8;color:var(--fs-ink);}
+.fs-root{--fs-teal:#5FA09E;--fs-blue:#B6DEF0;--fs-gold:#DEDA75;--fs-ink:#2E2516;--fs-line:#e2e5e8;color:var(--fs-ink);}
 .fs-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:14px;}
 .fs-title{font-family:var(--serif);font-size:34px;font-weight:400;color:var(--fs-ink);margin:0;line-height:1;}
 .fs-head-actions{display:flex;gap:10px;flex-wrap:wrap;}

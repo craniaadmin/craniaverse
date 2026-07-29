@@ -56,11 +56,11 @@ function guardianContact(customer) {
 const STATUS_STYLE = {
   Active:       { bg: '#dff5e0', fg: '#2b7a2e' },
   'Late Start': { bg: '#fff4d6', fg: '#8a6a00' },
-  'On-Hold':    { bg: '#eef1f4', fg: '#5b6573' },
+  'On-Hold':    { bg: '#eef1f4', fg: '#6B6455' },
   Completed:    { bg: '#e4f2fb', fg: '#1c6ea4' },
   Cancelled:    { bg: '#fde0e0', fg: '#a12626' },
 }
-function statusStyle(s) { return STATUS_STYLE[s] || { bg: '#eef1f4', fg: '#5b6573' } }
+function statusStyle(s) { return STATUS_STYLE[s] || { bg: '#eef1f4', fg: '#6B6455' } }
 
 // ---- build class groups from store data ----
 function useClassLists() {
@@ -284,7 +284,7 @@ export default function ClassLists({ onNavigate }) {
                         <span style={pillStyle}>{c.program.category}</span>
                       )}
                       {c.program.active === false && (
-                        <span style={{ ...pillStyle, background: '#eef1f4', color: '#5b6573' }}>Inactive</span>
+                        <span style={{ ...pillStyle, background: '#eef1f4', color: '#6B6455' }}>Inactive</span>
                       )}
                       <button
                         onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate('Programs') }}

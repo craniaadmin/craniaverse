@@ -288,7 +288,7 @@ const METHOD_COLORS = {
   'Cheque':      { bg: '#f2eaff', fg: '#5b3e9e' },
   'Credit Card': { bg: '#fff0e6', fg: '#9e4e00' },
   'Debit':       { bg: '#fff8db', fg: '#8a6a00' },
-  'Other':       { bg: '#eef1f4', fg: '#5b6573' },
+  'Other':       { bg: '#eef1f4', fg: '#6B6455' },
 }
 
 function MethodPill({ method }) {

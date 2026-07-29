@@ -107,20 +107,20 @@ function printHtml(title, body) {
     body { font-family: Arial, sans-serif; margin: 40px; color: #222; font-size: 13px; }
     h1  { font-size: 20px; margin: 0 0 2px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-    th  { background: #2c7a7b; color: #fff; padding: 6px 9px; text-align: left; font-size: 11px; }
+    th  { background: #5FA09E; color: #fff; padding: 6px 9px; text-align: left; font-size: 11px; }
     th.r, td.r { text-align: right; }
     td  { padding: 6px 9px; border-bottom: 1px solid #eee; }
     .bold { font-weight: 700; }
-    .teal { color: #2c7a7b; }
+    .teal { color: #5FA09E; }
     .grey { color: #777; }
     .net-row td { background: #eef6f6; font-weight: 700; font-size: 15px; }
-    .hdr  { display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 2px solid #2c7a7b; margin-bottom: 16px; }
-    .hdr-co { font-size: 20px; font-weight: 800; color: #2c7a7b; }
+    .hdr  { display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 2px solid #5FA09E; margin-bottom: 16px; }
+    .hdr-co { font-size: 20px; font-weight: 800; color: #5FA09E; }
     .pill { display: inline-block; background: #fff8e1; border: 1px solid #f9a825; border-radius: 4px; padding: 8px 14px; margin-top: 12px; }
     .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 12px 0; }
     .box { border: 1px solid #ccc; border-radius: 4px; padding: 8px 10px; }
     .box-num { font-size: 10px; color: #888; font-weight: 700; }
-    .box-val { font-size: 16px; font-weight: 700; color: #2c7a7b; margin-top: 2px; }
+    .box-val { font-size: 16px; font-weight: 700; color: #5FA09E; margin-top: 2px; }
     @media print { body { margin: 20px; } }
   </style></head><body>${body}</body></html>`)
   w.document.close()
@@ -181,7 +181,7 @@ function PaystubModal({ entry, run, onClose }) {
         </tbody>
       </table>
 
-      <div style="background:linear-gradient(135deg,#2c7a7b,#3d8e90);border-radius:8px;padding:14px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="background:linear-gradient(135deg,#5FA09E,#3d8e90);border-radius:8px;padding:14px 18px;color:#fff;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div style="font-size:13px;font-weight:600;">NET PAY</div>
         <div style="font-size:26px;font-weight:800;">${fmt(entry.netPay)}</div>
       </div>
@@ -217,16 +217,16 @@ function PaystubModal({ entry, run, onClose }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ fontWeight: 700, fontSize: 17 }}>Paystub — {entry.name}</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={handlePrint} style={{ background: '#2c7a7b', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', cursor: 'pointer', fontWeight: 600 }}>Print / PDF</button>
+            <button onClick={handlePrint} style={{ background: '#5FA09E', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', cursor: 'pointer', fontWeight: 600 }}>Print / PDF</button>
             <button onClick={onClose} style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '7px 14px', cursor: 'pointer' }}>Close</button>
           </div>
         </div>
 
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 14, borderBottom: '2px solid #2c7a7b', marginBottom: 14 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 14, borderBottom: '2px solid #5FA09E', marginBottom: 14 }}>
           <div>
             <img src={craniaLogo} alt="Crania" style={{ height: 40, marginBottom: 8 }} />
-            <div style={{ fontSize: 19, fontWeight: 800, color: '#2c7a7b' }}>CRANIA SCHOOLS</div>
+            <div style={{ fontSize: 19, fontWeight: 800, color: '#5FA09E' }}>CRANIA SCHOOLS</div>
             <div style={{ fontSize: 11, color: '#888' }}>Employee Pay Statement · {TAX_YEAR}</div>
           </div>
           <div style={{ textAlign: 'right', fontSize: 12 }}>
@@ -308,7 +308,7 @@ function PaystubModal({ entry, run, onClose }) {
         </div>
 
         {/* Net pay */}
-        <div style={{ background: 'linear-gradient(135deg,#2c7a7b,#3d8e90)', borderRadius: 8, padding: '14px 18px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div style={{ background: 'linear-gradient(135deg,#5FA09E,#3d8e90)', borderRadius: 8, padding: '14px 18px', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <div style={{ fontSize: 13, fontWeight: 600 }}>NET PAY</div>
           <div style={{ fontSize: 26, fontWeight: 800 }}>{fmt(entry.netPay)}</div>
         </div>
@@ -328,7 +328,7 @@ function PaystubModal({ entry, run, onClose }) {
 
         {/* Email / Save */}
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={handleSave} style={{ flex: 1, background: '#2c7a7b', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+          <button onClick={handleSave} style={{ flex: 1, background: '#5FA09E', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
             Email Paystub
           </button>
           <button onClick={handlePrint} style={{ flex: 1, background: '#3d8e90', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
@@ -364,7 +364,7 @@ function T4Modal({ member, ytd, onClose }) {
       </div>`).join('')
 
     const body = `
-      <div style="background:#2c7a7b;color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px;">
+      <div style="background:#5FA09E;color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px;">
         <div style="font-size:18px;font-weight:800;">T4 — Statement of Remuneration Paid</div>
         <div style="font-size:13px;opacity:.85;">Tax Year: ${TAX_YEAR} · Crania Schools</div>
       </div>
@@ -392,12 +392,12 @@ function T4Modal({ member, ytd, onClose }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ fontWeight: 700, fontSize: 17 }}>T4 — {member.name} ({TAX_YEAR})</div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={handlePrint} style={{ background: '#2c7a7b', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', cursor: 'pointer', fontWeight: 600 }}>Print / PDF</button>
+            <button onClick={handlePrint} style={{ background: '#5FA09E', color: '#fff', border: 'none', borderRadius: 6, padding: '7px 16px', cursor: 'pointer', fontWeight: 600 }}>Print / PDF</button>
             <button onClick={onClose} style={{ background: '#eee', border: 'none', borderRadius: 6, padding: '7px 14px', cursor: 'pointer' }}>Close</button>
           </div>
         </div>
 
-        <div style={{ background: '#2c7a7b', color: '#fff', padding: '12px 16px', borderRadius: 7, marginBottom: 16 }}>
+        <div style={{ background: '#5FA09E', color: '#fff', padding: '12px 16px', borderRadius: 7, marginBottom: 16 }}>
           <div style={{ fontSize: 18, fontWeight: 800 }}>T4 — Statement of Remuneration Paid</div>
           <div style={{ fontSize: 12, opacity: .8 }}>Tax Year: {TAX_YEAR} · Crania Schools</div>
         </div>
@@ -413,7 +413,7 @@ function T4Modal({ member, ytd, onClose }) {
             <div key={num} style={{ border: '1px solid #ddd', borderRadius: 6, padding: '10px 12px' }}>
               <div style={{ fontSize: 10, fontWeight: 700, color: '#888' }}>Box {num}</div>
               <div style={{ fontSize: 11, color: '#555', margin: '2px 0 6px' }}>{label}</div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#2c7a7b' }}>{fmt(val)}</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: '#5FA09E' }}>{fmt(val)}</div>
             </div>
           ))}
         </div>
@@ -565,7 +565,7 @@ export default function Payroll() {
         </div>
         <div style={{ marginLeft: 'auto' }}>
           <button onClick={processPayRun} style={{
-            background: '#2c7a7b', color: '#fff', border: 'none', borderRadius: 8,
+            background: '#5FA09E', color: '#fff', border: 'none', borderRadius: 8,
             padding: '10px 26px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
           }}>Process Pay Run</button>
         </div>
@@ -623,7 +623,7 @@ export default function Payroll() {
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, color: hasGross ? '#1a1a1a' : '#ccc' }}>{hasGross ? fmt(r.cppEE) : '—'}</td>
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, color: hasGross ? '#1a1a1a' : '#ccc' }}>{hasGross ? fmt(r.eiEE) : '—'}</td>
                     <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, color: hasGross ? '#1a1a1a' : '#ccc' }}>{hasGross ? fmt(r.taxPP) : '—'}</td>
-                    <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: hasGross ? '#2c7a7b' : '#ccc' }}>{hasGross ? fmt(r.netPay) : '—'}</td>
+                    <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: hasGross ? '#5FA09E' : '#ccc' }}>{hasGross ? fmt(r.netPay) : '—'}</td>
                     <td style={{ padding: '4px 8px' }}>
                       <input type="date" value={empPaidMap[s.id] || ''}
                         onChange={e => setEmpPaidMap(p => ({ ...p, [s.id]: e.target.value }))}
@@ -783,7 +783,7 @@ export default function Payroll() {
                                     <td style={{ padding: '5px 8px', textAlign: 'right' }}>{fmt(e.cppEE)}</td>
                                     <td style={{ padding: '5px 8px', textAlign: 'right' }}>{fmt(e.eiEE)}</td>
                                     <td style={{ padding: '5px 8px', textAlign: 'right' }}>{fmt(e.taxPP)}</td>
-                                    <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: 700, color: '#2c7a7b' }}>{fmt(e.netPay)}</td>
+                                    <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: 700, color: '#5FA09E' }}>{fmt(e.netPay)}</td>
                                     <td style={{ padding: '5px 8px' }}>
                                       <button onClick={() => setPaystub({ entry: { ...e, ytd: ytdAll[e.staffId] }, run })}
                                         style={{ background: 'none', border: '1px solid var(--logo-teal)', borderRadius: 4, padding: '2px 8px', fontSize: 11, cursor: 'pointer', color: 'var(--logo-teal)', fontWeight: 600 }}>
@@ -842,10 +842,10 @@ export default function Payroll() {
                       <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13 }}>{fmt(y.cppEE)}</td>
                       <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13 }}>{fmt(y.eiEE)}</td>
                       <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13 }}>{fmt(y.taxPP)}</td>
-                      <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: '#2c7a7b' }}>{fmt(y.netPay)}</td>
+                      <td style={{ padding: '8px 10px', textAlign: 'right', fontSize: 13, fontWeight: 700, color: '#5FA09E' }}>{fmt(y.netPay)}</td>
                       <td style={{ padding: '6px 10px' }}>
                         <button onClick={() => setT4Target({ member: { id: s.id, name: `${s.firstName} ${s.lastName}`, sin: s.sin, role: s.role }, ytd: y })}
-                          style={{ background: '#2c7a7b', border: 'none', borderRadius: 5, padding: '4px 12px', fontSize: 11, cursor: 'pointer', color: '#fff', fontWeight: 700 }}>
+                          style={{ background: '#5FA09E', border: 'none', borderRadius: 5, padding: '4px 12px', fontSize: 11, cursor: 'pointer', color: '#fff', fontWeight: 700 }}>
                           T4
                         </button>
                       </td>

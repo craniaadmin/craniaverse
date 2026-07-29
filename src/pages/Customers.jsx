@@ -178,7 +178,7 @@ const FEE_LABELS = ['REG', 'MAT', 'A', 'S', 'O', 'N', 'D', 'J', 'F', 'M', 'A', '
 const FEE_KEYS   = ['reg', 'mat', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul']
 
 const STATUS_STYLE = {
-  'Completed': { background: '#e0e4e8', color: '#5b6573' },
+  'Completed': { background: '#e0e4e8', color: '#6B6455' },
   'Late Start': { background: '#cfe6b4', color: '#3a6020' },
   'On-Hold':   { background: '#f6e3a1', color: '#7a5c00' },
   'Cancelled': { background: '#f6b0b0', color: '#8b1a1a' },
@@ -248,16 +248,16 @@ function ProgramRow({ prog, onToggleActive, onFeeChange }) {
   const status = prog.active ? 'Active' : 'Inactive'
   const statusStyle = prog.active
     ? { background: '#cfe6b4', color: '#3a6020' }
-    : { background: '#e0e4e8', color: '#5b6573' }
+    : { background: '#e0e4e8', color: '#6B6455' }
   const payment = derivedPayment(prog.fees)
   const paymentColor = payment === 'Paid' ? '#cfe6b4' : payment === 'Pending' ? '#f6e3a1' : payment === 'Overdue' ? '#e8503f' : '#e8ecef'
-  const paymentTextColor = payment === 'Overdue' ? '#fff' : '#5b6573'
+  const paymentTextColor = payment === 'Overdue' ? '#fff' : '#6B6455'
 
   return (
     <tr className="cust-prog-row">
       <td className="cust-prog-cell" style={{ textAlign: 'center', padding: '10px' }}>
         <input type="checkbox" checked={prog.active || false} onChange={() => onToggleActive(prog)}
-          style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#2c7a7b' }} />
+          style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#5FA09E' }} />
       </td>
       <td className="cust-prog-cell">
         <span className="cust-pill" style={statusStyle}>{status}</span>
@@ -268,7 +268,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange }) {
       </td>
       <td className="cust-prog-cell" style={{ whiteSpace: 'nowrap' }}>
         {prog.rate && (
-          <><b>{prog.rate}</b>{prog.rateUnit && <span style={{ color: '#8b95a3', fontSize: 12 }}> {prog.rateUnit}</span>}</>
+          <><b>{prog.rate}</b>{prog.rateUnit && <span style={{ color: '#9A948A', fontSize: 12 }}> {prog.rateUnit}</span>}</>
         )}
       </td>
       <td className="cust-prog-cell">
@@ -472,10 +472,10 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
                 <th className="cust-prog-th">PROGRAM</th>
                 <th className="cust-prog-th">RATE</th>
                 <th className="cust-prog-th">
-                  <div style={{ fontSize: 10, color: '#8b95a3', marginBottom: 3, textAlign: 'center', letterSpacing: 1 }}>FEE SCHEDULE</div>
+                  <div style={{ fontSize: 10, color: '#9A948A', marginBottom: 3, textAlign: 'center', letterSpacing: 1 }}>FEE SCHEDULE</div>
                   <div style={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
                     {FEE_LABELS.map((m, i) => (
-                      <span key={i} style={{ width: 16, textAlign: 'center', fontSize: 9, color: '#8b95a3', fontWeight: 700 }}>{m}</span>
+                      <span key={i} style={{ width: 16, textAlign: 'center', fontSize: 9, color: '#9A948A', fontWeight: 700 }}>{m}</span>
                     ))}
                   </div>
                 </th>
@@ -485,7 +485,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
             <tbody>
               {displayedPrograms.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '22px', color: '#8b95a3', fontStyle: 'italic', fontSize: 14 }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '22px', color: '#9A948A', fontStyle: 'italic', fontSize: 14 }}>
                     {showOnlyActive ? 'No active programs.' : 'No programs registered.'}
                   </td>
                 </tr>

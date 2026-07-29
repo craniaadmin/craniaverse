@@ -292,7 +292,7 @@ export default function Dashboard({ onNavigate }) {
             {openTasks.length === 0 && <Empty label="No open tasks" />}
             {openTasks.map(t => (
               <div className="sc-row" key={t.id} title={t.text}>
-                <Square size={15} color="#5b9494" />
+                <Square size={15} color="#5FA09E" />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.text}</span>
               </div>
             ))}
@@ -302,7 +302,7 @@ export default function Dashboard({ onNavigate }) {
             {upcoming.length === 0 && <Empty label="Nothing in next 7 days" />}
             {upcoming.map(ev => (
               <div className="sc-row" key={ev.id} title={ev.title}>
-                <CalendarIcon size={14} color="#5b9494" />
+                <CalendarIcon size={14} color="#5FA09E" />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   <strong style={{ color: 'var(--ink-soft)' }}>{formatDate(ev.startDate).replace(', ' + now.getFullYear(), '')}</strong>
                   {' · '}{ev.title}
@@ -343,7 +343,7 @@ export default function Dashboard({ onNavigate }) {
             {recentRecords.length === 0 && <Empty label="No registrations yet" />}
             {recentRecords.map(r => (
               <div className="sc-row" key={r.id}>
-                <CheckSquare size={14} color="#5b9494" />
+                <CheckSquare size={14} color="#5FA09E" />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {r.displayName || `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim() || '—'}
                 </span>
@@ -358,7 +358,7 @@ export default function Dashboard({ onNavigate }) {
               const name = `${g['First Name'] || ''} ${g['Last Name'] || ''}`.trim() || '—'
               return (
                 <div className="sc-row" key={r.id}>
-                  <CheckSquare size={14} color="#5b9494" />
+                  <CheckSquare size={14} color="#5FA09E" />
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
                 </div>
               )
@@ -369,7 +369,7 @@ export default function Dashboard({ onNavigate }) {
             {activeStaff.length === 0 && <Empty label="No staff on file" />}
             {activeStaff.slice(0, 4).map(s => (
               <div className="sc-row" key={s.id}>
-                <CheckSquare size={14} color="#5b9494" />
+                <CheckSquare size={14} color="#5FA09E" />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {`${s.firstName || ''} ${s.lastName || ''}`.trim()}
                   {s.role && <span className="muted"> — {s.role}</span>}
@@ -382,7 +382,7 @@ export default function Dashboard({ onNavigate }) {
             {activePrograms.length === 0 && <Empty label="No active programs" />}
             {activePrograms.slice(0, 4).map(p => (
               <div className="sc-row" key={p.number || p.code || p.title}>
-                <CheckSquare size={14} color="#5b9494" />
+                <CheckSquare size={14} color="#5FA09E" />
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
               </div>
             ))}
@@ -390,7 +390,7 @@ export default function Dashboard({ onNavigate }) {
 
           <StatusCard title="SEARCH">
             <div className="sc-row">
-              <Search size={16} color="#8b95a3" />
+              <Search size={16} color="#9A948A" />
               <span className="muted small">Search records…</span>
             </div>
           </StatusCard>
@@ -403,7 +403,7 @@ export default function Dashboard({ onNavigate }) {
 function Stat({ n, label }) {
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-      <div style={{ fontSize: 26, fontWeight: 800, color: '#2c7a7b', minWidth: 48 }}>{n}</div>
+      <div style={{ fontSize: 26, fontWeight: 800, color: '#5FA09E', minWidth: 48 }}>{n}</div>
       <div className="muted small">{label}</div>
     </div>
   )

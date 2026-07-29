@@ -19,7 +19,7 @@ const STATUS_STYLE = {
   Waiting:   { bg: '#fff4d6', fg: '#8a6a00' },
   Submitted: { bg: '#e4f2fb', fg: '#1c6ea4' },
   Complete:  { bg: '#dff5e0', fg: '#2b7a2e' },
-  Cancelled: { bg: '#eef1f4', fg: '#5b6573' },
+  Cancelled: { bg: '#eef1f4', fg: '#6B6455' },
 }
 
 const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -27,7 +27,7 @@ const today = new Date(); today.setHours(0, 0, 0, 0)
 function deadlineStyle(dateStr) {
   if (!dateStr) return null
   const diff = (new Date(dateStr) - today) / 86400000
-  if (diff < 0)   return { bg: '#eee', fg: '#5b6573', label: 'past' }
+  if (diff < 0)   return { bg: '#eee', fg: '#6B6455', label: 'past' }
   if (diff <= 2)  return { bg: '#fde0e0', fg: '#a12626', label: 'imminent' }
   if (diff <= 14) return { bg: '#fff4d6', fg: '#8a6a00', label: 'soon' }
   return null

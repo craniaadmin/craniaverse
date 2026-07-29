@@ -125,11 +125,11 @@ export default function Accounting() {
             <ResponsiveContainer>
               <BarChart data={monthlyRevenue} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke="#eef1f3" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#5b6573' }} interval={0} />
-                <YAxis tick={{ fontSize: 11, fill: '#8b95a3' }} tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
+                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#6B6455' }} interval={0} />
+                <YAxis tick={{ fontSize: 11, fill: '#9A948A' }} tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
                 <Tooltip formatter={v => money(v)} />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Bar dataKey="invoiced" name="Invoiced" fill="#c2e7f8" radius={[3, 3, 0, 0]} barSize={14} />
+                <Bar dataKey="invoiced" name="Invoiced" fill="#A6E2F9" radius={[3, 3, 0, 0]} barSize={14} />
                 <Bar dataKey="received" name="Received" fill="#5FA09E" radius={[3, 3, 0, 0]} barSize={14} />
               </BarChart>
             </ResponsiveContainer>
