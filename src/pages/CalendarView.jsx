@@ -959,60 +959,57 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
           </div>
         )}
 
-        {/* Calendar chips */}
+        {/* Calendar chips bar — colored backgrounds per calendar */}
         <div className="cal-chips">
-          {data.calendars.map(c => (
-            <span
-              key={c.id}
-              className={`cal-chip${data.hidden[c.id] ? ' hidden-cal' : ''}${chipDrag === c.id ? ' dragging-chip' : ''}${chipOver === c.id ? ' drag-over-chip' : ''}`}
-              draggable
-              onDragStart={e => handleChipDragStart(e, c.id)}
-              onDragOver={e => handleChipDragOver(e, c.id)}
-              onDrop={e => handleChipDrop(e, c.id)}
-              onDragEnd={handleChipDragEnd}
-              onClick={() => toggleCalVisibility(c.id)}
-              onDoubleClick={() => setEditingCalendar({ mode: 'edit', cal: c })}
-              onContextMenu={e => showCalCtx(e, c.id)}
-              title={data.hidden[c.id] ? 'Click to show' : 'Click to hide'}
-            >
-              <span className="chip-dot" style={{ background: c.color || DEFAULT_CAL_COLOR }} />
-              <span className="chip-name">{c.name}</span>
-              <button className="chip-edit" onClick={e => { e.stopPropagation(); setEditingCalendar({ mode: 'edit', cal: c }) }} title="Edit calendar">
-                <Edit2 size={12} />
-              </button>
-            </span>
-          ))}
+          {data.calendars.map(c => {
+            const col = c.color || DEFAULT_CAL_COLOR
+            const hidden = !!data.hidden[c.id]
+            return (
+              <span
+                key={c.id}
+                className={`cal-chip${hidden ? ' hidden-cal' : ''}${chipDrag === c.id ? ' dragging-chip' : ''}${chipOver === c.id ? ' drag-over-chip' : ''}`}
+                style={hidden ? undefined : { background: col, color: textOn(col) }}
+                draggable
+                onDragStart={e => handleChipDragStart(e, c.id)}
+                onDragOver={e => handleChipDragOver(e, c.id)}
+                onDrop={e => handleChipDrop(e, c.id)}
+                onDragEnd={handleChipDragEnd}
+                onClick={() => toggleCalVisibility(c.id)}
+                onDoubleClick={() => setEditingCalendar({ mode: 'edit', cal: c })}
+                onContextMenu={e => showCalCtx(e, c.id)}
+                title={hidden ? 'Click to show' : 'Click to hide'}
+              >
+                <span className="chip-name">{c.name}</span>
+                <button className="chip-edit" style={hidden ? undefined : { color: textOn(col) }} onClick={e => { e.stopPropagation(); setEditingCalendar({ mode: 'edit', cal: c }) }} title="Edit calendar">
+                  <Edit2 size={11} />
+                </button>
+              </span>
+            )
+          })}
           <button className="addcal-btn" onClick={() => setEditingCalendar({ mode: 'new', cal: null })}>
             + Add Calendar
           </button>
           {data.calendars.length > 0 && (
             <button className="toggle-all-btn" onClick={toggleAllCals}>
-              {allHidden ? <Eye size={12} /> : <EyeOff size={12} />}
               {allHidden ? 'Show All' : 'Hide All'}
             </button>
           )}
         </div>
 
-        {/* Actions row */}
+        {/* Actions row — matches v22: Undo Redo | + New Event | CSV | spacer | date Go */}
         <div className="actions-row">
-          <button className="act-btn" disabled={!undoLen} onClick={undo} title="Undo (Ctrl+Z)">
-            <Undo2 size={14} /> Undo
-          </button>
-          <button className="act-btn" disabled={!redoLen} onClick={redo} title="Redo (Ctrl+Shift+Z)">
-            <Redo2 size={14} /> Redo
-          </button>
+          <button className="act-btn" disabled={!undoLen} onClick={undo} title="Undo (Ctrl+Z)">Undo</button>
+          <button className="act-btn" disabled={!redoLen} onClick={redo} title="Redo (Ctrl+Shift+Z)">Redo</button>
           <button className="act-btn primary" onClick={() => setEditingEvent({ mode: 'new', event: null, date: iso(today) })}>
-            <Plus size={14} /> New Event
+            + New Event
           </button>
-          <button className="act-btn" onClick={exportCSV}>
-            <Download size={14} /> CSV
-          </button>
+          <button className="act-btn" onClick={exportCSV}>CSV</button>
           <div style={{ flex: 1 }} />
           <input type="date" className="goto-input" value={gotoDate} onChange={e => setGotoDate(e.target.value)} title="Go to date" />
           <button className="act-btn" onClick={() => { if (gotoDate) { goTo(gotoDate); setGotoDate('') } }}>Go</button>
         </div>
 
-        {/* Toolbar */}
+        {/* Navigation toolbar — matches v22: < Today > Period | Month Week Day Year tabs */}
         <div className="toolbar">
           <button className="nav-btn" onClick={goPrev} title="Previous"><ChevronLeft size={18} /></button>
           <button className="today-btn" onClick={goToday}>Today</button>
@@ -1020,12 +1017,15 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
           <span className="period-label">{periodLabel}</span>
           <span className="spacer" />
           <div className="view-btns">
-            {['month', 'week', 'day', 'year'].map(v => (
+            {[['month','Month'],['week','Week'],['day','Day'],['year','Year']].map(([v,l]) => (
               <button key={v} className={`view-btn${view === v ? ' active' : ''}`} onClick={() => setView(v)}>
-                {v.charAt(0).toUpperCase() + v.slice(1)}
+                {l}
               </button>
             ))}
           </div>
+          <button className="act-btn primary" onClick={() => setEditingEvent({ mode: 'new', event: null, date: iso(cur) })} style={{ marginLeft: 8 }}>
+            + New Event
+          </button>
         </div>
 
         {/* Main layout */}
