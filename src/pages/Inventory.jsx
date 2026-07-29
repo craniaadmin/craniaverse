@@ -422,15 +422,15 @@ export default function Inventory() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: 'var(--brand-dark-blue)', color: '#fff', textAlign: 'left' }}>
-                  <Th>Item #</Th><Th>Name</Th><Th>Category</Th><Th>Sub-Category</Th><Th>SKU</Th>
-                  <Th align="right">On Hand</Th><Th align="right">Reorder</Th>
-                  <Th align="right">Unit Cost</Th><Th align="right">Value</Th>
-                  <Th>Location</Th><Th align="center">Status</Th><Th></Th>
+                  {visibleCols.map(key => (
+                    <Th key={key} align={COL_ALIGN[key] || 'left'}>{COLUMN_LABELS[key] || key}</Th>
+                  ))}
+                  <Th></Th>
                 </tr>
               </thead>
               <tbody>
                 {filteredItems.length === 0 && (
-                  <tr><td colSpan={12} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
+                  <tr><td colSpan={visibleCols.length + 1} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
                     {data.items.length === 0
                       ? 'No items yet — click + Add Item to start your inventory.'
                       : 'No items match your filters.'}
@@ -441,6 +441,7 @@ export default function Inventory() {
                     key={it.id}
                     item={it}
                     stripe={i % 2}
+                    visibleCols={visibleCols}
                     catColor={data.categoryColors[it.category]}
                     subColor={data.subColors[subKey(it.category, it.sub)]}
                     onEdit={() => setEditing({ mode: 'edit', item: it })}
