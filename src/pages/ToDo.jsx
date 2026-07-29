@@ -1548,37 +1548,41 @@ function ColorSwatches({ value, palette, onChange }) {
 // ---------------------- Settings popover ----------------------
 function SettingsPopover({ onClose, state, setState, runChecklists }) {
   const ref = useRef(null)
+  const [backups, setBackups] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [restoreOpen, setRestoreOpen] = useState(false)
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target) && !restoreOpen) onClose() }
     setTimeout(() => document.addEventListener('click', handler), 0)
     return () => document.removeEventListener('click', handler)
-  }, [onClose])
+  }, [onClose, restoreOpen])
 
-  const backupNow = () => {
-    const text = JSON.stringify(state, null, 2)
-    const blob = new Blob([text], { type: 'application/json' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `crania-todo-backup-${isoLocal(new Date())}.json`
-    document.body.appendChild(a); a.click(); a.remove()
-    setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+  useEffect(() => {
+    fetch(`${API_BASE}/api/todo/backups`)
+      .then(r => r.json())
+      .then(setBackups)
+      .catch(() => setBackups([]))
+  }, [])
+
+  const backupNow = async () => {
+    setBusy(true)
+    try {
+      await fetch(`${API_BASE}/api/todo/backup`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: new Date().toLocaleString() }),
+      })
+      const list = await fetch(`${API_BASE}/api/todo/backups`).then(r => r.json())
+      setBackups(list)
+    } catch (err) { console.error('Backup failed:', err) }
+    setBusy(false)
   }
 
-  const restore = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = '.json'
-    input.onchange = async (e) => {
-      const file = e.target.files?.[0]
-      if (!file) return
-      try {
-        const text = await file.text()
-        const data = JSON.parse(text)
-        if (!Array.isArray(data.lists) || !Array.isArray(data.items)) {
-          alert('Invalid backup file — expected lists and items arrays.')
-          return
-        }
+  const doRestore = async (id) => {
+    setBusy(true)
+    try {
+      const data = await fetch(`${API_BASE}/api/todo/restore/${id}`, { method: 'POST' }).then(r => r.json())
+      if (Array.isArray(data.lists)) {
         setState({
           lists: data.lists || [],
           items: data.items || [],
@@ -1586,24 +1590,60 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
           _migPri: !!data._migPri,
           _migBg: !!data._migBg,
         })
-        onClose()
-      } catch { alert('Could not read the backup file.') }
-    }
-    input.click()
+      }
+      setRestoreOpen(false)
+      onClose()
+    } catch (err) { console.error('Restore failed:', err) }
+    setBusy(false)
   }
+
+  const lastBackup = backups?.[0]
+  const lastLine = lastBackup
+    ? `Last backup: ${lastBackup.label || new Date(lastBackup.created).toLocaleString()}`
+    : backups === null ? 'Loading…' : 'No backups yet'
 
   return (
     <div className="settings-popover" ref={ref} onClick={(e) => e.stopPropagation()}>
       <div className="field sect">
         <label>Backups</label>
         <div className="hint">
-          Data is saved automatically to the server. Use these buttons
-          to download a local backup or restore from one.
+          Backs up to the database (last 14 kept). Use Back Up Now before
+          making big changes, or Restore to roll back.
         </div>
+        <div style={{ fontSize: 12.5, color: '#6B6455', marginBottom: 4 }}>{lastLine}</div>
         <div className="bkbtns">
-          <button className="small" onClick={backupNow}>Back Up Now</button>
-          <button className="small" onClick={restore}>Restore…</button>
+          <button className="small" disabled={busy} onClick={backupNow}>
+            {busy ? '…' : 'Back Up Now'}
+          </button>
+          <button className="small" disabled={busy} onClick={() => setRestoreOpen(v => !v)}>
+            Restore…
+          </button>
         </div>
+        {restoreOpen && backups && (
+          <div style={{ marginTop: 8, maxHeight: 180, overflowY: 'auto', fontSize: 12 }}>
+            {backups.length === 0 && <div style={{ color: '#9a948a', padding: 6 }}>No backups available.</div>}
+            {backups.map(b => (
+              <div
+                key={b.id}
+                style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '5px 6px', borderRadius: 6, cursor: 'pointer',
+                  background: '#fbfaf5', marginBottom: 3,
+                }}
+              >
+                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {b.label || new Date(b.created).toLocaleString()}
+                </span>
+                <button
+                  className="small"
+                  style={{ padding: '3px 8px', fontSize: 11, marginTop: 0 }}
+                  disabled={busy}
+                  onClick={() => doRestore(b.id)}
+                >Restore</button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div className="field sect">
         <label>Checklists</label>
