@@ -421,22 +421,17 @@ const MAX_TODO_BACKUPS = 14
 
 export async function listTodoBackups() {
   await ensureAuth()
-  const rows = await pb().collection('todo_backups').getFullList({ sort: '-created' })
+  const rows = await pb().collection('todo_backups').getFullList()
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
   return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
 }
 
 export async function createTodoBackup(label) {
   await ensureAuth()
   const todo = await loadTodo()
-  console.log('[backup] creating backup, label:', label, 'payload keys:', Object.keys(todo), 'items:', (todo.items || []).length)
-  try {
-    await pb().collection('todo_backups').create({ label: label || '', payload: todo })
-  } catch (err) {
-    logPbError('backup-create', err)
-    throw err
-  }
-  // prune old backups beyond MAX_TODO_BACKUPS
-  const all = await pb().collection('todo_backups').getFullList({ sort: '-created' })
+  await pb().collection('todo_backups').create({ label: label || '', payload: todo })
+  const all = await pb().collection('todo_backups').getFullList()
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
   for (const old of all.slice(MAX_TODO_BACKUPS)) {
     await pb().collection('todo_backups').delete(old.id)
   }
