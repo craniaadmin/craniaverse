@@ -47,6 +47,7 @@ import {
   loadCraniaStore,   saveCraniaStore,
   loadContests,      saveContests,
   loadTodo,          saveTodo,
+  listTodoBackups,   createTodoBackup,  restoreTodoBackup,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
