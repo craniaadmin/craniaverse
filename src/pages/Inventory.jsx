@@ -503,20 +503,22 @@ function MetricTile({ label, value, hint, color, onClick }) {
 }
 
 // ---------- Row ----------
-function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump }) {
+function ItemRow({ item, stripe, visibleCols, catColor, subColor, onEdit, onDelete, onBump }) {
   const s = statusOf(item)
   const value = (Number(item.qty) || 0) * (Number(item.cost) || 0)
   const bg = stripe ? '#fafaf7' : '#fff'
-  return (
-    <tr style={{ background: bg, borderTop: '1px solid #f0ede3' }}>
-      <Td mono>{item.num}</Td>
-      <Td strong onClick={onEdit} style={{ cursor: 'pointer' }}>{item.name}</Td>
+  const CELLS = {
+    num: <Td mono>{item.num}</Td>,
+    name: <Td strong onClick={onEdit} style={{ cursor: 'pointer' }}>{item.name}</Td>,
+    category: (
       <Td>
         <span style={{
           background: catColor || '#eee', color: textOn(catColor || '#eee'),
           borderRadius: 5, padding: '2px 8px', fontSize: 12, fontWeight: 600,
         }}>{item.category || '—'}</span>
       </Td>
+    ),
+    sub: (
       <Td>
         {item.sub ? (
           <span style={{
@@ -525,7 +527,9 @@ function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump })
           }}>{item.sub}</span>
         ) : <span style={{ color: 'var(--muted)' }}>—</span>}
       </Td>
-      <Td muted>{item.sku || '—'}</Td>
+    ),
+    sku: <Td muted>{item.sku || '—'}</Td>,
+    qty: (
       <Td align="right">
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
           <button onClick={() => onBump(-1)} style={btnMini} title="−1"><Minus size={12} /></button>
@@ -536,13 +540,16 @@ function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump })
           <button onClick={() => onBump(+1)} style={btnMini} title="+1"><Plus size={12} /></button>
         </div>
       </Td>
-      <Td align="right" muted>{item.reorder || 0}</Td>
-      <Td align="right" muted>{money(item.cost)}</Td>
-      <Td align="right" strong>{money(value)}</Td>
-      <Td muted>{item.location || '—'}</Td>
-      <Td align="center">
-        <StatusPill status={s} />
-      </Td>
+    ),
+    reorder: <Td align="right" muted>{item.reorder || 0}</Td>,
+    cost: <Td align="right" muted>{money(item.cost)}</Td>,
+    value: <Td align="right" strong>{money(value)}</Td>,
+    location: <Td muted>{item.location || '—'}</Td>,
+    status: <Td align="center"><StatusPill status={s} /></Td>,
+  }
+  return (
+    <tr style={{ background: bg, borderTop: '1px solid #f0ede3' }}>
+      {visibleCols.map(key => <Fragment key={key}>{CELLS[key]}</Fragment>)}
       <Td align="center">
         <button onClick={onEdit} title="Edit" style={iconBtn}><Edit2 size={13} /></button>
         <button onClick={onDelete} title="Delete" style={iconBtn}><Trash2 size={13} /></button>
