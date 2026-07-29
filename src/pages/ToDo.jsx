@@ -280,6 +280,17 @@ const CSS = `
 .tdroot .ctxmenu button:hover{background:#f4f2ea;}
 .tdroot .ctxmenu button.ctx-danger{color:#c0392b;}
 
+/* settings popover */
+.tdroot .settings-popover{position:fixed;top:118px;right:max(16px,calc(50% - 430px));z-index:290;background:#fff;border:1px solid #e2ded2;border-radius:12px;box-shadow:0 8px 30px rgba(46,37,22,.18);padding:14px;width:300px;text-align:left;box-sizing:border-box;}
+.tdroot .settings-popover .field.sect{margin:0 0 8px;padding:12px;border-radius:8px;}
+.tdroot .settings-popover .field.sect:nth-child(even){background:#E7EAEC;}
+.tdroot .settings-popover .field.sect:last-child{margin-bottom:0;}
+.tdroot .settings-popover label{display:block;font-weight:700;font-size:13px;margin-bottom:6px;color:var(--dark-brown);}
+.tdroot .settings-popover .hint{font-size:11px;color:#9a948a;margin:6px 0 8px;line-height:1.4;}
+.tdroot .settings-popover .bkbtns{display:flex;gap:8px;}
+.tdroot .settings-popover button.small{background:var(--dark-blue);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:2px;}
+.tdroot .settings-popover button.small:hover{filter:brightness(1.08);}
+
 /* footer */
 .tdroot .td-footer{text-align:center;font-size:12px;color:#9a948a;padding:16px 0 4px;}
 
