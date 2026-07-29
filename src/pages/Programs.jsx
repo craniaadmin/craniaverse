@@ -203,9 +203,13 @@ export default function Programs() {
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
-      <div className="page-head" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div className="page-head" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <h2 className="page-title" style={{ marginRight: 'auto' }}>Programs</h2>
-        <button className="icon-btn" onClick={exportCsv} title="Export CSV" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, padding: '8px 12px' }}>
+        <button onClick={exportCsv} title="Export CSV" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+          fontSize: 13, fontWeight: 600, padding: '9px 14px', borderRadius: 8,
+          border: '1px solid var(--line)', background: '#fff', color: 'var(--ink)', cursor: 'pointer',
+        }}>
           <Download size={15} /> Export CSV
         </button>
         <button className="icon-btn solid" onClick={addProgram} title="Add new program">
