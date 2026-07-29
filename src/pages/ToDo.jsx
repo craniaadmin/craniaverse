@@ -1574,20 +1574,26 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
   const backupNow = async () => {
     setBusy(true)
     try {
-      await fetch(`${API_BASE}/api/todo/backup`, {
+      const res = await fetch(`${API_BASE}/api/todo/backup`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ label: new Date().toLocaleString() }),
       })
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
       const list = await fetch(`${API_BASE}/api/todo/backups`).then(r => r.json())
       setBackups(list)
-    } catch (err) { console.error('Backup failed:', err) }
+    } catch (err) {
+      console.error('Backup failed:', err)
+      alert('Backup failed — make sure the todo_backups collection exists (run pb-setup.js).')
+    }
     setBusy(false)
   }
 
   const doRestore = async (id) => {
     setBusy(true)
     try {
-      const data = await fetch(`${API_BASE}/api/todo/restore/${id}`, { method: 'POST' }).then(r => r.json())
+      const res = await fetch(`${API_BASE}/api/todo/restore/${id}`, { method: 'POST' })
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
+      const data = await res.json()
       if (Array.isArray(data.lists)) {
         setState({
           lists: data.lists || [],
@@ -1599,7 +1605,10 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
       }
       setRestoreOpen(false)
       onClose()
-    } catch (err) { console.error('Restore failed:', err) }
+    } catch (err) {
+      console.error('Restore failed:', err)
+      alert('Restore failed — see console for details.')
+    }
     setBusy(false)
   }
 
