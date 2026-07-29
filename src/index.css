@@ -1208,7 +1208,7 @@ textarea.reg-input { resize: vertical; min-height: 96px; }
   width: 22px; height: 22px; border-radius: 5px;
   border: 2px solid #ddd; cursor: pointer; padding: 0;
 }
-.rm-swatch.on { border-color: #1f2733; box-shadow: 0 0 0 2px rgba(0,0,0,0.05); }
+.rm-swatch.on { border-color: #2E2516; box-shadow: 0 0 0 2px rgba(0,0,0,0.05); }
 
 /* record picker — refresh + connection status */
 .record-refresh{
