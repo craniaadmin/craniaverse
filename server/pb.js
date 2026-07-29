@@ -436,7 +436,7 @@ export async function createTodoBackup(label) {
     throw err
   }
   // prune old backups beyond MAX_TODO_BACKUPS
-  const all = await pb().collection('todo_backups').getFullList({ sort: '-created', fields: 'id' })
+  const all = await pb().collection('todo_backups').getFullList({ sort: '-created' })
   for (const old of all.slice(MAX_TODO_BACKUPS)) {
     await pb().collection('todo_backups').delete(old.id)
   }
