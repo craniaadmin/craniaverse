@@ -431,14 +431,11 @@ export async function listTodoBackups() {
 export async function createTodoBackup(label) {
   await ensureAuth()
   const todo = await loadTodo()
-  console.log('[backup] creating backup, label:', label, 'payload keys:', Object.keys(todo))
+  console.log('[backup] creating backup, label:', label, 'payload keys:', Object.keys(todo), 'items:', (todo.items || []).length)
   try {
-    await pb().collection('todo_backups').create({
-      label: String(label || ''),
-      payload: JSON.stringify(todo),
-    })
+    await pb().collection('todo_backups').create({ label: label || '', payload: todo })
   } catch (err) {
-    console.error('[backup create error] status:', err?.status, 'data:', JSON.stringify(err?.data), 'response:', JSON.stringify(err?.response))
+    logPbError('backup-create', err)
     throw err
   }
   // prune old backups beyond MAX_TODO_BACKUPS
