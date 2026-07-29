@@ -142,7 +142,7 @@ export default function Dashboard({ onNavigate }) {
     return s
   }, [payments])
   const monthPct = Math.min(100, Math.round((monthRevenue / MONTHLY_TARGET) * 100))
-  const gaugeData = [{ name: 'rev', value: monthPct, fill: '#4f9ea0' }]
+  const gaugeData = [{ name: 'rev', value: monthPct, fill: '#5FA09E' }]
 
   // Revenue by program (target = sum of invoice.total, actual = amount collected).
   const revenueByProgram = useMemo(() => {
