@@ -1049,7 +1049,7 @@ textarea.reg-input { resize: vertical; min-height: 96px; }
   letter-spacing: 0.3px;
 }
 .sch-entry-unassigned {
-  color: #1f2733;
+  color: #2E2516;
   background: repeating-linear-gradient(
     45deg, #e6e9ec, #e6e9ec 6px, #d9dde0 6px, #d9dde0 12px
   ) !important;
