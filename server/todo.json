@@ -1,0 +1,777 @@
+{
+  "lists": [
+    {
+      "id": "mrcegddm288d2",
+      "name": "Financial",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrcegh4zhp342",
+      "name": "Marketing",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrcegqc2vophu",
+      "name": "Operations",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrceg2y2c70y7",
+      "name": "Customers",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrc6d51oru4wx",
+      "name": "Students",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrceyo6furcag",
+      "name": "Staff",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrcegm6y4h050",
+      "name": "Technology",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrcelpoy68g5j",
+      "name": "Day School",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrcf5n99iu9zl",
+      "name": "Curriculum",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "mrcf6btpdr26f",
+      "name": "Products",
+      "color": "#5FA09E"
+    }
+  ],
+  "items": [
+    {
+      "id": "ms5k4kvjhb3fa",
+      "listId": "mrc6d51oru4wx",
+      "text": "Check Student Comments",
+      "priority": "high",
+      "due": "2026-07-29",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg8v5g6rc8i",
+      "entryId": "mrcglz036d7ei",
+      "periodKey": "2026-07-29"
+    },
+    {
+      "id": "ms5hwxg6pcv04",
+      "listId": "mrc6d51oru4wx",
+      "text": "Check Student Comments",
+      "priority": "high",
+      "due": "2026-07-28",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg8v5g6rc8i",
+      "entryId": "mrcglz036d7ei",
+      "periodKey": "2026-07-28"
+    },
+    {
+      "id": "mrm3h3is800zv",
+      "listId": "mrc6d51oru4wx",
+      "text": "Check Student Comments",
+      "priority": "high",
+      "due": "2026-07-15",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg8v5g6rc8i",
+      "entryId": "mrcglz036d7ei",
+      "periodKey": "2026-07-15"
+    },
+    {
+      "id": "mrm3h3istgoyx",
+      "listId": "mrcegqc2vophu",
+      "text": "Order Supplies  printer paper",
+      "priority": "med",
+      "due": "2026-07-15",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mri1k8rzm969m",
+      "periodKey": "2026-07"
+    },
+    {
+      "id": "mrkuvzcbteze0",
+      "listId": "mrc6d51oru4wx",
+      "text": "Check Student Comments",
+      "priority": "high",
+      "due": "2026-07-14",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg8v5g6rc8i",
+      "entryId": "mrcglz036d7ei",
+      "periodKey": "2026-07-14"
+    },
+    {
+      "id": "mrkuvzcbat1s1",
+      "listId": "mrc6d51oru4wx",
+      "text": "Review Attendance",
+      "priority": "high",
+      "due": "2026-07-01",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg8v5g6rc8i",
+      "entryId": "mrcglz03tce5g",
+      "periodKey": "2026-07"
+    },
+    {
+      "id": "mri1n6twd1vk9",
+      "listId": "mrcegddm288d2",
+      "text": "Pay Credit Card",
+      "priority": "high",
+      "due": "2026-07-01",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrdkbrn0b4783",
+      "periodKey": "2026-07"
+    },
+    {
+      "id": "mrcg1kev99kkf",
+      "listId": "mrcegddm288d2",
+      "text": "Hana SWPP Mid-Term Questionaire",
+      "priority": "high",
+      "due": "",
+      "done": true,
+      "color": "#FBDDE4",
+      "notes": ""
+    },
+    {
+      "id": "mrdkaqhhiy8pm",
+      "listId": "mrcegddm288d2",
+      "text": "Cancel Quickbooks",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrdkaewl8eedi",
+      "listId": "mrcegddm288d2",
+      "text": "Turn off Google Ads",
+      "priority": "high",
+      "due": "",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mri1l11icz4kn",
+      "listId": "mrcegddm288d2",
+      "text": "Pay Rent",
+      "priority": "high",
+      "due": "2026-07-01",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcglz031up6m",
+      "periodKey": "2026-07"
+    },
+    {
+      "id": "mri1l11ivo99w",
+      "listId": "mrcegddm288d2",
+      "text": "Pay Kefah",
+      "priority": "high",
+      "due": "2026-07-01",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcglz03th6mf",
+      "periodKey": "2026-07"
+    },
+    {
+      "id": "mri0uhjuv5395",
+      "listId": "mrcegddm288d2",
+      "text": "Payroll - save T4's (automate this)",
+      "priority": "high",
+      "due": "2026-07-05",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcgueepjdx6c"
+    },
+    {
+      "id": "mri0uhjuwdqni",
+      "listId": "mrcegddm288d2",
+      "text": "Payroll - pay taxes",
+      "priority": "high",
+      "due": "2026-07-05",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcgtqd3arzno"
+    },
+    {
+      "id": "mri0uhjuxho7m",
+      "listId": "mrcegddm288d2",
+      "text": "Payroll - send e-transfers",
+      "priority": "high",
+      "due": "2026-07-05",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcglz03tff5s"
+    },
+    {
+      "id": "mri0uhjud5qor",
+      "listId": "mrcegddm288d2",
+      "text": "Pay Bills",
+      "priority": "high",
+      "due": "2026-07-01",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcrluw81obl7"
+    },
+    {
+      "id": "mri0uhjumntv5",
+      "listId": "mrcegddm288d2",
+      "text": "Pay Nicolas",
+      "priority": "high",
+      "due": "2026-07-01",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcglz037ggir"
+    },
+    {
+      "id": "mrcrfkqgtenhr",
+      "listId": "mrcegddm288d2",
+      "text": "Pay Cleaner - having trouble depositing",
+      "priority": "high",
+      "due": "2026-07-26",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": "",
+      "checklistId": "mrcg7e3gn5mjv",
+      "entryId": "mrcglz039k0ki"
+    },
+    {
+      "id": "mrcel83gk2bnr",
+      "listId": "mrceg2y2c70y7",
+      "text": "Send last contest results",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "Max & Maya"
+    },
+    {
+      "id": "mrcpg1wf0eo4x",
+      "listId": "mrcegqc2vophu",
+      "text": "Check Casa mail for debit card!!",
+      "priority": "high",
+      "due": "2026-07-09",
+      "done": false,
+      "color": "#FBDDE4",
+      "notes": ""
+    },
+    {
+      "id": "mrceh9cb6nmts",
+      "listId": "mrcegqc2vophu",
+      "text": "Recurring order of soap, paper towels and toilet paper - both locations",
+      "priority": "low",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6"
+    },
+    {
+      "id": "mrcem0c03v9vo",
+      "listId": "mrcelpoy68g5j",
+      "text": "Submit NOI!",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcestuoccibu",
+      "listId": "mrcegh4zhp342",
+      "text": "Prepare for Jul 12, 2026 event",
+      "priority": "low",
+      "due": "",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcey8b2ly1x0",
+      "listId": "mrceg2y2c70y7",
+      "text": "Nabeela respond",
+      "priority": "high",
+      "due": "",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcf2eweofoke",
+      "listId": "mrceyo6furcag",
+      "text": "Payroll! - pay Tony",
+      "priority": "high",
+      "due": "",
+      "done": true,
+      "color": "#FBDDE4",
+      "notes": ""
+    },
+    {
+      "id": "mrcezihbm2oj2",
+      "listId": "mrceyo6furcag",
+      "text": "Tony - keys + uniform back",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcf052v7os51",
+      "listId": "mrcegm6y4h050",
+      "text": "Set up Wifi & Projector at BW",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcf1b92dr2z8",
+      "listId": "mrcegm6y4h050",
+      "text": "CraniaVerse!",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#FBDDE4",
+      "notes": ""
+    },
+    {
+      "id": "mrcf1tgt81rd5",
+      "listId": "mrceyo6furcag",
+      "text": "HS Co-op Evaluations",
+      "priority": "med",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcf7x051sngq",
+      "listId": "mrcf5n99iu9zl",
+      "text": "Create Assessments",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": "Math"
+    },
+    {
+      "id": "mri1ph6fzlhtb",
+      "listId": "mrcf6btpdr26f",
+      "text": "Edit IE agenda",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#FBDDE4",
+      "notes": ""
+    },
+    {
+      "id": "mrcf8pg58yooc",
+      "listId": "mrcf6btpdr26f",
+      "text": "Make Agenda Sales Website",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcf8z2oeri9k",
+      "listId": "mrceyo6furcag",
+      "text": "Write Delaram",
+      "priority": "low",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mri1cgim8tr0t",
+      "listId": "mrceyo6furcag",
+      "text": "Respond Sameena (Teacher)",
+      "priority": "med",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrcrxur0uydat",
+      "listId": "mrceyo6furcag",
+      "text": "Contact Ben for piano",
+      "priority": "med",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mri169gihlyf8",
+      "listId": "mrceyo6furcag",
+      "text": "Pay Joanne - Summer",
+      "priority": "high",
+      "due": "",
+      "done": true,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mri1cv3492fdd",
+      "listId": "mrceyo6furcag",
+      "text": "Hire Fall Co-ops",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    },
+    {
+      "id": "mrko50wmhonl0",
+      "listId": "mrcegh4zhp342",
+      "text": "Waterloo Rec TV ads",
+      "priority": "high",
+      "due": "",
+      "done": false,
+      "color": "#EEF3F6",
+      "notes": ""
+    }
+  ],
+  "checklists": [
+    {
+      "id": "mrcg7e3gn5mjv",
+      "name": "Monthly",
+      "freq": "monthly",
+      "entries": [
+        {
+          "id": "mrcglz03th6mf",
+          "text": "Pay Kefah",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcglz037ggir",
+          "text": "Pay Nicolas",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcglz031up6m",
+          "text": "Pay Rent",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrdkbrn0b4783",
+          "text": "Pay Credit Card",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcrluw81obl7",
+          "text": "Pay Bills",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcglz03tff5s",
+          "text": "Payroll - send e-transfers",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 5,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcgtqd3arzno",
+          "text": "Payroll - pay taxes",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 5,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcgueepjdx6c",
+          "text": "Payroll - save T4's (automate this)",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 5,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mri1k8rzm969m",
+          "text": "Order Supplies",
+          "note": "",
+          "listId": "mrcegqc2vophu",
+          "priority": "med",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 15,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcglz039k0ki",
+          "text": "Pay Cleaner",
+          "note": "",
+          "listId": "mrcegddm288d2",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 20,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        }
+      ],
+      "lastKey": "2026-07",
+      "listId": "mrcegh4zhp342",
+      "active": true,
+      "color": "#E0DE85"
+    },
+    {
+      "id": "mrcg8podrumi0",
+      "name": "Weekly",
+      "freq": "daily",
+      "entries": [
+        {
+          "id": "mrcglz03gptns",
+          "text": "",
+          "note": "",
+          "listId": "mrcegh4zhp342",
+          "priority": "high",
+          "active": false,
+          "freq": "weekly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-W28"
+        }
+      ],
+      "lastKey": "2026-07-08",
+      "listId": "mrcegh4zhp342",
+      "active": true,
+      "color": "#E0DE85"
+    },
+    {
+      "id": "mrcg8v5g6rc8i",
+      "name": "Daily",
+      "freq": "daily",
+      "entries": [
+        {
+          "id": "mrcglz03tce5g",
+          "text": "Review Attendance",
+          "note": "",
+          "listId": "mrc6d51oru4wx",
+          "priority": "high",
+          "active": true,
+          "freq": "monthly",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07"
+        },
+        {
+          "id": "mrcglz036d7ei",
+          "text": "Check Student Comments",
+          "note": "",
+          "listId": "mrc6d51oru4wx",
+          "priority": "high",
+          "active": true,
+          "freq": "daily",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "2026-07-29"
+        }
+      ],
+      "lastKey": "2026-07-08",
+      "listId": "mrcegh4zhp342",
+      "active": true,
+      "color": "#E0DE85"
+    },
+    {
+      "id": "mrkuwpdwku10t",
+      "name": "Custom",
+      "listId": "mrcegddm288d2",
+      "active": true,
+      "entries": [
+        {
+          "id": "mrkuwpdwlmm1u",
+          "text": "Pay Joanne - Summer",
+          "note": "",
+          "listId": "mrceyo6furcag",
+          "priority": "high",
+          "active": false,
+          "freq": "custom",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "C1-20663-0"
+        },
+        {
+          "id": "mrkuy86z0ozs2",
+          "text": "Pay Joanne - Term 1",
+          "note": "",
+          "listId": "mrceyo6furcag",
+          "priority": "high",
+          "active": true,
+          "freq": "custom",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "",
+          "customStart": "2026-09-01"
+        },
+        {
+          "id": "mrkuypcbgqb1s",
+          "text": "Pay Joanne - Term 2",
+          "note": "",
+          "listId": "mrceyo6furcag",
+          "priority": "high",
+          "active": true,
+          "freq": "custom",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "",
+          "customStart": "2027-02-01"
+        },
+        {
+          "id": "mrkvi8ou3894x",
+          "text": "Pay Joanne - Term 3",
+          "note": "",
+          "listId": "mrceyo6furcag",
+          "priority": "high",
+          "active": true,
+          "freq": "custom",
+          "customDays": 1,
+          "monthMode": "date",
+          "monthDate": 1,
+          "monthWeek": 1,
+          "monthWeekday": 1,
+          "lastKey": "",
+          "customStart": "2027-04-01"
+        }
+      ],
+      "color": "#E0DE85"
+    }
+  ],
+  "_migPri": true
+}
