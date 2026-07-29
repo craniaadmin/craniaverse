@@ -1655,14 +1655,6 @@ function SettingsPopover({ onClose, state, setState, runChecklists }) {
           </div>
         )}
       </div>
-      <div className="sp-card">
-        <div className="sp-card-title">Checklists</div>
-        <div className="sp-hint">
-          Checklist items are added to your To-Do list automatically
-          on their schedule. Force a refresh now if needed.
-        </div>
-        <button type="button" className="sp-btn" onClick={() => { runChecklists(); onClose() }}>Run Checklists Now</button>
-      </div>
     </div>
   )
 }
