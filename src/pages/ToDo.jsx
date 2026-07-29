@@ -1016,28 +1016,12 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         </div>
       )}
 
-      {settingsOpen && (
-        <div className="overlay" onClick={(e) => { if (e.target === e.currentTarget) setSettingsOpen(false) }}>
-          <div className="modal" style={{ maxWidth: 380 }}>
-            <h2>Settings</h2>
-            <div style={{ fontSize: 13, color: '#6b6455', lineHeight: 1.5, marginBottom: 16 }}>
-              Checklist items are added to your To-Do list automatically — each item
-              on its own schedule (daily, weekly, monthly, or custom), set when you
-              create or edit it under Checklists.
-            </div>
-            <button
-              onClick={() => { runChecklists(); setSettingsOpen(false) }}
-              style={{
-                width: '100%', background: 'var(--dark-blue)', color: '#fff', border: 'none',
-                borderRadius: 8, padding: '10px 14px', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-              }}
-            >Run Checklists Now</button>
-            <div className="modal-actions">
-              <button className="cancel" onClick={() => setSettingsOpen(false)}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {settingsOpen && <SettingsPopover
+        onClose={() => setSettingsOpen(false)}
+        state={state}
+        setState={setState}
+        runChecklists={runChecklists}
+      />}
     </div>
   )
 }
