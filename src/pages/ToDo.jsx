@@ -1533,3 +1533,74 @@ function ColorSwatches({ value, palette, onChange }) {
     </>
   )
 }
+
+// ---------------------- Settings popover ----------------------
+function SettingsPopover({ onClose, state, setState, runChecklists }) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    setTimeout(() => document.addEventListener('click', handler), 0)
+    return () => document.removeEventListener('click', handler)
+  }, [onClose])
+
+  const backupNow = () => {
+    const text = JSON.stringify(state, null, 2)
+    const blob = new Blob([text], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `crania-todo-backup-${isoLocal(new Date())}.json`
+    document.body.appendChild(a); a.click(); a.remove()
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+  }
+
+  const restore = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+      try {
+        const text = await file.text()
+        const data = JSON.parse(text)
+        if (!Array.isArray(data.lists) || !Array.isArray(data.items)) {
+          alert('Invalid backup file — expected lists and items arrays.')
+          return
+        }
+        setState({
+          lists: data.lists || [],
+          items: data.items || [],
+          checklists: (data.checklists || []).map(normalizeChecklist),
+          _migPri: !!data._migPri,
+          _migBg: !!data._migBg,
+        })
+        onClose()
+      } catch { alert('Could not read the backup file.') }
+    }
+    input.click()
+  }
+
+  return (
+    <div className="settings-popover" ref={ref} onClick={(e) => e.stopPropagation()}>
+      <div className="field sect">
+        <label>Backups</label>
+        <div className="hint">
+          Data is saved automatically to the server. Use these buttons
+          to download a local backup or restore from one.
+        </div>
+        <div className="bkbtns">
+          <button className="small" onClick={backupNow}>Back Up Now</button>
+          <button className="small" onClick={restore}>Restore…</button>
+        </div>
+      </div>
+      <div className="field sect">
+        <label>Checklists</label>
+        <div className="hint">
+          Checklist items are added to your To-Do list automatically.
+        </div>
+        <button className="small" onClick={() => { runChecklists(); onClose() }}>Run Checklists Now</button>
+      </div>
+    </div>
+  )
+}
