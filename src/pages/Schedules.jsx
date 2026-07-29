@@ -165,7 +165,12 @@ export default function Schedules() {
             const start = snapToSlot(o.start)
             const end   = snapToSlot(o.end)
             if (!start || !end || end <= start) return
-            const id = `seed_${prog.code || prog.number}_${o.day}_${start}_${idx}`
+            // Include location: the same program code/number can have a
+            // same-day-same-time offering at two different locations
+            // (Boardwalk vs Waterloo East), and without locId here the
+            // second one would collide with the first's id and get
+            // silently dropped instead of imported.
+            const id = `seed_${prog.code || prog.number}_${locId}_${o.day}_${start}_${idx}`
             if (existing.has(id)) return
             existing.set(id, {
               id,
