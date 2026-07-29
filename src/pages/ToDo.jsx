@@ -948,6 +948,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
 
       {view === 'checklists' && <ChecklistsView
         state={state}
+        addChecklist={addChecklist}
         askConfirm={askConfirm}
         openChecklistEdit={openChecklistEdit}
         updateChecklistActive={updateChecklistActive}
