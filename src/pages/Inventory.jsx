@@ -11,7 +11,7 @@
 // export, bulk edit/delete, drag-reorder categories, backups,
 // per-item colour swatches management.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Plus, Minus, Edit2, Trash2, Search, X, Eye, Download } from 'lucide-react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
