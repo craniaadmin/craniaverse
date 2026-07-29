@@ -313,11 +313,16 @@ async function importPrograms() {
   let c = 0, u = 0, skipped = 0
   for (let i = 0; i < records.length; i++) {
     const rec = records[i]
-    // Some legacy program rows have a blank `number`. Fall back to
-    // `code`, then to a positional id, so every row imports.
+    // The same catalog number legitimately appears on more than one
+    // row when a program is offered at multiple locations, each with
+    // its own offerings — so the key must include location, not just
+    // number, or the second location's row silently overwrites the
+    // first's. Some legacy rows also have a blank `number`; fall back
+    // to `code`, then a positional id, so every row still imports.
     let recordId = String(rec.number || '').trim()
     if (!recordId) recordId = String(rec.code || '').trim()
     if (!recordId) recordId = `prog-${i}`
+    recordId = `${recordId}::${String(rec.location || '').trim()}`
     try {
       const action = await upsertByRecordId('programs', recordId, { recordId, payload: rec })
       if (action === 'created') c++; else u++
