@@ -416,6 +416,37 @@ export async function saveTodo(payload) {
   }
 }
 
+// ---- todo backups (timestamped snapshots, last 14 kept) --------
+const MAX_TODO_BACKUPS = 14
+
+export async function listTodoBackups() {
+  await ensureAuth()
+  const rows = await pb().collection('todo_backups').getFullList({
+    sort: '-created',
+    fields: 'id,label,created',
+  })
+  return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
+}
+
+export async function createTodoBackup(label) {
+  await ensureAuth()
+  const todo = await loadTodo()
+  await pb().collection('todo_backups').create({ label: label || '', payload: todo })
+  // prune old backups beyond MAX_TODO_BACKUPS
+  const all = await pb().collection('todo_backups').getFullList({ sort: '-created', fields: 'id' })
+  for (const old of all.slice(MAX_TODO_BACKUPS)) {
+    await pb().collection('todo_backups').delete(old.id)
+  }
+}
+
+export async function restoreTodoBackup(backupId) {
+  await ensureAuth()
+  const row = await pb().collection('todo_backups').getOne(backupId)
+  if (!row?.payload) throw new Error('Backup not found or empty')
+  await saveTodo(row.payload)
+  return row.payload
+}
+
 // ---- projects (kanban board — singleton payload) --------
 // Schema mirrors the "crania-projects.json" file the client's
 // v20 kanban mockup writes to disk, so exports/imports round-trip.
