@@ -421,11 +421,16 @@ const MAX_TODO_BACKUPS = 14
 
 export async function listTodoBackups() {
   await ensureAuth()
-  const rows = await pb().collection('todo_backups').getFullList({
-    sort: '-created',
-    fields: 'id,label,created',
-  })
-  return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
+  try {
+    const rows = await pb().collection('todo_backups').getFullList({
+      sort: '-created',
+      fields: 'id,label,created',
+    })
+    return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
+  } catch (err) {
+    logPbError('backup-list', err)
+    throw err
+  }
 }
 
 export async function createTodoBackup(label) {
