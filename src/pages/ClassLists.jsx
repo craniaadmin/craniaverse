@@ -162,7 +162,10 @@ function useClassLists() {
       const all = cls.allSessions
       const groups = new Map() // session key (or null) -> rows
       for (const row of cls.roster) {
-        const s = matchSession(row.entry.schedule, all)
+        let s = matchSession(row.entry.schedule, all)
+        // A class that runs one session has nowhere else to put anyone, so
+        // stale or missing schedule text should not strand them.
+        if (!s && all.length === 1) s = all[0]
         const key = s ? s.key : null
         if (!groups.has(key)) groups.set(key, [])
         groups.get(key).push(row)
