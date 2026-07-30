@@ -1262,7 +1262,7 @@ function ChecklistsView({
           onClick={addChecklist}
           style={{
             background: 'var(--light-blue)', color: 'var(--dark-brown)',
-            border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700,
+            border: 'none', padding: '9px 20px', fontSize: 14, fontWeight: 700,
             borderRadius: 8, cursor: 'pointer', flexShrink: 0,
           }}
         >+ Add Checklist</button>
