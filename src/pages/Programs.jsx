@@ -1161,10 +1161,10 @@ function ProgramsPage() {
     }
     return [...list.slice(0, i + 1), dup, ...list.slice(i + 1)]
   })
-  const deleteProgram = (progId) => {
+  const deleteProgram = async (progId) => {
     const p = programs.find(x => x.id === progId)
     if (!p) return
-    if (!window.confirm(`Delete "${p.name || 'Untitled'}" and all its scheduled entries?`)) return
+    if (!await dialog.confirm(`Delete "${p.name || 'Untitled'}" and all its scheduled entries?`)) return
     mutate(list => list.filter(x => x.id !== progId))
   }
 
