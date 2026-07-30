@@ -1805,7 +1805,7 @@ function ProgramModal({ mode, initial, locations, teacherOptions, registrations,
   }, [form.duration, form.sessions, form.period])
 
   const save = () => {
-    if (!String(form.name || '').trim()) { window.alert('Please enter a program name.'); return }
+    if (!String(form.name || '').trim()) { dialog.alert('Missing Name', 'Please enter a program name.'); return }
     onSave({
       ...form, name: String(form.name).trim(),
       duration: form.duration === '' ? '' : Number(form.duration),
