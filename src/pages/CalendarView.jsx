@@ -1338,6 +1338,15 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
         {ctxMenu && (
           <ContextMenu x={ctxMenu.x} y={ctxMenu.y} items={ctxMenu.items} />
         )}
+
+        {colorPick && (
+          <CalColorPop
+            x={colorPick.x} y={colorPick.y}
+            current={(data.calendars.find(c => c.id === colorPick.calId) || {}).color}
+            onPick={c => setCalColor(colorPick.calId, c)}
+            onClose={() => setColorPick(null)}
+          />
+        )}
       </div>
     </div>
   )
