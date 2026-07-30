@@ -1573,12 +1573,58 @@ function TodoSidebar() {
     } catch { /* silent */ }
   }, [])
 
-  // Show high-priority undone items
+  /* Write the whole payload back — the API whitelists lists/items/checklists,
+     so a partial body would drop the rest. */
+  const commit = useCallback(async (next) => {
+    todosRef.current = next
+    setTodos(next)
+    try {
+      await fetch(`${API_BASE}/api/todo`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...HEADERS },
+        body: JSON.stringify(next),
+      })
+    } catch { /* silent — the poll will resync */ }
+  }, [])
+
+  const updateItem = useCallback((id, patch) => {
+    const d = todosRef.current
+    if (!d) return
+    commit({ ...d, items: (d.items || []).map(it => it.id === id ? { ...it, ...patch } : it) })
+  }, [commit])
+
+  const duplicateItem = useCallback((id) => {
+    const d = todosRef.current
+    if (!d) return
+    const items = [...(d.items || [])]
+    const i = items.findIndex(it => it.id === id)
+    if (i < 0) return
+    const copy = { ...items[i], id: uid(), done: false }
+    delete copy.checklistId
+    delete copy.entryId
+    items.splice(i + 1, 0, copy)
+    commit({ ...d, items })
+  }, [commit])
+
+  const deleteItem = useCallback((id) => {
+    const d = todosRef.current
+    if (!d) return
+    commit({ ...d, items: (d.items || []).filter(it => it.id !== id) })
+  }, [commit])
+
+  /* High-priority and unfinished, soonest due first, undated last. */
   const items = useMemo(() => {
     if (!todos || !todos.items) return []
     return todos.items
       .filter(it => it.priority === 'high' && !it.done)
-      .slice(0, 10)
+      .sort((a, b) => {
+        const ea = a.due || '', eb = b.due || ''
+        if (ea && eb) return ea < eb ? -1 : (ea > eb ? 1 : 0)
+        if (ea && !eb) return -1
+        if (!ea && eb) return 1
+        return 0
+      })
+      .slice(0, 50)
   }, [todos])
 
   const fmtDue = (due) => {
@@ -1586,27 +1632,141 @@ function TodoSidebar() {
     const d = new Date(due + 'T00:00:00')
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
   }
+  const isOverdue = (due) => {
+    if (!due) return false
+    const t = new Date(); t.setHours(0, 0, 0, 0)
+    return new Date(due + 'T00:00:00') < t
+  }
+
+  const editing = editId ? (todos?.items || []).find(it => it.id === editId) : null
 
   return (
     <>
       <div className="side-title"><List size={14} /> To-Do</div>
       <div className="todo-list">
         {items.length === 0 && (
-          <div className="agenda-empty">{todos === null ? 'Loading...' : 'No high-priority tasks'}</div>
+          <div className="agenda-empty">{todos === null ? 'Loading...' : 'No high-priority to-dos.'}</div>
         )}
+        {items.map(it => {
+          const od = isOverdue(it.due)
+          return (
+            <div
+              key={it.id}
+              className={`todo-item p-${it.priority || 'high'}`}
+              onDoubleClick={e => { if (!e.target.closest('input,button')) setEditId(it.id) }}
+              onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setCtx({ x: e.clientX, y: e.clientY, id: it.id }) }}
+            >
+              <input
+                type="checkbox"
+                checked={!!it.done}
+                onClick={e => e.stopPropagation()}
+                onChange={() => toggleDone(it.id)}
+              />
+              <span
+                className={`todo-text${it.done ? ' done-text' : ''}`}
+                title="Click to edit · right-click for options"
+                onClick={e => { e.stopPropagation(); setEditId(it.id) }}
+              >{it.text}</span>
+              {it.due && (
+                <span className={`todo-due${od ? ' od' : ''}`}>
+                  {od ? 'Overdue · ' : ''}{fmtDue(it.due)}
+                </span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {ctx && (
+        <TodoCtxMenu
+          x={ctx.x} y={ctx.y}
+          onClose={() => setCtx(null)}
+          onEdit={() => setEditId(ctx.id)}
+          onDuplicate={() => duplicateItem(ctx.id)}
+          onDelete={() => deleteItem(ctx.id)}
+        />
+      )}
+
+      {editing && (
+        <TodoEditModal
+          item={editing}
+          lists={todos?.lists || []}
+          onClose={() => setEditId(null)}
+          onSave={patch => { updateItem(editing.id, patch); setEditId(null) }}
+        />
+      )}
+    </>
+  )
+}
+
+/* Right-click menu for a to-do in the sidebar. */
+function TodoCtxMenu({ x, y, onClose, onEdit, onDuplicate, onDelete }) {
+  const items = [
+    { label: 'Edit', on: onEdit },
+    { label: 'Duplicate', on: onDuplicate },
+    { label: 'Delete', on: onDelete, danger: true },
+  ]
+  return (
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 300 }}
+        onClick={onClose} onContextMenu={e => { e.preventDefault(); onClose() }} />
+      <div className="cal-ctxmenu" style={{
+        left: Math.min(x, window.innerWidth - 160),
+        top: Math.min(y, window.innerHeight - 130),
+      }}>
         {items.map(it => (
-          <div key={it.id} className={`todo-item p-${it.priority || 'high'}`}>
-            <input
-              type="checkbox"
-              checked={!!it.done}
-              onChange={() => toggleDone(it.id)}
-            />
-            <span className={`todo-text${it.done ? ' done-text' : ''}`}>{it.text}</span>
-            {it.due && <span className="todo-due">{fmtDue(it.due)}</span>}
-          </div>
+          <button key={it.label} type="button" className={it.danger ? 'danger' : undefined}
+            onClick={() => { onClose(); it.on() }}>{it.label}</button>
         ))}
       </div>
     </>
+  )
+}
+
+function TodoEditModal({ item, lists, onClose, onSave }) {
+  const [text, setText] = useState(item.text || '')
+  const [listId, setListId] = useState(item.listId || (lists[0]?.id || ''))
+  const [priority, setPriority] = useState(item.priority || 'low')
+  const [due, setDue] = useState(item.due || '')
+  const [notes, setNotes] = useState(item.notes || '')
+  const inputRef = useRef(null)
+  useEffect(() => { inputRef.current?.focus() }, [])
+
+  const save = () => {
+    const t = text.trim()
+    if (!t) { inputRef.current?.focus(); return }
+    onSave({ text: t, listId: listId || item.listId, priority, due, notes: notes.trim() })
+  }
+
+  return (
+    <div className="cal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="cal-modal" onClick={e => e.stopPropagation()}>
+        <h3>Edit To-Do</h3>
+        <div className="fld"><label>Task</label>
+          <input ref={inputRef} value={text} onChange={e => setText(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') save() }} /></div>
+        <div className="fld"><label>List</label>
+          <select value={listId} onChange={e => setListId(e.target.value)}>
+            {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+          </select></div>
+        <div className="row2">
+          <div className="fld"><label>Priority</label>
+            <select value={priority} onChange={e => setPriority(e.target.value)}>
+              <option value="high">High</option>
+              <option value="med">Medium</option>
+              <option value="low">Low</option>
+            </select></div>
+          <div className="fld"><label>Due</label>
+            <input type="date" value={due} onChange={e => setDue(e.target.value)} /></div>
+        </div>
+        <div className="fld"><label>Notes</label>
+          <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} /></div>
+        <div className="modal-actions">
+          <button className="btn-ghost" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" onClick={save}>Save</button>
+        </div>
+      </div>
+    </div>
   )
 }
 
