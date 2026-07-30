@@ -40,11 +40,11 @@ const SEED_CAT_ORDER = Array.isArray(SEED.categoryOrder) ? SEED.categoryOrder : 
 const SEED_HIDDEN_COLS = (SEED.hiddenCols && typeof SEED.hiddenCols === 'object') ? SEED.hiddenCols : {}
 
 const COLS = [
-  { k: 'number', l: 'Program ID' }, { k: 'code', l: 'Program Code' }, { k: 'name', l: 'Program', gear: 'prog' },
+  { k: 'number', l: 'Program ID' }, { k: 'code', l: 'Program Code' }, { k: 'name', l: 'Program' },
   { k: 'active', l: 'Active' }, { k: 'subject', l: 'Subject', gear: 'cat' }, { k: 'category', l: 'Category', gear: 'cat' },
-  { k: 'year', l: 'Year' }, { k: 'age', l: 'Grade' }, { k: 'location', l: 'Location' },
-  { k: 'platform', l: 'Platform', gear: 'platform' }, { k: 'days', l: 'Days', gear: 'day' },
-  { k: 'time', l: 'Time', gear: 'time' }, { k: 'duration', l: 'Duration' }, { k: 'lessons', l: '# Of Lessons' },
+  { k: 'year', l: 'Year' }, { k: 'age', l: 'Grade' }, { k: 'location', l: 'Location', gear: 'loc' },
+  { k: 'platform', l: 'Platform' }, { k: 'days', l: 'Days' },
+  { k: 'time', l: 'Time' }, { k: 'duration', l: 'Duration' }, { k: 'lessons', l: '# Of Lessons' },
   { k: 'cost', l: 'Cost' }, { k: 'rate', l: 'Rate/Hr' }, { k: 'hours', l: 'Total Hrs' },
   { k: 'spots', l: 'Enrolment' }, { k: 'instructor', l: 'Instructor' },
 ]
@@ -509,7 +509,7 @@ export default function Programs() {
     colOrder: SEED_COL_ORDER.slice(),
     hiddenCols: { ...SEED_HIDDEN_COLS },
     categoryOrder: SEED_CAT_ORDER.slice(),
-    subjOrder: [],
+    subjOrder: {},
     catColors: { ...SEED_CAT_COLORS },
     subjColors: { ...SEED_SUBJ_COLORS },
   }), [])
@@ -528,7 +528,7 @@ export default function Programs() {
       colOrder: Array.isArray(raw.colOrder) ? raw.colOrder : defaultViewState.colOrder,
       hiddenCols: raw.hiddenCols && typeof raw.hiddenCols === 'object' ? raw.hiddenCols : defaultViewState.hiddenCols,
       categoryOrder: Array.isArray(raw.categoryOrder) ? raw.categoryOrder : defaultViewState.categoryOrder,
-      subjOrder: Array.isArray(raw.subjOrder) ? raw.subjOrder : defaultViewState.subjOrder,
+      subjOrder: raw.subjOrder && typeof raw.subjOrder === 'object' && !Array.isArray(raw.subjOrder) ? raw.subjOrder : defaultViewState.subjOrder,
       catColors: raw.catColors && typeof raw.catColors === 'object' ? raw.catColors : defaultViewState.catColors,
       subjColors: raw.subjColors && typeof raw.subjColors === 'object' ? raw.subjColors : defaultViewState.subjColors,
     }
@@ -617,10 +617,10 @@ export default function Programs() {
     return viewState.categoryOrder.concat(
       present.filter(c => !viewState.categoryOrder.includes(c)).sort((a, b) => a.localeCompare(b)))
   }, [viewState.categoryOrder, programs])
-  const subjOrder = useMemo(() => {
-    const present = [...new Set(programs.map(p => p.subject).filter(Boolean))]
-    return viewState.subjOrder.concat(
-      present.filter(s => !viewState.subjOrder.includes(s)).sort((a, b) => a.localeCompare(b)))
+  const subjectsOf = useCallback((cat) => {
+    const ordered = (viewState.subjOrder && viewState.subjOrder[cat]) || []
+    const present = [...new Set(programs.filter(p => p.category === cat).map(p => p.subject).filter(Boolean))]
+    return ordered.concat(present.filter(s => !ordered.includes(s)).sort((a, b) => a.localeCompare(b)))
   }, [viewState.subjOrder, programs])
   const catColors = useMemo(() => {
     const out = {}
@@ -1288,9 +1288,6 @@ export default function Programs() {
           style={{ marginLeft: 'auto' }} onClick={createScheduleImage}>🖼 Create Schedule</button>
         <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}>👁 Columns</button>
-        <button title="Manage locations" onClick={() => setManaging('locations')}>📍 Locations</button>
-        <button title="Manage categories" onClick={() => setManaging('categories')}>🏷 Categories</button>
-        <button title="Manage subjects" onClick={() => setManaging('subjects')}>🏷 Subjects</button>
         <button title="Settings" onClick={() => setSettingsOpen(true)}>⚙</button>
         <button title="Download all programs as a CSV file" onClick={exportCsv}>⤓ Export CSV</button>
       </div>
@@ -1378,7 +1375,11 @@ export default function Programs() {
                     <span className="thicons">
                       {arrow(c.k)}
                       {c.gear && <span className="gear" title={`Manage ${c.l}`}
-                        onClick={e => { e.stopPropagation(); setPop({ kind: 'filter', fk: FK[c.k], rect: e.currentTarget.getBoundingClientRect() }) }}>⚙</span>}
+                        onClick={e => {
+                          e.stopPropagation()
+                          if (c.gear === 'cat') setManaging('catsubj')
+                          else if (c.gear === 'loc') setManaging('locations')
+                        }}>⚙</span>}
                       <span className="eye" title="Hide Column"
                         onClick={e => { e.stopPropagation(); hideCol(c.k) }}>👁</span>
                     </span>
@@ -1920,13 +1921,13 @@ function BulkModal({ count, locations, categories, onClose, onApply }) {
 /* ================= managers ================= */
 function ManageModal({ kind, onClose, programs, setPrograms, viewState, setViewState }) {
   if (kind === 'locations') return <LocationsManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
-  if (kind === 'categories') return <CategoriesManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
-  return <SubjectsManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+  return <CatSubjManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
 }
 
 function LocationsManager({ onClose, programs, setPrograms, viewState, setViewState }) {
   const [locs, setLocs] = useState(viewState.locations.map(l => ({ ...l })))
   const [msg, setMsg] = useState('')
+  useEffect(() => { setLocs(viewState.locations.map(l => ({ ...l }))) }, [viewState.locations])
   const update = (nextLocs) => {
     setLocs(nextLocs)
     setViewState(vs => ({ ...vs, locations: nextLocs.map(l => ({ ...l })) }))
@@ -1940,6 +1941,12 @@ function LocationsManager({ onClose, programs, setPrograms, viewState, setViewSt
   }
   const rename = (id, name) => update(locs.map(l => l.id === id ? { ...l, name } : l))
   const recolour = (id, color) => update(locs.map(l => l.id === id ? { ...l, color } : l))
+  const move = (i, dir) => {
+    if (i + dir < 0 || i + dir >= locs.length) return
+    const next = locs.slice()
+    ;[next[i], next[i + dir]] = [next[i + dir], next[i]]
+    update(next)
+  }
   const remove = (id) => {
     if (locs.length <= 1) { setMsg('You must keep at least one location.'); return }
     const inUse = programs.some(p => (p.offerings || []).some(o => o.locationId === id))
@@ -1957,12 +1964,14 @@ function LocationsManager({ onClose, programs, setPrograms, viewState, setViewSt
         <h2>Manage Locations</h2>
         {msg && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10 }}>{msg}</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-          {locs.map(l => (
+          {locs.map((l, i) => (
             <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="color" value={l.color} onChange={e => recolour(l.id, e.target.value)}
                 style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
               <input value={l.name} onChange={e => rename(l.id, e.target.value)}
                 style={{ flex: 1 }} />
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0}>▲</button>
+              <button type="button" onClick={() => move(i, 1)} disabled={i === locs.length - 1}>▼</button>
               <button type="button" className="rmtime" onClick={() => remove(l.id)} title="Delete">×</button>
             </div>
           ))}
@@ -1976,144 +1985,183 @@ function LocationsManager({ onClose, programs, setPrograms, viewState, setViewSt
   )
 }
 
-function CategoriesManager({ onClose, programs, setPrograms, viewState, setViewState }) {
+function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewState }) {
   const [cats, setCats] = useState(viewState.categoryOrder.slice())
-  const [colors, setColors] = useState({ ...viewState.catColors })
+  const [subjOrder, setSubjOrder] = useState({ ...viewState.subjOrder })
+  const [catColors, setCatColors] = useState({ ...viewState.catColors })
+  const [subjColors, setSubjColors] = useState({ ...viewState.subjColors })
   const [msg, setMsg] = useState('')
-  const commit = (nextCats, nextColors) => {
+  useEffect(() => {
+    setCats(viewState.categoryOrder.slice())
+    setSubjOrder({ ...viewState.subjOrder })
+    setCatColors({ ...viewState.catColors })
+    setSubjColors({ ...viewState.subjColors })
+  }, [viewState])
+
+  const commit = (nextCats, nextSubjOrder, nextCatColors, nextSubjColors) => {
     setCats(nextCats)
-    setColors(nextColors)
-    setViewState(vs => ({ ...vs, categoryOrder: nextCats.slice(), catColors: { ...nextColors } }))
+    setSubjOrder(nextSubjOrder)
+    setCatColors(nextCatColors)
+    setSubjColors(nextSubjColors)
+    setViewState(vs => ({
+      ...vs,
+      categoryOrder: nextCats.slice(),
+      subjOrder: { ...nextSubjOrder },
+      catColors: { ...nextCatColors },
+      subjColors: { ...nextSubjColors },
+    }))
   }
-  const add = () => {
+
+  const subjectsOf = useCallback((cat) => {
+    const ordered = (subjOrder && subjOrder[cat]) || []
+    const present = [...new Set(programs.filter(p => p.category === cat).map(p => p.subject).filter(Boolean))]
+    return ordered.concat(present.filter(s => !ordered.includes(s)).sort((a, b) => a.localeCompare(b)))
+  }, [subjOrder, programs])
+
+  const countCat = useCallback((cat) => programs.filter(p => p.category === cat).length, [programs])
+  const countSubj = useCallback((cat, s) => programs.filter(p => p.category === cat && p.subject === s).length, [programs])
+
+  const recolourCat = (cat, color) => commit(cats, subjOrder, { ...catColors, [cat]: color }, subjColors)
+  const recolourSubj = (cat, s, color) => commit(cats, subjOrder, catColors, { ...subjColors, [cat + '\u0000' + s]: color })
+
+  const moveCat = (i, dir) => {
+    if (i + dir < 0 || i + dir >= cats.length) return
+    const next = cats.slice()
+    ;[next[i], next[i + dir]] = [next[i + dir], next[i]]
+    commit(next, subjOrder, catColors, subjColors)
+  }
+  const moveSubj = (cat, i, dir) => {
+    const arr = (subjOrder[cat] || []).slice()
+    if (i + dir < 0 || i + dir >= arr.length) return
+    ;[arr[i], arr[i + dir]] = [arr[i + dir], arr[i]]
+    commit(cats, { ...subjOrder, [cat]: arr }, catColors, subjColors)
+  }
+
+  const addCat = () => {
     const name = window.prompt('New category name')
     if (!name || !name.trim()) return
     const n = name.trim()
     if (cats.includes(n)) { setMsg('That category already exists.'); return }
-    commit([...cats, n], { ...colors, [n]: DEFAULT_CAT_COLOR })
+    const color = LPAL[Object.keys(catColors).length % LPAL.length]
+    commit([...cats, n], subjOrder, { ...catColors, [n]: color }, subjColors)
   }
-  const rename = (oldName, newName) => {
-    if (!newName.trim() || cats.includes(newName.trim())) return
-    const nextCats = cats.map(c => c === oldName ? newName.trim() : c)
-    const nextColors = { ...colors }
-    nextColors[newName.trim()] = nextColors[oldName]
+
+  const renameCat = (oldName, newName) => {
+    const n = newName.trim()
+    if (!n || n === oldName) return
+    if (cats.includes(n)) { setMsg(`Category "${n}" already exists.`); return }
+    setPrograms(list => list.map(p => p.category === oldName ? { ...p, category: n } : p))
+    const nextCats = cats.map(c => c === oldName ? n : c)
+    const nextColors = { ...catColors, [n]: catColors[oldName] || DEFAULT_CAT_COLOR }
     delete nextColors[oldName]
-    setPrograms(list => list.map(p => p.category === oldName ? { ...p, category: newName.trim() } : p))
-    commit(nextCats, nextColors)
+    const nextSubjOrder = { ...subjOrder }
+    if (nextSubjOrder[oldName]) { nextSubjOrder[n] = nextSubjOrder[oldName]; delete nextSubjOrder[oldName] }
+    const nextSubjColors = { ...subjColors }
+    Object.keys(nextSubjColors).forEach(k => {
+      if (k.startsWith(oldName + '\u0000')) {
+        nextSubjColors[n + '\u0000' + k.split('\u0000')[1]] = nextSubjColors[k]
+        delete nextSubjColors[k]
+      }
+    })
+    commit(nextCats, nextSubjOrder, nextColors, nextSubjColors)
   }
-  const recolour = (name, color) => commit(cats, { ...colors, [name]: color })
-  const move = (i, dir) => {
-    if (i + dir < 0 || i + dir >= cats.length) return
-    const next = cats.slice()
-    ;[next[i], next[i + dir]] = [next[i + dir], next[i]]
-    commit(next, colors)
+
+  const renameSubj = (cat, oldName, newName) => {
+    const n = newName.trim()
+    if (!n || n === oldName) return
+    const existing = subjectsOf(cat)
+    if (existing.includes(n)) { setMsg(`Subject "${n}" already exists under ${cat}.`); return }
+    setPrograms(list => list.map(p => p.category === cat && p.subject === oldName ? { ...p, subject: n } : p))
+    const arr = (subjOrder[cat] || []).slice()
+    const idx = arr.indexOf(oldName)
+    if (idx >= 0) arr[idx] = n
+    const nextSubjColors = { ...subjColors }
+    const oldKey = cat + '\u0000' + oldName
+    const newKey = cat + '\u0000' + n
+    if (nextSubjColors[oldKey] !== undefined) {
+      nextSubjColors[newKey] = nextSubjColors[oldKey]
+      delete nextSubjColors[oldKey]
+    }
+    commit(cats, { ...subjOrder, [cat]: arr }, catColors, nextSubjColors)
   }
-  const remove = (name) => {
-    if (!window.confirm(`Delete category "${name}"? Programs using it will keep the text but it will no longer be in the category list.`)) return
-    setPrograms(list => list.map(p => p.category === name ? { ...p, category: '' } : p))
-    const nextCats = cats.filter(c => c !== name)
-    const nextColors = { ...colors }
-    delete nextColors[name]
-    commit(nextCats, nextColors)
+
+  const deleteCat = (cat) => {
+    const n = countCat(cat)
+    if (!window.confirm(`Delete category "${cat}"? ${n} program(s) will keep their data but lose this category label.`)) return
+    setPrograms(list => list.map(p => p.category === cat ? { ...p, category: '' } : p))
+    const nextCats = cats.filter(c => c !== cat)
+    const nextColors = { ...catColors }
+    delete nextColors[cat]
+    const nextSubjOrder = { ...subjOrder }
+    delete nextSubjOrder[cat]
+    const nextSubjColors = { ...subjColors }
+    Object.keys(nextSubjColors).forEach(k => { if (k.startsWith(cat + '\u0000')) delete nextSubjColors[k] })
+    commit(nextCats, nextSubjOrder, nextColors, nextSubjColors)
   }
+
+  const deleteSubj = (cat, s) => {
+    const n = countSubj(cat, s)
+    if (!window.confirm(`Delete subject "${s}" under "${cat}"? ${n} program(s) will keep their data but lose this subject label.`)) return
+    setPrograms(list => list.map(p => p.category === cat && p.subject === s ? { ...p, subject: '' } : p))
+    const arr = (subjOrder[cat] || []).filter(x => x !== s)
+    const nextSubjOrder = { ...subjOrder, [cat]: arr }
+    if (!arr.length) delete nextSubjOrder[cat]
+    const nextSubjColors = { ...subjColors }
+    delete nextSubjColors[cat + '\u0000' + s]
+    commit(cats, nextSubjOrder, catColors, nextSubjColors)
+  }
+
+  const rowStyle = { display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', borderBottom: '1px solid #f2efe6' }
+  const inputStyle = { flex: 1, padding: '2px 4px', border: '1px solid transparent', borderRadius: 6, fontSize: 13.5, fontWeight: 600, color: 'var(--dark-brown)', background: 'none' }
+  const subInputStyle = { ...inputStyle, fontWeight: 400, color: '#6b6455' }
+  const btnStyle = { background: 'none', border: 'none', color: '#9a948a', padding: '0 6px', fontSize: 15, cursor: 'pointer' }
+  const countStyle = { fontSize: 11, color: 'var(--muted)', fontWeight: 600, minWidth: 18, textAlign: 'center' }
+
   return (
     <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
-        <h2>Manage Categories</h2>
+      <div className="pgmodal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
+        <h2>Categories</h2>
+        <div style={{ fontSize: 12, color: '#6b6455', marginBottom: 14, lineHeight: 1.4 }}>
+          Reorder or delete categories and subjects with ▲ ▼ and × (or drag). Click a name to edit it, or the colour dot to recolour it — for categories and subjects alike. Deleting never removes programs — they just lose that label.
+        </div>
         {msg && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10 }}>{msg}</div>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-          {cats.map((c, i) => (
-            <div key={c} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="color" value={colors[c] || DEFAULT_CAT_COLOR}
-                onChange={e => recolour(c, e.target.value)}
-                style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
-              <input defaultValue={c}
-                onBlur={e => { if (e.target.value !== c) rename(c, e.target.value) }}
-                onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                style={{ flex: 1 }} />
-              <button type="button" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
-              <button type="button" onClick={() => move(i, 1)} disabled={i === cats.length - 1}>↓</button>
-              <button type="button" className="rmtime" onClick={() => remove(c)} title="Delete">×</button>
-            </div>
+        <div style={{ maxHeight: '60vh', overflow: 'auto', marginBottom: 8 }}>
+          {cats.map((cat, ci) => (
+            <React.Fragment key={cat}>
+              <div style={rowStyle}>
+                <span style={{ cursor: 'grab', color: '#9a948a', fontSize: 14 }}>☰</span>
+                <input type="color" value={catColors[cat] || DEFAULT_CAT_COLOR}
+                  onChange={e => recolourCat(cat, e.target.value)}
+                  style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #d8d3c6', padding: 0 }} />
+                <input defaultValue={cat}
+                  onBlur={e => { if (e.target.value !== cat) renameCat(cat, e.target.value) }}
+                  onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
+                  style={inputStyle} />
+                <span style={countStyle}>{countCat(cat)}</span>
+                <button type="button" style={btnStyle} onClick={() => moveCat(ci, -1)} disabled={ci === 0}>▲</button>
+                <button type="button" style={btnStyle} onClick={() => moveCat(ci, 1)} disabled={ci === cats.length - 1}>▼</button>
+                <button type="button" className="rmtime" onClick={() => deleteCat(cat)} title="Delete">×</button>
+              </div>
+              {subjectsOf(cat).map((s, si) => (
+                <div key={cat + '|' + s} style={{ ...rowStyle, paddingLeft: 34 }}>
+                  <span style={{ cursor: 'grab', color: '#9a948a', fontSize: 14 }}>☰</span>
+                  <input type="color" value={subjColors[cat + '\u0000' + s] || DEFAULT_CAT_COLOR}
+                    onChange={e => recolourSubj(cat, s, e.target.value)}
+                    style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #d8d3c6', padding: 0 }} />
+                  <input defaultValue={s}
+                    onBlur={e => { if (e.target.value !== s) renameSubj(cat, s, e.target.value) }}
+                    onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
+                    style={subInputStyle} />
+                  <span style={countStyle}>{countSubj(cat, s)}</span>
+                  <button type="button" style={btnStyle} onClick={() => moveSubj(cat, si, -1)} disabled={si === 0}>▲</button>
+                  <button type="button" style={btnStyle} onClick={() => moveSubj(cat, si, 1)} disabled={si === subjectsOf(cat).length - 1}>▼</button>
+                  <button type="button" className="rmtime" onClick={() => deleteSubj(cat, s)} title="Delete">×</button>
+                </div>
+              ))}
+            </React.Fragment>
           ))}
         </div>
-        <button type="button" className="addtime" onClick={add}>+ Add Category</button>
-        <div className="macts">
-          <button onClick={onClose}>Done</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function SubjectsManager({ onClose, programs, setPrograms, viewState, setViewState }) {
-  const allSubs = useMemo(() => {
-    const present = [...new Set(programs.map(p => p.subject).filter(Boolean))]
-    return viewState.subjOrder.concat(present.filter(s => !viewState.subjOrder.includes(s)).sort((a, b) => a.localeCompare(b)))
-  }, [programs, viewState.subjOrder])
-  const [subs, setSubs] = useState(allSubs)
-  const [colors, setColors] = useState({ ...viewState.subjColors })
-  useEffect(() => {
-    setSubs(allSubs)
-    setColors({ ...viewState.subjColors })
-  }, [allSubs, viewState.subjColors])
-  const commit = (nextSubs, nextColors) => {
-    setSubs(nextSubs)
-    setColors(nextColors)
-    setViewState(vs => ({ ...vs, subjOrder: nextSubs.slice(), subjColors: { ...nextColors } }))
-  }
-  const rename = (oldName, newName) => {
-    if (!newName.trim() || subs.includes(newName.trim())) return
-    const n = newName.trim()
-    setPrograms(list => list.map(p => p.subject === oldName ? { ...p, subject: n } : p))
-    const nextSubs = subs.map(s => s === oldName ? n : s)
-    const nextColors = { ...colors }
-    programs.forEach(p => {
-      if (p.category && p.subject === oldName) {
-        nextColors[p.category + '\u0000' + n] = colors[p.category + '\u0000' + oldName]
-        delete nextColors[p.category + '\u0000' + oldName]
-      }
-    })
-    commit(nextSubs, nextColors)
-  }
-  const recolour = (subject, color) => {
-    const nextColors = { ...colors }
-    programs.forEach(p => {
-      if (p.category && p.subject === subject) {
-        nextColors[p.category + '\u0000' + subject] = color
-      }
-    })
-    commit(subs, nextColors)
-  }
-  const remove = (subject) => {
-    if (!window.confirm(`Delete subject "${subject}"? Programs using it will keep the text but it will no longer be in the subject list.`)) return
-    setPrograms(list => list.map(p => p.subject === subject ? { ...p, subject: '' } : p))
-    const nextSubs = subs.filter(s => s !== subject)
-    const nextColors = { ...colors }
-    Object.keys(nextColors).forEach(k => { if (k.endsWith('\u0000' + subject)) delete nextColors[k] })
-    commit(nextSubs, nextColors)
-  }
-  return (
-    <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
-        <h2>Manage Subjects</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-          {subs.map(s => {
-            const sampleCat = programs.find(p => p.subject === s)?.category || ''
-            const c = colors[sampleCat + '\u0000' + s] || DEFAULT_CAT_COLOR
-            return (
-              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input type="color" value={c} onChange={e => recolour(s, e.target.value)}
-                  style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
-                <input defaultValue={s}
-                  onBlur={e => { if (e.target.value !== s) rename(s, e.target.value) }}
-                  onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                  style={{ flex: 1 }} />
-                <button type="button" className="rmtime" onClick={() => remove(s)} title="Delete">×</button>
-              </div>
-            )
-          })}
-        </div>
+        <button type="button" className="addtime" onClick={addCat}>+ Add Category</button>
         <div className="macts">
           <button onClick={onClose}>Done</button>
         </div>
