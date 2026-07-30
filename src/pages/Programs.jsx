@@ -1550,7 +1550,7 @@ function ProgramsPage() {
         cls = 'col-active tint'
         style = { '--tint': ac, color: at }
         return <td key={k} className={cls} style={style} data-ek={editable ? k : undefined}
-          onClick={() => toggleActive(r.progId)}>{cells[k]}</td>
+          onClick={e => { e.stopPropagation(); toggleActive(r) }}>{cells[k]}</td>
       }
       if (k === 'category' && r.category) {
         const cc = catColor(r.category)
