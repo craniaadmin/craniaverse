@@ -1712,12 +1712,12 @@ function TodoCtxMenu({ x, y, onClose, onEdit, onDuplicate, onDelete }) {
     <>
       <div style={{ position: 'fixed', inset: 0, zIndex: 300 }}
         onClick={onClose} onContextMenu={e => { e.preventDefault(); onClose() }} />
-      <div className="cal-ctxmenu" style={{
-        left: Math.min(x, window.innerWidth - 160),
-        top: Math.min(y, window.innerHeight - 130),
-      }}>
+      <div className="ctx-menu" style={{
+        left: Math.min(x, window.innerWidth - 180),
+        top: Math.min(y, window.innerHeight - 160),
+      }} onClick={e => e.stopPropagation()}>
         {items.map(it => (
-          <button key={it.label} type="button" className={it.danger ? 'danger' : undefined}
+          <button key={it.label} type="button" className={it.danger ? 'ctx-danger' : ''}
             onClick={() => { onClose(); it.on() }}>{it.label}</button>
         ))}
       </div>
