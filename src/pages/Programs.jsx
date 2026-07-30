@@ -561,6 +561,38 @@ const CSS = `
 .pgmodal .sblock .brow{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;
     font-size:12px;margin-bottom:2px;background:#fff}
 .pgmodal .sblock .brow span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455}
+
+/* manager boxes: categories, locations and the managed lists */
+.pgmodal .mhint{font-size:12px;color:#6b6455;margin-bottom:14px;line-height:1.4}
+.pgmodal .mlist{max-height:60vh;overflow:auto;margin-bottom:8px}
+.pgmodal .catrow{display:flex;align-items:center;gap:10px;padding:10px 4px;
+    border-bottom:1px solid #f2efe6;background:none;border-radius:0;cursor:default}
+.pgmodal .catrow.dropt{outline:2px dashed #5FA09E;outline-offset:-2px}
+.pgmodal .catrow.subrow{padding-left:34px}
+.pgmodal .catrow .grip{cursor:grab;color:#9a948a;font-size:14px;flex:none}
+.pgmodal .catrow .cdot{border-radius:50%;flex:none;border:2px solid #fff;
+    box-shadow:0 0 0 1px #d8d3c6;cursor:pointer;padding:0}
+.pgmodal .catrow input.cnm{flex:1;padding:2px 4px;border:1px solid transparent;border-radius:6px;
+    font-size:13.5px;font-weight:600;color:#2E2516;min-width:0;background:none;font-family:inherit}
+.pgmodal .catrow input.cnm:hover{border-color:#e2ded2}
+.pgmodal .catrow input.cnm:focus{outline:none;border-color:#5FA09E;background:#fff}
+.pgmodal .catrow span.cnm{flex:1;font-size:13.5px;font-weight:600;color:#2E2516;min-width:0}
+.pgmodal .catrow.subrow input.cnm,.pgmodal .catrow.subrow span.cnm{font-weight:400;color:#6b6455}
+.pgmodal .catrow input.gfrom,.pgmodal .catrow input.gto{flex:0 1 82px;text-align:center}
+.pgmodal .catrow .gdash{color:#9a948a;font-size:13px;flex:none}
+.pgmodal .catrow .cuse{font-size:11px;color:#6B6455;font-weight:600;min-width:18px;text-align:center;flex:none}
+.pgmodal .catrow .mv{background:none;border:none;color:#9a948a;padding:0 6px;font-size:15px;
+    width:auto;height:auto;font-weight:400;cursor:pointer;font-family:inherit;flex:none}
+.pgmodal .catrow .mv:hover:not(:disabled){color:#5FA09E}
+.pgmodal .catrow .mv:disabled{opacity:.3;cursor:default}
+.pgmodal .catrow .del2{background:transparent;border:none;color:#C9C3B5;font-size:17px;font-weight:400;
+    line-height:1;padding:0 6px;cursor:pointer;font-family:inherit;flex:none}
+.pgmodal .catrow .del2:hover:not(:disabled){color:#C0392B}
+.pgmodal .catrow .del2:disabled{opacity:.3;cursor:default}
+.cpop{position:fixed;z-index:301;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
+    box-shadow:0 8px 24px rgba(46,37,22,.22);padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:172px}
+.cpop .sw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid #fff;
+    box-shadow:0 0 0 1px #d8d3c6}
 `
 
 /* ================= in-app dialogs =================
