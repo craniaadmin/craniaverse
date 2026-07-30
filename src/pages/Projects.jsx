@@ -278,6 +278,7 @@ export default function Projects() {
   const [colsOpen, setColsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [archiveMode, setArchiveMode] = useState(false)
+  const [cardCtx, setCardCtx] = useState(null)   // { x, y, id }
   const dragCardId = useRef(null)
   const colsBtnRef = useRef(null)
   const colsPopRef = useRef(null)
