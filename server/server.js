@@ -807,6 +807,18 @@ app.post('/api/todo/restore/:id', wrap(async (req, res) => {
   res.json(payload)
 }))
 
+// ---- checklist backups --------
+app.get('/api/checklist/backups', wrap(async (_req, res) => res.json(await listChecklistBackups())))
+app.post('/api/checklist/backup', wrap(async (req, res) => {
+  const label = (req.body?.label || '').trim() || new Date().toLocaleString()
+  await createChecklistBackup(label)
+  res.json({ ok: true })
+}))
+app.post('/api/checklist/restore/:id', wrap(async (req, res) => {
+  const payload = await restoreChecklistBackup(req.params.id)
+  res.json(payload)
+}))
+
 // ---- finance (singleton {invoices, payments, meta}) -----
 // The whole payload is written on every save. That's fine at the
 // expected volume (few thousand transactions per year for a small
