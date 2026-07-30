@@ -4,6 +4,20 @@ import { useStore } from '../data/store'
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
 
+const DOW = [
+  { n: 0, l: 'Sun' }, { n: 1, l: 'Mon' }, { n: 2, l: 'Tue' }, { n: 3, l: 'Wed' },
+  { n: 4, l: 'Thu' }, { n: 5, l: 'Fri' }, { n: 6, l: 'Sat' },
+]
+const PLATFORMS = ['In-Person', 'Online', 'In-Person/Online']
+const PERIODS = ['', '/week', '/month', '/term', '/year']
+const COST_UNITS = ['', '/week', '/month', '/term', '/year', '/session', '/class']
+const LOCATIONS = [
+  { id: 'loc_boardwalk', name: 'Boardwalk', color: '#5FA09E' },
+  { id: 'loc_waterloo', name: 'Waterloo East', color: '#A6E2F9' },
+]
+
+function locName(id) { return LOCATIONS.find(l => l.id === id)?.name || '' }
+function locColor(id) { return LOCATIONS.find(l => l.id === id)?.color || '#ccc' }
 function fmtTime(t) {
   if (!t) return ''
   const m = String(t).match(/^(\d{1,2}):(\d{2})/)
@@ -11,51 +25,87 @@ function fmtTime(t) {
   let h = parseInt(m[1], 10)
   const min = m[2]
   const ampm = h >= 12 ? 'pm' : 'am'
-  if (h === 0) h = 12
-  else if (h > 12) h -= 12
-  return `${h}:${min} ${ampm}`
+  if (h === 0) h = 12; else if (h > 12) h -= 12
+  return `${h}:${min}${ampm}`
+}
+function fmtRange(slot) {
+  if (!slot) return ''
+  return `${fmtTime(slot.start)}–${fmtTime(slot.end)}`
+}
+function fmtDuration(d) {
+  const n = Number(d)
+  if (!isFinite(n) || n <= 0) return ''
+  if (n >= 60) { const h = Math.floor(n / 60); const m = n % 60; return m ? `${h}h ${m}m` : `${h}h` }
+  return `${n}m`
+}
+function money(v) { return '$' + Number(v).toFixed(2) }
+function uid() { return 'p_' + Math.random().toString(36).slice(2, 10) }
+function oidGen() { return 's' + Math.random().toString(36).slice(2, 10) }
+
+const DEFCOLS = ['active', 'number', 'code', 'year', 'name', 'subject', 'category', 'age',
+  'location', 'days', 'time', 'platform', 'duration', 'lessons', 'cost', 'rate', 'hours', 'spots', 'instructor']
+
+const COL_LABELS = {
+  active: 'Active', number: 'Program ID', code: 'Program Code', year: 'Year',
+  name: 'Program', subject: 'Subject', category: 'Category', age: 'Grade',
+  location: 'Location', days: 'Days', time: 'Time', platform: 'Platform',
+  duration: 'Duration', lessons: '# Of Lessons', cost: 'Cost', rate: 'Rate/Hr',
+  hours: 'Total Hrs', spots: 'Enrolment', instructor: 'Instructor',
 }
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const PLATFORMS = ['In-Person', 'Online', 'In-Person/Online']
-const PERIODS = ['/week', '/month', '/term', '/year']
-const COST_UNITS = ['', '/week', '/month', '/term', '/year', '/session', '/class']
-
-function generateNumber(_p, count) { return String(90000 + count) }
-function generateCode(p) {
-  const slug = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '')
-  const loc = (p.location || 'TBD').slice(0, 2).toUpperCase()
-  return [loc, slug(p.category), slug(p.subject), slug(p.title)].filter(Boolean).join('-') || 'TBD'
+function blankProgram() {
+  return {
+    id: uid(), number: '', code: '', name: '', subject: '', category: '',
+    ageRange: '', duration: 55, sessions: '1', period: '/week', rate: null,
+    totalHours: null, description: '', year: '', gradeFrom: '', gradeTo: '',
+    platform: 'In-Person', cost: null, costUnit: '', active: true,
+    offerings: [{ id: oidGen(), locationId: 'loc_boardwalk', days: [], times: [], capacity: null, enrolled: '', instructor: '' }],
+  }
 }
 
-const TABLE_COLS = [
-  { id: 'active',    label: 'Active',        w: '62px' },
-  { id: 'number',    label: 'Number',        w: '70px' },
-  { id: 'code',      label: 'Code',          w: '150px' },
-  { id: 'category',  label: 'Category',      w: '130px' },
-  { id: 'subject',   label: 'Subject',       w: '90px' },
-  { id: 'title',     label: 'Program',       w: '210px' },
-  { id: 'duration',  label: 'Duration',      w: '74px' },
-  { id: 'sessions',  label: 'Lessons',       w: '100px' },
-  { id: 'rateHr',    label: 'Rate/Hr',       w: '80px' },
-  { id: 'fees',      label: 'Fees',          w: '110px' },
-  { id: 'location',  label: 'Location',      w: '100px' },
-  { id: 'offerings', label: 'Offerings',     w: '380px' },
-  { id: 'edit',      label: '',              w: '59px' },
-]
+function flattenRows(programs) {
+  const out = []
+  for (const p of programs) {
+    const prate = p.rate, phrs = p.totalHours
+    const offs = (p.offerings && p.offerings.length) ? p.offerings : [null]
+    for (const of_ of offs) {
+      const dayList = (of_ && of_.days && of_.days.length) ? [...of_.days].sort((a, b) => a - b) : [null]
+      const timeList = (of_ && of_.times && of_.times.length) ? of_.times : [null]
+      for (const dayN of dayList) {
+        for (let ti = 0; ti < timeList.length; ti++) {
+          const tm = timeList[ti]
+          out.push({
+            progId: p.id, offId: of_ ? of_.id : null,
+            day: dayN, slot: tm || null, slotIndex: tm ? ti : null,
+            number: p.number || '', code: p.code || '', name: p.name || '',
+            active: p.active !== false, subject: p.subject || '',
+            category: p.category || '', year: p.year || '', platform: p.platform || '',
+            age: p.ageRange || '', gradeFrom: p.gradeFrom || '', gradeTo: p.gradeTo || '',
+            desc: p.description || '', rate: prate, hours: phrs,
+            duration: p.duration != null ? p.duration : '',
+            sessions: p.sessions || '', period: p.period || '',
+            locId: of_ ? of_.locationId : '', locName: of_ ? locName(of_.locationId) : '',
+            days: of_ ? (of_.days || []) : [],
+            start: of_ ? ((of_.times?.[0] || {}).start || '') : '',
+            end: of_ ? ((of_.times?.[0] || {}).end || '') : '',
+            cost: p.cost != null && p.cost !== '' ? Number(p.cost) : null,
+            costUnit: p.costUnit || '',
+            capacity: of_ ? of_.capacity : null,
+            enrolled: of_ ? of_.enrolled : null,
+            instructor: of_ ? (of_.instructor || '') : '',
+          })
+        }
+      }
+    }
+  }
+  return out
+}
 
-const FILTER_FIELDS = [
-  { key: 'number', label: 'Number' },
-  { key: 'code', label: 'Code' },
-  { key: 'category', label: 'Category' },
-  { key: 'subject', label: 'Subject' },
-  { key: 'title', label: 'Program Title' },
-  { key: 'location', label: 'Location' },
-]
+function famKey(r) { return String(r.number || r.name || r.progId) }
 
 const PG_CSS = `
 .pg-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
-.pg-actions button{background:#fff;border:1px solid #e2ded2;color:var(--brand-dark-brown,#2E2516);padding:6px 12px;font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit}
+.pg-actions button{background:#fff;border:1px solid #e2ded2;color:#2E2516;padding:6px 12px;font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit}
 .pg-actions button:hover{background:#f4f2ea}
 .pg-actions button:disabled{opacity:.4;cursor:default}
 .pg-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:14px}
@@ -74,13 +124,33 @@ const PG_CSS = `
 .pg-filters select:focus{outline:none;border-color:#5FA09E}
 .pg-card{background:#fff;border-radius:12px 12px 0 0;box-shadow:0 1px 3px rgba(46,37,22,.15);border-left:3px solid #A6E2F9;border-right:3px solid #E0DE85;border-bottom:3px solid #5FA09E;overflow-x:auto}
 .pg-card table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:5px 5px;background:#fff}
-.pg-card thead th{background:#5FA09E;color:#fff;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:6px 8px;height:26px;white-space:nowrap;border-radius:6px}
-.pg-card tbody td{padding:4px 7px;background:#F1F3F4;border-radius:5px;font-size:12px;font-weight:400;vertical-align:middle;white-space:nowrap;line-height:1.35;height:22px;overflow:hidden;text-overflow:ellipsis}
+.pg-card thead th{background:#5FA09E;color:#fff;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;border-radius:6px;user-select:none}
+.pg-card thead th.th-blank{background:transparent}
+.pg-card tbody td{padding:0 7px;background:#F1F3F4;border-radius:5px;font-size:12px;font-weight:400;vertical-align:middle;white-space:nowrap;line-height:1.35;height:22px;overflow:hidden;text-overflow:ellipsis}
 .pg-card tbody tr:hover td{background:#E4EFF3}
 .pg-card tbody tr.inactive td{color:#b0a99e}
-.pg-card thead th.th-edit{background:transparent}
-.pg-card td.td-active{text-align:center;background:transparent}
-.pg-card td.td-edit{text-align:center;background:transparent;white-space:nowrap}
+.pg-card tbody td.rep{background:transparent}
+.pg-card tbody tr.progsep td{background:transparent;height:1px;padding:0;border-radius:0;border-top:1px solid #CFD6D8}
+.pg-card tbody tr.progsep td.nosep{border-top:none}
+.pg-card tbody td.col-active{text-align:center}
+.pg-card tbody td.actcell{background:transparent;white-space:nowrap;text-align:center;width:59px;min-width:59px;max-width:59px}
+.pg-card thead th.th-act{width:59px;min-width:59px;max-width:59px}
+.actbtn{border:none;background:none;padding:0;font-size:12px;font-weight:400;cursor:pointer;line-height:inherit}
+.loc{display:inline-flex;align-items:center;gap:5px;font-weight:400;font-size:12px;white-space:nowrap}
+.loc .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.cost{font-weight:700;white-space:nowrap}
+.spots{font-size:12px;font-weight:400;white-space:nowrap}
+.spots.ok{color:#1f7a3d}
+.spots.full{color:#922B21}
+.spots.none{color:#6B6455}
+.enr{display:inline-flex;gap:5px;align-items:center}
+.hint{color:#9A948A;font-size:12px}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px;color:#6B6455}
+.prog-name{font-weight:400}
+.rowbtn{background:none;border:none;color:#c9c3b5;padding:0;font-size:12px;line-height:1;width:15px;height:15px;border-radius:4px;cursor:pointer;transition:color .15s}
+.rowbtn:hover{background:none}
+.rowbtn.rb-pen:hover,.rowbtn.rb-dup:hover{color:#5FA09E}
+.rowbtn.rb-del:hover{color:#c0392b}
 .pg-colspop{position:fixed;z-index:200;background:#fff;border:1px solid #E7EBE7;border-radius:12px;box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;overflow:auto}
 .pg-colspop .h{font-size:12px;color:#6B6455;font-weight:700;margin:2px 2px 7px}
 .pg-colspop .ch{display:flex;align-items:center;gap:9px;padding:5px 3px;font-size:13px;font-weight:600;cursor:pointer}
@@ -101,31 +171,7 @@ const PG_CSS = `
 .pg-settings .sp-row:hover{background:#f4f2ea}
 .pg-settings .sp-row .sp-rlabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455}
 .pg-settings .sp-row .sp-btn{padding:3px 8px;font-size:11px}
-.rowbtn{background:none;border:none;color:#c9c3b5;padding:0;font-size:12px;line-height:1;width:15px;height:15px;border-radius:4px;cursor:pointer;transition:color .15s}
-.rowbtn:hover{background:none}
-.rowbtn.rb-pen:hover,.rowbtn.rb-dup:hover{color:#5FA09E}
-.rowbtn.rb-del:hover{color:#c0392b}
 `
-
-function blankProgram() {
-  return {
-    number: '', code: '', category: '', subject: '',
-    gradeFrom: '', gradeTo: '', title: 'NEW PROGRAM', year: '', ageRange: '',
-    duration: '', sessions: 1, period: '/week', rateHr: null, fees: null,
-    costUnit: '', totalHours: null, description: '',
-    location: '', active: true, offerings: [],
-  }
-}
-function blankOffering() {
-  return { active: true, day: 'Mon', start: '16:30', end: '17:25', spots: null, platform: 'In-Person', teacher: '' }
-}
-
-function offeringWeeklyHours(prog) {
-  if (prog.period && prog.period !== '/week') return 0
-  const mins = Number(prog.duration) || 0
-  const activeCount = (prog.offerings || []).filter(o => o.active !== false).length
-  return (mins * activeCount) / 60
-}
 
 export default function Programs() {
   const { staff, programs, setPrograms, records: registrations } = useStore()
@@ -134,15 +180,12 @@ export default function Programs() {
     [staff],
   )
 
-  const [filter, setFilter] = useState({ field: null, value: null })
-  const [filterOpen, setFilterOpen] = useState(false)
-  const [activePane, setActivePane] = useState(FILTER_FIELDS[2].key)
   const [search, setSearch] = useState('')
-  const [availFilter, setAvailFilter] = useState('all')
-  const [editing, setEditing] = useState(null)
+  const [availFilter, setAvailFilter] = useState('')
   const [hiddenCols, setHiddenCols] = useState({})
   const [colsOpen, setColsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [editing, setEditing] = useState(null)
   const colsBtnRef = useRef(null)
   const colsPopRef = useRef(null)
   const settingsRef = useRef(null)
@@ -158,101 +201,102 @@ export default function Programs() {
   }, [colsOpen, settingsOpen])
 
   const visCols = useMemo(
-    () => TABLE_COLS.filter(c => !hiddenCols[c.id]),
+    () => DEFCOLS.filter(k => !hiddenCols[k]),
     [hiddenCols],
   )
 
-  const valuesForField = useMemo(() => {
-    if (!activePane) return []
-    const set = new Set(programs.map(p => p[activePane]).filter(Boolean))
-    return Array.from(set).sort((a, b) => String(a).localeCompare(String(b), undefined, { sensitivity: 'base' }))
-  }, [programs, activePane])
+  const allRows = useMemo(() => flattenRows(programs), [programs])
 
   const q = search.trim().toLowerCase()
   const visible = useMemo(() => {
-    let list = programs
-    if (filter.field && filter.value != null) list = list.filter(p => p[filter.field] === filter.value)
+    let list = allRows
     if (q) {
-      list = list.filter(p => {
-        const hay = [p.title, p.number, p.code, p.category, p.subject, p.location,
-          ...(p.offerings || []).map(o => o.teacher)].filter(Boolean).join(' ').toLowerCase()
+      list = list.filter(r => {
+        const hay = [r.name, r.number, r.code, r.category, r.subject, r.locName, r.instructor, r.desc].filter(Boolean).join(' ').toLowerCase()
         return hay.includes(q)
       })
     }
-    if (availFilter !== 'all') {
-      list = list.filter(p => {
-        const openOfferings = (p.offerings || []).filter(o => o.active !== false && (o.spots == null || o.spots > 0))
-        return availFilter === 'open' ? openOfferings.length > 0 : openOfferings.length === 0 && (p.offerings || []).length > 0
+    if (availFilter === 'open') {
+      list = list.filter(r => {
+        const cap = Number(r.capacity), en = Number(r.enrolled)
+        return isFinite(cap) && cap > 0 && (cap - (isFinite(en) ? en : 0)) > 0
+      })
+    } else if (availFilter === 'full') {
+      list = list.filter(r => {
+        const cap = Number(r.capacity), en = Number(r.enrolled)
+        return isFinite(cap) && cap > 0 && (cap - (isFinite(en) ? en : 0)) <= 0
       })
     }
     return list
-  }, [programs, filter, q, availFilter])
-
-  const filterLabel = filter.field
-    ? `${FILTER_FIELDS.find(f => f.key === filter.field)?.label}: ${filter.value}`
-    : 'Filter'
+  }, [allRows, q, availFilter])
 
   const metrics = useMemo(() => {
-    const activeCount = programs.filter(p => p.active !== false).length
-    const scheduledEntries = programs.reduce((n, p) => n + (p.offerings || []).length, 0)
-    let spotsOpen = 0, classesWithSpots = 0
+    const fams = new Map()
+    allRows.forEach(r => { const k = famKey(r); if (!fams.has(k)) fams.set(k, false); if (r.active) fams.set(k, true) })
+    let act = 0; fams.forEach(v => { if (v) act++ })
+    let open = 0, roomy = 0
     for (const p of programs) {
       for (const o of (p.offerings || [])) {
-        if (o.active === false) continue
-        if (o.spots != null && o.spots > 0) { spotsOpen += o.spots; classesWithSpots++ }
+        const c = Number(o.capacity), e = Number(o.enrolled)
+        if (isFinite(c) && c > 0) { const left = c - (isFinite(e) ? e : 0); if (left > 0) { open += left; roomy++ } }
       }
     }
-    const weeklyHours = programs.reduce((n, p) => n + offeringWeeklyHours(p), 0)
-    return { activeCount, scheduledEntries, spotsOpen, classesWithSpots, weeklyHours }
-  }, [programs])
+    let mins = 0; allRows.forEach(r => { const d = Number(r.duration); if (isFinite(d)) mins += d })
+    return { progCount: fams.size, activeCount: act, entries: allRows.length, spotsOpen: open, classesWithSpots: roomy, weeklyHours: Math.round(mins / 60 * 10) / 10 }
+  }, [allRows, programs])
 
-  const toggleProgram = (i) => {
-    setPrograms(p => p.map((row, idx) => idx === i ? { ...row, active: !row.active } : row))
+  const toggleActive = (progId) => {
+    setPrograms(list => list.map(p => p.id === progId ? { ...p, active: p.active === false } : p))
   }
-  const toggleOffering = (i, j) => {
-    setPrograms(p => p.map((row, idx) => idx === i
-      ? { ...row, offerings: row.offerings.map((o, oi) => oi === j ? { ...o, active: !o.active } : o) }
-      : row))
+
+  const openEdit = (progId) => {
+    const p = programs.find(x => x.id === progId)
+    if (p) setEditing({ mode: 'edit', program: p })
   }
-  const setOfferingTeacher = (i, j, teacher) => {
-    setPrograms(p => p.map((row, idx) => idx === i
-      ? { ...row, offerings: row.offerings.map((o, oi) => oi === j ? { ...o, teacher } : o) }
-      : row))
+
+  const duplicateProgram = (progId) => {
+    setPrograms(list => {
+      const idx = list.findIndex(p => p.id === progId)
+      if (idx < 0) return list
+      const orig = list[idx]
+      const dup = {
+        ...orig, id: uid(),
+        offerings: (orig.offerings || []).map(o => ({ ...o, id: oidGen(), times: (o.times || []).map(t => ({ ...t })), days: [...(o.days || [])] })),
+      }
+      return [...list.slice(0, idx + 1), dup, ...list.slice(idx + 1)]
+    })
   }
+
+  const deleteProgram = (progId) => {
+    const p = programs.find(x => x.id === progId)
+    if (!p) return
+    if (!confirm(`Delete "${p.name || 'Untitled'}"?`)) return
+    setPrograms(list => list.filter(x => x.id !== progId))
+  }
+
   const addProgram = () => {
-    const np = blankProgram()
-    np.number = generateNumber(np, programs.length)
-    np.code = generateCode(np)
-    setEditing({ mode: 'new', program: np, index: null })
+    setEditing({ mode: 'new', program: blankProgram() })
   }
-  const editProgram = (i) => setEditing({ mode: 'edit', program: programs[i], index: i })
-  const deleteProgram = (i) => {
-    const p = programs[i]
-    if (!confirm(`Delete "${p.title || 'this program'}" (${p.location || 'no location'})? This also deletes its ${(p.offerings || []).length} scheduled offering(s).`)) return
-    setPrograms(list => list.filter((_, idx) => idx !== i))
-  }
+
   const saveProgram = (form) => {
     if (editing.mode === 'new') {
       setPrograms(list => [form, ...list])
     } else {
-      setPrograms(list => list.map((row, idx) => idx === editing.index ? form : row))
+      setPrograms(list => list.map(p => p.id === form.id ? form : p))
     }
     setEditing(null)
   }
 
   const exportCsv = () => {
-    const header = ['Number', 'Code', 'Category', 'Subject', 'Title', 'Year', 'Grade From', 'Grade To',
-      'Duration (min)', 'Sessions', 'Period', 'Rate/Hr', 'Fees', 'Cost Per', 'Total Hrs', 'Location', 'Active',
-      'Offering Day', 'Offering Start', 'Offering End', 'Offering Spots', 'Offering Platform', 'Offering Teacher']
+    const header = ['Number', 'Code', 'Name', 'Category', 'Subject', 'Year', 'Grade From', 'Grade To',
+      'Duration (min)', 'Sessions', 'Period', 'Rate/Hr', 'Cost', 'Cost Per', 'Total Hrs', 'Platform', 'Active',
+      'Location', 'Day', 'Start', 'End', 'Capacity', 'Enrolled', 'Instructor']
     const rows = []
-    for (const p of programs) {
-      const base = [p.number, p.code, p.category, p.subject, p.title, p.year, p.gradeFrom, p.gradeTo,
-        p.duration, p.sessions, p.period, p.rateHr, p.fees, p.costUnit, p.totalHours, p.location, p.active]
-      if (!p.offerings || p.offerings.length === 0) {
-        rows.push([...base, '', '', '', '', '', ''])
-      } else {
-        for (const o of p.offerings) rows.push([...base, o.day, o.start, o.end, o.spots, o.platform, o.teacher])
-      }
+    for (const r of allRows) {
+      rows.push([r.number, r.code, r.name, r.category, r.subject, r.year, r.gradeFrom, r.gradeTo,
+        r.duration, r.sessions, r.period, r.rate, r.cost, r.costUnit, r.hours, r.platform, r.active,
+        r.locName, r.day != null ? (DOW.find(d => d.n === r.day)?.l || '') : '',
+        r.slot?.start || '', r.slot?.end || '', r.capacity, r.enrolled, r.instructor])
     }
     const csv = [header, ...rows].map(row => row.map(cell => {
       const str = cell == null ? '' : String(cell)
@@ -271,35 +315,85 @@ export default function Programs() {
     if (next[colId]) delete next[colId]; else next[colId] = true
     return next
   })
-  const anyHidden = TABLE_COLS.some(c => c.id !== 'edit' && hiddenCols[c.id])
+  const anyHidden = DEFCOLS.some(k => hiddenCols[k])
   const toggleAllCols = () => {
     if (anyHidden) setHiddenCols({})
-    else setHiddenCols(Object.fromEntries(TABLE_COLS.filter(c => c.id !== 'edit').map(c => [c.id, true])))
+    else setHiddenCols(Object.fromEntries(DEFCOLS.map(k => [k, true])))
   }
 
-  const cellVal = (p, col) => {
-    switch (col.id) {
-      case 'active': return null
-      case 'number': return p.number
-      case 'code': return p.code
-      case 'category': return p.category
-      case 'subject': return p.subject
-      case 'title': return p.title
-      case 'duration': return p.duration ? `${p.duration} min` : ''
-      case 'sessions': return `${p.sessions ?? ''}${p.period ? ` ${p.period}` : ''}`
-      case 'rateHr': return p.rateHr ? `$${Number(p.rateHr).toFixed(2)}` : ''
-      case 'fees': return p.fees ? `$${p.fees}${p.costUnit || ' /month'}` : ''
-      case 'location': return p.location
-      default: return ''
+  const cellContent = (r, col) => {
+    switch (col) {
+      case 'active': {
+        const bg = r.active ? '#DEF2DE' : '#FADBD8'
+        const fg = r.active ? '#2C6B2E' : '#922B21'
+        return { html: r.active ? 'Active' : 'Inactive', style: { background: bg, color: fg, textAlign: 'center', cursor: 'pointer' }, cls: 'col-active' }
+      }
+      case 'number': return { text: r.number || '', cls: 'col-number' }
+      case 'code': return { text: r.code ? r.code : '', mono: true, cls: 'col-code' }
+      case 'year': return { text: r.year || '', cls: 'col-year' }
+      case 'name': return { text: r.name || '', cls: 'col-name', bold: false }
+      case 'subject': return { text: r.subject || '', cls: 'col-subject' }
+      case 'category': return { text: r.category || '', cls: 'col-category' }
+      case 'age': {
+        const from = r.gradeFrom, to = r.gradeTo
+        const txt = from && to ? `${from}–${to}` : (from || to || r.age || '')
+        return { text: txt, cls: 'col-age' }
+      }
+      case 'location': {
+        if (!r.locName) return { text: '', cls: 'col-location' }
+        return { loc: { name: r.locName, color: locColor(r.locId) }, cls: 'col-location' }
+      }
+      case 'days': {
+        if (r.day == null) return { text: '', cls: 'col-days' }
+        const d = DOW.find(x => x.n === r.day)
+        return { text: d ? d.l : '', cls: 'col-days' }
+      }
+      case 'time': {
+        const txt = r.slot ? fmtRange(r.slot) : ''
+        return { text: txt, cls: 'col-time' }
+      }
+      case 'platform': return { text: r.platform || '', cls: 'col-platform' }
+      case 'duration': return { text: r.duration !== '' && r.duration != null ? fmtDuration(r.duration) : '', cls: 'col-duration' }
+      case 'lessons': return { text: r.sessions ? r.sessions + (r.period || '') : '', cls: 'col-lessons' }
+      case 'cost': {
+        if (r.cost == null) return { text: '', cls: 'col-cost' }
+        return { html: `<span class="cost">${money(r.cost)}${r.costUnit ? ' <span class="hint">' + r.costUnit + '</span>' : ''}</span>`, cls: 'col-cost' }
+      }
+      case 'rate': {
+        if (r.rate == null) return { text: '', cls: 'col-rate' }
+        return { html: `<span class="cost">${money(r.rate)}<span class="hint">/hr</span></span>`, cls: 'col-rate' }
+      }
+      case 'hours': {
+        if (r.hours == null) return { text: '', cls: 'col-hours' }
+        return { text: r.hours + ' h', cls: 'col-hours' }
+      }
+      case 'spots': {
+        const cap = Number(r.capacity), en = Number(r.enrolled)
+        if (isFinite(cap) && cap > 0) {
+          const left = cap - (isFinite(en) ? en : 0)
+          return { html: `<span class="enr"><span class="spots">${isFinite(en) ? en : 0} / ${cap}</span><span class="spots ${left <= 0 ? 'full' : 'ok'}">${left <= 0 ? 'full' : left + ' left'}</span></span>`, cls: 'col-spots' }
+        }
+        if (isFinite(en) && en > 0) return { html: `<span class="spots">${en} enrolled</span>`, cls: 'col-spots' }
+        return { html: '<span class="spots none">—</span>', cls: 'col-spots' }
+      }
+      case 'instructor': return { text: r.instructor || '', cls: 'col-instructor' }
+      default: return { text: '', cls: '' }
     }
   }
+
+  const cellKey = (r, col) => {
+    const c = cellContent(r, col)
+    return c.html || c.text || ''
+  }
+
+  const REPEATABLE = { category: true }
+  const REPEATABLE_IN_PROGRAM = { number: true, code: true, name: true }
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
       <style>{PG_CSS}</style>
       <h2 className="page-title">Programs</h2>
 
-      {/* Toolbar row — matches the v47 template */}
       <div className="pg-actions">
         <button title="Create Schedule Image" onClick={() => alert('Schedule image export coming soon.')}>🖼 Create Schedule</button>
         <button ref={colsBtnRef} title="Choose which columns are shown" onClick={() => setColsOpen(v => !v)}>👁 Columns</button>
@@ -312,43 +406,34 @@ export default function Programs() {
           style={{
             top: colsBtnRef.current ? colsBtnRef.current.getBoundingClientRect().bottom + 6 : 200,
             left: colsBtnRef.current ? Math.min(colsBtnRef.current.getBoundingClientRect().left, window.innerWidth - 220) : 100,
-          }}
-        >
+          }}>
           <div className="h">Show Columns</div>
-          {TABLE_COLS.filter(c => c.id !== 'edit').map(col => (
-            <label key={col.id} className="ch">
-              <input type="checkbox" checked={!hiddenCols[col.id]} onChange={() => toggleCol(col.id)} />
-              <span>{col.label}</span>
+          {DEFCOLS.map(k => (
+            <label key={k} className="ch">
+              <input type="checkbox" checked={!hiddenCols[k]} onChange={() => toggleCol(k)} />
+              <span>{COL_LABELS[k]}</span>
             </label>
           ))}
           <div className="allrow">
-            <button type="button" onClick={toggleAllCols}>
-              {anyHidden ? 'Show All' : 'Hide All'}
-            </button>
+            <button type="button" onClick={toggleAllCols}>{anyHidden ? 'Show All' : 'Hide All'}</button>
           </div>
         </div>
       )}
 
       {settingsOpen && (
-        <ProgramsSettingsPopover
-          ref={settingsRef}
-          onClose={() => setSettingsOpen(false)}
-          programs={programs}
-          setPrograms={setPrograms}
-        />
+        <ProgramsSettingsPopover ref={settingsRef} onClose={() => setSettingsOpen(false)} programs={programs} setPrograms={setPrograms} />
       )}
 
-      {/* Metrics */}
       <div className="pg-metrics">
         <div className="pg-metric">
           <div className="m-label">Programs</div>
-          <div className="m-value">{programs.length}</div>
-          <div className="m-hint">{metrics.scheduledEntries} scheduled entries</div>
+          <div className="m-value">{metrics.progCount}</div>
+          <div className="m-hint">{metrics.entries} scheduled entries</div>
         </div>
         <div className="pg-metric m-act">
           <div className="m-label">Active</div>
           <div className="m-value">{metrics.activeCount}</div>
-          <div className="m-hint">{programs.length - metrics.activeCount} inactive</div>
+          <div className="m-hint">{metrics.progCount - metrics.activeCount} inactive</div>
         </div>
         <div className="pg-metric m-spots">
           <div className="m-label">Spots Open</div>
@@ -357,197 +442,91 @@ export default function Programs() {
         </div>
         <div className="pg-metric m-hours">
           <div className="m-label">Weekly Hours</div>
-          <div className="m-value">{metrics.weeklyHours.toFixed(1)}</div>
+          <div className="m-value">{metrics.weeklyHours}</div>
           <div className="m-hint">contact hours across the week</div>
         </div>
       </div>
 
-      {/* Filters row */}
       <div className="pg-filters">
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search programs, instructors, codes…"
-        />
+        <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search programs, instructors, codes..." />
         <select value={availFilter} onChange={e => setAvailFilter(e.target.value)}>
-          <option value="all">Any Availability</option>
+          <option value="">Any Availability</option>
           <option value="open">Spots Open</option>
           <option value="full">Full</option>
         </select>
-
-        {/* Category/field filter */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setFilterOpen(o => !o)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              background: filter.field ? '#5FA09E' : '#fff',
-              color: filter.field ? '#fff' : '#2E2516',
-              border: filter.field ? 'none' : '1px solid #D5D0C4', borderRadius: 8, padding: '7px 14px',
-              fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-            }}>
-            🔍 {filterLabel}
-            {filter.field && (
-              <span
-                onClick={(e) => { e.stopPropagation(); setFilter({ field: null, value: null }) }}
-                style={{ marginLeft: 4, opacity: .8, padding: '0 4px' }}
-                title="Clear filter"
-              >×</span>
-            )}
-          </button>
-          {filterOpen && (
-            <div style={{
-              position: 'absolute', top: '100%', left: 0, marginTop: 4, zIndex: 10,
-              background: '#fff', border: '1px solid #E7EBE7', borderRadius: 8,
-              boxShadow: '0 4px 12px rgba(0,0,0,.1)',
-              display: 'grid', gridTemplateColumns: '140px 320px',
-              height: 360, overflow: 'hidden',
-            }}>
-              <div style={{ borderRight: '1px solid #E7EBE7', background: '#fafbfb', overflowY: 'auto', minHeight: 0 }}>
-                {FILTER_FIELDS.map(f => (
-                  <div
-                    key={f.key}
-                    onClick={() => setActivePane(f.key)}
-                    style={{
-                      padding: '10px 14px', fontSize: 13, cursor: 'pointer',
-                      background: activePane === f.key ? '#fff' : 'transparent',
-                      fontWeight: activePane === f.key ? 700 : 500,
-                      color: activePane === f.key ? '#5FA09E' : '#6B6455',
-                      borderLeft: activePane === f.key ? '3px solid #5FA09E' : '3px solid transparent',
-                    }}
-                  >
-                    {f.label}
-                  </div>
-                ))}
-              </div>
-              <div style={{ overflowY: 'auto', minHeight: 0 }}>
-                {valuesForField.length === 0 ? (
-                  <div style={{ padding: 14, fontSize: 13, color: '#9A948A', fontStyle: 'italic' }}>No values.</div>
-                ) : valuesForField.map(v => {
-                  const isActive = filter.field === activePane && filter.value === v
-                  return (
-                    <div
-                      key={v}
-                      onClick={() => { setFilter({ field: activePane, value: v }); setFilterOpen(false) }}
-                      style={{
-                        padding: '9px 14px', fontSize: 13, cursor: 'pointer',
-                        background: isActive ? 'rgba(95,160,158,.10)' : 'transparent',
-                        fontWeight: isActive ? 700 : 500,
-                        color: isActive ? '#5FA09E' : '#2E2516',
-                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      }}
-                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#f5f5f5' }}
-                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
-                      title={v}
-                    >
-                      {v}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
         <button onClick={addProgram} style={{
           marginLeft: 'auto', background: '#A6E2F9', color: '#2E2516',
           border: 'none', borderRadius: 8, padding: '8px 14px',
           fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
-        }}>
-          + Add Program
-        </button>
+        }}>+ Add Program</button>
       </div>
 
-      {/* Table */}
       <div className="pg-card">
         <table>
           <thead>
             <tr>
-              {visCols.map(col => (
-                <th key={col.id} className={col.id === 'edit' ? 'th-edit' : ''}
-                  style={{ width: col.w, minWidth: col.w }}>
-                  {col.label}
-                </th>
-              ))}
+              {visCols.map(k => <th key={k}>{COL_LABELS[k]}</th>)}
+              <th className="th-blank th-act"></th>
             </tr>
           </thead>
           <tbody>
             {visible.length === 0 && (
-              <tr><td colSpan={visCols.length} style={{ textAlign: 'center', color: '#9A948A', padding: 40 }}>No programs match this filter.</td></tr>
+              <tr><td colSpan={visCols.length + 1} style={{ textAlign: 'center', color: '#9A948A', padding: 40, background: 'transparent' }}>
+                {programs.length === 0 ? <><b>No programs yet.</b><br />Click "+ Add Program" to create your first one.</> : <><b>Nothing to show.</b><br />Your search or filter is too narrow.</>}
+              </td></tr>
             )}
-            {visible.map((p) => {
-              const i = programs.indexOf(p)
+            {visible.map((r, ri) => {
+              const prevRow = ri > 0 ? visible[ri - 1] : null
+              const sameProg = prevRow && famKey(prevRow) === famKey(r)
+              const showSep = prevRow && !sameProg
+
+              const tds = visCols.map(col => {
+                const c = cellContent(r, col)
+                const prevVal = prevRow ? cellKey(prevRow, col) : null
+                const curVal = cellKey(r, col)
+                const same = prevRow && curVal === prevVal && curVal !== '' && (
+                  REPEATABLE[col] || (REPEATABLE_IN_PROGRAM[col] && sameProg)
+                )
+                if (same) return <td key={col} className={`${c.cls} rep`}></td>
+
+                if (col === 'active') {
+                  return (
+                    <td key={col} className={c.cls} style={c.style} onClick={() => toggleActive(r.progId)}>
+                      <button className="actbtn">{c.html}</button>
+                    </td>
+                  )
+                }
+                if (c.loc) {
+                  return (
+                    <td key={col} className={c.cls}>
+                      <span className="loc"><span className="dot" style={{ background: c.loc.color }}></span>{c.loc.name}</span>
+                    </td>
+                  )
+                }
+                if (c.html) return <td key={col} className={c.cls} dangerouslySetInnerHTML={{ __html: c.html }} />
+                if (c.mono) return <td key={col} className={c.cls}><span className="mono">{c.text}</span></td>
+                const txt = c.text || ''
+                return <td key={col} className={c.cls}>{txt || <span className="hint">—</span>}</td>
+              })
+
               return (
-                <tr key={i} className={p.active === false ? 'inactive' : ''}>
-                  {visCols.map(col => {
-                    if (col.id === 'active') {
-                      return (
-                        <td key={col.id} className="td-active">
-                          <input type="checkbox" checked={p.active !== false} onChange={() => toggleProgram(i)}
-                            style={{ width: 14, height: 14, accentColor: '#5FA09E', cursor: 'pointer' }} />
-                        </td>
-                      )
-                    }
-                    if (col.id === 'offerings') {
-                      return (
-                        <td key={col.id} style={{ whiteSpace: 'normal', maxWidth: 380, verticalAlign: 'top', padding: '4px 7px' }}>
-                          {(p.offerings || []).length === 0 ? (
-                            <span style={{ fontSize: 11, color: '#9a948a', fontStyle: 'italic' }}>No offerings</span>
-                          ) : (p.offerings || []).map((o, j) => (
-                            <div key={j} style={{
-                              display: 'flex', gap: 6, fontSize: 11, padding: '1px 0',
-                              opacity: o.active !== false ? 1 : 0.5, alignItems: 'center',
-                            }}>
-                              <input type="checkbox" checked={o.active !== false} onChange={() => toggleOffering(i, j)}
-                                style={{ width: 12, height: 12, accentColor: '#5FA09E', cursor: 'pointer', flex: 'none' }} />
-                              <span>{o.day}</span>
-                              <span>{fmtTime(o.start)}</span>
-                              <span style={{ color: '#9a948a' }}>{o.spots != null ? `${o.spots} spots` : ''}</span>
-                              <select
-                                value={o.teacher || ''}
-                                onChange={(e) => setOfferingTeacher(i, j, e.target.value)}
-                                style={{
-                                  minWidth: 0, flex: 1,
-                                  fontFamily: 'inherit', fontSize: 11,
-                                  color: o.teacher ? '#2E2516' : '#9A948A',
-                                  background: 'transparent', border: '1px solid transparent',
-                                  borderRadius: 3, padding: '1px 2px', cursor: 'pointer',
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.borderColor = '#E7EBE7' }}
-                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent' }}
-                              >
-                                <option value="">—</option>
-                                {o.teacher && !teacherOptions.includes(o.teacher) && <option value={o.teacher}>{o.teacher}</option>}
-                                {teacherOptions.map(t => <option key={t} value={t}>{t}</option>)}
-                              </select>
-                            </div>
-                          ))}
-                        </td>
-                      )
-                    }
-                    if (col.id === 'edit') {
-                      return (
-                        <td key={col.id} className="td-edit">
-                          <button className="rowbtn rb-pen" title="Edit" onClick={() => editProgram(i)}>✎</button>
-                          {' '}
-                          <button className="rowbtn rb-dup" title="Duplicate" onClick={() => {
-                            setPrograms(list => {
-                              const dup = { ...list[i], number: generateNumber(list[i], list.length), offerings: (list[i].offerings || []).map(o => ({ ...o })) }
-                              return [...list.slice(0, i + 1), dup, ...list.slice(i + 1)]
-                            })
-                          }}>⧉</button>
-                          {' '}
-                          <button className="rowbtn rb-del" title="Delete" onClick={() => deleteProgram(i)}>✕</button>
-                        </td>
-                      )
-                    }
-                    if (col.id === 'title') {
-                      return <td key={col.id} style={{ fontWeight: 600 }}>{p.title}</td>
-                    }
-                    return <td key={col.id}>{cellVal(p, col)}</td>
-                  })}
-                </tr>
+                <React.Fragment key={`${r.progId}-${r.offId}-${r.day}-${r.slotIndex}`}>
+                  {showSep && (
+                    <tr className="progsep">
+                      <td className="nosep" colSpan={visCols.length + 1}></td>
+                    </tr>
+                  )}
+                  <tr className={r.active ? '' : 'inactive'}>
+                    {tds}
+                    <td className="actcell">
+                      <button className="rowbtn rb-pen" title="Edit" onClick={() => openEdit(r.progId)}>✎</button>
+                      {' '}
+                      <button className="rowbtn rb-dup" title="Duplicate" onClick={() => duplicateProgram(r.progId)}>⧉</button>
+                      {' '}
+                      <button className="rowbtn rb-del" title="Delete" onClick={() => deleteProgram(r.progId)}>✕</button>
+                    </td>
+                  </tr>
+                </React.Fragment>
               )
             })}
           </tbody>
@@ -555,7 +534,7 @@ export default function Programs() {
       </div>
 
       <div style={{ fontSize: 12, color: '#9A948A', marginTop: 8, textAlign: 'right' }}>
-        {visible.length} of {programs.length} programs
+        {visible.length} of {allRows.length} entries
       </div>
 
       {editing && (
@@ -566,14 +545,16 @@ export default function Programs() {
           registrations={registrations}
           onClose={() => setEditing(null)}
           onSave={saveProgram}
-          onDelete={editing.mode === 'edit' ? () => { deleteProgram(editing.index); setEditing(null) } : null}
+          onDelete={editing.mode === 'edit' ? () => { deleteProgram(editing.program.id); setEditing(null) } : null}
         />
       )}
     </div>
   )
 }
 
-// ---------- Settings popover ----------
+// need React for Fragment
+import React from 'react'
+
 const ProgramsSettingsPopover = forwardRef(function ProgramsSettingsPopover({ onClose, programs, setPrograms }, ref) {
   const [backups, setBackups] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -624,15 +605,10 @@ const ProgramsSettingsPopover = forwardRef(function ProgramsSettingsPopover({ on
         <div className="sp-title">Programs Settings</div>
         <button style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6b6455' }} onClick={onClose}>✕</button>
       </div>
-
       <div className="sp-title" style={{ fontSize: 12.5 }}>Backups</div>
       <div className="sp-hint">Keep up to 14 snapshots. Restore replaces current data.</div>
-      <div className="sp-btnrow">
-        <button className="sp-btn" disabled={busy} onClick={backUp}>Back Up Now</button>
-      </div>
-
+      <div className="sp-btnrow"><button className="sp-btn" disabled={busy} onClick={backUp}>Back Up Now</button></div>
       {msg && <div style={{ fontSize: 12, color: msg.startsWith('Backup') || msg.startsWith('Restored') ? '#20bab5' : '#c94040', marginTop: 6 }}>{msg}</div>}
-
       {backups && backups.length > 0 && (
         <div className="sp-list">
           {backups.map(b => (
@@ -648,55 +624,78 @@ const ProgramsSettingsPopover = forwardRef(function ProgramsSettingsPopover({ on
   )
 })
 
-// ---------- Program modal (add/edit) ----------
 function ProgramModal({ mode, initial, teacherOptions, registrations, onClose, onSave, onDelete }) {
   const [form, setForm] = useState(initial)
   const set = (patch) => setForm(f => ({ ...f, ...patch }))
 
-  const setOffering = (idx, patch) => {
-    setForm(f => ({ ...f, offerings: f.offerings.map((o, i) => i === idx ? { ...o, ...patch } : o) }))
+  const offIdx = useRef(0)
+  const [activeOff, setActiveOff] = useState(0)
+  const off = (form.offerings || [])[activeOff] || null
+
+  const setOff = (patch) => {
+    setForm(f => ({
+      ...f,
+      offerings: f.offerings.map((o, i) => i === activeOff ? { ...o, ...patch } : o),
+    }))
   }
-  const addOffering = () => setForm(f => ({ ...f, offerings: [...(f.offerings || []), blankOffering()] }))
-  const removeOffering = (idx) => setForm(f => ({ ...f, offerings: f.offerings.filter((_, i) => i !== idx) }))
+
+  const addOffering = () => {
+    const newOff = { id: oidGen(), locationId: 'loc_boardwalk', days: [], times: [{ start: '16:30', end: '17:25' }], capacity: null, enrolled: '', instructor: '' }
+    setForm(f => ({ ...f, offerings: [...(f.offerings || []), newOff] }))
+    setActiveOff((form.offerings || []).length)
+  }
+
+  const removeOffering = () => {
+    if ((form.offerings || []).length <= 1) return
+    setForm(f => ({ ...f, offerings: f.offerings.filter((_, i) => i !== activeOff) }))
+    setActiveOff(a => Math.max(0, a - 1))
+  }
+
+  const toggleDay = (dayN) => {
+    if (!off) return
+    const days = off.days.includes(dayN) ? off.days.filter(d => d !== dayN) : [...off.days, dayN].sort((a, b) => a - b)
+    setOff({ days })
+  }
+
+  const addTime = () => setOff({ times: [...(off.times || []), { start: '', end: '' }] })
+  const removeTime = (idx) => setOff({ times: off.times.filter((_, i) => i !== idx) })
+  const setTime = (idx, patch) => setOff({ times: off.times.map((t, i) => i === idx ? { ...t, ...patch } : t) })
 
   const enrolledStudents = useMemo(() => {
-    if (!registrations || !form.title) return []
+    if (!registrations || !form.name) return []
     return registrations.filter(r => {
       const payload = r.payload || r
       const progs = payload.programs || payload.enrolledPrograms || []
       return progs.some(pg => {
         const name = typeof pg === 'string' ? pg : (pg.program || pg.name || pg.title || '')
-        return name.toLowerCase().includes(form.title.toLowerCase())
+        return name.toLowerCase().includes(form.name.toLowerCase())
       })
     }).map(r => {
       const payload = r.payload || r
       return payload.displayName || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || payload.email || 'Unknown'
     })
-  }, [registrations, form.title])
+  }, [registrations, form.name])
 
   const handleSave = () => {
-    if (!form.title.trim()) { alert('Please enter a program title.'); return }
+    if (!form.name.trim()) { alert('Please enter a program name.'); return }
     onSave({
       ...form,
-      title: form.title.trim(),
-      number: String(form.number || '').trim(),
-      code: String(form.code || '').trim(),
+      name: form.name.trim(),
       duration: form.duration === '' ? '' : Number(form.duration),
-      sessions: form.sessions === '' ? '' : Number(form.sessions),
-      rateHr: form.rateHr === '' || form.rateHr == null ? null : Number(form.rateHr),
-      fees: form.fees === '' || form.fees == null ? null : Number(form.fees),
+      rate: form.rate === '' || form.rate == null ? null : Number(form.rate),
+      cost: form.cost === '' || form.cost == null ? null : Number(form.cost),
       totalHours: form.totalHours === '' || form.totalHours == null ? null : Number(form.totalHours),
     })
   }
 
   return (
     <div className="kb-modal-scrim" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="kb-modal" style={{ maxWidth: 680 }} onClick={e => e.stopPropagation()}>
+      <div className="kb-modal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
         <h2>{mode === 'edit' ? 'Edit Program' : 'New Program'}</h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '104px 1fr', gap: 12 }}>
           <div className="kb-field"><label>Program #</label><input value={form.number} onChange={e => set({ number: e.target.value })} /></div>
-          <div className="kb-field"><label>Program Name</label><input value={form.title} onChange={e => set({ title: e.target.value })} autoFocus /></div>
+          <div className="kb-field"><label>Program Name</label><input value={form.name} onChange={e => set({ name: e.target.value })} autoFocus /></div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div className="kb-field"><label>Program Code</label><input value={form.code} onChange={e => set({ code: e.target.value })} /></div>
@@ -709,80 +708,119 @@ function ProgramModal({ mode, initial, teacherOptions, registrations, onClose, o
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
           <div className="kb-field"><label>Grade From</label><input value={form.gradeFrom} onChange={e => set({ gradeFrom: e.target.value })} /></div>
           <div className="kb-field"><label>Grade To</label><input value={form.gradeTo} onChange={e => set({ gradeTo: e.target.value })} /></div>
-          <div className="kb-field"><label>Location</label><input value={form.location} onChange={e => set({ location: e.target.value })} placeholder="e.g. Boardwalk" /></div>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-          <div className="kb-field"><label>Duration (min)</label><input type="number" min="0" value={form.duration} onChange={e => set({ duration: e.target.value })} /></div>
-          <div className="kb-field"><label># of Lessons</label><input type="number" min="0" value={form.sessions} onChange={e => set({ sessions: e.target.value })} /></div>
-          <div className="kb-field"><label>Per</label>
-            <select value={form.period} onChange={e => set({ period: e.target.value })}>
+          <div className="kb-field"><label>Platform</label>
+            <select value={form.platform || ''} onChange={e => set({ platform: e.target.value })}>
               <option value="">—</option>
-              {PERIODS.map(p => <option key={p} value={p}>{p}</option>)}
+              {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-          <div className="kb-field"><label>Rate ($/hr)</label><input type="number" min="0" step="0.01" value={form.rateHr ?? ''} onChange={e => set({ rateHr: e.target.value })} /></div>
-          <div className="kb-field"><label>Fees ($)</label><input type="number" min="0" step="0.01" value={form.fees ?? ''} onChange={e => set({ fees: e.target.value })} /></div>
+          <div className="kb-field"><label>Duration (min)</label><input type="number" min="0" value={form.duration} onChange={e => set({ duration: e.target.value })} /></div>
+          <div className="kb-field"><label># of Lessons</label><input value={form.sessions} onChange={e => set({ sessions: e.target.value })} /></div>
+          <div className="kb-field"><label>Per</label>
+            <select value={form.period} onChange={e => set({ period: e.target.value })}>
+              {PERIODS.map(p => <option key={p} value={p}>{p || '—'}</option>)}
+            </select>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div className="kb-field"><label>Cost ($)</label><input type="number" min="0" step="0.01" value={form.cost ?? ''} onChange={e => set({ cost: e.target.value })} /></div>
           <div className="kb-field"><label>Cost Per</label>
             <select value={form.costUnit} onChange={e => set({ costUnit: e.target.value })}>
               {COST_UNITS.map(c => <option key={c} value={c}>{c || 'one-time'}</option>)}
             </select>
           </div>
+          <div className="kb-field"><label>Rate ($/hr)</label><input type="number" min="0" step="0.01" value={form.rate ?? ''} onChange={e => set({ rate: e.target.value })} /></div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div className="kb-field"><label>Total Hrs</label><input type="number" min="0" step="0.01" value={form.totalHours ?? ''} onChange={e => set({ totalHours: e.target.value })} /></div>
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, marginTop: 22 }}>
-            <input type="checkbox" checked={!!form.active} onChange={e => set({ active: e.target.checked })} style={{ accentColor: '#5FA09E' }} /> Active
+            <input type="checkbox" checked={form.active !== false} onChange={e => set({ active: e.target.checked })} style={{ accentColor: '#5FA09E' }} /> Active
           </label>
         </div>
         <div className="kb-field"><label>Comments / Notes</label><textarea rows={2} value={form.description} onChange={e => set({ description: e.target.value })} /></div>
 
         {/* Offerings */}
         <div style={{ borderTop: '1px solid #E7EBE7', marginTop: 6, paddingTop: 14 }}>
-          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8, color: '#5FA09E' }}>Offerings</div>
-          {(form.offerings || []).length === 0 && (
-            <div style={{ fontSize: 12, color: '#9A948A', fontStyle: 'italic', marginBottom: 8 }}>No offerings yet — add a day/time below.</div>
-          )}
-          {(form.offerings || []).map((o, idx) => (
-            <div key={idx} style={{
-              display: 'grid', gridTemplateColumns: '30px 90px 100px 100px 70px 1fr 1fr 26px',
-              gap: 6, alignItems: 'center', marginBottom: 6,
-            }}>
-              <input type="checkbox" checked={o.active !== false} onChange={e => setOffering(idx, { active: e.target.checked })}
-                style={{ accentColor: '#5FA09E' }} />
-              <select value={o.day} onChange={e => setOffering(idx, { day: e.target.value })} style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }}>
-                {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-              <input type="time" value={o.start} onChange={e => setOffering(idx, { start: e.target.value })} style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }} />
-              <input type="time" value={o.end} onChange={e => setOffering(idx, { end: e.target.value })} style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }} />
-              <input type="number" min="0" placeholder="spots" value={o.spots ?? ''} onChange={e => setOffering(idx, { spots: e.target.value === '' ? null : Number(e.target.value) })}
-                style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }} />
-              <select value={o.platform || ''} onChange={e => setOffering(idx, { platform: e.target.value })} style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }}>
-                <option value="">—</option>
-                {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
-              <input list="progTeacherList" placeholder="Teacher" value={o.teacher || ''} onChange={e => setOffering(idx, { teacher: e.target.value })}
-                style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }} />
-              <button onClick={() => removeOffering(idx)} title="Remove offering"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A948A', fontSize: 16 }}>×</button>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+            {(form.offerings || []).map((o, i) => (
+              <button key={o.id} type="button" onClick={() => setActiveOff(i)} style={{
+                background: i === activeOff ? '#A6E2F9' : '#eef3f6', border: '1px solid ' + (i === activeOff ? '#A6E2F9' : '#D5D0C4'),
+                borderRadius: 8, padding: '8px 14px', fontSize: 12.5, fontWeight: 600,
+                color: i === activeOff ? '#2E2516' : '#5a6b6f', cursor: 'pointer',
+              }}>
+                {locName(o.locationId) || 'Offering'} {i + 1}
+              </button>
+            ))}
+            <button type="button" onClick={addOffering} style={{
+              background: 'transparent', border: '1px dashed #5FA09E', borderRadius: 8,
+              padding: '8px 14px', fontSize: 12.5, fontWeight: 600, color: '#5FA09E', cursor: 'pointer',
+            }}>+ Add Offering</button>
+          </div>
+
+          {off && (
+            <div style={{ border: '1px solid #BEE6F7', borderLeft: '4px solid #A6E2F9', borderRadius: 12, padding: 16, background: '#EDF8FD' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#2E2516' }}>
+                  {locName(off.locationId) || 'Offering'} — Offering {activeOff + 1}
+                </div>
+                {(form.offerings || []).length > 1 && (
+                  <button type="button" onClick={removeOffering} style={{ background: 'transparent', border: 'none', color: '#c0392b', fontSize: 12.5, fontWeight: 600, cursor: 'pointer' }}>Remove</button>
+                )}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div className="kb-field"><label>Location</label>
+                  <select value={off.locationId} onChange={e => setOff({ locationId: e.target.value })}>
+                    {LOCATIONS.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                  </select>
+                </div>
+                <div className="kb-field"><label>Capacity</label><input type="number" min="0" value={off.capacity ?? ''} onChange={e => setOff({ capacity: e.target.value === '' ? null : Number(e.target.value) })} /></div>
+                <div className="kb-field"><label>Enrolled</label><input type="number" min="0" value={off.enrolled ?? ''} onChange={e => setOff({ enrolled: e.target.value })} /></div>
+              </div>
+
+              <div className="kb-field"><label>Instructor</label>
+                <input list="progTeacherList" value={off.instructor || ''} onChange={e => setOff({ instructor: e.target.value })} />
+              </div>
+              <datalist id="progTeacherList">{teacherOptions.map(t => <option key={t} value={t} />)}</datalist>
+
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#6b6455', marginBottom: 5 }}>Days</label>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {DOW.map(d => {
+                    const on = off.days.includes(d.n)
+                    return (
+                      <button key={d.n} type="button" onClick={() => toggleDay(d.n)} style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        border: '1px solid ' + (on ? '#5FA09E' : '#D5D0C4'), borderRadius: 8,
+                        padding: '6px 11px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+                        background: on ? '#5FA09E' : '#fff', color: on ? '#fff' : '#2E2516',
+                      }}>{d.l}</button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#6b6455', marginBottom: 5 }}>Times</label>
+                {(off.times || []).map((t, ti) => (
+                  <div key={ti} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 7 }}>
+                    <input type="time" value={t.start} onChange={e => setTime(ti, { start: e.target.value })} style={{ flex: 1, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6, fontSize: 12 }} />
+                    <span style={{ color: '#6b6455' }}>–</span>
+                    <input type="time" value={t.end} onChange={e => setTime(ti, { end: e.target.value })} style={{ flex: 1, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6, fontSize: 12 }} />
+                    <button type="button" onClick={() => removeTime(ti)} style={{ background: 'transparent', border: 'none', color: '#C9C3B5', fontSize: 16, fontWeight: 700, cursor: 'pointer', lineHeight: 1 }}>×</button>
+                  </div>
+                ))}
+                <button type="button" onClick={addTime} style={{
+                  background: 'transparent', border: '1px dashed #5FA09E', color: '#5FA09E',
+                  borderRadius: 8, padding: '6px 11px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', marginTop: 2,
+                }}>+ Add Time</button>
+              </div>
             </div>
-          ))}
-          <datalist id="progTeacherList">
-            {teacherOptions.map(t => <option key={t} value={t} />)}
-          </datalist>
-          <button
-            onClick={addOffering}
-            style={{
-              marginTop: 4, background: 'transparent', border: '1px dashed #5FA09E',
-              borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600,
-              color: '#5FA09E', cursor: 'pointer', width: '100%',
-            }}>
-            + Add offering
-          </button>
+          )}
         </div>
 
-        {/* Enrolled students */}
         {mode === 'edit' && enrolledStudents.length > 0 && (
           <div style={{ borderTop: '1px solid #E7EBE7', marginTop: 10, paddingTop: 12 }}>
             <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6, color: '#5FA09E' }}>
@@ -790,10 +828,7 @@ function ProgramModal({ mode, initial, teacherOptions, registrations, onClose, o
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {enrolledStudents.map((name, idx) => (
-                <span key={idx} style={{
-                  background: '#E4EFF3', borderRadius: 6, padding: '4px 10px',
-                  fontSize: 12, color: '#2E2516', fontWeight: 500,
-                }}>{name}</span>
+                <span key={idx} style={{ background: '#E4EFF3', borderRadius: 6, padding: '4px 10px', fontSize: 12, color: '#2E2516', fontWeight: 500 }}>{name}</span>
               ))}
             </div>
           </div>
