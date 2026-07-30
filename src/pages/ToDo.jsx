@@ -1353,7 +1353,7 @@ const WEEKDAY_OPTIONS = [
 function ChecklistEntryRow({
   entry: en, index, isFirst, isLast, lists,
   onText, onNote, onPriority, onListId, onActive, onSchedule,
-  onMoveUp, onMoveDown,
+  onMoveUp, onMoveDown, onDuplicate, onRemove,
 }) {
   return (
     <div className={'clentry' + (en.active === false ? ' inactive' : '')}>
