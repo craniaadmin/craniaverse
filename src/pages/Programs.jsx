@@ -2528,9 +2528,11 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
     commit(nextCats, nextSubjOrder, nextColors, nextSubjColors)
   }
 
-  const deleteSubj = (cat, s) => {
+  const deleteSubj = async (cat, s) => {
     const n = countSubj(cat, s)
-    if (!window.confirm(`Delete subject "${s}" under "${cat}"? ${n} program(s) will keep their data but lose this subject label.`)) return
+    if (!await dialog.confirm(
+      `Remove the subject "${s}" from "${cat}"? ${n} program(s) keep their data, they just lose that label.`,
+      { title: 'Remove Subject', button: 'Remove' })) return
     setPrograms(list => list.map(p => p.category === cat && p.subject === s ? { ...p, subject: '' } : p))
     const arr = (subjOrder[cat] || []).filter(x => x !== s)
     const nextSubjOrder = { ...subjOrder, [cat]: arr }
