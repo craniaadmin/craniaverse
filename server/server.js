@@ -42,6 +42,7 @@ import {
   loadProjects,      saveProjects,
   loadItAccounts,    saveItAccounts,
   loadCalendar,      saveCalendar,
+  listCalendarBackups, createCalendarBackup, restoreCalendarBackup,
   loadMarketingCalendar, saveMarketingCalendar,
   loadStock,         saveStock,
   loadCraniaStore,   saveCraniaStore,
