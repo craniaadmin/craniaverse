@@ -1326,6 +1326,8 @@ function ChecklistsView({
                   onSchedule={(patch) => updateEntrySchedule(cl.id, en.id, patch)}
                   onMoveUp={() => moveEntry(cl.id, en.id, -1)}
                   onMoveDown={() => moveEntry(cl.id, en.id, 1)}
+                  onDuplicate={() => duplicateEntry(cl.id, en.id)}
+                  onRemove={() => removeEntry(cl.id, en.id)}
                 />
               ))}
             </div>
