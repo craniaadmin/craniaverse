@@ -536,6 +536,10 @@ const CSS = `
     font:inherit;font-size:12px;line-height:1.35;height:21px;padding:0 4px;color:var(--dark-brown);
     box-shadow:inset 0 0 0 1px var(--teal);outline:none;display:block}
 .pg tr.frow th{background:#eaf3f2;padding:6px 8px;border-top:1px solid var(--line);border-radius:0}
+/* The filter row's placeholders — above the checkbox and the row buttons —
+   carry no filter, so they must not paint a panel. Declared after the rule
+   above because it has the same specificity. */
+.pg thead tr.frow th:empty{background:transparent;border-top:none}
 .pg .colf{width:100%;background:#fff;border:1px solid var(--field);border-radius:7px;padding:5px 8px;
     font-size:12px;color:var(--dark-brown);font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
 .pg .colf.on{background:var(--light-blue);border-color:var(--light-blue)}
