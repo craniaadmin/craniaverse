@@ -1109,9 +1109,6 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="cal-footer">CraniaVerse &middot; Calendar</div>
-
         {/* Modals */}
         {editingEvent && (
           <EventModal
