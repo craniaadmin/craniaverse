@@ -228,6 +228,26 @@ function packEvents(eventsWithPos) {
 }
 
 // ─── Store hook ───
+/* One-shot data fixes, flagged so they run once. Mutates `d`; returns whether
+   anything changed, so the caller can write it back.
+   Personal was #8C9294 grey, which washes to almost exactly the same pale tone
+   as Afterschool's teal in the month chips (RGB distance 21 — indistinguishable).
+   Purple is the furthest unused colour in the palette from the rest of the set.
+   Only moved if it is still that exact grey, so a deliberate choice is kept. */
+function migrateCalendar(d) {
+  let changed = false
+  if (d._personalHue !== 'v1') {
+    const personal = (d.calendars || []).find(c => /^personal$/i.test((c.name || '').trim()))
+    if (personal && String(personal.color || '').toUpperCase() === '#8C9294') {
+      personal.color = '#7030A0'
+      changed = true
+    }
+    d._personalHue = 'v1'
+    changed = true
+  }
+  return changed
+}
+
 function useCalendar(apiPath) {
   const [data, setData] = useState({ calendars: [], events: [], hidden: {} })
   const [loading, setLoading] = useState(true)
