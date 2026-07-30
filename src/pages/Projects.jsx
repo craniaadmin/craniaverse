@@ -167,10 +167,96 @@ function useProjects() {
 
 // ---------- Projects page ----------
 export default function Projects() {
-  const { state, loading, status, mutate } = useProjects()
+  const { state, setState, loading, status, mutate } = useProjects()
   const [filter, setFilter] = useState('')
-  const [editing, setEditing] = useState(null)   // {mode:'edit'|'new', card, col}
+  const [editing, setEditing] = useState(null)
+  const [hiddenCols, setHiddenCols] = useState({})
+  const [colsOpen, setColsOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const dragCardId = useRef(null)
+  const colsBtnRef = useRef(null)
+  const colsPopRef = useRef(null)
+  const settingsRef = useRef(null)
+
+  // Undo / redo
+  const undoStack = useRef([])
+  const redoStack = useRef([])
+  const histBase = useRef(null)
+  const [undoLen, setUndoLen] = useState(0)
+  const [redoLen, setRedoLen] = useState(0)
+
+  useEffect(() => {
+    if (!loading && histBase.current === null) histBase.current = JSON.stringify(state)
+  }, [loading, state])
+
+  const recordHistory = useCallback((prev) => {
+    const snap = JSON.stringify(prev)
+    if (histBase.current === null) { histBase.current = snap; return }
+    if (snap !== histBase.current) {
+      undoStack.current.push(histBase.current)
+      if (undoStack.current.length > 100) undoStack.current.shift()
+      redoStack.current = []
+      histBase.current = snap
+      setUndoLen(undoStack.current.length)
+      setRedoLen(0)
+    }
+  }, [])
+
+  const mutateWithHistory = useCallback((mutFn) => {
+    recordHistory(state)
+    mutate(mutFn)
+  }, [mutate, state, recordHistory])
+
+  const undo = useCallback(() => {
+    if (!undoStack.current.length) return
+    redoStack.current.push(JSON.stringify(state))
+    const prev = JSON.parse(undoStack.current.pop())
+    histBase.current = JSON.stringify(prev)
+    setState(prev)
+    setUndoLen(undoStack.current.length)
+    setRedoLen(redoStack.current.length)
+    fetch(`${API_BASE}/api/projects`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', ...HEADERS },
+      body: JSON.stringify(prev),
+    }).catch(() => {})
+  }, [state, setState])
+
+  const redo = useCallback(() => {
+    if (!redoStack.current.length) return
+    undoStack.current.push(JSON.stringify(state))
+    const next = JSON.parse(redoStack.current.pop())
+    histBase.current = JSON.stringify(next)
+    setState(next)
+    setUndoLen(undoStack.current.length)
+    setRedoLen(redoStack.current.length)
+    fetch(`${API_BASE}/api/projects`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', ...HEADERS },
+      body: JSON.stringify(next),
+    }).catch(() => {})
+  }, [state, setState])
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.target?.closest('input,textarea,select')) return
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault(); if (e.shiftKey) redo(); else undo()
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo() }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  })
+
+  // Close popovers on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (colsOpen && colsPopRef.current && !colsPopRef.current.contains(e.target)
+          && colsBtnRef.current && !colsBtnRef.current.contains(e.target)) setColsOpen(false)
+      if (settingsOpen && settingsRef.current && !settingsRef.current.contains(e.target)) setSettingsOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [colsOpen, settingsOpen])
 
   const cardsByCol = useMemo(() => {
     const out = {}
@@ -188,7 +274,6 @@ export default function Projects() {
       const bucket = out[c.col] || (out[c.col] = [])
       bucket.push(c)
     }
-    // Sort: notes newest-first; everything else by project → task.
     for (const key of Object.keys(out)) {
       if (key === 'notes') {
         out[key].sort((a, b) => (b.created || '').localeCompare(a.created || ''))
@@ -208,12 +293,17 @@ export default function Projects() {
     [state.colOrder],
   )
 
+  const visibleCols = useMemo(
+    () => orderedCols.filter(c => !hiddenCols[c.id]),
+    [orderedCols, hiddenCols],
+  )
+
   const onDragStart = (id) => { dragCardId.current = id }
   const onDropTo = (colId) => {
     const id = dragCardId.current
     dragCardId.current = null
     if (!id) return
-    mutate(s => {
+    mutateWithHistory(s => {
       const idx = s.cards.findIndex(c => c.id === id)
       if (idx === -1) return
       s.cards[idx] = { ...s.cards[idx], col: colId }
@@ -224,11 +314,11 @@ export default function Projects() {
     const c = state.cards.find(x => x.id === id)
     const label = c ? (c.task || c.project || 'this card') : 'this card'
     if (!confirm(`Delete "${label}"?`)) return
-    mutate(s => { s.cards = s.cards.filter(x => x.id !== id) })
+    mutateWithHistory(s => { s.cards = s.cards.filter(x => x.id !== id) })
   }
 
   const duplicate = (id) => {
-    mutate(s => {
+    mutateWithHistory(s => {
       const idx = s.cards.findIndex(c => c.id === id)
       if (idx === -1) return
       s.cards.splice(idx + 1, 0, { ...s.cards[idx], id: uid(), created: new Date().toISOString() })
@@ -236,7 +326,7 @@ export default function Projects() {
   }
 
   const toggleGoal = (cardId, goalId) => {
-    mutate(s => {
+    mutateWithHistory(s => {
       const c = s.cards.find(x => x.id === cardId)
       if (!c) return
       c.goals = (c.goals || []).map(g => g.id === goalId ? { ...g, done: !g.done } : g)
@@ -247,7 +337,7 @@ export default function Projects() {
   const openEdit = (card)  => setEditing({ mode: 'edit', card })
 
   const saveCard = (form) => {
-    mutate(s => {
+    mutateWithHistory(s => {
       if (editing.mode === 'new') {
         s.cards.push({
           id: uid(), col: editing.col, created: new Date().toISOString(),
@@ -262,6 +352,39 @@ export default function Projects() {
     setEditing(null)
   }
 
+  const exportCsv = () => {
+    const esc = (v) => { const s = String(v ?? ''); return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g, '""') + '"' : s }
+    const header = ['Column', 'Project', 'Task', 'Who', 'Tags', 'Due', 'Days', 'Color', 'Created', 'Comments']
+    const rows = [header.join(',')]
+    for (const c of state.cards) {
+      if (c.archived) continue
+      const colName = COL_BY_ID[c.col]?.name || c.col
+      const commStr = (c.comments || []).map(x => `${x.date||''} ${x.author||''}: ${x.text||''}`).join(' | ')
+      rows.push([
+        esc(colName), esc(c.project), esc(c.task), esc(c.who),
+        esc((c.tags || []).join(', ')), esc(c.due), esc(daysLabel(c.days)),
+        esc(c.color), esc(c.created), esc(commStr),
+      ].join(','))
+    }
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'craniaverse-projects.csv'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  const toggleCol = (colId) => setHiddenCols(prev => {
+    const next = { ...prev }
+    if (next[colId]) delete next[colId]; else next[colId] = true
+    return next
+  })
+  const anyHidden = COLUMNS.some(c => hiddenCols[c.id])
+  const toggleAllCols = () => {
+    if (anyHidden) setHiddenCols({})
+    else setHiddenCols(Object.fromEntries(COLUMNS.map(c => [c.id, true])))
+  }
+
   if (loading) {
     return (
       <div className="page">
@@ -273,6 +396,7 @@ export default function Projects() {
 
   return (
     <div className="page">
+      <style>{PJ_CSS}</style>
       <h2 className="page-title">Projects</h2>
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
@@ -281,24 +405,66 @@ export default function Projects() {
         </div>
       )}
 
-      <div className="kb-toolbar">
+      <div className="pj-toolbar">
+        <button title="Undo (Ctrl+Z)" disabled={undoLen === 0} onClick={undo}>↶ Undo</button>
+        <button title="Redo (Ctrl+Shift+Z)" disabled={redoLen === 0} onClick={redo}>↷</button>
+        <button style={{ marginLeft: 'auto' }} title="Settings" onClick={() => setSettingsOpen(v => !v)}>⚙</button>
+        <button onClick={exportCsv} title="Download all cards as a CSV file">⤓ Export CSV</button>
+      </div>
+
+      <div className="pj-toolbar">
         <input
           className="kb-filter"
           type="search"
           placeholder="Filter cards…"
           value={filter}
           onChange={e => setFilter(e.target.value)}
+          style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #d5d0c4', background: '#fff', font: 'inherit', fontSize: 13, width: 220 }}
         />
+        <button ref={colsBtnRef} title="Choose which columns are shown" onClick={() => setColsOpen(v => !v)}>
+          👁 Columns
+        </button>
         {state.updatedAt && (
-          <span className="kb-updated">
+          <span style={{ marginLeft: 'auto', fontSize: 11.5, color: '#9a948a' }}>
             Last updated {new Date(state.updatedAt).toLocaleString(undefined,
               { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
           </span>
         )}
       </div>
 
-      <div className="kanban">
-        {orderedCols.map(col => (
+      {colsOpen && (
+        <div className="pj-colspop" ref={colsPopRef}
+          style={{ position: 'absolute', zIndex: 200,
+            top: colsBtnRef.current ? colsBtnRef.current.getBoundingClientRect().bottom + 6 : 200,
+            left: colsBtnRef.current ? Math.min(colsBtnRef.current.getBoundingClientRect().left, window.innerWidth - 220) : 100,
+          }}
+        >
+          <div className="h">Show Columns</div>
+          {orderedCols.map(col => (
+            <label key={col.id}>
+              <input type="checkbox" checked={!hiddenCols[col.id]} onChange={() => toggleCol(col.id)} />
+              <span>{col.name}</span>
+            </label>
+          ))}
+          <div className="allrow">
+            <button type="button" onClick={toggleAllCols}>
+              {anyHidden ? 'Show All Columns' : 'Hide All Columns'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {settingsOpen && (
+        <ProjectSettingsPopover
+          ref={settingsRef}
+          onClose={() => setSettingsOpen(false)}
+          state={state}
+          setState={setState}
+        />
+      )}
+
+      <div className="kanban" style={{ gridTemplateColumns: `repeat(${visibleCols.length || 1}, 1fr)` }}>
+        {visibleCols.map(col => (
           <BoardColumn
             key={col.id}
             col={col}
