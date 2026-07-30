@@ -253,10 +253,23 @@ export default function Projects() {
   const hiddenCols = state.hiddenCols || {}
   const [colsOpen, setColsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [archiveMode, setArchiveMode] = useState(false)
   const dragCardId = useRef(null)
   const colsBtnRef = useRef(null)
   const colsPopRef = useRef(null)
   const settingsRef = useRef(null)
+
+  /* Daily tasks come back and goals clear on their own schedule — checked once
+     the board has loaded, then every five minutes so a tab left open overnight
+     still turns over. Not put through history: it is the clock's doing, not an
+     edit anyone would want to undo. */
+  useEffect(() => {
+    if (loading) return
+    const run = () => mutate(d => { processResets(d); processGoalsClear(d) })
+    run()
+    const t = setInterval(run, 5 * 60 * 1000)
+    return () => clearInterval(t)
+  }, [loading, mutate])
 
   // Undo / redo
   const undoStack = useRef([])
