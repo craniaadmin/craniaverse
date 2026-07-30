@@ -359,7 +359,14 @@ const CSS = `
 .calroot .settings-popover .sp-hint{font-size:11px;color:#9a948a;margin:6px 0 8px;line-height:1.4;}
 .calroot .settings-popover .sp-btnrow{display:flex;gap:8px;}
 .calroot .settings-popover .sp-btn{background:var(--dark-blue);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:2px;}
-.calroot .settings-popover .sp-btn:hover{filter:brightness(1.08);}
+.calroot .settings-popover .sp-btn:hover:not(:disabled){filter:brightness(1.08);}
+.calroot .settings-popover .sp-btn:disabled{opacity:.5;cursor:default;}
+.calroot .settings-popover .sp-meta{font-size:12.5px;color:#6B6455;margin-bottom:2px;}
+.calroot .settings-popover .sp-restore-list{margin-top:8px;max-height:170px;overflow-y:auto;}
+.calroot .settings-popover .sp-restore-row{display:flex;align-items:center;padding:5px 6px;border-radius:6px;font-size:12px;margin-bottom:2px;background:#fff;}
+.calroot .settings-popover .sp-restore-row:hover{background:#f4f2ea;}
+.calroot .settings-popover .sp-restore-row .sp-rlabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455;}
+.calroot .settings-popover .sp-restore-row .sp-btn{padding:3px 8px;font-size:11px;}
 
 /* calendar chips bar — matches v22 calbar2 */
 .calroot .calbar2{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:8px 0 0;flex-wrap:wrap;}
