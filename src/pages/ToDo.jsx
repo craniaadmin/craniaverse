@@ -322,23 +322,48 @@ const CSS = `
 .tdroot .cldel:hover{color:#c0392b;opacity:1;}
 .tdroot .clmove{background:none;border:none;color:inherit;opacity:.55;padding:0 2px;font-size:13px;line-height:1;font-weight:700;cursor:pointer;}
 .tdroot .clmove:hover{opacity:1;}
-.tdroot .clentries{padding:6px 14px;}
-.tdroot .clentry{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #f0ece2;}
-.tdroot .clentry:last-child{border-bottom:none;}
-.tdroot .clentry.inactive{opacity:.55;}
-.tdroot .clenthandle{cursor:grab;color:#b8b2a2;font-size:12px;}
-.tdroot .clentmoves{display:flex;flex-direction:column;gap:0;}
-.tdroot .clentmove{background:none;border:none;color:#9a948a;padding:0 1px;font-size:9px;line-height:1;font-weight:700;cursor:pointer;}
-.tdroot .clentmove:hover{color:var(--dark-blue);}
-.tdroot .clenttext{flex:1 1 130px;min-width:90px;padding:4px 7px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12.5px;background:#fff;}
-.tdroot .clentnote{flex:1 1 90px;min-width:60px;padding:4px 7px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12.5px;color:#6b6455;background:#fff;}
-.tdroot .clentfreq{padding:4px 6px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12px;background:#fff;}
-.tdroot .clentsep{color:#b8b2a2;font-size:13px;margin:0 2px;}
-.tdroot .clentlistwrap{color:#6b6455;display:inline-flex;align-items:center;gap:3px;font-size:12px;}
-.tdroot .clentlist{padding:3px 6px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:11.5px;background:#fff;}
-.tdroot .clentpri{padding:3px 7px;border:none;border-radius:5px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;}
-.tdroot .clentactive{display:flex;align-items:center;gap:3px;color:#6b6455;white-space:nowrap;font-size:12px;}
+.tdroot .clentries{display:flex;flex-direction:column;gap:5px;padding:6px 14px 10px;}
+.tdroot .clentry{display:flex;flex-wrap:nowrap;align-items:center;gap:5px;padding:0;}
+.tdroot .clentry.inactive{opacity:.5;}
+/* Every field sits on a pill, and the control itself stays invisible until you
+   use it — the row should read as text, not as a bank of inputs. */
+.tdroot .clentry select,
+.tdroot .clentry input:not([type=checkbox]){
+  background:var(--pill);border:none;border-radius:5px;padding:0 8px;height:22px;
+  font:inherit;font-size:12px;line-height:1.35;color:var(--dark-brown);min-width:0;box-sizing:border-box;}
+.tdroot .clentry select:hover,
+.tdroot .clentry input:not([type=checkbox]):hover{background:#E4EFF3;}
+.tdroot .clentry select:focus,
+.tdroot .clentry input:not([type=checkbox]):focus{
+  outline:none;background:#fff;box-shadow:inset 0 0 0 1px var(--dark-blue);}
+.tdroot .clentry input::placeholder{color:#b0aa9c;}
+.tdroot .clenttext{flex:1;min-width:150px;max-width:260px;width:auto;}
+.tdroot .clentnote{flex:none;width:150px;}
+.tdroot .clentfreq{flex:none;width:86px;}
+.tdroot .clentsep{color:#b8b2a2;font-size:13px;margin:0 2px;flex:none;}
+.tdroot .clentlistwrap{color:#6b6455;display:inline-flex;align-items:center;gap:3px;font-size:12px;flex:none;white-space:nowrap;}
+.tdroot .clentlist{flex:none;width:112px;}
+.tdroot .clentpri{width:64px;flex:none;font-weight:700;cursor:pointer;}
+.tdroot .clentactive{display:inline-flex;align-items:center;gap:4px;color:#6b6455;white-space:nowrap;font-size:12px;flex:none;}
 .tdroot .clentactive input{width:13px;height:13px;accent-color:var(--dark-blue);}
+/* Priority keeps its own colour — stated after the generic field rule and with
+   enough weight to beat it. */
+.tdroot .clentry .clentpri.pri-high{background:#FADBD8;color:#922B21;}
+.tdroot .clentry .clentpri.pri-med{background:var(--light-brown);color:var(--dark-brown);}
+.tdroot .clentry .clentpri.pri-low{background:var(--light-blue);color:var(--dark-brown);}
+/* Reordering and removal stay out of sight until the row is hovered. */
+.tdroot .clenthandle{cursor:grab;color:#c9c3b5;font-size:12px;flex:none;opacity:0;transition:opacity .12s;}
+.tdroot .clentmoves{display:flex;flex-direction:column;gap:0;flex:none;}
+.tdroot .clentmove{background:none;border:none;color:#b8b2a2;padding:0 1px;font-size:10px;line-height:1;font-weight:700;cursor:pointer;opacity:0;transition:opacity .12s;}
+.tdroot .clentmove:hover{color:var(--dark-blue);}
+.tdroot .clentdup{background:none;border:none;color:#c9c3b5;font-size:12px;padding:0 4px;font-weight:400;
+  margin-left:auto;flex:none;cursor:pointer;opacity:0;transition:opacity .12s;}
+.tdroot .clentdel{background:none;border:none;color:#c9c3b5;font-size:13px;padding:0 5px;font-weight:400;
+  flex:none;cursor:pointer;opacity:0;transition:opacity .12s;}
+.tdroot .clentry:hover .clenthandle,.tdroot .clentry:hover .clentmove,
+.tdroot .clentry:hover .clentdup,.tdroot .clentry:hover .clentdel{opacity:1;}
+.tdroot .clentdup:hover{color:var(--dark-blue);}
+.tdroot .clentdel:hover{color:#c0392b;}
 .tdroot .clactive input{accent-color:var(--dark-blue);}
 .tdroot .clactions{display:flex;gap:8px;align-items:center;padding:4px 14px 0;}
 .tdroot .clactions .cladd{background:transparent;color:var(--light-blue);border:none;font-size:20px;font-weight:800;padding:0 8px;line-height:1;cursor:pointer;}
