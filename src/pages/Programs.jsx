@@ -1650,6 +1650,7 @@ function ProgramsPage() {
           onClose={() => setManaging(null)}
           programs={programs}
           setPrograms={setPrograms}
+          rows={allRows}
           viewState={viewState}
           setViewState={setViewState}
         />
