@@ -1443,6 +1443,15 @@ function ProgramsPage() {
           cls = 'col-subject tint'
           style = { '--tint': sc, color: isDarkColor(sc) ? '#fff' : 'var(--dark-brown)' }
         }
+      } else if (MANAGED_KIND[k]) {
+        /* Program, Platform, Grade, Day and Time carry whatever colour their
+           managed list assigns — the default pill colour means "untinted". */
+        const mv = MANAGED_VALUE[k](r)
+        const mc = (mv == null || mv === '') ? null : managedColor(MANAGED_KIND[k], String(mv))
+        if (mc && mc !== DEFAULT_CAT_COLOR) {
+          cls = `col-${k} tint`
+          style = { '--tint': mc, color: isDarkColor(mc) ? '#fff' : 'var(--dark-brown)' }
+        }
       }
       return <td key={k} className={cls} style={style} data-ek={editable ? k : undefined}
         onClick={editable ? (e => {
