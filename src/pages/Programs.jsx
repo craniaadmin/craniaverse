@@ -1324,7 +1324,7 @@ const ColsPop = React.forwardRef(function ColsPop(
 })
 
 /* ================= inline cell editor ================= */
-function CellEditor({ row, col, locations, programs, catColors, teacherOptions, onCommit, onCancel }) {
+function CellEditor({ row, col, locations, programs, categories, teacherOptions, onCommit, onCancel }) {
   const spec = CELL_EDIT[col]
   const initial = (() => {
     switch (col) {
