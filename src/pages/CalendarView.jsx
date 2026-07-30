@@ -15,6 +15,9 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 const MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const DOW_LONG = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
 const DOW_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+/* Indexed by JS day number (0 = Sunday), which is what recur.days stores —
+   DOW_SHORT above is Monday-first for the grid headings and does not line up. */
+const DOW_BY_NUM = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
 const DOW_LETTER = ['M','T','W','T','F','S','S']
 const PALETTE = ["#A6E2F9","#5FA09E","#E0DE85","#2E2516","#20BAB5","#8C9294",
   "#C00000","#FF0000","#FFC000","#FFFF00","#92D050","#00B050",
