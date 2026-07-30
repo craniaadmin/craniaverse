@@ -338,7 +338,8 @@ const CSS = `
 .tdroot .clentlist{padding:3px 6px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:11.5px;background:#fff;}
 .tdroot .clentpri{padding:3px 7px;border:none;border-radius:5px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;}
 .tdroot .clentactive{display:flex;align-items:center;gap:3px;color:#6b6455;white-space:nowrap;font-size:12px;}
-.tdroot .clentactive input{width:13px;height:13px;}
+.tdroot .clentactive input{width:13px;height:13px;accent-color:var(--dark-blue);}
+.tdroot .clactive input{accent-color:var(--dark-blue);}
 .tdroot .clactions{display:flex;gap:8px;align-items:center;padding:4px 14px 0;}
 .tdroot .clactions .cladd{background:transparent;color:var(--light-blue);border:none;font-size:20px;font-weight:800;padding:0 8px;line-height:1;cursor:pointer;}
 .tdroot .clrun{margin-left:auto;background:var(--light-brown);color:var(--dark-brown);border:none;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;}
