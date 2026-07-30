@@ -826,6 +826,12 @@ function ProgramsPage() {
       subjOrder: {},
       catColors: { ...SEED_CAT_COLORS },
       subjColors: { ...SEED_SUBJ_COLORS },
+      vocab: {
+        year: Array.isArray(SEED.vocab?.year) ? SEED.vocab.year.slice() : [],
+        subject: Array.isArray(SEED.vocab?.subject) ? SEED.vocab.subject.slice() : [],
+        time: Array.isArray(SEED.vocab?.time) ? SEED.vocab.time.slice() : [],
+        cost: Array.isArray(SEED.vocab?.cost) ? SEED.vocab.cost.slice() : [],
+      },
     }
     /* Managed-list colours and orders, seeded from the template file where it has them. */
     LIST_STATE_KEYS.forEach(k => {
