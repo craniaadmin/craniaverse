@@ -525,7 +525,9 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
   const [ctxMenu, setCtxMenu] = useState(null) // { x, y, items }
   const [gotoDate, setGotoDate] = useState('')
   const [dragEv, setDragEv] = useState(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const timeGridRef = useRef(null)
+  const settingsRef = useRef(null)
 
   // close context menu on any click
   useEffect(() => {
