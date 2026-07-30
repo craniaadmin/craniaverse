@@ -1664,7 +1664,9 @@ function ProgramsPage() {
           kind={managing}
           onClose={() => setManaging(null)}
           programs={programs}
-          setPrograms={setPrograms}
+          /* through `mutate`, so renaming or removing from a manager joins the
+             undo history the same way an inline cell edit does */
+          setPrograms={mutate}
           rows={allRows}
           viewState={viewState}
           setViewState={setViewState}
