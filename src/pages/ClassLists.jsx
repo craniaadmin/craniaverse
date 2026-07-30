@@ -221,18 +221,16 @@ export default function ClassLists({ onNavigate }) {
     for (const c of classes) {
       for (const row of c.roster) { uniqueStudents.add(row.record.id); enrollments++ }
       for (const s of c.sessions) {
-        if (s.offering.spots != null && s.rows.length >= s.offering.spots) atCapacity++
+        if (s.session.capacity != null && s.rows.length >= s.session.capacity) atCapacity++
       }
     }
-    const needsAttention = unlisted.reduce((n, u) => n + u.roster.length, 0)
     return {
       classesRunning: withStudents.length,
       uniqueStudents: uniqueStudents.size,
       enrollments,
       atCapacity,
-      needsAttention,
     }
-  }, [classes, unlisted])
+  }, [classes])
 
   const toggle = (key) => setExpanded((prev) => {
     const next = new Set(prev)
