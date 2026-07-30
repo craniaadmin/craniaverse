@@ -270,7 +270,6 @@ function useCalendar(apiPath) {
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const j = await r.json()
       const d = {
-        ...j,
         calendars: Array.isArray(j.calendars) ? j.calendars : [],
         events: Array.isArray(j.events) ? j.events : [],
         hidden: j.hidden && typeof j.hidden === 'object' ? j.hidden : {},
