@@ -489,7 +489,7 @@ export default function Programs() {
   }, [categoryOrder])
   const catColor = useCallback(c => catColors[c] || DEFAULT_CAT_COLOR, [catColors])
   const subjColor = useCallback(
-    (cat, s) => SEED_SUBJ_COLORS[(cat || '') + ' ' + (s || '')] || DEFAULT_CAT_COLOR, [])
+    (cat, s) => SEED_SUBJ_COLORS[(cat || '') + '\u0000' + (s || '')] || DEFAULT_CAT_COLOR, [])
   const catOrderIndex = useCallback(c => {
     const i = categoryOrder.indexOf(c)
     return i < 0 ? 999 : i
@@ -1257,7 +1257,7 @@ export default function Programs() {
       {editing && (
         <ProgramModal mode={editing.mode} initial={editing.program} locations={locations}
           teacherOptions={teacherOptions} registrations={registrations}
-          categories={Object.keys(catColors)}
+          categories={categoryOrder}
           onClose={() => setEditing(null)} onSave={saveProgram}
           onDelete={editing.mode === 'edit' ? () => { deleteProgram(editing.program.id); setEditing(null) } : null} />
       )}
