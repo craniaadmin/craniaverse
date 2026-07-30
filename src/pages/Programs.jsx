@@ -437,8 +437,8 @@ export default function Programs() {
     day: [], time: [], cost: [], dur: [], gen: {},
   })
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
-  const [hiddenCols, setHiddenCols] = useState({})
-  const [colOrder, setColOrder] = useState(DEFCOLS.slice())
+  const [hiddenCols, setHiddenCols] = useState(() => ({ ...SEED_HIDDEN_COLS }))
+  const [colOrder, setColOrder] = useState(() => SEED_COL_ORDER.slice())
   const [selected, setSelected] = useState(() => new Set())
   const [pop, setPop] = useState(null)        // {kind:'filter'|'cols', fk?, rect}
   const [editing, setEditing] = useState(null) // program modal
