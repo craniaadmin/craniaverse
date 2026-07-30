@@ -196,6 +196,10 @@ function gradeRank(g) {
   return isNaN(n) ? 98 : n
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7) }
+/* Subject colours are keyed per category, so "MATH under FLEX" and "MATH under
+   CONTESTS" can differ. NUL is the separator, as in the template. */
+const SUBJ_SEP = String.fromCharCode(0)
+const subjKey = (cat, s) => (cat || '') + SUBJ_SEP + (s || '')
 
 /* ---------- auto-numbering / hours helpers from the v47 template ---------- */
 const CODE_MAP = {
@@ -950,14 +954,14 @@ function ProgramsPage() {
     const out = {}
     programs.forEach(p => {
       if (p.category && p.subject) {
-        out[p.category + '\u0000' + p.subject] = viewState.subjColors[p.category + '\u0000' + p.subject] || DEFAULT_CAT_COLOR
+        out[subjKey(p.category, p.subject)] = viewState.subjColors[subjKey(p.category, p.subject)] || DEFAULT_CAT_COLOR
       }
     })
     return out
   }, [programs, viewState.subjColors])
   const catColor = useCallback(c => catColors[c] || DEFAULT_CAT_COLOR, [catColors])
   const subjColor = useCallback(
-    (cat, s) => subjColors[(cat || '') + '\u0000' + (s || '')] || DEFAULT_CAT_COLOR, [subjColors])
+    (cat, s) => subjColors[subjKey(cat, s)] || DEFAULT_CAT_COLOR, [subjColors])
   /* Colour a managed list assigns to one of its values. */
   const managedColor = useCallback((kind, v) => {
     const K = LIST_KINDS[kind]
@@ -1830,7 +1834,7 @@ function ProgramsPage() {
           catColor={catColor} subjColor={subjColor}
           onPickCatColor={(cat, c) => setViewState(vs => ({ ...vs, catColors: { ...vs.catColors, [cat]: c } }))}
           onPickSubjColor={(cat, s, c) => setViewState(vs => ({
-            ...vs, subjColors: { ...vs.subjColors, [cat + ' ' + s]: c },
+            ...vs, subjColors: { ...vs.subjColors, [subjKey(cat, s)]: c },
           }))}
           onClose={() => setEditing(null)} onSave={saveEntry}
           onDelete={editing.mode === 'edit'
