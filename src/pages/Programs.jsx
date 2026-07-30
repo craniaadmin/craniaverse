@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../data/store'
+/* The seed file carries the presentation settings the template shipped with — column
+   order, category colours and the two real locations. Programs themselves come from
+   the store; only these view defaults are read from it. */
+import SEED from '../data/programsData.json'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
