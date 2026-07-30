@@ -105,8 +105,16 @@ const daysLabel = (days) => {
   return [1, 2, 3, 4, 5, 6, 0].filter(d => days.includes(d)).map(d => WD_ABBR[d]).join(', ')
 }
 
+/* Only real column ids, so a stale id cannot hide a column that no longer
+   matches anything. */
+function normalizeHiddenCols(x) {
+  const out = {}
+  if (x && typeof x === 'object') COLUMNS.forEach(c => { if (x[c.id]) out[c.id] = true })
+  return out
+}
+
 const BLANK_STATE = {
-  cards: [], colOrder: COLUMNS.map(c => c.id),
+  cards: [], colOrder: COLUMNS.map(c => c.id), hiddenCols: {},
   updatedAt: null, resetTime: '08:00', clearGoalsTime: '00:00',
 }
 
