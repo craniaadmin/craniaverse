@@ -536,6 +536,16 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
     return () => document.removeEventListener('click', fn)
   }, [])
 
+  // close settings popover on outside click
+  useEffect(() => {
+    if (!settingsOpen) return
+    const fn = (e) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target)) setSettingsOpen(false)
+    }
+    document.addEventListener('mousedown', fn)
+    return () => document.removeEventListener('mousedown', fn)
+  }, [settingsOpen])
+
   // Keyboard shortcuts: Ctrl+Z undo, Ctrl+Shift+Z redo
   useEffect(() => {
     const fn = (e) => {
