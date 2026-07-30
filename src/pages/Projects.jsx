@@ -350,6 +350,16 @@ export default function Projects() {
     return () => document.removeEventListener('mousedown', handler)
   }, [colsOpen, settingsOpen])
 
+  /* Archived cards, newest first, and honouring the same search box. */
+  const archivedCards = useMemo(() => {
+    const q = filter.trim().toLowerCase()
+    return state.cards
+      .filter(c => c.archived)
+      .filter(c => !q || ((c.project || '') + ' ' + (c.task || '') + ' ' + (c.tags || []).join(' '))
+        .toLowerCase().includes(q))
+      .sort((a, b) => String(b.archivedAt || '').localeCompare(String(a.archivedAt || '')))
+  }, [state.cards, filter])
+
   const cardsByCol = useMemo(() => {
     const out = {}
     for (const col of state.colOrder) out[col] = []
