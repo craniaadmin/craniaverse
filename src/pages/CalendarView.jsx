@@ -977,36 +977,83 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
     downloadCsv(`crania-calendar-export-${iso(new Date())}.csv`, rows)
   }
 
+  /* The picture is the year, not the current view — every calendar is drawn
+     whether or not it is ticked on screen, and each day takes the colour of a
+     calendar it has an event on, with a legend naming them all. */
   const exportYearImage = () => {
     const year = cur.getFullYear()
+    const cals = data.calendars
+    const yearDays = expandEvents(data.events, new Date(year, 0, 1), new Date(year, 11, 31))
+
+    const PAD = 40, TITLE_H = 86, MW = 320, MH = 210, GAP_X = 20, GAP_Y = 18, COLS = 4
+    const rowsOfMonths = Math.ceil(12 / COLS)
+    const legendRows = Math.ceil(cals.length / 3)
+    const legendH = 30 + legendRows * 24
+    const W = PAD * 2 + COLS * MW + (COLS - 1) * GAP_X
+    const H = PAD + TITLE_H + rowsOfMonths * MH + (rowsOfMonths - 1) * GAP_Y + legendH + PAD
+
     const canvas = document.createElement('canvas')
-    const W = 1400, H = 1000
-    canvas.width = W; canvas.height = H
+    const S = 2                              // drawn at 2× so it stays crisp in print
+    canvas.width = W * S; canvas.height = H * S
     const ctx = canvas.getContext('2d')
+    ctx.scale(S, S)
     ctx.fillStyle = '#F4F7F8'; ctx.fillRect(0, 0, W, H)
-    ctx.fillStyle = '#2E2516'; ctx.font = 'bold 28px sans-serif'
-    ctx.fillText(`CraniaVerse Calendar — ${year}`, 40, 50)
-    const cols = 4, rows_ = 3, cellW = (W - 80) / cols, cellH = (H - 80) / rows_
+
+    // Branded header band
+    ctx.fillStyle = '#2E2516'; ctx.fillRect(0, 0, W, TITLE_H - 22)
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 26px "Segoe UI",system-ui,sans-serif'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(`Crania Schools — ${year} Calendar`, PAD, (TITLE_H - 22) / 2 - 9)
+    ctx.font = '13px "Segoe UI",system-ui,sans-serif'; ctx.fillStyle = '#C9C3B5'
+    ctx.fillText(`${cals.length} calendar${cals.length === 1 ? '' : 's'} · generated ${iso(new Date())}`,
+      PAD, (TITLE_H - 22) / 2 + 17)
+
     for (let m = 0; m < 12; m++) {
-      const col = m % cols, row = Math.floor(m / cols)
-      const x = 40 + col * cellW, y = 70 + row * cellH
-      ctx.fillStyle = '#5FA09E'; ctx.font = 'bold 14px sans-serif'
-      ctx.fillText(MONTHS[m], x + 4, y + 16)
-      const first = new Date(year, m, 1), daysInMonth = new Date(year, m + 1, 0).getDate()
-      const startDay = (first.getDay() + 6) % 7
-      ctx.font = '10px sans-serif'; ctx.fillStyle = '#8a8474'
-      DOW_SHORT.forEach((d, i) => ctx.fillText(d, x + 4 + i * 26, y + 32))
-      for (let d = 0; d < daysInMonth; d++) {
-        const cx = x + 4 + ((startDay + d) % 7) * 26
-        const cy = y + 44 + Math.floor((startDay + d) / 7) * 16
-        const dISO = `${year}-${String(m + 1).padStart(2, '0')}-${String(d + 1).padStart(2, '0')}`
-        const hasEvt = eventsByDay[dISO]?.length > 0
-        if (hasEvt) { ctx.fillStyle = '#A6E2F9'; ctx.fillRect(cx - 1, cy - 10, 22, 14); ctx.fillStyle = '#2E2516' }
-        else ctx.fillStyle = '#2E2516'
-        ctx.font = '11px sans-serif'
-        ctx.fillText(String(d + 1), cx, cy)
+      const cx0 = PAD + (m % COLS) * (MW + GAP_X)
+      const cy0 = TITLE_H + Math.floor(m / COLS) * (MH + GAP_Y)
+      ctx.fillStyle = '#fff'; ctx.fillRect(cx0, cy0, MW, MH)
+      ctx.fillStyle = '#5FA09E'; ctx.font = 'bold 14px "Segoe UI",system-ui,sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(MONTHS[m].toUpperCase(), cx0 + MW / 2, cy0 + 15)
+
+      const cw = (MW - 20) / 7
+      ctx.font = 'bold 10px "Segoe UI",system-ui,sans-serif'; ctx.fillStyle = '#8a8474'
+      DOW_SHORT.forEach((d, i) => ctx.fillText(d, cx0 + 10 + i * cw + cw / 2, cy0 + 36))
+
+      const dim = new Date(year, m + 1, 0).getDate()
+      const pad = (new Date(year, m, 1).getDay() + 6) % 7
+      for (let d = 1; d <= dim; d++) {
+        const idx = pad + d - 1
+        const cx = cx0 + 10 + (idx % 7) * cw
+        const cy = cy0 + 46 + Math.floor(idx / 7) * 24
+        const dISO = `${year}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+        const evs = yearDays.get(dISO) || []
+        if (evs.length) {
+          const col = (calById[evs[0].calId] || {}).color || '#A6E2F9'
+          ctx.fillStyle = col + (isRedColor(col) ? '55' : '73')
+          ctx.fillRect(cx + 1, cy, cw - 2, 20)
+        }
+        ctx.fillStyle = '#2E2516'
+        ctx.font = '11px "Segoe UI",system-ui,sans-serif'
+        ctx.fillText(String(d), cx + cw / 2, cy + 11)
       }
     }
+
+    // Legend — three across, so it stays readable at any calendar count
+    const legY = TITLE_H + rowsOfMonths * MH + (rowsOfMonths - 1) * GAP_Y + 18
+    ctx.textAlign = 'left'
+    ctx.fillStyle = '#6B6455'; ctx.font = 'bold 12px "Segoe UI",system-ui,sans-serif'
+    ctx.fillText('CALENDARS', PAD, legY)
+    ctx.font = '13px "Segoe UI",system-ui,sans-serif'
+    cals.forEach((c, i) => {
+      const lx = PAD + (i % 3) * ((W - PAD * 2) / 3)
+      const ly = legY + 22 + Math.floor(i / 3) * 24
+      ctx.fillStyle = c.color || '#999'
+      ctx.beginPath(); ctx.roundRect(lx, ly - 8, 14, 14, 4); ctx.fill()
+      ctx.fillStyle = '#2E2516'
+      ctx.fillText(c.name || '', lx + 22, ly)
+    })
+    ctx.textBaseline = 'alphabetic'
     canvas.toBlob(blob => {
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
