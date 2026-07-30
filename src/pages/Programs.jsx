@@ -594,7 +594,7 @@ export default function Programs() {
     if (key === 'dur') return [...new Set(allRows.map(r => r.duration).filter(v => v !== '' && v != null).map(String))]
       .sort((a, b) => Number(a) - Number(b)).map(v => ({ value: v, label: fmtDuration(v) }))
     return []
-  }, [allRows, programs, locations, catColors])
+  }, [allRows, programs, locations, usedCategories])
 
   const matchRow = useCallback((r) => {
     if (filters.prog.length && !filters.prog.includes(r.name)) return false
