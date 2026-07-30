@@ -391,16 +391,17 @@ export default function Projects() {
     URL.revokeObjectURL(a.href)
   }
 
-  const toggleCol = (colId) => setHiddenCols(prev => {
-    const next = { ...prev }
+  /* Which columns are hidden is part of the board, not of this browser tab —
+     it saves with everything else so it survives a reload. */
+  const toggleCol = (colId) => mutate(d => {
+    const next = { ...(d.hiddenCols || {}) }
     if (next[colId]) delete next[colId]; else next[colId] = true
-    return next
+    d.hiddenCols = next
   })
   const anyHidden = COLUMNS.some(c => hiddenCols[c.id])
-  const toggleAllCols = () => {
-    if (anyHidden) setHiddenCols({})
-    else setHiddenCols(Object.fromEntries(COLUMNS.map(c => [c.id, true])))
-  }
+  const toggleAllCols = () => mutate(d => {
+    d.hiddenCols = anyHidden ? {} : Object.fromEntries(COLUMNS.map(c => [c.id, true]))
+  })
 
   if (loading) {
     return (
