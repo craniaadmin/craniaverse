@@ -981,10 +981,25 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
     setCtxMenu({
       x: e.clientX, y: e.clientY,
       items: [
+        /* Recolouring is the thing people reach for most, and it was buried
+           behind double-click → edit box. */
+        { label: 'Change Colour', icon: <Palette size={14} />, action: () => setColorPick({ x: e.clientX, y: e.clientY, calId }) },
+        { label: 'Rename…', icon: <Edit2 size={14} />, action: () => {
+          const cal = data.calendars.find(c => c.id === calId)
+          if (cal) setEditingCalendar({ mode: 'edit', cal })
+        } },
         { label: 'Duplicate', icon: <Copy size={14} />, action: () => duplicateCalendar(calId) },
         { label: 'Delete', icon: <Trash2 size={14} />, danger: true, action: () => deleteCalendar(calId) },
       ],
     })
+  }
+
+  const setCalColor = (calId, color) => {
+    mutate(d => {
+      const i = d.calendars.findIndex(c => c.id === calId)
+      if (i !== -1) d.calendars[i] = { ...d.calendars[i], color }
+    })
+    setColorPick(null)
   }
 
   // ─── CSV export ───
