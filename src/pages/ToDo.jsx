@@ -1251,9 +1251,7 @@ function ChecklistsView({
     <div className="cl-wrap">
       <div className="cltoprow">
         <p className="clhint">
-          Each checklist adds its items to a chosen To-Do list, each item on its own
-          schedule (daily / weekly / monthly / custom) — editing a schedule moves the
-          item that's already on the board instead of duplicating it.
+          Each checklist adds its items to the top of a chosen To-Do list, each on its own schedule (daily / weekly / monthly / custom).
         </p>
         <button
           onClick={addChecklist}
