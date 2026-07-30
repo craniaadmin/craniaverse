@@ -368,6 +368,7 @@ const CSS = `
 .calroot .settings-popover .sp-btn:hover:not(:disabled){filter:brightness(1.08);}
 .calroot .settings-popover .sp-btn:disabled{opacity:.5;cursor:default;}
 .calroot .settings-popover .sp-meta{font-size:12.5px;color:#6B6455;margin-bottom:2px;}
+.calroot .settings-popover .sp-err{font-size:12px;color:#c0392b;line-height:1.4;margin:4px 0 6px;}
 .calroot .settings-popover .sp-restore-list{margin-top:8px;max-height:170px;overflow-y:auto;}
 .calroot .settings-popover .sp-restore-row{display:flex;align-items:center;padding:5px 6px;border-radius:6px;font-size:12px;margin-bottom:2px;background:#fff;}
 .calroot .settings-popover .sp-restore-row:hover{background:#f4f2ea;}
