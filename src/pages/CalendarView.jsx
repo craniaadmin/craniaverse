@@ -975,8 +975,8 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
         <div className="actionsrow">
           <button disabled={!undoLen} onClick={undo} title="Undo (Ctrl+Z)">{'↶'} Undo</button>
           <button disabled={!redoLen} onClick={redo} title="Redo (Ctrl+Shift+Z)">{'↷'}</button>
-          <button className="settings-btn" title="Settings">{'⚙'}</button>
-          <button title="Save the whole year as a PNG image">{'🖼'} Year Image</button>
+          <button className="settings-btn" title="Settings" onClick={e => { e.stopPropagation(); setSettingsOpen(o => !o) }}>{'⚙'}</button>
+          <button title="Save the whole year as a PNG image" onClick={exportYearImage}>{'🖼'} Year Image</button>
           <button onClick={exportCSV} title="Download all events as a CSV file">{'⤓'} Export CSV</button>
         </div>
 
