@@ -696,6 +696,10 @@ const CSS = `
     line-height:1;padding:0 6px;cursor:pointer;font-family:inherit;flex:none}
 .pgmodal .catrow .del2:hover:not(:disabled){color:#C0392B}
 .pgmodal .catrow .del2:disabled{opacity:.3;cursor:default}
+.pgmodal .swatches{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.pgmodal .swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid #fff;
+    box-shadow:0 0 0 1px #d8d3c6;padding:0}
+.pgmodal .swatch.sel{box-shadow:0 0 0 2px #2E2516}
 .ctxmenu{position:fixed;z-index:301;background:#fff;border:1px solid #E7EBE7;border-radius:10px;
     box-shadow:0 8px 24px rgba(46,37,22,.2);overflow:hidden;min-width:170px;color:#2E2516;
     font-family:inherit}
@@ -2107,40 +2111,54 @@ function CellEditor({ row, col, locations, programs, categories, teacherOptions,
 }
 
 /* ================= program modal ================= */
-function ProgramModal({ mode, initial, locations, teacherOptions, registrations, categories, onClose, onSave, onDelete }) {
+/* ================= entry editor =================
+   One row is one entry: a program at one location, on one day, at one time.
+   The editor matches that — a single Location/Day/Start/End rather than the
+   whole program's offerings, so what you edit is what you clicked. */
+function EntryModal({
+  mode, initial, ctx, locations, teacherOptions, registrations, categories,
+  subjects, years, platforms, catColor, subjColor, onPickCatColor, onPickSubjColor,
+  onClose, onSave, onDelete,
+}) {
   const dialog = useDialog()
-  const [form, setForm] = useState(initial)
-  const [activeOff, setActiveOff] = useState(0)
-  const set = patch => setForm(f => ({ ...f, ...patch }))
-  const offs = form.offerings || []
-  const off = offs[activeOff] || null
-  const setOff = patch => setForm(f => ({
-    ...f, offerings: f.offerings.map((o, i) => i === activeOff ? { ...o, ...patch } : o),
-  }))
 
-  const addOffering = () => {
-    setForm(f => ({
-      ...f,
-      offerings: [...(f.offerings || []), {
-        id: 's' + uid(), locationId: locations[0]?.id || 'loc_boardwalk',
-        days: [], times: [{ start: '16:30', end: '17:25' }], capacity: null, enrolled: '', instructor: '',
-      }],
-    }))
-    setActiveOff(offs.length)
-  }
-  const removeOffering = () => {
-    if (offs.length <= 1) return
-    setForm(f => ({ ...f, offerings: f.offerings.filter((_, i) => i !== activeOff) }))
-    setActiveOff(a => Math.max(0, a - 1))
-  }
-  const toggleDay = n => setOff({
-    days: off.days.includes(n) ? off.days.filter(d => d !== n)
-      : [...off.days, n].sort((a, b) => DOW_ORD[a] - DOW_ORD[b]),
-  })
-  const times = off ? offTimes(off) : []
-  const setTime = (i, patch) => setOff({ times: times.map((t, j) => j === i ? { ...t, ...patch } : t) })
-  const addTime = () => setOff({ times: [...times, { start: '', end: '' }] })
-  const rmTime = i => setOff({ times: times.filter((_, j) => j !== i) })
+  const seed = useMemo(() => {
+    const p = initial
+    const offs = p.offerings || []
+    const of = (ctx && offs.find(o => o.id === ctx.offId)) || offs[0] || null
+    const ts = of ? offTimes(of) : []
+    const tm = (ctx && ctx.slotIndex != null && ts[ctx.slotIndex]) ? ts[ctx.slotIndex] : (ts[0] || null)
+    const dayN = (ctx && ctx.day != null) ? ctx.day : ((of && (of.days || [])[0] != null) ? of.days[0] : '')
+    const g = parseGrade(p.ageRange)
+    return {
+      number: p.number || '', name: p.name || '', code: p.code || '', year: p.year || '',
+      category: p.category || '', subject: p.subject || '',
+      gradeFrom: p.gradeFrom || g.from || '', gradeTo: p.gradeTo || g.to || '',
+      ageRange: p.ageRange || '', platform: p.platform || '',
+      locationId: of ? (of.locationId || '') : (locations[0]?.id || ''),
+      day: dayN === '' || dayN == null ? '' : String(dayN),
+      start: tm ? (tm.start || '') : '', end: tm ? (tm.end || '') : '',
+      duration: p.duration != null ? p.duration : '',
+      sessions: p.sessions != null ? p.sessions : '',
+      period: p.period || '', active: p.active !== false,
+      cost: p.cost ?? '', costUnit: p.costUnit || '', rate: p.rate ?? '',
+      totalHours: p.totalHours ?? '',
+      capacity: of ? (of.capacity ?? '') : '', enrolled: of ? (of.enrolled ?? '') : '',
+      instructor: of ? (of.instructor || '') : '',
+      description: p.description || '',
+    }
+  }, [initial, ctx, locations])
+
+  const [form, setForm] = useState(seed)
+  const set = patch => setForm(f => ({ ...f, ...patch }))
+
+  /* Total hours follows duration × lessons, as it does in the template. */
+  useEffect(() => {
+    const h = computeTotalHours(form.duration, form.sessions, form.period)
+    if (h !== '') setForm(f => (f.totalHours === h ? f : { ...f, totalHours: h }))
+  }, [form.duration, form.sessions, form.period])
+
+  const entryTotal = entryCount(initial)
 
   const enrolled = useMemo(() => {
     if (!registrations || !form.name) return []
@@ -2158,151 +2176,152 @@ function ProgramModal({ mode, initial, locations, teacherOptions, registrations,
     return out
   }, [registrations, form.name])
 
-  useEffect(() => {
-    const h = computeTotalHours(form.duration, form.sessions, form.period)
-    if (h !== '') setForm(f => ({ ...f, totalHours: h }))
-  }, [form.duration, form.sessions, form.period])
-
   const save = () => {
     if (!String(form.name || '').trim()) { dialog.alert('Missing Name', 'Please enter a program name.'); return }
-    onSave({
-      ...form, name: String(form.name).trim(),
-      duration: form.duration === '' ? '' : Number(form.duration),
-      rate: form.rate === '' || form.rate == null ? null : Number(form.rate),
-      cost: form.cost === '' || form.cost == null ? null : Number(form.cost),
-      totalHours: form.totalHours === '' || form.totalHours == null ? null : Number(form.totalHours),
-    })
+    onSave(form)
   }
 
   return (
     <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="pgmodal" onClick={e => e.stopPropagation()}>
-        <h2>{mode === 'edit' ? 'Edit Program' : 'New Program'}</h2>
+        <h2>{mode === 'edit' ? 'Edit Entry' : 'New Program'}</h2>
+        {mode === 'edit' && entryTotal > 1 && (
+          <div className="mhint">
+            This program has {entryTotal} entries. Saving changes only the one you opened —
+            the other {entryTotal - 1} stay as they are.
+          </div>
+        )}
 
         <div className="frow">
           <div className="field" style={{ flex: 'none', width: 104 }}>
             <label>Program #</label>
-            <input value={form.number || ''} onChange={e => set({ number: e.target.value })} />
+            <input value={form.number} onChange={e => set({ number: e.target.value })} />
           </div>
           <div className="field">
             <label>Program Name</label>
-            <input value={form.name || ''} onChange={e => set({ name: e.target.value })} autoFocus />
+            <input value={form.name} onChange={e => set({ name: e.target.value })} autoFocus />
           </div>
         </div>
         <div className="frow">
           <div className="field"><label>Program Code</label>
-            <input value={form.code || ''} onChange={e => set({ code: e.target.value })} /></div>
+            <input value={form.code} onChange={e => set({ code: e.target.value })} placeholder="auto" /></div>
           <div className="field"><label>Year</label>
-            <input value={form.year || ''} onChange={e => set({ year: e.target.value })} placeholder="e.g. 2026–27" /></div>
+            <input list="emYears" value={form.year} onChange={e => set({ year: e.target.value })} />
+            <datalist id="emYears">{years.map(y => <option key={y} value={y} />)}</datalist></div>
         </div>
         <div className="frow">
           <div className="field"><label>Category</label>
-            <input list="pgCatList" value={form.category || ''} onChange={e => set({ category: e.target.value })} />
-            <datalist id="pgCatList">{categories.map(c => <option key={c} value={c} />)}</datalist></div>
+            <input list="emCats" value={form.category} onChange={e => set({ category: e.target.value })} />
+            <datalist id="emCats">{categories.map(c => <option key={c} value={c} />)}</datalist></div>
           <div className="field"><label>Subject</label>
-            <input value={form.subject || ''} onChange={e => set({ subject: e.target.value })} /></div>
+            <input list="emSubs" value={form.subject} onChange={e => set({ subject: e.target.value })} />
+            <datalist id="emSubs">{subjects.map(s => <option key={s} value={s} />)}</datalist></div>
         </div>
         <div className="frow">
           <div className="field"><label>Grade From</label>
-            <select value={form.gradeFrom || ''} onChange={e => set({ gradeFrom: e.target.value })}>
+            <select value={form.gradeFrom} onChange={e => set({ gradeFrom: e.target.value })}>
               <option value="">—</option>{GRADES.map(g => <option key={g} value={g}>{g}</option>)}
             </select></div>
           <div className="field"><label>Grade To</label>
-            <select value={form.gradeTo || ''} onChange={e => set({ gradeTo: e.target.value })}>
+            <select value={form.gradeTo} onChange={e => set({ gradeTo: e.target.value })}>
               <option value="">—</option>{GRADES.map(g => <option key={g} value={g}>{g}</option>)}
             </select></div>
           <div className="field"><label>Platform</label>
-            <select value={form.platform || ''} onChange={e => set({ platform: e.target.value })}>
-              <option value="">—</option>{PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
+            <select value={form.platform} onChange={e => set({ platform: e.target.value })}>
+              <option value="">—</option>
+              {platforms.map(p => <option key={p} value={p}>{p}</option>)}
             </select></div>
         </div>
-        <div className="field"><label>Grade Range (label)</label>
-          <input value={form.ageRange || ''} onChange={e => set({ ageRange: e.target.value })}
-            placeholder="e.g. 1–10, or Up to 8" /></div>
+
         <div className="frow">
+          <div className="field"><label>Location</label>
+            <select value={form.locationId} onChange={e => set({ locationId: e.target.value })}>
+              <option value="">—</option>
+              {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+            </select></div>
+          <div className="field"><label>Day</label>
+            <select value={form.day} onChange={e => set({ day: e.target.value })}>
+              <option value="">—</option>
+              {DOW.map(d => <option key={d.n} value={String(d.n)}>{d.l}</option>)}
+            </select></div>
+        </div>
+        <div className="frow">
+          <div className="field"><label>Start Time</label>
+            <input type="time" value={form.start} onChange={e => set({ start: e.target.value })} /></div>
+          <div className="field"><label>End Time</label>
+            <input type="time" value={form.end} onChange={e => set({ end: e.target.value })} /></div>
           <div className="field"><label>Duration (Min)</label>
-            <input type="number" min="0" value={form.duration ?? ''} onChange={e => set({ duration: e.target.value })} /></div>
+            <input type="number" min="0" value={form.duration}
+              onChange={e => set({ duration: e.target.value })} /></div>
+        </div>
+        <div className="frow">
           <div className="field"><label># Of Lessons</label>
-            <input value={form.sessions || ''} onChange={e => set({ sessions: e.target.value })} /></div>
+            <input value={form.sessions} onChange={e => set({ sessions: e.target.value })} /></div>
           <div className="field"><label>Per</label>
-            <select value={form.period || ''} onChange={e => set({ period: e.target.value })}>
+            <select value={form.period} onChange={e => set({ period: e.target.value })}>
               {PERIODS.map(p => <option key={p} value={p}>{p || '—'}</option>)}
             </select></div>
-        </div>
-        <div className="frow">
-          <div className="field"><label>Cost ($)</label>
-            <input type="number" min="0" step="0.01" value={form.cost ?? ''} onChange={e => set({ cost: e.target.value })} /></div>
-          <div className="field"><label>Cost Per</label>
-            <select value={form.costUnit || ''} onChange={e => set({ costUnit: e.target.value })}>
-              {COST_UNITS.map(c => <option key={c} value={c}>{c || 'one-time'}</option>)}
-            </select></div>
-          <div className="field"><label>Rate ($/Hr)</label>
-            <input type="number" min="0" step="0.01" value={form.rate ?? ''} onChange={e => set({ rate: e.target.value })} /></div>
-        </div>
-        <div className="frow">
-          <div className="field"><label>Total Hrs</label>
-            <input type="number" min="0" step="0.01" value={form.totalHours ?? ''} onChange={e => set({ totalHours: e.target.value })} /></div>
           <div className="field"><label>Status</label>
             <label className="bchk">
-              <input type="checkbox" checked={form.active !== false} onChange={e => set({ active: e.target.checked })} />
+              <input type="checkbox" checked={form.active}
+                onChange={e => set({ active: e.target.checked })} />
               <span>Active</span>
             </label></div>
         </div>
-        <div className="field"><label>Comments / Notes</label>
-          <textarea rows={3} value={form.description || ''} onChange={e => set({ description: e.target.value })} /></div>
-
-        <div className="sec-h">Offerings</div>
-        <div className="offtabs">
-          {offs.map((o, i) => (
-            <button key={o.id} type="button" className={'offtab' + (i === activeOff ? ' on' : '')}
-              onClick={() => setActiveOff(i)}>
-              {(locations.find(l => l.id === o.locationId) || {}).name || 'Offering'} {i + 1}
-            </button>
-          ))}
-          <button type="button" className="offtab add" onClick={addOffering}>+ Add Offering</button>
+        <div className="frow">
+          <div className="field"><label>Cost ($)</label>
+            <input type="number" min="0" step="0.01" value={form.cost}
+              onChange={e => set({ cost: e.target.value })} /></div>
+          <div className="field"><label>Cost Per</label>
+            <select value={form.costUnit} onChange={e => set({ costUnit: e.target.value })}>
+              {COST_UNITS.map(c => <option key={c} value={c}>{c || 'one-time'}</option>)}
+            </select></div>
+          <div className="field"><label>Rate ($/Hr)</label>
+            <input type="number" min="0" step="0.01" value={form.rate}
+              onChange={e => set({ rate: e.target.value })} /></div>
         </div>
+        <div className="frow">
+          <div className="field"><label>Total Hrs</label>
+            <input type="number" min="0" step="0.01" value={form.totalHours}
+              onChange={e => set({ totalHours: e.target.value })} /></div>
+          <div className="field"><label>Capacity</label>
+            <input type="number" min="0" value={form.capacity}
+              onChange={e => set({ capacity: e.target.value })} /></div>
+          <div className="field"><label>Enrolled</label>
+            <input type="number" min="0" value={form.enrolled}
+              onChange={e => set({ enrolled: e.target.value })} /></div>
+        </div>
+        <div className="field"><label>Instructor</label>
+          <input list="emTeachers" value={form.instructor}
+            onChange={e => set({ instructor: e.target.value })} />
+          <datalist id="emTeachers">{teacherOptions.map(t => <option key={t} value={t} />)}</datalist></div>
+        <div className="field"><label>Comments / Notes</label>
+          <textarea rows={3} value={form.description}
+            onChange={e => set({ description: e.target.value })} /></div>
 
-        {off && (
-          <div className="off">
-            <div className="off-h">
-              <div className="off-t">
-                {(locations.find(l => l.id === off.locationId) || {}).name || 'Offering'} — Offering {activeOff + 1}
-              </div>
-              {offs.length > 1 && <button type="button" className="rmoff" onClick={removeOffering}>Remove</button>}
-            </div>
-            <div className="frow">
-              <div className="field"><label>Location</label>
-                <select value={off.locationId || ''} onChange={e => setOff({ locationId: e.target.value })}>
-                  {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                </select></div>
-              <div className="field"><label>Capacity</label>
-                <input type="number" min="0" value={off.capacity ?? ''}
-                  onChange={e => setOff({ capacity: e.target.value === '' ? null : Number(e.target.value) })} /></div>
-              <div className="field"><label>Enrolled</label>
-                <input type="number" min="0" value={off.enrolled ?? ''}
-                  onChange={e => setOff({ enrolled: e.target.value })} /></div>
-            </div>
-            <div className="field"><label>Instructor</label>
-              <input list="pgTeachers" value={off.instructor || ''} onChange={e => setOff({ instructor: e.target.value })} />
-              <datalist id="pgTeachers">{teacherOptions.map(t => <option key={t} value={t} />)}</datalist></div>
-            <div className="field"><label>Days</label>
-              <div className="days">
-                {DOW.map(d => (
-                  <button key={d.n} type="button"
-                    className={'daybox' + (off.days.includes(d.n) ? ' on' : '')}
-                    onClick={() => toggleDay(d.n)}>{d.l}</button>
-                ))}
-              </div></div>
-            <div className="field"><label>Times</label>
-              {times.map((t, i) => (
-                <div className="trow" key={i}>
-                  <input type="time" value={t.start || ''} onChange={e => setTime(i, { start: e.target.value })} />
-                  <span style={{ color: '#6B6455' }}>–</span>
-                  <input type="time" value={t.end || ''} onChange={e => setTime(i, { end: e.target.value })} />
-                  <button type="button" className="rmtime" title="Remove Time" onClick={() => rmTime(i)}>×</button>
-                </div>
+        {form.category && (
+          <div className="field">
+            <label>Category Colour</label>
+            <div className="swatches">
+              {LPAL.map(c => (
+                <button key={c} type="button"
+                  className={'swatch' + (catColor(form.category) === c ? ' sel' : '')}
+                  style={{ background: c }} title={c}
+                  onClick={() => onPickCatColor(form.category, c)} />
               ))}
-              <button type="button" className="addtime" onClick={addTime}>+ Add Time</button>
+            </div>
+          </div>
+        )}
+        {form.category && form.subject && (
+          <div className="field">
+            <label>Subject Colour</label>
+            <div className="swatches">
+              {LPAL.map(c => (
+                <button key={c} type="button"
+                  className={'swatch' + (subjColor(form.category, form.subject) === c ? ' sel' : '')}
+                  style={{ background: c }} title={c}
+                  onClick={() => onPickSubjColor(form.category, form.subject, c)} />
+              ))}
             </div>
           </div>
         )}
@@ -2331,7 +2350,7 @@ function ProgramModal({ mode, initial, locations, teacherOptions, registrations,
   )
 }
 
-/* ================= bulk edit ================= */
+
 function BulkModal({ count, locations, categories, onClose, onApply }) {
   const [f, setF] = useState({
     category: '', subject: '', year: '', ageRange: '', platform: '__', locationId: '',
