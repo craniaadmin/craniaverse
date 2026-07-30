@@ -1291,7 +1291,7 @@ function ProgramsPage() {
   /* Create Schedule — draws what is on screen as a weekly grid PNG. */
   const createScheduleImage = () => {
     const days = DOW.filter(d => rs.some(r => r.day === d.n))
-    if (!days.length) { window.alert('Nothing scheduled in the current view.'); return }
+    if (!days.length) { dialog.alert('Nothing To Draw', 'Nothing is scheduled in the current view.'); return }
     const byDay = new Map(days.map(d => [d.n, rs.filter(r => r.day === d.n)
       .slice().sort((a, b) => ((a.slot?.start) || '').localeCompare((b.slot?.start) || ''))]))
     const maxRows = Math.max(...days.map(d => byDay.get(d.n).length))
