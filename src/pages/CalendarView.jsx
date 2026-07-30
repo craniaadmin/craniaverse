@@ -973,10 +973,12 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
           <div className="calchips">
             {data.calendars.map(c => {
               const visible = !data.hidden[c.id]
+              const col = c.color || DEFAULT_CAL_COLOR
               return (
                 <button
                   key={c.id}
                   className={`calchip${visible ? ' on' : ''}${chipDrag === c.id ? ' dragging' : ''}${chipOver === c.id ? ' drag-over' : ''}`}
+                  style={visible ? { background: col, borderColor: col, color: textOn(col) } : undefined}
                   draggable
                   onDragStart={e => handleChipDragStart(e, c.id)}
                   onDragOver={e => handleChipDragOver(e, c.id)}
