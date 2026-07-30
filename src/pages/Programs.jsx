@@ -603,6 +603,7 @@ const CSS = `
 .pgpop .ch input{margin:0;accent-color:#5FA09E}
 .pgpop .selbar{display:flex;gap:12px;margin:0 3px 7px;font-size:12px;font-weight:700}
 .pgpop .selbar span{cursor:pointer}
+.pgpop .addrow{color:#5FA09E;font-weight:700;cursor:pointer}
 .pgpop .selbar .sa{color:#5FA09E}
 .pgpop .selbar .cl{color:#6B6455}
 .pgpop .allrow{border-top:1px solid #EDEAE2;margin-top:4px;padding-top:4px;display:flex;gap:4px;
