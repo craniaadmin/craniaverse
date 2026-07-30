@@ -189,23 +189,22 @@ export default function Projects() {
     if (!loading && histBase.current === null) histBase.current = JSON.stringify(state)
   }, [loading, state])
 
-  const recordHistory = useCallback((prev) => {
-    const snap = JSON.stringify(prev)
-    if (histBase.current === null) { histBase.current = snap; return }
-    if (snap !== histBase.current) {
-      undoStack.current.push(histBase.current)
+  /* Push the state we are leaving, inside the updater, so the snapshot is the
+     one actually being replaced. The old code compared the pre-edit state
+     against histBase — which already held exactly that — so the first edit
+     recorded nothing and every later one pushed a snapshot a full edit stale.
+     Undoing then jumped back two steps and threw an edit away. */
+  const mutateWithHistory = useCallback((mutFn) => {
+    mutate(mutFn, (prevSnap, nextSnap) => {
+      if (prevSnap === nextSnap) return
+      undoStack.current.push(prevSnap)
       if (undoStack.current.length > 100) undoStack.current.shift()
       redoStack.current = []
-      histBase.current = snap
+      histBase.current = nextSnap
       setUndoLen(undoStack.current.length)
       setRedoLen(0)
-    }
-  }, [])
-
-  const mutateWithHistory = useCallback((mutFn) => {
-    recordHistory(state)
-    mutate(mutFn)
-  }, [mutate, state, recordHistory])
+    })
+  }, [mutate])
 
   const undo = useCallback(() => {
     if (!undoStack.current.length) return
