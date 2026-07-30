@@ -852,6 +852,12 @@ function ProgramsPage() {
   const catColor = useCallback(c => catColors[c] || DEFAULT_CAT_COLOR, [catColors])
   const subjColor = useCallback(
     (cat, s) => subjColors[(cat || '') + '\u0000' + (s || '')] || DEFAULT_CAT_COLOR, [subjColors])
+  /* Colour a managed list assigns to one of its values. */
+  const managedColor = useCallback((kind, v) => {
+    const K = LIST_KINDS[kind]
+    if (!K) return DEFAULT_CAT_COLOR
+    return (viewState[K.colours] && viewState[K.colours][v]) || DEFAULT_CAT_COLOR
+  }, [viewState])
   const catOrderIndex = useCallback(c => {
     const i = categoryOrder.indexOf(c)
     return i < 0 ? 999 : i
