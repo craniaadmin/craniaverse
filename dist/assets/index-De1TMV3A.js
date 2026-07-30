@@ -560,8 +560,8 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 .calroot .year-mini-dot{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--dark-blue);}
 
 /* sidebar */
-.calroot .side-title{font-weight:700;font-size:14px;padding:10px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:6px;}
-.calroot .agenda-list{padding:8px 12px;max-height:340px;overflow-y:auto;}
+.calroot .side-title{margin:0 0 10px;font-size:14px;font-weight:700;color:var(--dark-blue);display:flex;align-items:center;gap:6px;flex:none;}
+.calroot .agenda-list{max-height:340px;overflow-y:auto;flex:1;min-height:0;}
 .calroot .agenda-day-label{font-size:11px;font-weight:700;color:#8a8474;text-transform:uppercase;margin:8px 0 4px;letter-spacing:.5px;}
 .calroot .agenda-day-label:first-child{margin-top:0;}
 .calroot .agenda-ev{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;margin-bottom:2px;}
@@ -573,7 +573,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 .calroot .agenda-empty{padding:16px;text-align:center;color:#9a948a;font-size:13px;}
 
 /* todo sidebar */
-.calroot .todo-list{padding:8px 12px;max-height:340px;overflow-y:auto;}
+.calroot .todo-list{max-height:340px;overflow-y:auto;flex:1;min-height:0;}
 .calroot .todo-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;font-size:12px;margin-bottom:2px;border-left:3px solid var(--dark-blue);}
 .calroot .todo-item input[type=checkbox]{width:14px;height:14px;flex:none;cursor:pointer;accent-color:var(--dark-blue);}
 .calroot .todo-item .todo-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
