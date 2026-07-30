@@ -1,11 +1,9 @@
-// Kanban board — the "Projects" page under Home. Ported from the
-// v20 mockup (crania-projects.json shape). Server persistence via
-// GET/PUT /api/projects; the whole payload is written on any edit.
+// Kanban board — the "Projects" page under Home. Follows the v23 mockup
+// (crania-projects.json shape). Server persistence via GET/PUT
+// /api/projects; the whole payload is written on any edit.
 //
-// v1 covers the essentials — six columns, drag/drop, add/edit/delete
-// cards, comments, goals cards, filter, color picker. Not yet ported
-// (round-trips as data, just no UI): archive mode, undo/redo, CSV
-// export, timed daily/goals resets, folder-backup. Add later.
+// The mockup's folder-backup is deliberately not carried over — backups
+// go to PocketBase through /api/projects/backup instead.
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
