@@ -412,30 +412,9 @@ export default function ClassLists({ onNavigate }) {
               </div>
             )
           })}
-        </div>
-      )}
-
-      {/* Needs attention */}
-      {unlisted.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <AlertTriangle size={16} color="#a12626" />
-            <h3 style={{ margin: 0, fontSize: 15, color: '#a12626' }}>Needs Attention</h3>
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 10 }}>
-            These registrations reference a program title that no longer matches anything in the Programs list —
-            check for typos or renamed/deleted programs.
-          </div>
-          <div style={{ background: '#fff', borderRadius: 10, overflow: 'hidden', ...cardShadow }}>
-            {unlisted.map((u, i) => (
-              <div key={u.title} style={{ padding: '10px 16px', borderTop: i > 0 ? '1px solid #f0ede3' : 'none' }}>
-                <div style={{ fontWeight: 700, fontSize: 13, color: '#a12626', marginBottom: 4 }}>{u.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
-                  {u.roster.map((row) => `${row.record.student?.firstName || ''} ${row.record.student?.lastName || ''}`.trim()).join(', ')}
-                </div>
               </div>
-            ))}
-          </div>
+            </section>
+          ))}
         </div>
       )}
     </div>
