@@ -2654,7 +2654,8 @@ function SettingsModal({ onClose, setPrograms }) {
     finally { setBusy(false) }
   }
   const restore = async (id) => {
-    if (!window.confirm('Restore this backup? Current programs will be replaced.')) return
+    if (!await dialog.confirm('Restore this backup? The current programs will be replaced.',
+      { title: 'Restore Backup', button: 'Restore' })) return
     setBusy(true); setMsg('')
     try {
       const r = await fetch(`${API_BASE}/api/programs/restore/${id}`, {
