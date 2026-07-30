@@ -36,6 +36,27 @@ const PJ_CSS = `
 .pj-settings .sp-restore-row:hover{background:#f4f2ea;}
 .pj-settings .sp-restore-row .sp-rlabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455;}
 .pj-settings .sp-restore-row .sp-btn{padding:3px 8px;font-size:11px;}
+.pj-settings .sp-time{border:1px solid #d5d0c4;border-radius:8px;padding:5px 8px;font:inherit;font-size:13px;background:#fff;color:var(--brand-dark-brown);}
+/* Hiding a column is a quiet action — the eye only shows on the header it belongs to. */
+.kb-col-head .kb-colhide{background:none;border:none;color:inherit;opacity:0;font-size:11px;padding:0 2px;margin-left:4px;cursor:pointer;transition:opacity .12s;}
+.kb-col-head:hover .kb-colhide{opacity:.75;}
+.kb-col-head .kb-colhide:hover{opacity:1;}
+.kb-card .kb-arch{background:none;border:none;color:inherit;opacity:.55;font-size:11px;padding:0 3px;cursor:pointer;}
+.kb-card .kb-arch:hover{opacity:1;}
+.pj-footer{text-align:center;font-size:12px;color:#9a948a;padding:16px 0 4px;}
+.pj-archlink{background:none;border:none;color:var(--brand-dark-blue);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0;}
+.pj-archlink:hover{text-decoration:underline;}
+.pj-archive{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(46,37,22,.15);padding:16px;border-top:3px solid var(--brand-dark-blue);}
+.pj-archive h3{margin:0 0 4px;font-size:15px;color:var(--brand-dark-brown);}
+.pj-arch-empty{color:#9a948a;font-size:13px;padding:18px 0;text-align:center;}
+.pj-arch-row{display:flex;align-items:center;gap:9px;padding:7px 4px;border-bottom:1px solid #f2efe6;font-size:13px;}
+.pj-arch-row:last-child{border-bottom:none;}
+.pj-arch-dot{width:10px;height:10px;border-radius:3px;flex:none;}
+.pj-arch-task{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pj-arch-proj{font-size:11px;color:#6b6455;background:#F1F3F4;border-radius:4px;padding:1px 7px;flex:none;}
+.pj-arch-when{font-size:11px;color:#9a948a;flex:none;white-space:nowrap;}
+.pj-arch-restore{background:none;border:none;color:var(--brand-dark-blue);font:inherit;font-size:12px;font-weight:700;cursor:pointer;flex:none;}
+.pj-arch-restore:hover{text-decoration:underline;}
 `
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -695,7 +716,7 @@ function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete,
 }
 
 // ---------- Board card ----------
-function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onToggleGoal }) {
+function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onArchive, onToggleGoal }) {
   const isGoals = card.col === 'goals'
   const isDaily = (card.days && card.days.length > 0) || card.col === 'daily'
   const isNote  = card.col === 'notes'
@@ -709,6 +730,7 @@ function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onToggleG
         onDragStart={() => onDragStart(card.id)}
         onDoubleClick={() => onEdit(card)}
       >
+        <button className="kb-arch" title="Archive" onClick={(e) => { e.stopPropagation(); onArchive(card.id) }}>🗀</button>
         <button className="kb-dup" title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(card.id) }}>⧉</button>
         <button className="kb-x"   title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(card.id)    }}>×</button>
         {card.who && <div style={{ fontWeight: 700, fontSize: 14 }}>{card.who}</div>}
@@ -748,6 +770,7 @@ function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onToggleG
       onDragStart={() => onDragStart(card.id)}
       onDoubleClick={() => onEdit(card)}
     >
+      <button className="kb-arch" title="Archive" onClick={(e) => { e.stopPropagation(); onArchive(card.id) }}>🗀</button>
       <button className="kb-dup" title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(card.id) }}>⧉</button>
       <button className="kb-x"   title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(card.id)    }}>×</button>
       {card.project && !isDaily && <div className="project">{card.project}</div>}
