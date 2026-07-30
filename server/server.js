@@ -49,6 +49,7 @@ import {
   loadContests,      saveContests,
   loadTodo,          saveTodo,
   listTodoBackups,   createTodoBackup,  restoreTodoBackup,
+  listChecklistBackups, createChecklistBackup, restoreChecklistBackup,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
