@@ -535,6 +535,9 @@ const CSS = `
 
 /* swatches in modal */
 .calroot .swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.calroot .cal-colorpop{position:fixed;z-index:301;background:#fff;border:1px solid #e2ded2;border-radius:12px;
+  box-shadow:0 8px 24px rgba(46,37,22,.22);padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:186px;}
+.calroot .cal-colorpop .swatch{width:20px;height:20px;padding:0;}
 .calroot .swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #d8d3c6;}
 .calroot .swatch.sel{box-shadow:0 0 0 2px var(--dark-brown);}
 .calroot .swatch-cal{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px #d8d3c6;background:repeating-linear-gradient(45deg,#ddd,#ddd 3px,#fff 3px,#fff 6px);}
