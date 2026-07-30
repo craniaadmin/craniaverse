@@ -575,7 +575,7 @@ export default function Programs() {
         .sort((a, b) => String(a[0]).localeCompare(String(b[0]), undefined, { numeric: true }))
         .map(([value, label]) => ({ value, label }))
     }
-    if (key === 'cat') return Object.keys(catColors).map(c => ({ value: c, label: c }))
+    if (key === 'cat') return usedCategories.map(c => ({ value: c, label: c }))
     if (key === 'prog') return [...new Set(programs.map(p => p.name).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b)).map(x => ({ value: x, label: x }))
     if (key === 'sub') return [...new Set(programs.map(p => p.subject).filter(Boolean))]
