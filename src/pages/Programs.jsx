@@ -1269,6 +1269,24 @@ function ProgramsPage() {
     }
   }, [rs, programs])
 
+  const anyFilterActive = useMemo(() => {
+    if (search.trim() || enrolFilter) return true
+    for (const [k, v] of Object.entries(filters)) {
+      if (k === 'gen') { if (Object.values(v).some(a => a && a.length)) return true }
+      else if (Array.isArray(v) && v.length) return true
+    }
+    return false
+  }, [filters, search, enrolFilter])
+
+  const clearAllFilters = useCallback(() => {
+    setFilters({
+      prog: [], sub: [], cat: [], year: [], grade: [], locf: [], platform: [],
+      day: [], time: [], cost: [], dur: [], gen: {},
+    })
+    setSearch('')
+    setEnrolFilter('')
+  }, [])
+
   const orderedCols = useMemo(
     () => colOrder.map(k => COL[k]).filter(c => c && c.l && !hiddenCols[c.k]),
     [colOrder, hiddenCols])
