@@ -358,9 +358,7 @@ export default function ClassLists({ onNavigate }) {
                       ><ExternalLink size={13} /></button>
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {c.sessions.length === 0
-                        ? 'No offerings scheduled'
-                        : c.sessions.map((s) => `${sessionLabel(s.session)}${s.session.instructor ? ` · ${s.session.instructor}` : ''}`).join('  •  ')}
+                      {summarise(c.sessions)}
                     </div>
                   </div>
                   {/* Fixed width so the counts line up down the column instead of
