@@ -1046,7 +1046,7 @@ export default function Programs() {
       if (isEditing) {
         return <td key={k} className={`col-${k} editing`}>
           <CellEditor row={r} col={k} locations={locations} programs={programs}
-            catColors={catColors} teacherOptions={teacherOptions}
+            categories={categoryOrder} teacherOptions={teacherOptions}
             onCommit={v => commitCell(r, k, v)} onCancel={() => setCellEdit(null)} />
         </td>
       }
