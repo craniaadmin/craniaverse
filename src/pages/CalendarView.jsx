@@ -1928,7 +1928,7 @@ function CalSettingsPopover({ onClose }) {
   }, [])
 
   const backupNow = async () => {
-    setBusy(true)
+    setBusy(true); setErr('')
     try {
       const res = await fetch(`${API_BASE}/api/calendar/backup`, {
         method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' },
@@ -1937,24 +1937,24 @@ function CalSettingsPopover({ onClose }) {
       if (!res.ok) throw new Error(`Server returned ${res.status}`)
       const list = await fetch(`${API_BASE}/api/calendar/backups`, { headers: HEADERS }).then(r => r.json())
       setBackups(list)
-    } catch (err) {
-      console.error('Calendar backup failed:', err)
-      alert('Backup failed — make sure the calendar_backups collection exists (run pb-setup.js).')
+    } catch (e) {
+      console.error('Calendar backup failed:', e)
+      setErr('Backup failed — check that the calendar_backups collection exists (run pb-setup.js).')
     }
     setBusy(false)
   }
 
   const doRestore = async (id) => {
-    setBusy(true)
+    setBusy(true); setErr('')
     try {
       const res = await fetch(`${API_BASE}/api/calendar/restore/${id}`, { method: 'POST', headers: HEADERS })
       if (!res.ok) throw new Error(`Server returned ${res.status}`)
       window.location.reload()
-    } catch (err) {
-      console.error('Calendar restore failed:', err)
-      alert('Restore failed — see console for details.')
+    } catch (e) {
+      console.error('Calendar restore failed:', e)
+      setErr('Restore failed — the backup may be missing or the server unreachable.')
+      setBusy(false)
     }
-    setBusy(false)
   }
 
   const lastBackup = backups?.[0]
