@@ -1247,11 +1247,6 @@ function ChecklistsView({
 }) {
   const checklists = state.checklists || []
 
-  const footerText = (() => {
-    const n = checklists.reduce((s, cl) => s + (cl.entries || []).filter(e => e.text).length, 0)
-    return `CraniaVerse · Checklists · Count=${n}`
-  })()
-
   return (
     <div className="cl-wrap">
       <div className="cltoprow">
