@@ -1999,8 +1999,11 @@ function ProgramsPage() {
 }
 
 /* ================= popovers ================= */
+/* Which filters let you introduce a value the data does not have yet. */
+const FILTER_ADD = { sub: 'Subject', year: 'Year', time: 'Time', cost: 'Cost', locf: 'Location' }
+
 const FilterPop = React.forwardRef(function FilterPop(
-  { rect, fk, options, selectedVals, onToggle, onSelectAll, onClear }, ref) {
+  { rect, fk, options, selectedVals, onToggle, onSelectAll, onClear, onAdd }, ref) {
   const style = {
     left: Math.min(rect.left, window.innerWidth - 220),
     top: rect.bottom + 6,
