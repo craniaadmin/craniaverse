@@ -1263,7 +1263,7 @@ export default function Programs() {
       )}
 
       {bulkOpen && (
-        <BulkModal count={selected.size} locations={locations} categories={Object.keys(catColors)}
+        <BulkModal count={selected.size} locations={locations} categories={categoryOrder}
           onClose={() => setBulkOpen(false)} onApply={applyBulk} />
       )}
 
