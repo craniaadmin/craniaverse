@@ -1768,7 +1768,7 @@ function EventModal({ mode, initial, initialDate, initialTime, calendars, onClos
               <select value={endsMode} onChange={e => setEndsMode(e.target.value)} style={{ marginBottom: 8 }}>
                 <option value="never">Never</option>
                 <option value="on">On date</option>
-                <option value="after">After N occurrences</option>
+                <option value="after">After N times</option>
               </select>
               {endsMode === 'on' && (
                 <input type="date" value={until} onChange={e => setUntil(e.target.value)} />
