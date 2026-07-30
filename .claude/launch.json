@@ -18,18 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "pjpreview",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "vite",
-        "--config",
-        "vite.pjpreview.config.js",
-        "--port",
-        "5196"
-      ],
-      "port": 5196
     }
   ]
 }

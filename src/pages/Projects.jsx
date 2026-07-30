@@ -723,7 +723,7 @@ export default function Projects() {
 }
 
 // ---------- Board column ----------
-function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete, onDuplicate, onArchive, onToggleGoal, onHide }) {
+function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete, onDuplicate, onToggleGoal, onHide, onCardCtx }) {
   const [over, setOver] = useState(false)
   return (
     <div
@@ -747,8 +747,8 @@ function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete,
             onEdit={onEdit}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
-            onArchive={onArchive}
             onToggleGoal={onToggleGoal}
+            onCardCtx={onCardCtx}
           />
         ))}
       </div>
@@ -758,7 +758,7 @@ function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete,
 }
 
 // ---------- Board card ----------
-function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onArchive, onToggleGoal }) {
+function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onToggleGoal, onCardCtx }) {
   const isGoals = card.col === 'goals'
   const isDaily = (card.days && card.days.length > 0) || card.col === 'daily'
   const isNote  = card.col === 'notes'
@@ -771,6 +771,7 @@ function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onArchive
         draggable
         onDragStart={() => onDragStart(card.id)}
         onDoubleClick={() => onEdit(card)}
+        onContextMenu={(e) => onCardCtx(e, card.id)}
       >
         <button className="kb-dup" title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(card.id) }}>⧉</button>
         <button className="kb-x"   title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(card.id)    }}>×</button>
@@ -810,6 +811,7 @@ function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onArchive
       draggable
       onDragStart={() => onDragStart(card.id)}
       onDoubleClick={() => onEdit(card)}
+      onContextMenu={(e) => onCardCtx(e, card.id)}
     >
       <button className="kb-dup" title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(card.id) }}>⧉</button>
       <button className="kb-x"   title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(card.id)    }}>×</button>
