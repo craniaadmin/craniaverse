@@ -506,6 +506,35 @@ export async function restoreProjectBackup(backupId) {
   return row.payload
 }
 
+// ---- programs backups ------------------------------------
+const MAX_PROGRAMS_BACKUPS = 14
+
+export async function listProgramsBackups() {
+  await ensureAuth()
+  const rows = await pb().collection('programs_backups').getFullList()
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
+}
+
+export async function createProgramsBackup(label) {
+  await ensureAuth()
+  const progs = await loadPrograms()
+  await pb().collection('programs_backups').create({ label: label || '', payload: progs })
+  const all = await pb().collection('programs_backups').getFullList()
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  for (const old of all.slice(MAX_PROGRAMS_BACKUPS)) {
+    await pb().collection('programs_backups').delete(old.id)
+  }
+}
+
+export async function restoreProgramsBackup(backupId) {
+  await ensureAuth()
+  const row = await pb().collection('programs_backups').getOne(backupId)
+  if (!row?.payload) throw new Error('Backup not found or empty')
+  await savePrograms(row.payload)
+  return row.payload
+}
+
 // ---- projects (kanban board — singleton payload) --------
 // Schema mirrors the "crania-projects.json" file the client's
 // v20 kanban mockup writes to disk, so exports/imports round-trip.
