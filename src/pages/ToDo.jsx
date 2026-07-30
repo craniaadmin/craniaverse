@@ -1443,6 +1443,8 @@ function ChecklistEntryRow({
       <label className="clentactive">
         <input type="checkbox" checked={en.active !== false} onChange={e => onActive(e.target.checked)} /> Active
       </label>
+      <button className="clentdup" title="Duplicate" onClick={onDuplicate}>⧉</button>
+      <button className="clentdel" title="Remove" onClick={onRemove}>×</button>
     </div>
   )
 }
