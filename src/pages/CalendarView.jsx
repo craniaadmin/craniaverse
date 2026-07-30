@@ -1883,6 +1883,104 @@ function ConfirmDialog({ msg, onYes, onNo }) {
 // ═══════════════════════════════════════
 // ─── Context Menu ───
 // ═══════════════════════════════════════
+// ═══════════════════════════════════════
+// ─── Calendar Settings Popover ───
+// ═══════════════════════════════════════
+function CalSettingsPopover({ onClose }) {
+  const ref = useRef(null)
+  const [backups, setBackups] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [restoreOpen, setRestoreOpen] = useState(false)
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
+  }, [onClose])
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/calendar/backups`, { headers: HEADERS })
+      .then(r => r.json())
+      .then(setBackups)
+      .catch(() => setBackups([]))
+  }, [])
+
+  const backupNow = async () => {
+    setBusy(true)
+    try {
+      const res = await fetch(`${API_BASE}/api/calendar/backup`, {
+        method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: new Date().toLocaleString() }),
+      })
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
+      const list = await fetch(`${API_BASE}/api/calendar/backups`, { headers: HEADERS }).then(r => r.json())
+      setBackups(list)
+    } catch (err) {
+      console.error('Calendar backup failed:', err)
+      alert('Backup failed — make sure the calendar_backups collection exists (run pb-setup.js).')
+    }
+    setBusy(false)
+  }
+
+  const doRestore = async (id) => {
+    setBusy(true)
+    try {
+      const res = await fetch(`${API_BASE}/api/calendar/restore/${id}`, { method: 'POST', headers: HEADERS })
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
+      window.location.reload()
+    } catch (err) {
+      console.error('Calendar restore failed:', err)
+      alert('Restore failed — see console for details.')
+    }
+    setBusy(false)
+  }
+
+  const lastBackup = backups?.[0]
+  const lastLine = lastBackup
+    ? `Last backup: ${lastBackup.label || new Date(lastBackup.created).toLocaleString()}`
+    : backups === null ? 'Loading…' : 'No backups yet'
+
+  return (
+    <div className="settings-popover" ref={ref} onMouseDown={(e) => e.stopPropagation()}>
+      <div className="sp-card">
+        <div className="sp-card-title">Backups</div>
+        <div className="sp-hint">
+          Snapshots are saved to the database (last 14 kept).
+          Back up before big changes, or restore to roll back.
+        </div>
+        <div className="sp-meta">{lastLine}</div>
+        <div className="sp-btnrow">
+          <button type="button" className="sp-btn" disabled={busy} onClick={backupNow}>
+            {busy ? 'Saving…' : 'Back Up Now'}
+          </button>
+          <button type="button" className="sp-btn" disabled={busy} onClick={() => setRestoreOpen(v => !v)}>
+            Restore{restoreOpen ? ' ▾' : '…'}
+          </button>
+        </div>
+        {restoreOpen && backups && (
+          <div className="sp-restore-list">
+            {backups.length === 0 && (
+              <div style={{ color: '#9a948a', padding: '10px 12px', textAlign: 'center', fontSize: 12 }}>
+                No backups yet — click Back Up Now to create one.
+              </div>
+            )}
+            {backups.map(b => (
+              <div key={b.id} className="sp-restore-row">
+                <span className="sp-rlabel">
+                  {b.label || new Date(b.created).toLocaleString()}
+                </span>
+                <button type="button" className="sp-btn" disabled={busy} onClick={() => doRestore(b.id)}>
+                  Restore
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function ContextMenu({ x, y, items }) {
   // Adjust position so it doesn't overflow viewport
   const style = { left: Math.min(x, window.innerWidth - 180), top: Math.min(y, window.innerHeight - 160) }
