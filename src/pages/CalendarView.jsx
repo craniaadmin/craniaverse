@@ -940,6 +940,45 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
     downloadCsv('calendar-export.csv', rows)
   }
 
+  const exportYearImage = () => {
+    const year = cur.getFullYear()
+    const canvas = document.createElement('canvas')
+    const W = 1400, H = 1000
+    canvas.width = W; canvas.height = H
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#F4F7F8'; ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#2E2516'; ctx.font = 'bold 28px sans-serif'
+    ctx.fillText(`CraniaVerse Calendar — ${year}`, 40, 50)
+    const cols = 4, rows_ = 3, cellW = (W - 80) / cols, cellH = (H - 80) / rows_
+    for (let m = 0; m < 12; m++) {
+      const col = m % cols, row = Math.floor(m / cols)
+      const x = 40 + col * cellW, y = 70 + row * cellH
+      ctx.fillStyle = '#5FA09E'; ctx.font = 'bold 14px sans-serif'
+      ctx.fillText(MONTHS[m], x + 4, y + 16)
+      const first = new Date(year, m, 1), daysInMonth = new Date(year, m + 1, 0).getDate()
+      const startDay = (first.getDay() + 6) % 7
+      ctx.font = '10px sans-serif'; ctx.fillStyle = '#8a8474'
+      DOW_SHORT.forEach((d, i) => ctx.fillText(d, x + 4 + i * 26, y + 32))
+      for (let d = 0; d < daysInMonth; d++) {
+        const cx = x + 4 + ((startDay + d) % 7) * 26
+        const cy = y + 44 + Math.floor((startDay + d) / 7) * 16
+        const dISO = `${year}-${String(m + 1).padStart(2, '0')}-${String(d + 1).padStart(2, '0')}`
+        const hasEvt = eventsByDay[dISO]?.length > 0
+        if (hasEvt) { ctx.fillStyle = '#A6E2F9'; ctx.fillRect(cx - 1, cy - 10, 22, 14); ctx.fillStyle = '#2E2516' }
+        else ctx.fillStyle = '#2E2516'
+        ctx.font = '11px sans-serif'
+        ctx.fillText(String(d + 1), cx, cy)
+      }
+    }
+    canvas.toBlob(blob => {
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `crania-calendar-${year}.png`
+      document.body.appendChild(a); a.click(); a.remove()
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+    }, 'image/png')
+  }
+
   // ─── Scroll time grid to 7am on mount ───
   useEffect(() => {
     if ((view === 'week' || view === 'day') && timeGridRef.current) {
