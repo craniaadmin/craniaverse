@@ -1598,19 +1598,25 @@ function ProgramsPage() {
     bodyRows.push(
       <tr key={key} className={[isSel ? 'sel' : '', r.active ? '' : (deadRun[ri] ? 'rdead' : 'rinactive')]
         .filter(Boolean).join(' ')}
-        title="Click a cell to edit it; ✎ opens the full box">
+        title="Click a cell to edit it; ✎ opens the full box"
+        onDoubleClick={() => openEdit(r)}
+        onContextMenu={e => {
+          e.preventDefault()
+          setRowCtx({ x: e.clientX, y: e.clientY, row: r })
+        }}>
         <td className="selcol">
-          <input type="checkbox" checked={isSel} onChange={e => setSelected(prev => {
-            const n = new Set(prev)
-            if (e.target.checked) n.add(key); else n.delete(key)
-            return n
-          })} />
+          <input type="checkbox" checked={isSel} onClick={e => e.stopPropagation()}
+            onChange={e => setSelected(prev => {
+              const n = new Set(prev)
+              if (e.target.checked) n.add(key); else n.delete(key)
+              return n
+            })} />
         </td>
         {tds}
         <td className="actcell">
-          <button className="rowbtn rb-pen" title="Open the full edit box" onClick={() => openEdit(r.progId)}>✎</button>
-          <button className="rowbtn rb-dup" title="Duplicate this program" onClick={() => duplicateProgram(r.progId)}>⧉</button>
-          <button className="rowbtn rb-del" title="Delete this program" onClick={() => deleteProgram(r.progId)}>×</button>
+          <button className="rowbtn rb-pen" title="Open the full edit box" onClick={() => openEdit(r)}>✎</button>
+          <button className="rowbtn rb-dup" title="Duplicate this entry" onClick={() => duplicateEntry(r)}>⧉</button>
+          <button className="rowbtn rb-del" title="Delete this entry" onClick={() => deleteEntry(r)}>×</button>
         </td>
         <td className="filler" />
       </tr>)
