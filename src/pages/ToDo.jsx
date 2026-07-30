@@ -1268,7 +1268,6 @@ function ChecklistsView({
         return (
           <div key={cl.id} className={'clcard' + (cl.active === false ? ' inactive' : '')}>
             <div className={'clhead' + (darkHead ? ' darkhead' : '')} style={headStyle}>
-              <span className="clhandle" title="Drag to reorder">⠿</span>
               <span className="clname" title="Click to rename or recolour" onClick={() => openChecklistEdit(cl.id)}>{cl.name}</span>
               <span className="count">{(cl.entries || []).filter(e => e.text).length}</span>
               <label className="clactive">
