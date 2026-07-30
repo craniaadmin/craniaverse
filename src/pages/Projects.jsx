@@ -145,11 +145,20 @@ function useProjects() {
 
   useEffect(() => { refresh() }, [refresh])
 
-  const mutate = useCallback((mutFn) => {
+  /* `onChange(prevSnap, nextSnap)` runs inside the updater with the states
+     either side of the edit, so callers can record history against the
+     snapshot actually being replaced. */
+  const mutate = useCallback((mutFn, onChange) => {
     setState(prev => {
+      const prevSnap = onChange ? JSON.stringify(prev) : null
       const next = { ...prev, cards: [...prev.cards], colOrder: [...prev.colOrder] }
       mutFn(next)
       next.updatedAt = new Date().toISOString()
+      if (onChange) {
+        /* updatedAt always moves, so compare without it. */
+        const strip = (o) => { const { updatedAt, ...rest } = o; return JSON.stringify(rest) }
+        if (strip(prev) !== strip(next)) onChange(prevSnap, JSON.stringify(next))
+      }
       clearTimeout(saveTimer.current)
       saveTimer.current = setTimeout(() => {
         fetch(`${API_BASE}/api/projects`, {
