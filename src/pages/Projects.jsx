@@ -7,7 +7,7 @@
 // (round-trips as data, just no UI): archive mode, undo/redo, CSV
 // export, timed daily/goals resets, folder-backup. Add later.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 const PJ_CSS = `
 .pj-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0 8px;}
