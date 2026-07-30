@@ -476,24 +476,33 @@ export default function Projects() {
     setEditing(null)
   }
 
+  /* Archived cards are included and sorted last, so the export is the whole
+     board rather than only what is on screen. */
   const exportCsv = () => {
     const esc = (v) => { const s = String(v ?? ''); return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g, '""') + '"' : s }
-    const header = ['Column', 'Project', 'Task', 'Who', 'Tags', 'Due', 'Days', 'Color', 'Created', 'Comments']
+    const header = ['Column', 'Project', 'Task / Note', 'Assigned To', 'Tags', 'Due Date',
+      'Repeat Days', 'Goals', 'Comments', 'Archived', 'Archived At']
     const rows = [header.join(',')]
-    for (const c of state.cards) {
-      if (c.archived) continue
-      const colName = COL_BY_ID[c.col]?.name || c.col
-      const commStr = (c.comments || []).map(x => `${x.date||''} ${x.author||''}: ${x.text||''}`).join(' | ')
+    const pos = id => {
+      const i = state.colOrder.indexOf(id)
+      return i < 0 ? 99 : i
+    }
+    const sorted = [...state.cards].sort((a, b) =>
+      (a.archived ? 1 : 0) - (b.archived ? 1 : 0) || pos(a.col) - pos(b.col))
+    for (const c of sorted) {
+      const commStr = (c.comments || []).map(x => `${x.date || ''} ${x.author || ''}: ${x.text || ''}`).join(' | ')
+      const goalStr = (c.goals || []).map(g => `${g.done ? '[x]' : '[ ]'} ${g.text || ''}`).join(' | ')
       rows.push([
-        esc(colName), esc(c.project), esc(c.task), esc(c.who),
+        esc(colName(c.col) || c.col), esc(c.project), esc(c.task), esc(c.who),
         esc((c.tags || []).join(', ')), esc(c.due), esc(daysLabel(c.days)),
-        esc(c.color), esc(c.created), esc(commStr),
+        esc(goalStr), esc(commStr),
+        esc(c.archived ? 'Yes' : 'No'), esc(c.archivedAt ? fmtDateTime(c.archivedAt) : ''),
       ].join(','))
     }
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+    const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)
-    a.download = 'craniaverse-projects.csv'
+    a.download = `crania-projects-export-${isoLocal(new Date())}.csv`
     a.click()
     URL.revokeObjectURL(a.href)
   }
