@@ -1741,31 +1741,31 @@ function TodoEditModal({ item, lists, onClose, onSave }) {
   }
 
   return (
-    <div className="cal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="cal-modal" onClick={e => e.stopPropagation()}>
+    <div className="overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 420 }}>
         <h3>Edit To-Do</h3>
-        <div className="fld"><label>Task</label>
+        <div className="field"><label>Task</label>
           <input ref={inputRef} value={text} onChange={e => setText(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') save() }} /></div>
-        <div className="fld"><label>List</label>
+        <div className="field"><label>List</label>
           <select value={listId} onChange={e => setListId(e.target.value)}>
             {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
           </select></div>
-        <div className="row2">
-          <div className="fld"><label>Priority</label>
+        <div className="row-2">
+          <div className="field"><label>Priority</label>
             <select value={priority} onChange={e => setPriority(e.target.value)}>
               <option value="high">High</option>
               <option value="med">Medium</option>
               <option value="low">Low</option>
             </select></div>
-          <div className="fld"><label>Due</label>
+          <div className="field"><label>Due</label>
             <input type="date" value={due} onChange={e => setDue(e.target.value)} /></div>
         </div>
-        <div className="fld"><label>Notes</label>
+        <div className="field"><label>Notes</label>
           <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)} /></div>
         <div className="modal-actions">
-          <button className="btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="btn-primary" onClick={save}>Save</button>
+          <button className="cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="save-btn" onClick={save}>Save</button>
         </div>
       </div>
     </div>
