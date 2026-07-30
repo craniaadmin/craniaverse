@@ -1236,7 +1236,7 @@ function ProgramsPage() {
   }, [rs, selected])
   const bulkDelete = () => {
     if (!selectedProgIds.size) return
-    if (!window.confirm(`Delete ${selectedProgIds.size} program(s) and all their entries?`)) return
+    if (!await dialog.confirm(`Delete ${selectedProgIds.size} program(s) and all their entries?`)) return
     mutate(list => list.filter(p => !selectedProgIds.has(p.id)))
     setSelected(new Set())
   }
