@@ -322,7 +322,7 @@ const CSS = `
 .tdroot .cldel:hover{color:#c0392b;opacity:1;}
 .tdroot .clmove{background:none;border:none;color:inherit;opacity:.55;padding:0 2px;font-size:13px;line-height:1;font-weight:700;cursor:pointer;}
 .tdroot .clmove:hover{opacity:1;}
-.tdroot .clentries{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.tdroot .clactions{padding:0 14px;}
 .tdroot .clentries{padding:6px 14px;}
 .tdroot .clentry{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #f0ece2;}
 .tdroot .clentry:last-child{border-bottom:none;}
