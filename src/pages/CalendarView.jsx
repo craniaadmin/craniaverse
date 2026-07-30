@@ -945,16 +945,19 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
   const exportCSV = () => {
     const header = ['Calendar', 'Title', 'Date', 'All Day', 'Start', 'End', 'Repeats', 'Notes']
     const rows = [header]
-    for (const ev of data.events) {
+    /* Chronological, so the file reads like a schedule rather than like the
+       order things happened to be created in. */
+    const sorted = [...data.events].sort((a, b) =>
+      (a.date || '').localeCompare(b.date || '') || (a.start || '').localeCompare(b.start || ''))
+    for (const ev of sorted) {
       const cal = calById[ev.calId]
-      const freq = ev.recur?.freq || ''
       rows.push([
         cal?.name || '', ev.title || '', ev.date || '',
         ev.allDay ? 'Yes' : 'No', ev.start || '', ev.end || '',
-        freq, ev.notes || '',
+        recurLabel(ev.recur), ev.notes || '',
       ])
     }
-    downloadCsv('calendar-export.csv', rows)
+    downloadCsv(`crania-calendar-export-${iso(new Date())}.csv`, rows)
   }
 
   const exportYearImage = () => {
