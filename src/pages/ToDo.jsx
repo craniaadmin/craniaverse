@@ -323,20 +323,17 @@ const CSS = `
 .tdroot .clmove{background:none;border:none;color:inherit;opacity:.55;padding:0 2px;font-size:13px;line-height:1;font-weight:700;cursor:pointer;}
 .tdroot .clmove:hover{opacity:1;}
 .tdroot .clentries{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
-.tdroot .clentry{background:#fbfaf5;border:1px solid #ece8dc;border-radius:8px;padding:5px 8px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.tdroot .clentries{padding:6px 14px;}
+.tdroot .clentry{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #f0ece2;}
+.tdroot .clentry:last-child{border-bottom:none;}
 .tdroot .clentry.inactive{opacity:.55;}
-.tdroot .clenttext{flex:1 1 130px;min-width:90px;padding:5px 7px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12.5px;}
-.tdroot .clentnote{flex:1 1 100px;min-width:70px;padding:5px 7px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12.5px;color:#6b6455;}
-.tdroot .clentfreq{padding:5px 6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12px;background:#fff;}
-.tdroot .clentmove{background:none;border:none;color:#9a948a;padding:0 1px;font-size:10px;line-height:1;font-weight:700;cursor:pointer;}
-.tdroot .clentmove:hover{color:var(--dark-blue);}
-.tdroot .clentdup,.tdroot .clentdel{background:none;border:none;color:#c9c3b5;font-size:14px;padding:0 3px;font-weight:700;cursor:pointer;}
-.tdroot .clentdup:hover{color:var(--dark-blue);}
-.tdroot .clentdel:hover{color:#c0392b;}
-.tdroot .clentsep{color:#d5d0c4;font-size:12px;margin:0 1px;}
+.tdroot .clenttext{flex:1 1 130px;min-width:90px;padding:4px 7px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12.5px;background:#fff;}
+.tdroot .clentnote{flex:1 1 90px;min-width:60px;padding:4px 7px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12.5px;color:#6b6455;background:#fff;}
+.tdroot .clentfreq{padding:4px 6px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12px;background:#fff;}
+.tdroot .clentsep{color:#b8b2a2;font-size:13px;margin:0 2px;}
 .tdroot .clentlistwrap{color:#6b6455;display:inline-flex;align-items:center;gap:3px;font-size:12px;}
-.tdroot .clentlist{padding:4px 6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:11.5px;background:#fff;}
-.tdroot .clentpri{padding:3px 7px;border:none;border-radius:6px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;}
+.tdroot .clentlist{padding:3px 6px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:11.5px;background:#fff;}
+.tdroot .clentpri{padding:3px 7px;border:none;border-radius:5px;font:inherit;font-size:11px;font-weight:700;cursor:pointer;}
 .tdroot .clentactive{display:flex;align-items:center;gap:3px;color:#6b6455;white-space:nowrap;font-size:12px;}
 .tdroot .clentactive input{width:13px;height:13px;}
 .tdroot .clactions{display:flex;gap:8px;align-items:center;}
