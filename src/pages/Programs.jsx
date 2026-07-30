@@ -1061,8 +1061,16 @@ export default function Programs() {
       }
       if (k === 'category' && r.category) {
         const cc = catColor(r.category)
-        cls = 'col-category tint'
-        style = { '--tint': cc, color: isDarkColor(cc) ? '#fff' : 'var(--dark-brown)' }
+        if (cc !== DEFAULT_CAT_COLOR) {
+          cls = 'col-category tint'
+          style = { '--tint': cc, color: isDarkColor(cc) ? '#fff' : 'var(--dark-brown)' }
+        }
+      } else if (k === 'subject' && r.subject) {
+        const sc = subjColor(r.category || '', r.subject)
+        if (sc !== DEFAULT_CAT_COLOR) {
+          cls = 'col-subject tint'
+          style = { '--tint': sc, color: isDarkColor(sc) ? '#fff' : 'var(--dark-brown)' }
+        }
       }
       return <td key={k} className={cls} style={style} data-ek={editable ? k : undefined}
         onClick={editable ? (e => {
