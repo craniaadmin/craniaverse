@@ -1259,13 +1259,19 @@ function ProgramsPage() {
     }
   }, [])
 
-  /* ---------- actions ---------- */
-  const toggleActive = (progId) =>
-    mutate(list => list.map(p => p.id === progId ? { ...p, active: p.active === false } : p))
+  /* ---------- actions ----------
+     Each of these is scoped to the row it was invoked from, not to the whole
+     program: pausing Monday must not pause Tuesday. */
+  const ctxOf = (r) => ({ progId: r.progId, offId: r.offId, day: r.day, slotIndex: r.slotIndex })
 
-  const openEdit = (progId) => {
-    const p = programs.find(x => x.id === progId)
-    if (p) setEditing({ mode: 'edit', program: JSON.parse(JSON.stringify(p)) })
+  const toggleActive = (r) => mutate(list => {
+    const iso = isolateEntryList(list, r.progId, r.offId, r.day, r.slotIndex)
+    return iso.list.map(p => p.id === iso.progId ? { ...p, active: p.active === false } : p)
+  })
+
+  const openEdit = (r) => {
+    const p = programs.find(x => x.id === r.progId)
+    if (p) setEditing({ mode: 'edit', ctx: ctxOf(r), program: deep(p) })
   }
   const addProgram = () => setEditing({
     mode: 'new',
