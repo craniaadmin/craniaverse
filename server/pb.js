@@ -681,6 +681,35 @@ export async function saveCalendar(payload) {
   }
 }
 
+// ---- calendar backups (timestamped snapshots, last 14 kept) --------
+const MAX_CALENDAR_BACKUPS = 14
+
+export async function listCalendarBackups() {
+  await ensureAuth()
+  const rows = await pb().collection('calendar_backups').getFullList()
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
+}
+
+export async function createCalendarBackup(label) {
+  await ensureAuth()
+  const cal = await loadCalendar()
+  await pb().collection('calendar_backups').create({ label: label || '', payload: cal })
+  const all = await pb().collection('calendar_backups').getFullList()
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  for (const old of all.slice(MAX_CALENDAR_BACKUPS)) {
+    await pb().collection('calendar_backups').delete(old.id)
+  }
+}
+
+export async function restoreCalendarBackup(backupId) {
+  await ensureAuth()
+  const row = await pb().collection('calendar_backups').getOne(backupId)
+  if (!row?.payload) throw new Error('Backup not found or empty')
+  await saveCalendar(row.payload)
+  return row.payload
+}
+
 // ---- marketing calendar (singleton payload — fully independent) --
 // Same shape as the operations calendar above, but its own
 // PocketBase collection: no events, categories, or visibility state
