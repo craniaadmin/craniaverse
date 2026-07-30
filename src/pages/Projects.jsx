@@ -553,6 +553,9 @@ export default function Projects() {
           onClose={() => setSettingsOpen(false)}
           state={state}
           setState={setState}
+          mutate={mutate}
+          onResetNow={resetDailyNow}
+          onClearGoalsNow={clearGoalsNow}
         />
       )}
 
