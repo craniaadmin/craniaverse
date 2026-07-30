@@ -228,26 +228,11 @@ function packEvents(eventsWithPos) {
 }
 
 // ─── Store hook ───
-/* One-shot data fix. Mutates `d`; returns whether anything changed so the
-   caller can write it back.
-
-   Personal was #8C9294 grey, which as a month-chip wash lands almost exactly
-   on Afterschool's teal — rgb(203,206,207) against rgb(183,212,211), close
-   enough that the two are not tellable apart. Purple is the furthest unused
-   palette colour from the rest of the set.
-
-   Deliberately condition-based rather than flagged: the API stores only
-   calendars/events/hidden, so a flag would not survive the round trip and the
-   fix would re-run on every load. Keying off the exact old grey makes it
-   naturally run once, and leaves any colour the user has chosen alone. */
-function migrateCalendar(d) {
-  const personal = (d.calendars || []).find(c => /^personal$/i.test((c.name || '').trim()))
-  if (personal && String(personal.color || '').toUpperCase() === '#8C9294') {
-    personal.color = '#7030A0'
-    return true
-  }
-  return false
-}
+/* Calendar colours are the user's to choose — nothing here rewrites them on
+   load. An earlier version moved Personal off #8C9294 because it washes to
+   nearly the same tone as Afterschool's teal in the month chips; that fought
+   the colours set in the app, so it is gone. Recolour from a chip's
+   right-click menu instead. */
 
 function useCalendar(apiPath) {
   const [data, setData] = useState({ calendars: [], events: [], hidden: {} })
