@@ -2047,6 +2047,9 @@ const FilterPop = React.forwardRef(function FilterPop(
           <span>{op.label}</span>
         </label>
       ))}
+      {onAdd && (
+        <div className="ch addrow" onClick={onAdd}>＋ Add {FILTER_ADD[fk]}…</div>
+      )}
     </div>
   )
 })
