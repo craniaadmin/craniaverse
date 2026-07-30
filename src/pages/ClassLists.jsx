@@ -1,15 +1,17 @@
 // Class Lists — read-only rosters derived from server data already
 // loaded by useStore(): the master Programs list (/api/programs) and
 // registrations (/api/registrations). No new storage — this page just
-// links the two by matching each student's enrolled program title to
-// a program definition, then further groups students under whichever
-// offering (day/time/teacher) their schedule text matches.
-// Registrations whose program title doesn't match anything in the
-// Programs list are surfaced under "Needs Attention" instead of being
-// silently dropped, so data drift is visible rather than hidden.
+// links the two by matching each student's enrolled program name to a
+// program definition, then groups students under whichever session
+// (day/time/instructor) their schedule text matches. Classes are laid
+// out under their category heading.
+//
+// Note: an enrolment naming a program that is not in the Programs list
+// does not appear anywhere on this page. The block that used to list
+// those was removed by request.
 
 import { useMemo, useState } from 'react'
-import { Search, ChevronDown, ChevronRight, ExternalLink, AlertTriangle } from 'lucide-react'
+import { Search, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
 
 const norm = (s) => String(s || '').trim().toUpperCase()
@@ -160,7 +162,7 @@ const cardShadow = { boxShadow: 'var(--brand-shadow)' }
 
 export default function ClassLists({ onNavigate }) {
   const { status: fetchStatus } = useStore()
-  const { classes, unlisted } = useClassLists()
+  const { classes } = useClassLists()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const [hideEmpty, setHideEmpty] = useState(true)
@@ -237,7 +239,7 @@ export default function ClassLists({ onNavigate }) {
     next.has(key) ? next.delete(key) : next.add(key)
     return next
   })
-  const expandAll = () => setExpanded(new Set(visible.map((c) => c.program.title + c.program.number + c.program.location)))
+  const expandAll = () => setExpanded(new Set(visible.map((c) => c.program.id || (c.program.name + c.program.number))))
   const collapseAll = () => setExpanded(new Set())
 
   return (
