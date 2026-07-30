@@ -1309,10 +1309,9 @@ function ChecklistsView({
       })}
       {checklists.length === 0 && (
         <div style={{ textAlign: 'center', color: '#9a948a', fontSize: 13, padding: '20px 0' }}>
-          No checklists yet — click "+ Add checklist" above to create one.
+          No checklists yet — click "+ Add Checklist" above to create one.
         </div>
       )}
-      <div className="td-footer">{footerText}</div>
     </div>
   )
 }
