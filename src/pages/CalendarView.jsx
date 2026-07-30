@@ -460,6 +460,8 @@ const CSS = `
 .calroot .todo-item .todo-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .calroot .todo-item .todo-text.done-text{text-decoration:line-through;color:#9a948a;}
 .calroot .todo-item .todo-due{font-size:10px;color:#8a8474;white-space:nowrap;}
+.calroot .todo-item .todo-due.od{color:#c0392b;font-weight:700;}
+.calroot .todo-item .todo-text{cursor:pointer;}
 .calroot .todo-item.p-high{border-left-color:#c0392b;}
 .calroot .todo-item.p-med{border-left-color:var(--light-brown);}
 .calroot .todo-item.p-low{border-left-color:var(--light-blue);}
