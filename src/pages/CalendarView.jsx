@@ -1019,6 +1019,41 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
           <button onClick={exportCSV} title="Download all events as a CSV file">{'⤓'} Export CSV</button>
         </div>
 
+        {/* Settings popover */}
+        {settingsOpen && (
+          <div className="settings-popover" ref={settingsRef}>
+            <div className="sp-card">
+              <div className="sp-card-title">Backups</div>
+              <div className="sp-hint">Calendar data is saved automatically. Use these to create a manual snapshot or restore a previous one.</div>
+              <div className="sp-btnrow">
+                <button className="sp-btn" onClick={async () => {
+                  try {
+                    const r = await fetch(`${API_BASE}/api/calendar/backup`, { method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' }, body: JSON.stringify({ label: 'Manual backup' }) })
+                    if (r.ok) alert('Backup created')
+                    else alert('Backup failed')
+                  } catch { alert('Backup failed — server unreachable') }
+                }}>Back Up Now</button>
+                <button className="sp-btn" onClick={async () => {
+                  try {
+                    const r = await fetch(`${API_BASE}/api/calendar/backups`, { headers: HEADERS })
+                    if (!r.ok) { alert('Could not load backups'); return }
+                    const list = await r.json()
+                    if (!list.length) { alert('No backups found'); return }
+                    const msg = list.map((b, i) => `${i + 1}. ${b.label || 'Backup'} — ${new Date(b.created).toLocaleString()}`).join('\n')
+                    const idx = prompt('Enter backup number to restore:\n\n' + msg)
+                    if (!idx) return
+                    const pick = list[parseInt(idx) - 1]
+                    if (!pick) { alert('Invalid selection'); return }
+                    const rr = await fetch(`${API_BASE}/api/calendar/restore/${pick.id}`, { method: 'POST', headers: HEADERS })
+                    if (rr.ok) { window.location.reload() }
+                    else alert('Restore failed')
+                  } catch { alert('Could not load backups') }
+                }}>Restore...</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Calendar chips bar — matches v22 calbar2 */}
         <div className="calbar2">
           <div className="calchips">
