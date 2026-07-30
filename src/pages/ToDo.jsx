@@ -598,7 +598,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
           ])
         }
       }
-      downloadCsv(`crania-todo-${stamp}.csv`, rows)
+      downloadCsv(`crania-todo-export-${stamp}.csv`, rows)
     }
   }
 
