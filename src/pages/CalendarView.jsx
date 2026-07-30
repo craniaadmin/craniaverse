@@ -1536,6 +1536,8 @@ function AgendaSidebar({ events, hidden, calById, eventColor, today, onEditEvent
 // ═══════════════════════════════════════
 function TodoSidebar() {
   const [todos, setTodos] = useState(null)
+  const [ctx, setCtx] = useState(null)       // {x, y, id}
+  const [editId, setEditId] = useState(null)
   const todosRef = useRef(null)
 
   const fetchTodos = useCallback(async () => {
