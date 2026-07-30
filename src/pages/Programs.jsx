@@ -567,15 +567,25 @@ export default function Programs() {
   const { staff, programs, setPrograms, programsState, setProgramsState, records: registrations } = useStore()
 
   /* ---------- persisted view state ---------- */
-  const defaultViewState = useMemo(() => ({
-    locations: SEED_LOCATIONS.map(l => ({ ...l })),
-    colOrder: SEED_COL_ORDER.slice(),
-    hiddenCols: { ...SEED_HIDDEN_COLS },
-    categoryOrder: SEED_CAT_ORDER.slice(),
-    subjOrder: {},
-    catColors: { ...SEED_CAT_COLORS },
-    subjColors: { ...SEED_SUBJ_COLORS },
-  }), [])
+  const defaultViewState = useMemo(() => {
+    const base = {
+      locations: SEED_LOCATIONS.map(l => ({ ...l })),
+      colOrder: SEED_COL_ORDER.slice(),
+      hiddenCols: { ...SEED_HIDDEN_COLS },
+      categoryOrder: SEED_CAT_ORDER.slice(),
+      subjOrder: {},
+      catColors: { ...SEED_CAT_COLORS },
+      subjColors: { ...SEED_SUBJ_COLORS },
+    }
+    /* Managed-list colours and orders, seeded from the template file where it has them. */
+    LIST_STATE_KEYS.forEach(k => {
+      base[k] = (SEED[k] && typeof SEED[k] === 'object' && !Array.isArray(SEED[k])) ? { ...SEED[k] } : {}
+    })
+    LIST_ORDER_KEYS.forEach(k => { base[k] = Array.isArray(SEED[k]) ? SEED[k].slice() : [] })
+    /* The seven days always exist, so give them a colour entry up front. */
+    DOW.forEach(d => { if (!base.dayColors[String(d.n)]) base.dayColors[String(d.n)] = DEFAULT_CAT_COLOR })
+    return base
+  }, [])
 
   const [viewState, setViewState] = useState(defaultViewState)
   const loadedViewRef = useRef(null)
