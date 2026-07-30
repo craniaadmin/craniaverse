@@ -662,9 +662,12 @@ export default function Projects() {
               onEdit={openEdit}
               onDelete={remove}
               onDuplicate={duplicate}
-              onArchive={archiveCard}
               onToggleGoal={toggleGoal}
               onHide={() => toggleCol(col.id)}
+              onCardCtx={(e, id) => {
+                e.preventDefault(); e.stopPropagation()
+                setCardCtx({ x: e.clientX, y: e.clientY, id })
+              }}
             />
           ))}
         </div>
