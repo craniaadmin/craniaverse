@@ -1082,7 +1082,9 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
                 </div>
                 <div className="gorow">
                   <span className="golbl">Go To:</span>
-                  <input type="date" className="godate" value={gotoDate} onChange={e => setGotoDate(e.target.value)} title="Go to date" />
+                  {/* Mirrors the date on screen, so it always says where you are. */}
+                  <input type="date" className="godate" value={iso(cur)}
+                    onChange={e => { if (e.target.value) goTo(e.target.value) }} title="Go to date" />
                 </div>
               </div>
               <div className="viewtabs">
