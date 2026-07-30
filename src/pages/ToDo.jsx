@@ -1335,96 +1335,93 @@ function ChecklistEntryRow({
 }) {
   return (
     <div className={'clentry' + (en.active === false ? ' inactive' : '')}>
-      <div className="clentrow1">
-        <button className="clentmove" title="Up" disabled={isFirst} onClick={onMoveUp} style={{ opacity: isFirst ? 0.3 : 1 }}>▲</button>
-        <button className="clentmove" title="Down" disabled={isLast} onClick={onMoveDown} style={{ opacity: isLast ? 0.3 : 1 }}>▼</button>
-        <input className="clenttext" value={en.text} placeholder={`Item ${index + 1}`} onChange={e => onText(e.target.value)} />
-        <input className="clentnote" value={en.note} placeholder="comment (optional)" onChange={e => onNote(e.target.value)} />
-        <select className="clentfreq" value={en.freq} onChange={e => onSchedule({ freq: e.target.value })}>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="custom">Custom</option>
-        </select>
+      <button className="clentmove" title="Up" disabled={isFirst} onClick={onMoveUp} style={{ opacity: isFirst ? 0.3 : 1 }}>▲</button>
+      <button className="clentmove" title="Down" disabled={isLast} onClick={onMoveDown} style={{ opacity: isLast ? 0.3 : 1 }}>▼</button>
+      <input className="clenttext" value={en.text} placeholder={`Item ${index + 1}`} onChange={e => onText(e.target.value)} />
+      <input className="clentnote" value={en.note} placeholder="comment" onChange={e => onNote(e.target.value)} />
+      <select className="clentfreq" value={en.freq} onChange={e => onSchedule({ freq: e.target.value })}>
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="custom">Custom</option>
+      </select>
 
-        {en.freq === 'weekly' && (
-          <span className="clweekwrap">on
-            <select value={String(en.weekDay ?? 1)} onChange={e => onSchedule({ weekDay: Number(e.target.value) })}>
-              {WEEKDAY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-            </select>
-          </span>
-        )}
-
-        {en.freq === 'monthly' && (
-          <span className="clmonthwrap">on
-            <select value={en.monthMode === 'weekday' ? 'weekday' : 'date'} onChange={e => onSchedule({ monthMode: e.target.value })}>
-              <option value="date">the date</option>
-              <option value="weekday">the</option>
-            </select>
-            {en.monthMode !== 'weekday' && (
-              <input type="number" min="1" max="31" style={{ width: 50 }}
-                value={Number(en.monthDate) || 1}
-                onChange={e => onSchedule({ monthDate: Math.min(31, Math.max(1, Number(e.target.value) || 1)) })} />
-            )}
-            {en.monthMode === 'weekday' && (
-              <>
-                <select value={String(en.monthWeek || '1')} onChange={e => onSchedule({ monthWeek: e.target.value })}>
-                  <option value="1">1st</option><option value="2">2nd</option>
-                  <option value="3">3rd</option><option value="4">4th</option>
-                  <option value="last">last</option>
-                </select>
-                <select value={String(en.monthWeekday ?? 1)} onChange={e => onSchedule({ monthWeekday: Number(e.target.value) })}>
-                  {WEEKDAY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                </select>
-              </>
-            )}
-          </span>
-        )}
-
-        {en.freq === 'custom' && (
-          <span className="clcustwrap">
-            <select value={en.customMode === 'on' ? 'on' : 'every'} onChange={e => onSchedule({ customMode: e.target.value })}>
-              <option value="every">every</option>
-              <option value="on">once on</option>
-            </select>
-            {en.customMode !== 'on' && (
-              <>
-                <input type="number" className="clcustom" min="1" value={Number(en.customDays) || 1}
-                  onChange={e => onSchedule({ customDays: Math.max(1, Number(e.target.value) || 1) })} />
-                days from
-              </>
-            )}
-            <input type="date" value={en.customStart || ''} onChange={e => onSchedule({ customStart: e.target.value })} />
-          </span>
-        )}
-
-        <button className="clentdup" title="Duplicate" onClick={onDuplicate}>⧉</button>
-        <button className="clentdel" title="Remove" onClick={onRemove}>×</button>
-      </div>
-      <div className="clentrow2">
-        <span className="clentlistwrap">→
-          <select className="clentlist" value={en.listId} onChange={e => onListId(e.target.value)}>
-            {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+      {en.freq === 'weekly' && (
+        <span className="clweekwrap">on
+          <select value={String(en.weekDay ?? 1)} onChange={e => onSchedule({ weekDay: Number(e.target.value) })}>
+            {WEEKDAY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
         </span>
-        <select
-          className={'clentpri pri-' + (en.priority || 'high')}
-          value={en.priority || 'high'}
-          onChange={e => onPriority(e.target.value)}
-          style={
-            (en.priority || 'high') === 'high' ? { background: '#fadbd8', color: '#922b21' } :
-            en.priority === 'med' ? { background: '#E0DE85', color: '#2E2516' } :
-            { background: '#A6E2F9', color: '#2E2516' }
-          }
-        >
-          <option value="high">High</option>
-          <option value="med">Med</option>
-          <option value="low">Low</option>
+      )}
+
+      {en.freq === 'monthly' && (
+        <span className="clmonthwrap">on
+          <select value={en.monthMode === 'weekday' ? 'weekday' : 'date'} onChange={e => onSchedule({ monthMode: e.target.value })}>
+            <option value="date">the date</option>
+            <option value="weekday">the</option>
+          </select>
+          {en.monthMode !== 'weekday' && (
+            <input type="number" min="1" max="31" style={{ width: 50 }}
+              value={Number(en.monthDate) || 1}
+              onChange={e => onSchedule({ monthDate: Math.min(31, Math.max(1, Number(e.target.value) || 1)) })} />
+          )}
+          {en.monthMode === 'weekday' && (
+            <>
+              <select value={String(en.monthWeek || '1')} onChange={e => onSchedule({ monthWeek: e.target.value })}>
+                <option value="1">1st</option><option value="2">2nd</option>
+                <option value="3">3rd</option><option value="4">4th</option>
+                <option value="last">last</option>
+              </select>
+              <select value={String(en.monthWeekday ?? 1)} onChange={e => onSchedule({ monthWeekday: Number(e.target.value) })}>
+                {WEEKDAY_OPTIONS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </>
+          )}
+        </span>
+      )}
+
+      {en.freq === 'custom' && (
+        <span className="clcustwrap">
+          <select value={en.customMode === 'on' ? 'on' : 'every'} onChange={e => onSchedule({ customMode: e.target.value })}>
+            <option value="every">every</option>
+            <option value="on">once on</option>
+          </select>
+          {en.customMode !== 'on' && (
+            <>
+              <input type="number" className="clcustom" min="1" value={Number(en.customDays) || 1}
+                onChange={e => onSchedule({ customDays: Math.max(1, Number(e.target.value) || 1) })} />
+              days from
+            </>
+          )}
+          <input type="date" value={en.customStart || ''} onChange={e => onSchedule({ customStart: e.target.value })} />
+        </span>
+      )}
+
+      <span className="clentsep">|</span>
+      <span className="clentlistwrap">→
+        <select className="clentlist" value={en.listId} onChange={e => onListId(e.target.value)}>
+          {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
         </select>
-        <label className="clentactive">
-          <input type="checkbox" checked={en.active !== false} onChange={e => onActive(e.target.checked)} /> Active
-        </label>
-      </div>
+      </span>
+      <select
+        className={'clentpri pri-' + (en.priority || 'high')}
+        value={en.priority || 'high'}
+        onChange={e => onPriority(e.target.value)}
+        style={
+          (en.priority || 'high') === 'high' ? { background: '#fadbd8', color: '#922b21' } :
+          en.priority === 'med' ? { background: '#E0DE85', color: '#2E2516' } :
+          { background: '#A6E2F9', color: '#2E2516' }
+        }
+      >
+        <option value="high">High</option>
+        <option value="med">Med</option>
+        <option value="low">Low</option>
+      </select>
+      <label className="clentactive">
+        <input type="checkbox" checked={en.active !== false} onChange={e => onActive(e.target.checked)} /> Active
+      </label>
+      <button className="clentdup" title="Duplicate" onClick={onDuplicate}>⧉</button>
+      <button className="clentdel" title="Remove" onClick={onRemove}>×</button>
     </div>
   )
 }
