@@ -1354,7 +1354,7 @@ function CellEditor({ row, col, locations, programs, categories, teacherOptions,
     if (col === 'location') return locations.map(l => ({ v: l.id, l: l.name }))
     if (col === 'days') return DOW.map(d => ({ v: String(d.n), l: d.l }))
     if (col === 'platform') return PLATFORMS.map(p => ({ v: p, l: p }))
-    if (col === 'category') return Object.keys(catColors).map(c => ({ v: c, l: c }))
+    if (col === 'category') return categories.map(c => ({ v: c, l: c }))
     return null
   })()
 
