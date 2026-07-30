@@ -453,12 +453,9 @@ export default function Programs() {
     () => staff.map(s => `${s.firstName} ${s.lastName}`.trim()).filter(Boolean).sort(),
     [staff])
 
-  /* ---------- locations (derived from the data, seeded with the two real sites) ---------- */
+  /* ---------- locations (the seeded sites, plus anything the data introduces) ---------- */
   const locations = useMemo(() => {
-    const base = [
-      { id: 'loc_boardwalk', name: 'Boardwalk', color: '#5FA09E' },
-      { id: 'loc_waterloo', name: 'Waterloo East', color: '#A6E2F9' },
-    ]
+    const base = SEED_LOCATIONS.map(l => ({ ...l }))
     const seen = new Set(base.map(l => l.id))
     let i = base.length
     for (const p of programs) {
