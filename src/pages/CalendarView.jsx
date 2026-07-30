@@ -1048,57 +1048,50 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
                   onCellDrop={handleCellDrop}
                   onCellDragLeave={handleCellDragLeave}
                 />
-              </div>
             )}
             {view === 'week' && (
-              <div className="card main-card">
-                <TimeGrid
-                  days={weekDays}
-                  today={today}
-                  eventsByDay={eventsByDay}
-                  eventColor={eventColor}
-                  calById={calById}
-                  onNewEvent={(dISO, time) => setEditingEvent({ mode: 'new', event: null, date: dISO, time })}
-                  onEditEvent={(ev, dISO) => openEditEvent(ev, dISO)}
-                  onCtxEvent={showEventCtx}
-                  onDragStart={handleEvDragStart}
-                  onTimeDrop={handleTimeEvDrop}
-                  gridRef={timeGridRef}
-                />
-              </div>
+              <TimeGrid
+                days={weekDays}
+                today={today}
+                eventsByDay={eventsByDay}
+                eventColor={eventColor}
+                calById={calById}
+                onNewEvent={(dISO, time) => setEditingEvent({ mode: 'new', event: null, date: dISO, time })}
+                onEditEvent={(ev, dISO) => openEditEvent(ev, dISO)}
+                onCtxEvent={showEventCtx}
+                onDragStart={handleEvDragStart}
+                onTimeDrop={handleTimeEvDrop}
+                gridRef={timeGridRef}
+              />
             )}
             {view === 'day' && (
-              <div className="card main-card">
-                <TimeGrid
-                  days={[cur]}
-                  today={today}
-                  eventsByDay={eventsByDay}
-                  eventColor={eventColor}
-                  calById={calById}
-                  onNewEvent={(dISO, time) => setEditingEvent({ mode: 'new', event: null, date: dISO, time })}
-                  onEditEvent={(ev, dISO) => openEditEvent(ev, dISO)}
-                  onCtxEvent={showEventCtx}
-                  onDragStart={handleEvDragStart}
-                  onTimeDrop={handleTimeEvDrop}
-                  gridRef={timeGridRef}
-                />
-              </div>
+              <TimeGrid
+                days={[cur]}
+                today={today}
+                eventsByDay={eventsByDay}
+                eventColor={eventColor}
+                calById={calById}
+                onNewEvent={(dISO, time) => setEditingEvent({ mode: 'new', event: null, date: dISO, time })}
+                onEditEvent={(ev, dISO) => openEditEvent(ev, dISO)}
+                onCtxEvent={showEventCtx}
+                onDragStart={handleEvDragStart}
+                onTimeDrop={handleTimeEvDrop}
+                gridRef={timeGridRef}
+              />
             )}
             {view === 'year' && (
-              <div className="card main-card">
-                <YearGrid
-                  year={cur.getFullYear()}
-                  today={today}
-                  eventsByDay={eventsByDay}
-                  onDayClick={(d) => { setCur(d); setView('day') }}
-                />
-              </div>
+              <YearGrid
+                year={cur.getFullYear()}
+                today={today}
+                eventsByDay={eventsByDay}
+                onDayClick={(d) => { setCur(d); setView('day') }}
+              />
             )}
           </div>
 
           {/* Sidebar */}
           <div className="sidecol">
-            <div className="card upcoming-card">
+            <div className="sidebox box-up">
               <AgendaSidebar
                 events={data.events}
                 hidden={data.hidden}
@@ -1108,7 +1101,7 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
                 onEditEvent={(ev) => openEditEvent(ev, ev.date)}
               />
             </div>
-            <div className="card todo-card">
+            <div className="sidebox box-td">
               <TodoSidebar />
             </div>
           </div>
