@@ -192,7 +192,7 @@ const CSS = `
 .tdroot{--pill:#F1F3F4;--dark-blue:#5FA09E;--light-blue:#A6E2F9;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--card:#FFFFFF;--tshadow:0 1px 3px rgba(46,37,22,.15);
   color:var(--dark-brown);}
 
-.tdroot .undorow{max-width:860px;margin:0 auto 8px;padding:0 4px;display:flex;gap:6px;align-items:center;}
+.tdroot .undorow{margin:0 0 8px;padding:0 4px;display:flex;gap:6px;align-items:center;}
 .tdroot .undobtn{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:4px 10px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;}
 .tdroot .undobtn:hover:not(:disabled){background:#f4f2ea}
 .tdroot .undobtn:disabled{opacity:.4;cursor:default}
