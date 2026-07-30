@@ -323,19 +323,25 @@ const CSS = `
 .calroot .sidebox.box-up{border-top:3px solid var(--light-brown);}
 .calroot .sidebox.box-td{border-top:3px solid var(--dark-blue);}
 
-/* header / toolbar */
-.calroot .toolbar{display:flex;align-items:center;gap:8px;padding:0;flex-wrap:wrap;margin-bottom:12px;}
-.calroot .nav-btn{background:none;border:1px solid #d5d0c4;width:32px;height:32px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:var(--dark-brown);}
-.calroot .nav-btn:hover{background:#f4f2ea;}
-.calroot .today-btn{background:var(--light-brown);color:var(--dark-brown);border:none;padding:7px 18px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;}
+/* toolbar — inside main, matches v22 */
+.calroot .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.calroot .navstack{display:flex;flex-direction:column;gap:6px;}
+.calroot .navrow{display:flex;align-items:stretch;gap:8px;}
+.calroot .gorow{display:flex;align-items:center;gap:6px;}
+.calroot .golbl{font-size:12px;color:#8a8474;font-weight:600;}
+.calroot .godate{padding:5px 8px;border:1px solid #e2ded2;border-radius:7px;font-family:inherit;font-size:13px;}
+.calroot .navbtn{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:5px 10px;font-size:14px;font-weight:700;border-radius:8px;cursor:pointer;}
+.calroot .navbtn:hover{background:#f4f2ea;}
+.calroot .navbtn.arrow{font-size:22px;padding:0 15px;line-height:1;display:inline-flex;align-items:center;justify-content:center;align-self:stretch;}
+.calroot .today-btn{background:var(--light-brown);color:var(--dark-brown);border:none;padding:8px 22px;font-weight:700;font-size:15px;border-radius:8px;cursor:pointer;}
 .calroot .today-btn:hover{filter:brightness(.96);}
-.calroot .period-label{font-size:18px;font-weight:700;margin-left:4px;white-space:nowrap;}
-.calroot .spacer{flex:1;}
-.calroot .view-btns{display:inline-flex;border:1px solid #d5d0c4;border-radius:8px;overflow:hidden;}
-.calroot .view-btn{background:#fff;border:none;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--dark-brown);border-right:1px solid #d5d0c4;}
-.calroot .view-btn:last-child{border-right:none;}
-.calroot .view-btn.active{background:var(--dark-blue);color:#fff;}
-.calroot .view-btn:hover:not(.active){background:#f4f2ea;}
+.calroot .period-label{font-size:18px;font-weight:700;margin:0 6px;min-width:180px;}
+.calroot .viewtabs{display:inline-flex;gap:4px;margin-left:auto;}
+.calroot .viewtabs button{background:#f0efe7;border:none;color:var(--dark-brown);padding:5px 12px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;}
+.calroot .viewtabs button.on{background:var(--dark-blue);color:#fff;}
+.calroot .viewtabs button:hover:not(.on){background:#e6e3d8;}
+.calroot .addev{background:var(--light-blue);color:var(--dark-brown);border:none;padding:6px 14px;font-weight:700;font-size:13px;border-radius:8px;cursor:pointer;}
+.calroot .addev:hover{filter:brightness(.96);}
 
 /* actions row */
 .calroot .actions-row{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
