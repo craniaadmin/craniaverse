@@ -40,15 +40,78 @@ const SEED_CAT_ORDER = Array.isArray(SEED.categoryOrder) ? SEED.categoryOrder : 
 const SEED_HIDDEN_COLS = (SEED.hiddenCols && typeof SEED.hiddenCols === 'object') ? SEED.hiddenCols : {}
 
 const COLS = [
-  { k: 'number', l: 'Program ID' }, { k: 'code', l: 'Program Code' }, { k: 'name', l: 'Program' },
+  { k: 'number', l: 'Program ID' }, { k: 'code', l: 'Program Code' }, { k: 'name', l: 'Program', gear: 'prog' },
   { k: 'active', l: 'Active' }, { k: 'subject', l: 'Subject', gear: 'cat' }, { k: 'category', l: 'Category', gear: 'cat' },
-  { k: 'year', l: 'Year' }, { k: 'age', l: 'Grade' }, { k: 'location', l: 'Location', gear: 'loc' },
-  { k: 'platform', l: 'Platform' }, { k: 'days', l: 'Days' },
-  { k: 'time', l: 'Time' }, { k: 'duration', l: 'Duration' }, { k: 'lessons', l: '# Of Lessons' },
+  { k: 'year', l: 'Year' }, { k: 'age', l: 'Grade', gear: 'grade' }, { k: 'location', l: 'Location', gear: 'loc' },
+  { k: 'platform', l: 'Platform', gear: 'platform' }, { k: 'days', l: 'Days', gear: 'day' },
+  { k: 'time', l: 'Time', gear: 'time' }, { k: 'duration', l: 'Duration' }, { k: 'lessons', l: '# Of Lessons' },
   { k: 'cost', l: 'Cost' }, { k: 'rate', l: 'Rate/Hr' }, { k: 'hours', l: 'Total Hrs' },
   { k: 'spots', l: 'Enrolment' }, { k: 'instructor', l: 'Instructor' },
 ]
 const COL = Object.fromEntries(COLS.map(c => [c.k, c]))
+
+/* ---------- managed lists ----------
+   Program, Platform, Grade, Time and Day each keep their own colour map and,
+   where the order is the user's to choose, their own order array. `fixed`
+   lists cannot be renamed, reordered or removed — only recoloured. */
+const LIST_KINDS = {
+  prog: { title: 'Programs', field: 'name', colours: 'progColors', order: 'progOrder' },
+  platform: { title: 'Platforms', field: 'platform', colours: 'platformColors', order: 'platformOrder' },
+  grade: { title: 'Grades', field: 'ageRange', colours: 'gradeColors', order: 'gradeOrder', range: true },
+  time: { title: 'Times', field: null, colours: 'timeColors', order: 'timeOrder', time: true },
+  day: { title: 'Days', field: null, colours: 'dayColors', order: null, fixed: true },
+}
+const LIST_STATE_KEYS = ['progColors', 'platformColors', 'gradeColors', 'timeColors', 'dayColors']
+const LIST_ORDER_KEYS = ['progOrder', 'platformOrder', 'gradeOrder', 'timeOrder']
+
+/* The distinct values a managed list offers, read from the data. */
+function listValues(kind, programs, rows) {
+  switch (kind) {
+    case 'prog': return [...new Set(programs.map(p => p.name).filter(Boolean))]
+    case 'platform': return [...new Set(programs.map(p => p.platform).filter(Boolean))]
+    case 'grade': return [...new Set(programs.map(p => p.ageRange).filter(Boolean))]
+    case 'time': return [...new Set(rows.map(r => r.slot && r.slot.start).filter(Boolean))]
+    case 'day': return DOW.map(d => String(d.n))
+    default: return []
+  }
+}
+/* Saved order first, then anything new, sorted naturally. */
+function listOrdered(kind, programs, rows, orderArr) {
+  const K = LIST_KINDS[kind]
+  let vals = listValues(kind, programs, rows).map(String)
+  if (K.order) {
+    (orderArr || []).forEach(v => { if (!vals.includes(v)) vals.push(v) })
+    if (K.time) vals = vals.sort()
+    const ord = (orderArr || []).filter(v => vals.includes(v))
+    vals = ord.concat(vals.filter(v => !ord.includes(v))
+      .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true })))
+  } else if (K.time) vals = vals.sort()
+  return vals
+}
+function listLabel(kind, v) {
+  if (kind === 'grade') return fmtGrade(v)
+  if (kind === 'time') return fmtTime(v)
+  if (kind === 'day') return (DOW.find(d => String(d.n) === String(v)) || {}).l || v
+  return v
+}
+function listUsage(kind, v, programs, rows) {
+  if (kind === 'prog') return rows.filter(r => r.name === v).length
+  if (kind === 'day') return rows.filter(r => String(r.day) === String(v)).length
+  if (kind === 'time') return rows.filter(r => r.slot && r.slot.start === v).length
+  const K = LIST_KINDS[kind]
+  return programs.filter(p => (p[K.field] || '') === v).length
+}
+
+/* Which table cells carry the colour their managed list assigns, and how to
+   read the value to look up. */
+const MANAGED_KIND = { name: 'prog', platform: 'platform', age: 'grade', days: 'day', time: 'time' }
+const MANAGED_VALUE = {
+  name: r => r.name,
+  platform: r => r.platform,
+  age: r => r.age,
+  days: r => (r.day == null ? '' : String(r.day)),
+  time: r => (r.slot && r.slot.start) || '',
+}
 
 /* Which filter list each column drives. "gen:" keys derive their options from the rows. */
 const FK = {
