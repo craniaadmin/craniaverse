@@ -335,29 +335,35 @@ export default function ClassLists({ onNavigate }) {
                     background: isOpen ? '#f4f9f9' : '#fff',
                   }}
                 >
-                  {isOpen ? <ChevronDown size={16} color="var(--brand-dark-blue)" /> : <ChevronRight size={16} color="var(--brand-dark-blue)" />}
+                  <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+                    {isOpen ? <ChevronDown size={16} color="var(--brand-dark-blue)" /> : <ChevronRight size={16} color="var(--brand-dark-blue)" />}
+                  </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--brand-dark-blue)' }}>{c.program.title}</span>
-                      {c.program.category && (
-                        <span style={pillStyle}>{c.program.category}</span>
-                      )}
+                    {/* The name has to be allowed to shrink, or a long one pushes
+                        the link and the count out of alignment row to row. */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                      <span style={{
+                        fontWeight: 700, fontSize: 14, color: 'var(--brand-dark-blue)',
+                        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>{c.program.name}</span>
                       {c.program.active === false && (
-                        <span style={{ ...pillStyle, background: '#eef1f4', color: '#6B6455' }}>Inactive</span>
+                        <span style={{ ...pillStyle, background: '#eef1f4', color: '#6B6455', flexShrink: 0 }}>Inactive</span>
                       )}
                       <button
                         onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate('Programs') }}
                         title="View in Programs"
-                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex' }}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex', flexShrink: 0 }}
                       ><ExternalLink size={13} /></button>
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.sessions.length === 0
                         ? 'No offerings scheduled'
-                        : c.sessions.map((s) => `${offeringLabel(s.offering)}${s.offering.teacher ? ` · ${s.offering.teacher}` : ''}`).join('  •  ')}
+                        : c.sessions.map((s) => `${sessionLabel(s.session)}${s.session.instructor ? ` · ${s.session.instructor}` : ''}`).join('  •  ')}
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  {/* Fixed width so the counts line up down the column instead of
+                      drifting with the number of digits. */}
+                  <div style={{ textAlign: 'right', flexShrink: 0, width: 78 }}>
                     <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--ink)' }}>
                       {c.roster.length}{hasCapacity ? ` / ${capacity}` : ''}
                     </div>
