@@ -1911,6 +1911,7 @@ function ConfirmDialog({ msg, onYes, onNo }) {
 function CalSettingsPopover({ onClose }) {
   const ref = useRef(null)
   const [backups, setBackups] = useState(null)
+  const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
   const [restoreOpen, setRestoreOpen] = useState(false)
 
