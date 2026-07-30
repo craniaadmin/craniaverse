@@ -552,9 +552,6 @@ export default function Programs() {
   )
 }
 
-// need React for Fragment
-import React from 'react'
-
 const ProgramsSettingsPopover = forwardRef(function ProgramsSettingsPopover({ onClose, programs, setPrograms }, ref) {
   const [backups, setBackups] = useState(null)
   const [busy, setBusy] = useState(false)
