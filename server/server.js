@@ -636,6 +636,18 @@ app.put('/api/programs/decrement-spots', wrap(async (req, res) => {
   res.json({ ok: true, decremented: count })
 }))
 
+// ---- programs backups --------
+app.get('/api/programs/backups', wrap(async (_req, res) => res.json(await listProgramsBackups())))
+app.post('/api/programs/backup', wrap(async (req, res) => {
+  const label = (req.body?.label || '').trim() || new Date().toLocaleString()
+  await createProgramsBackup(label)
+  res.json({ ok: true })
+}))
+app.post('/api/programs/restore/:id', wrap(async (req, res) => {
+  const payload = await restoreProgramsBackup(req.params.id)
+  res.json(payload)
+}))
+
 app.get('/api/staff-board', wrap(async (_req, res) => res.json(await loadStaffBoard())))
 app.put('/api/staff-board', wrap(async (req, res) => {
   const body = req.body
