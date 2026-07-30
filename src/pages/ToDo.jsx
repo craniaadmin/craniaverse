@@ -326,6 +326,10 @@ const CSS = `
 .tdroot .clentry{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #f0ece2;}
 .tdroot .clentry:last-child{border-bottom:none;}
 .tdroot .clentry.inactive{opacity:.55;}
+.tdroot .clentmoves{display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity .15s;}
+.tdroot .clentry:hover .clentmoves,.tdroot .clentry:focus-within .clentmoves{opacity:1;}
+.tdroot .clentmove{background:none;border:none;color:#9a948a;padding:0 1px;font-size:9px;line-height:1;font-weight:700;cursor:pointer;}
+.tdroot .clentmove:hover{color:var(--dark-blue);}
 .tdroot .clenttext{flex:1 1 130px;min-width:90px;padding:4px 7px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12.5px;background:#fff;}
 .tdroot .clentnote{flex:1 1 90px;min-width:60px;padding:4px 7px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12.5px;color:#6b6455;background:#fff;}
 .tdroot .clentfreq{padding:4px 6px;border:1px solid #d5d0c4;border-radius:5px;font:inherit;font-size:12px;background:#fff;}
