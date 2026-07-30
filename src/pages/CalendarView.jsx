@@ -39,6 +39,12 @@ const startOfWeekMon = (d) => { const x = new Date(d); x.setHours(0,0,0,0); x.se
 const sameDay = (a, b) => a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
 
+/* The reds carry more weight than the rest of the palette, so their wash is
+   lighter — at the same alpha they shout. */
+function isRedColor(col) {
+  const c = String(col || '').toUpperCase()
+  return c === '#C00000' || c === '#FF0000' || c === '#ED1C24' || c === '#E06666'
+}
 function isDarkColor(hex) {
   const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '')
   if (!m) return false
