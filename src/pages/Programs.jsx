@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
-import { Plus, Filter, Search, Edit2, Trash2, Download } from 'lucide-react'
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../data/store'
 
-// Convert "16:30" / "16:30:00" -> "4:30 pm"
+const API_BASE = import.meta.env?.VITE_API_URL || ''
+const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
+
 function fmtTime(t) {
   if (!t) return ''
   const m = String(t).match(/^(\d{1,2}):(\d{2})/)
@@ -20,36 +21,91 @@ const PLATFORMS = ['In-Person', 'Online', 'In-Person/Online']
 const PERIODS = ['/week', '/month', '/term', '/year']
 const COST_UNITS = ['', '/week', '/month', '/term', '/year', '/session', '/class']
 
-// ─── Number / Code generators ──────────────────────────────────────────────
-// TODO: replace with the real equation once defined. Deterministic
-// placeholders so new rows aren't blank.
-function generateNumber(p, existingProgramsCount) {
-  return String(90000 + existingProgramsCount)
-}
+function generateNumber(_p, count) { return String(90000 + count) }
 function generateCode(p) {
   const slug = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '')
   const loc = (p.location || 'TBD').slice(0, 2).toUpperCase()
   return [loc, slug(p.category), slug(p.subject), slug(p.title)].filter(Boolean).join('-') || 'TBD'
 }
 
-const HEAD_STYLE = {
-  background: '#3d8e90', color: '#fff', fontWeight: 700, fontSize: 11,
-  letterSpacing: '.4px', padding: '5px 8px', borderRadius: 5, textAlign: 'left',
-  textTransform: 'uppercase',
-  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-  display: 'flex', alignItems: 'center', height: 26, boxSizing: 'border-box',
-}
+const TABLE_COLS = [
+  { id: 'active',    label: 'Active',        w: '62px' },
+  { id: 'number',    label: 'Number',        w: '70px' },
+  { id: 'code',      label: 'Code',          w: '150px' },
+  { id: 'category',  label: 'Category',      w: '130px' },
+  { id: 'subject',   label: 'Subject',       w: '90px' },
+  { id: 'title',     label: 'Program',       w: '210px' },
+  { id: 'duration',  label: 'Duration',      w: '74px' },
+  { id: 'sessions',  label: 'Lessons',       w: '100px' },
+  { id: 'rateHr',    label: 'Rate/Hr',       w: '80px' },
+  { id: 'fees',      label: 'Fees',          w: '110px' },
+  { id: 'location',  label: 'Location',      w: '100px' },
+  { id: 'offerings', label: 'Offerings',     w: '380px' },
+  { id: 'edit',      label: '',              w: '59px' },
+]
 
-const CELL_BOX = {
-  background: '#eef1f2', borderRadius: 5, padding: '5px 8px',
-  fontSize: 12, color: 'var(--ink)', height: 26, boxSizing: 'border-box',
-  display: 'flex', alignItems: 'center', minWidth: 0,
-  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-}
+const FILTER_FIELDS = [
+  { key: 'number', label: 'Number' },
+  { key: 'code', label: 'Code' },
+  { key: 'category', label: 'Category' },
+  { key: 'subject', label: 'Subject' },
+  { key: 'title', label: 'Program Title' },
+  { key: 'location', label: 'Location' },
+]
 
-// Compact widths sized to fit the longest expected content.
-const GRID_COLS = '70px 70px 170px 110px 80px 210px 70px 100px 80px 110px 100px 380px 70px'
-const TABLE_MIN_WIDTH = 1634
+const PG_CSS = `
+.pg-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.pg-actions button{background:#fff;border:1px solid #e2ded2;color:var(--brand-dark-brown,#2E2516);padding:6px 12px;font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit}
+.pg-actions button:hover{background:#f4f2ea}
+.pg-actions button:disabled{opacity:.4;cursor:default}
+.pg-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:14px}
+.pg-metric{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(46,37,22,.15);border-bottom:3px solid #5FA09E;cursor:default}
+.pg-metric.m-act{border-bottom-color:#E0DE85}
+.pg-metric.m-spots{border-bottom-color:#c0392b}
+.pg-metric.m-hours{border-bottom-color:#A6E2F9}
+.pg-metric .m-label{font-size:12.5px;color:#6b6455;font-weight:600;margin-bottom:4px}
+.pg-metric .m-value{font-size:24px;font-weight:700;color:#2E2516;font-variant-numeric:tabular-nums}
+.pg-metric .m-hint{font-size:11.5px;color:#9a948a;margin-top:3px}
+.pg-filters{display:flex;align-items:center;gap:8px;padding:8px 0 14px;flex-wrap:wrap}
+.pg-filters input[type=search]{padding:7px 12px;border:1px solid #D5D0C4;border-radius:8px;font-size:13px;color:#2E2516;background:#fff;width:220px}
+.pg-filters input[type=search]::placeholder{color:#9A948A}
+.pg-filters input[type=search]:focus{outline:none;border-color:#5FA09E}
+.pg-filters select{padding:7px 12px;border:1px solid #D5D0C4;border-radius:8px;font-size:13px;color:#2E2516;background:#fff}
+.pg-filters select:focus{outline:none;border-color:#5FA09E}
+.pg-card{background:#fff;border-radius:12px 12px 0 0;box-shadow:0 1px 3px rgba(46,37,22,.15);border-left:3px solid #A6E2F9;border-right:3px solid #E0DE85;border-bottom:3px solid #5FA09E;overflow-x:auto}
+.pg-card table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:5px 5px;background:#fff}
+.pg-card thead th{background:#5FA09E;color:#fff;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:6px 8px;height:26px;white-space:nowrap;border-radius:6px}
+.pg-card tbody td{padding:4px 7px;background:#F1F3F4;border-radius:5px;font-size:12px;font-weight:400;vertical-align:middle;white-space:nowrap;line-height:1.35;height:22px;overflow:hidden;text-overflow:ellipsis}
+.pg-card tbody tr:hover td{background:#E4EFF3}
+.pg-card tbody tr.inactive td{color:#b0a99e}
+.pg-card thead th.th-edit{background:transparent}
+.pg-card td.td-active{text-align:center;background:transparent}
+.pg-card td.td-edit{text-align:center;background:transparent;white-space:nowrap}
+.pg-colspop{position:fixed;z-index:200;background:#fff;border:1px solid #E7EBE7;border-radius:12px;box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;overflow:auto}
+.pg-colspop .h{font-size:12px;color:#6B6455;font-weight:700;margin:2px 2px 7px}
+.pg-colspop .ch{display:flex;align-items:center;gap:9px;padding:5px 3px;font-size:13px;font-weight:600;cursor:pointer}
+.pg-colspop .ch:hover{background:#f4f2ea;border-radius:6px}
+.pg-colspop .ch input{margin:0;accent-color:#5FA09E}
+.pg-colspop .allrow{border-top:1px solid #EDEAE2;margin-top:4px;padding-top:4px;display:flex;gap:4px}
+.pg-colspop .allrow button{background:none;border:none;color:#5FA09E;font-weight:700;font-size:12.5px;text-align:center;padding:6px 8px;border-radius:6px;flex:1;cursor:pointer}
+.pg-colspop .allrow button:hover{background:#f4f2ea}
+.pg-settings{position:fixed;z-index:200;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(46,37,22,.25);padding:14px;width:300px;top:120px;right:16px}
+.pg-settings .sp-title{font-weight:700;font-size:14px;margin-bottom:6px;color:#2E2516}
+.pg-settings .sp-hint{font-size:12px;color:#6b6455;line-height:1.4;margin-bottom:4px}
+.pg-settings .sp-btnrow{display:flex;gap:8px;margin-top:4px}
+.pg-settings .sp-btn{background:#5FA09E;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.pg-settings .sp-btn:hover:not(:disabled){filter:brightness(1.08)}
+.pg-settings .sp-btn:disabled{opacity:.5;cursor:default}
+.pg-settings .sp-list{margin-top:8px;max-height:170px;overflow-y:auto}
+.pg-settings .sp-row{display:flex;align-items:center;padding:5px 6px;border-radius:6px;font-size:12px;margin-bottom:2px;background:#fff}
+.pg-settings .sp-row:hover{background:#f4f2ea}
+.pg-settings .sp-row .sp-rlabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455}
+.pg-settings .sp-row .sp-btn{padding:3px 8px;font-size:11px}
+.rowbtn{background:none;border:none;color:#c9c3b5;padding:0;font-size:12px;line-height:1;width:15px;height:15px;border-radius:4px;cursor:pointer;transition:color .15s}
+.rowbtn:hover{background:none}
+.rowbtn.rb-pen:hover,.rowbtn.rb-dup:hover{color:#5FA09E}
+.rowbtn.rb-del:hover{color:#c0392b}
+`
 
 function blankProgram() {
   return {
@@ -64,16 +120,6 @@ function blankOffering() {
   return { active: true, day: 'Mon', start: '16:30', end: '17:25', spots: null, platform: 'In-Person', teacher: '' }
 }
 
-// Fields the user can filter by
-const FILTER_FIELDS = [
-  { key: 'number', label: 'Number' },
-  { key: 'code', label: 'Code' },
-  { key: 'category', label: 'Category' },
-  { key: 'subject', label: 'Subject' },
-  { key: 'title', label: 'Program Title' },
-  { key: 'location', label: 'Location' },
-]
-
 function offeringWeeklyHours(prog) {
   if (prog.period && prog.period !== '/week') return 0
   const mins = Number(prog.duration) || 0
@@ -82,19 +128,40 @@ function offeringWeeklyHours(prog) {
 }
 
 export default function Programs() {
-  const { staff, programs, setPrograms } = useStore()
+  const { staff, programs, setPrograms, registrations } = useStore()
   const teacherOptions = useMemo(
     () => staff.map(s => `${s.firstName} ${s.lastName}`.trim()).filter(Boolean).sort(),
-    [staff]
+    [staff],
   )
-  const [filter, setFilter] = useState({ field: null, value: null }) // { field: 'category', value: 'FLEX' }
-  const [filterOpen, setFilterOpen] = useState(false)
-  const [activePane, setActivePane] = useState(FILTER_FIELDS[2].key) // default to Category
-  const [search, setSearch] = useState('')
-  const [availFilter, setAvailFilter] = useState('all') // all | open | full
-  const [editing, setEditing] = useState(null) // null | { mode:'new'|'edit', program, index }
 
-  // Unique values for the currently hovered/active filter field
+  const [filter, setFilter] = useState({ field: null, value: null })
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [activePane, setActivePane] = useState(FILTER_FIELDS[2].key)
+  const [search, setSearch] = useState('')
+  const [availFilter, setAvailFilter] = useState('all')
+  const [editing, setEditing] = useState(null)
+  const [hiddenCols, setHiddenCols] = useState({})
+  const [colsOpen, setColsOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const colsBtnRef = useRef(null)
+  const colsPopRef = useRef(null)
+  const settingsRef = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (colsOpen && colsPopRef.current && !colsPopRef.current.contains(e.target)
+          && colsBtnRef.current && !colsBtnRef.current.contains(e.target)) setColsOpen(false)
+      if (settingsOpen && settingsRef.current && !settingsRef.current.contains(e.target)) setSettingsOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [colsOpen, settingsOpen])
+
+  const visCols = useMemo(
+    () => TABLE_COLS.filter(c => !hiddenCols[c.id]),
+    [hiddenCols],
+  )
+
   const valuesForField = useMemo(() => {
     if (!activePane) return []
     const set = new Set(programs.map(p => p[activePane]).filter(Boolean))
@@ -125,7 +192,6 @@ export default function Programs() {
     ? `${FILTER_FIELDS.find(f => f.key === filter.field)?.label}: ${filter.value}`
     : 'Filter'
 
-  // ── Metrics ──
   const metrics = useMemo(() => {
     const activeCount = programs.filter(p => p.active !== false).length
     const scheduledEntries = programs.reduce((n, p) => n + (p.offerings || []).length, 0)
@@ -193,51 +259,118 @@ export default function Programs() {
       return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str
     }).join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url
+    a.href = URL.createObjectURL(blob)
     a.download = 'crania-programs.csv'
     a.click()
-    URL.revokeObjectURL(url)
+    URL.revokeObjectURL(a.href)
+  }
+
+  const toggleCol = (colId) => setHiddenCols(prev => {
+    const next = { ...prev }
+    if (next[colId]) delete next[colId]; else next[colId] = true
+    return next
+  })
+  const anyHidden = TABLE_COLS.some(c => c.id !== 'edit' && hiddenCols[c.id])
+  const toggleAllCols = () => {
+    if (anyHidden) setHiddenCols({})
+    else setHiddenCols(Object.fromEntries(TABLE_COLS.filter(c => c.id !== 'edit').map(c => [c.id, true])))
+  }
+
+  const cellVal = (p, col) => {
+    switch (col.id) {
+      case 'active': return null
+      case 'number': return p.number
+      case 'code': return p.code
+      case 'category': return p.category
+      case 'subject': return p.subject
+      case 'title': return p.title
+      case 'duration': return p.duration ? `${p.duration} min` : ''
+      case 'sessions': return `${p.sessions ?? ''}${p.period ? ` ${p.period}` : ''}`
+      case 'rateHr': return p.rateHr ? `$${Number(p.rateHr).toFixed(2)}` : ''
+      case 'fees': return p.fees ? `$${p.fees}${p.costUnit || ' /month'}` : ''
+      case 'location': return p.location
+      default: return ''
+    }
   }
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
-      <div className="page-head" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <h2 className="page-title" style={{ marginRight: 'auto' }}>Programs</h2>
-        <button onClick={exportCsv} title="Export CSV" style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
-          fontSize: 13, fontWeight: 600, padding: '9px 14px', borderRadius: 8,
-          border: '1px solid var(--line)', background: '#fff', color: 'var(--ink)', cursor: 'pointer',
-        }}>
-          <Download size={15} /> Export CSV
-        </button>
-        <button className="icon-btn solid" onClick={addProgram} title="Add new program">
-          <Plus size={22} />
-        </button>
+      <style>{PG_CSS}</style>
+      <h2 className="page-title">Programs</h2>
+
+      {/* Toolbar row — matches the v47 template */}
+      <div className="pg-actions">
+        <button title="Create Schedule Image" onClick={() => alert('Schedule image export coming soon.')}>🖼 Create Schedule</button>
+        <button ref={colsBtnRef} title="Choose which columns are shown" onClick={() => setColsOpen(v => !v)}>👁 Columns</button>
+        <button title="Settings" onClick={() => setSettingsOpen(v => !v)} style={{ marginLeft: 'auto' }}>⚙</button>
+        <button onClick={exportCsv} title="Download all programs as a CSV file">⤓ Export CSV</button>
       </div>
+
+      {colsOpen && (
+        <div className="pg-colspop" ref={colsPopRef}
+          style={{
+            top: colsBtnRef.current ? colsBtnRef.current.getBoundingClientRect().bottom + 6 : 200,
+            left: colsBtnRef.current ? Math.min(colsBtnRef.current.getBoundingClientRect().left, window.innerWidth - 220) : 100,
+          }}
+        >
+          <div className="h">Show Columns</div>
+          {TABLE_COLS.filter(c => c.id !== 'edit').map(col => (
+            <label key={col.id} className="ch">
+              <input type="checkbox" checked={!hiddenCols[col.id]} onChange={() => toggleCol(col.id)} />
+              <span>{col.label}</span>
+            </label>
+          ))}
+          <div className="allrow">
+            <button type="button" onClick={toggleAllCols}>
+              {anyHidden ? 'Show All' : 'Hide All'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {settingsOpen && (
+        <ProgramsSettingsPopover
+          ref={settingsRef}
+          onClose={() => setSettingsOpen(false)}
+          programs={programs}
+          setPrograms={setPrograms}
+        />
+      )}
 
       {/* Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 14 }}>
-        <MetricTile label="Programs" value={programs.length} hint={`${metrics.scheduledEntries} scheduled entries`} />
-        <MetricTile label="Active" value={metrics.activeCount} hint={`${programs.length - metrics.activeCount} inactive`} />
-        <MetricTile label="Spots Open" value={metrics.spotsOpen} hint={`across ${metrics.classesWithSpots} classes`} color="#a12626" />
-        <MetricTile label="Weekly Hours" value={metrics.weeklyHours.toFixed(1)} hint="contact hours across the week" color="var(--brand-dark-blue)" />
+      <div className="pg-metrics">
+        <div className="pg-metric">
+          <div className="m-label">Programs</div>
+          <div className="m-value">{programs.length}</div>
+          <div className="m-hint">{metrics.scheduledEntries} scheduled entries</div>
+        </div>
+        <div className="pg-metric m-act">
+          <div className="m-label">Active</div>
+          <div className="m-value">{metrics.activeCount}</div>
+          <div className="m-hint">{programs.length - metrics.activeCount} inactive</div>
+        </div>
+        <div className="pg-metric m-spots">
+          <div className="m-label">Spots Open</div>
+          <div className="m-value">{metrics.spotsOpen}</div>
+          <div className="m-hint">across {metrics.classesWithSpots} classes</div>
+        </div>
+        <div className="pg-metric m-hours">
+          <div className="m-label">Weekly Hours</div>
+          <div className="m-value">{metrics.weeklyHours.toFixed(1)}</div>
+          <div className="m-hint">contact hours across the week</div>
+        </div>
       </div>
 
-      {/* Toolbar */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: '1 1 240px', maxWidth: 320 }}>
-          <Search size={14} style={{ position: 'absolute', top: 9, left: 10, color: 'var(--muted)' }} />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search programs, instructors, codes…"
-            style={{ width: '100%', padding: '7px 8px 7px 30px', fontSize: 13, border: '1px solid #d5d0c4', borderRadius: 8, background: '#fff' }}
-          />
-        </div>
-        <select value={availFilter} onChange={e => setAvailFilter(e.target.value)}
-          style={{ padding: '7px 10px', fontSize: 13, border: '1px solid #d5d0c4', borderRadius: 8, background: '#fff' }}>
+      {/* Filters row */}
+      <div className="pg-filters">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search programs, instructors, codes…"
+        />
+        <select value={availFilter} onChange={e => setAvailFilter(e.target.value)}>
           <option value="all">Any Availability</option>
           <option value="open">Spots Open</option>
           <option value="full">Full</option>
@@ -249,13 +382,12 @@ export default function Programs() {
             onClick={() => setFilterOpen(o => !o)}
             style={{
               display: 'flex', alignItems: 'center', gap: 6,
-              background: filter.field ? 'var(--logo-teal)' : '#eef1f2',
-              color: filter.field ? '#fff' : 'var(--ink)',
-              border: 'none', borderRadius: 8, padding: '8px 14px',
+              background: filter.field ? '#5FA09E' : '#fff',
+              color: filter.field ? '#fff' : '#2E2516',
+              border: filter.field ? 'none' : '1px solid #D5D0C4', borderRadius: 8, padding: '7px 14px',
               fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
             }}>
-            <Filter size={16} />
-            {filterLabel}
+            🔍 {filterLabel}
             {filter.field && (
               <span
                 onClick={(e) => { e.stopPropagation(); setFilter({ field: null, value: null }) }}
@@ -267,12 +399,12 @@ export default function Programs() {
           {filterOpen && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, marginTop: 4, zIndex: 10,
-              background: '#fff', border: '1px solid var(--line)', borderRadius: 8,
+              background: '#fff', border: '1px solid #E7EBE7', borderRadius: 8,
               boxShadow: '0 4px 12px rgba(0,0,0,.1)',
               display: 'grid', gridTemplateColumns: '140px 320px',
               height: 360, overflow: 'hidden',
             }}>
-              <div style={{ borderRight: '1px solid var(--line)', background: '#fafbfb', overflowY: 'auto', minHeight: 0 }}>
+              <div style={{ borderRight: '1px solid #E7EBE7', background: '#fafbfb', overflowY: 'auto', minHeight: 0 }}>
                 {FILTER_FIELDS.map(f => (
                   <div
                     key={f.key}
@@ -281,8 +413,8 @@ export default function Programs() {
                       padding: '10px 14px', fontSize: 13, cursor: 'pointer',
                       background: activePane === f.key ? '#fff' : 'transparent',
                       fontWeight: activePane === f.key ? 700 : 500,
-                      color: activePane === f.key ? 'var(--logo-teal)' : 'var(--ink-soft)',
-                      borderLeft: activePane === f.key ? '3px solid var(--logo-teal)' : '3px solid transparent',
+                      color: activePane === f.key ? '#5FA09E' : '#6B6455',
+                      borderLeft: activePane === f.key ? '3px solid #5FA09E' : '3px solid transparent',
                     }}
                   >
                     {f.label}
@@ -291,7 +423,7 @@ export default function Programs() {
               </div>
               <div style={{ overflowY: 'auto', minHeight: 0 }}>
                 {valuesForField.length === 0 ? (
-                  <div style={{ padding: 14, fontSize: 13, color: 'var(--muted)', fontStyle: 'italic' }}>No values.</div>
+                  <div style={{ padding: 14, fontSize: 13, color: '#9A948A', fontStyle: 'italic' }}>No values.</div>
                 ) : valuesForField.map(v => {
                   const isActive = filter.field === activePane && filter.value === v
                   return (
@@ -300,9 +432,9 @@ export default function Programs() {
                       onClick={() => { setFilter({ field: activePane, value: v }); setFilterOpen(false) }}
                       style={{
                         padding: '9px 14px', fontSize: 13, cursor: 'pointer',
-                        background: isActive ? 'rgba(61,142,144,.10)' : 'transparent',
+                        background: isActive ? 'rgba(95,160,158,.10)' : 'transparent',
                         fontWeight: isActive ? 700 : 500,
-                        color: isActive ? 'var(--logo-teal)' : 'var(--ink)',
+                        color: isActive ? '#5FA09E' : '#2E2516',
                         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                       }}
                       onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#f5f5f5' }}
@@ -317,150 +449,113 @@ export default function Programs() {
             </div>
           )}
         </div>
-        <div style={{ marginLeft: 'auto', fontSize: 13, color: 'var(--muted)' }}>{visible.length} of {programs.length}</div>
+
+        <button onClick={addProgram} style={{
+          marginLeft: 'auto', background: '#A6E2F9', color: '#2E2516',
+          border: 'none', borderRadius: 8, padding: '8px 14px',
+          fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+        }}>
+          + Add Program
+        </button>
       </div>
 
-      {/* Scroll container */}
-      <div style={{
-        overflow: 'auto', width: '100%', maxWidth: '100%',
-        height: 'calc(100vh - 300px)',
-        border: '1px solid var(--line)', borderRadius: 8, background: '#fff',
-      }}>
-
-      <div style={{
-        display: 'grid', gridTemplateColumns: GRID_COLS,
-        gap: 6, marginBottom: 10, minWidth: TABLE_MIN_WIDTH,
-        position: 'sticky', top: 0, zIndex: 5,
-        background: '#fff', padding: '12px 12px 6px',
-      }}>
-        <div style={HEAD_STYLE}>Active</div>
-        <div style={HEAD_STYLE}>Number</div>
-        <div style={HEAD_STYLE}>Code</div>
-        <div style={HEAD_STYLE}>Category</div>
-        <div style={HEAD_STYLE}>Subject</div>
-        <div style={HEAD_STYLE}>Program Title</div>
-        <div style={HEAD_STYLE}>Duration</div>
-        <div style={HEAD_STYLE}>Sessions</div>
-        <div style={HEAD_STYLE}>Rate/Hr</div>
-        <div style={HEAD_STYLE}>Fees</div>
-        <div style={HEAD_STYLE}>Location</div>
-        <div style={HEAD_STYLE}>Offerings</div>
-        <div style={{ ...HEAD_STYLE, background: 'transparent', color: 'var(--muted)', justifyContent: 'center' }}>Edit</div>
-      </div>
-
-      {visible.length === 0 && (
-        <div style={{ padding: 24, textAlign: 'center', color: 'var(--muted)', fontStyle: 'italic' }}>
-          No programs match this filter.
-        </div>
-      )}
-
-      {visible.map((p) => {
-        const i = programs.indexOf(p)
-        return (
-          <div key={i} style={{
-            display: 'grid', gridTemplateColumns: GRID_COLS,
-            gap: 6, marginBottom: 5, alignItems: 'start',
-            opacity: p.active ? 1 : 0.5, minWidth: TABLE_MIN_WIDTH,
-            padding: '0 10px',
-          }}>
-            <div style={{ ...CELL_BOX, justifyContent: 'center', background: 'transparent' }}>
-              <input
-                type="checkbox"
-                checked={p.active}
-                onChange={() => toggleProgram(i)}
-                style={{ width: 18, height: 18, accentColor: 'var(--logo-teal)', cursor: 'pointer' }}
-              />
-            </div>
-            <div style={CELL_BOX}>{p.number}</div>
-            <div style={CELL_BOX}>{p.code}</div>
-            <div style={CELL_BOX}>{p.category}</div>
-            <div style={CELL_BOX}>{p.subject}</div>
-            <div style={{ ...CELL_BOX, fontWeight: 600 }}>{p.title}</div>
-            <div style={CELL_BOX}>{p.duration ? `${p.duration} min` : ''}</div>
-            <div style={CELL_BOX}>
-              {p.sessions ?? ''}{p.period ? ` ${p.period}` : ''}
-            </div>
-            <div style={CELL_BOX}>{p.rateHr ? `$${p.rateHr.toFixed(2)}` : ''}</div>
-            <div style={CELL_BOX}>
-              {p.fees ? `$${p.fees}` : ''}{p.fees ? (p.costUnit || ' /month') : ''}
-            </div>
-            <div style={CELL_BOX}>{p.location}</div>
-
-            {/* Offerings sub-panel — read-only preview; edit via the pencil icon */}
-            <div style={{
-              background: '#eef1f2', borderRadius: 5, padding: '5px 8px',
-              minWidth: 0, maxHeight: 170, overflowY: 'auto', overflowX: 'hidden',
-            }}>
-              <div style={{
-                display: 'grid', gridTemplateColumns: '32px 44px 90px 44px 1fr',
-                gap: 4, fontSize: 10, fontWeight: 700, color: 'var(--ink-soft)',
-                textDecoration: 'underline', paddingBottom: 3,
-              }}>
-                <div>Active</div>
-                <div>Day</div>
-                <div>Time</div>
-                <div>Spots</div>
-                <div>Teacher</div>
-              </div>
-              {p.offerings.length === 0 ? (
-                <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', padding: '4px 0' }}>
-                  No offerings yet.
-                </div>
-              ) : p.offerings.map((o, j) => (
-                <div key={j} style={{
-                  display: 'grid', gridTemplateColumns: '32px 44px 90px 44px 1fr',
-                  gap: 4, fontSize: 11, padding: '1px 0',
-                  opacity: o.active ? 1 : 0.5,
-                }}>
-                  <div>
-                    <input
-                      type="checkbox"
-                      checked={o.active}
-                      onChange={() => toggleOffering(i, j)}
-                      style={{ width: 14, height: 14, accentColor: 'var(--logo-teal)', cursor: 'pointer' }}
-                    />
-                  </div>
-                  <div>{o.day}</div>
-                  <div>{fmtTime(o.start)}</div>
-                  <div>{o.spots ?? ''}</div>
-                  <select
-                    value={o.teacher || ''}
-                    onChange={(e) => setOfferingTeacher(i, j, e.target.value)}
-                    title={o.teacher || ''}
-                    style={{
-                      minWidth: 0, width: '100%',
-                      fontFamily: 'inherit', fontSize: 11,
-                      color: o.teacher ? 'var(--ink)' : 'var(--muted)',
-                      background: 'transparent', border: '1px solid transparent',
-                      borderRadius: 3, padding: '1px 2px', cursor: 'pointer',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--line)' }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent' }}
-                  >
-                    <option value="">—</option>
-                    {o.teacher && !teacherOptions.includes(o.teacher) && (
-                      <option value={o.teacher}>{o.teacher}</option>
-                    )}
-                    {teacherOptions.map(t => (
-                      <option key={t} value={t}>{t}</option>
-                    ))}
-                  </select>
-                </div>
+      {/* Table */}
+      <div className="pg-card">
+        <table>
+          <thead>
+            <tr>
+              {visCols.map(col => (
+                <th key={col.id} className={col.id === 'edit' ? 'th-edit' : ''}
+                  style={{ width: col.w, minWidth: col.w }}>
+                  {col.label}
+                </th>
               ))}
-            </div>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.length === 0 && (
+              <tr><td colSpan={visCols.length} style={{ textAlign: 'center', color: '#9A948A', padding: 40 }}>No programs match this filter.</td></tr>
+            )}
+            {visible.map((p) => {
+              const i = programs.indexOf(p)
+              return (
+                <tr key={i} className={p.active === false ? 'inactive' : ''}>
+                  {visCols.map(col => {
+                    if (col.id === 'active') {
+                      return (
+                        <td key={col.id} className="td-active">
+                          <input type="checkbox" checked={p.active !== false} onChange={() => toggleProgram(i)}
+                            style={{ width: 14, height: 14, accentColor: '#5FA09E', cursor: 'pointer' }} />
+                        </td>
+                      )
+                    }
+                    if (col.id === 'offerings') {
+                      return (
+                        <td key={col.id} style={{ whiteSpace: 'normal', maxWidth: 380, verticalAlign: 'top', padding: '4px 7px' }}>
+                          {(p.offerings || []).length === 0 ? (
+                            <span style={{ fontSize: 11, color: '#9a948a', fontStyle: 'italic' }}>No offerings</span>
+                          ) : (p.offerings || []).map((o, j) => (
+                            <div key={j} style={{
+                              display: 'flex', gap: 6, fontSize: 11, padding: '1px 0',
+                              opacity: o.active !== false ? 1 : 0.5, alignItems: 'center',
+                            }}>
+                              <input type="checkbox" checked={o.active !== false} onChange={() => toggleOffering(i, j)}
+                                style={{ width: 12, height: 12, accentColor: '#5FA09E', cursor: 'pointer', flex: 'none' }} />
+                              <span>{o.day}</span>
+                              <span>{fmtTime(o.start)}</span>
+                              <span style={{ color: '#9a948a' }}>{o.spots != null ? `${o.spots} spots` : ''}</span>
+                              <select
+                                value={o.teacher || ''}
+                                onChange={(e) => setOfferingTeacher(i, j, e.target.value)}
+                                style={{
+                                  minWidth: 0, flex: 1,
+                                  fontFamily: 'inherit', fontSize: 11,
+                                  color: o.teacher ? '#2E2516' : '#9A948A',
+                                  background: 'transparent', border: '1px solid transparent',
+                                  borderRadius: 3, padding: '1px 2px', cursor: 'pointer',
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.borderColor = '#E7EBE7' }}
+                                onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent' }}
+                              >
+                                <option value="">—</option>
+                                {o.teacher && !teacherOptions.includes(o.teacher) && <option value={o.teacher}>{o.teacher}</option>}
+                                {teacherOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                              </select>
+                            </div>
+                          ))}
+                        </td>
+                      )
+                    }
+                    if (col.id === 'edit') {
+                      return (
+                        <td key={col.id} className="td-edit">
+                          <button className="rowbtn rb-pen" title="Edit" onClick={() => editProgram(i)}>✎</button>
+                          {' '}
+                          <button className="rowbtn rb-dup" title="Duplicate" onClick={() => {
+                            setPrograms(list => {
+                              const dup = { ...list[i], number: generateNumber(list[i], list.length), offerings: (list[i].offerings || []).map(o => ({ ...o })) }
+                              return [...list.slice(0, i + 1), dup, ...list.slice(i + 1)]
+                            })
+                          }}>⧉</button>
+                          {' '}
+                          <button className="rowbtn rb-del" title="Delete" onClick={() => deleteProgram(i)}>✕</button>
+                        </td>
+                      )
+                    }
+                    if (col.id === 'title') {
+                      return <td key={col.id} style={{ fontWeight: 600 }}>{p.title}</td>
+                    }
+                    return <td key={col.id}>{cellVal(p, col)}</td>
+                  })}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
 
-            <div style={{ ...CELL_BOX, background: 'transparent', justifyContent: 'center', gap: 6 }}>
-              <RowIconButton title="Edit program" onClick={() => editProgram(i)} hoverColor="var(--brand-dark-blue)">
-                <Edit2 size={14} />
-              </RowIconButton>
-              <RowIconButton title="Delete program" onClick={() => deleteProgram(i)} hoverColor="#c0392b">
-                <Trash2 size={14} />
-              </RowIconButton>
-            </div>
-          </div>
-        )
-      })}
-
+      <div style={{ fontSize: 12, color: '#9A948A', marginTop: 8, textAlign: 'right' }}>
+        {visible.length} of {programs.length} programs
       </div>
 
       {editing && (
@@ -468,6 +563,7 @@ export default function Programs() {
           mode={editing.mode}
           initial={editing.program}
           teacherOptions={teacherOptions}
+          registrations={registrations}
           onClose={() => setEditing(null)}
           onSave={saveProgram}
           onDelete={editing.mode === 'edit' ? () => { deleteProgram(editing.index); setEditing(null) } : null}
@@ -477,50 +573,83 @@ export default function Programs() {
   )
 }
 
-// Small square icon button, sized to actually fit inside a 26px table
-// row (the shared .icon-btn class is a fixed 42px circle meant for
-// standalone toolbar buttons — using it here was clipping against the
-// row and the scrollbar). Hover fills a light tint of `hoverColor` so
-// edit vs. delete are visually distinct at a glance.
-function RowIconButton({ children, title, onClick, hoverColor }) {
-  const [hover, setHover] = useState(false)
-  return (
-    <button
-      title={title}
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        width: 24, height: 24, display: 'grid', placeItems: 'center',
-        border: 'none', borderRadius: 6, cursor: 'pointer', padding: 0,
-        background: hover ? `${hoverColor}1A` : 'transparent',
-        color: hover ? hoverColor : 'var(--ink-soft)',
-        transition: 'background .12s, color .12s',
-      }}
-    >
-      {children}
-    </button>
-  )
-}
+// ---------- Settings popover ----------
+const ProgramsSettingsPopover = forwardRef(function ProgramsSettingsPopover({ onClose, programs, setPrograms }, ref) {
+  const [backups, setBackups] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState('')
 
-function MetricTile({ label, value, hint, color }) {
+  const loadBackups = useCallback(async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/programs/backups`, { headers: HEADERS })
+      if (r.ok) setBackups(await r.json())
+    } catch {}
+  }, [])
+
+  useEffect(() => { loadBackups() }, [loadBackups])
+
+  const backUp = async () => {
+    setBusy(true); setMsg('')
+    try {
+      const label = new Date().toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+      const r = await fetch(`${API_BASE}/api/programs/backup`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...HEADERS },
+        body: JSON.stringify({ label }),
+      })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      setMsg('Backed up!')
+      loadBackups()
+    } catch (e) { setMsg('Backup failed: ' + e.message) }
+    finally { setBusy(false) }
+  }
+
+  const restore = async (id) => {
+    if (!confirm('Restore this backup? Current data will be replaced.')) return
+    setBusy(true); setMsg('')
+    try {
+      const r = await fetch(`${API_BASE}/api/programs/restore/${id}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...HEADERS },
+      })
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      const data = await r.json()
+      if (Array.isArray(data)) setPrograms(() => data)
+      setMsg('Restored!')
+    } catch (e) { setMsg('Restore failed: ' + e.message) }
+    finally { setBusy(false) }
+  }
+
   return (
-    <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 10, padding: '12px 16px', boxShadow: '0 1px 3px rgba(20,30,45,.06)' }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 800, color: color || 'var(--ink)' }}>{value}</div>
-      {hint && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 3 }}>{hint}</div>}
+    <div className="pg-settings" ref={ref}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+        <div className="sp-title">Programs Settings</div>
+        <button style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6b6455' }} onClick={onClose}>✕</button>
+      </div>
+
+      <div className="sp-title" style={{ fontSize: 12.5 }}>Backups</div>
+      <div className="sp-hint">Keep up to 14 snapshots. Restore replaces current data.</div>
+      <div className="sp-btnrow">
+        <button className="sp-btn" disabled={busy} onClick={backUp}>Back Up Now</button>
+      </div>
+
+      {msg && <div style={{ fontSize: 12, color: msg.startsWith('Backup') || msg.startsWith('Restored') ? '#20bab5' : '#c94040', marginTop: 6 }}>{msg}</div>}
+
+      {backups && backups.length > 0 && (
+        <div className="sp-list">
+          {backups.map(b => (
+            <div key={b.id} className="sp-row">
+              <span className="sp-rlabel">{b.label || new Date(b.created).toLocaleString()}</span>
+              <button className="sp-btn" disabled={busy} onClick={() => restore(b.id)}>Restore</button>
+            </div>
+          ))}
+        </div>
+      )}
+      {backups && backups.length === 0 && <div className="sp-hint" style={{ marginTop: 6 }}>No backups yet.</div>}
     </div>
   )
-}
+})
 
-// ─── Program editor (add/edit) ─────────────────────────────────────────────
-// Offerings are edited as part of THIS SAME program object — "add
-// offering" always appends to program.offerings[], it never creates a
-// second top-level program row. That's the fix for the bug in the
-// source mockup/export, where "add another time slot" created a whole
-// new duplicate program entry instead (see the programs-import notes
-// in server/programs.json's git history / commit message).
-function ProgramModal({ mode, initial, teacherOptions, onClose, onSave, onDelete }) {
+// ---------- Program modal (add/edit) ----------
+function ProgramModal({ mode, initial, teacherOptions, registrations, onClose, onSave, onDelete }) {
   const [form, setForm] = useState(initial)
   const set = (patch) => setForm(f => ({ ...f, ...patch }))
 
@@ -529,6 +658,21 @@ function ProgramModal({ mode, initial, teacherOptions, onClose, onSave, onDelete
   }
   const addOffering = () => setForm(f => ({ ...f, offerings: [...(f.offerings || []), blankOffering()] }))
   const removeOffering = (idx) => setForm(f => ({ ...f, offerings: f.offerings.filter((_, i) => i !== idx) }))
+
+  const enrolledStudents = useMemo(() => {
+    if (!registrations || !form.title) return []
+    return registrations.filter(r => {
+      const payload = r.payload || r
+      const progs = payload.programs || payload.enrolledPrograms || []
+      return progs.some(pg => {
+        const name = typeof pg === 'string' ? pg : (pg.name || pg.title || '')
+        return name.toLowerCase().includes(form.title.toLowerCase())
+      })
+    }).map(r => {
+      const payload = r.payload || r
+      return payload.displayName || `${payload.firstName || ''} ${payload.lastName || ''}`.trim() || payload.email || 'Unknown'
+    })
+  }, [registrations, form.title])
 
   const handleSave = () => {
     if (!form.title.trim()) { alert('Please enter a program title.'); return }
@@ -589,16 +733,16 @@ function ProgramModal({ mode, initial, teacherOptions, onClose, onSave, onDelete
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div className="kb-field"><label>Total Hrs</label><input type="number" min="0" step="0.01" value={form.totalHours ?? ''} onChange={e => set({ totalHours: e.target.value })} /></div>
           <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, marginTop: 22 }}>
-            <input type="checkbox" checked={!!form.active} onChange={e => set({ active: e.target.checked })} /> Active
+            <input type="checkbox" checked={!!form.active} onChange={e => set({ active: e.target.checked })} style={{ accentColor: '#5FA09E' }} /> Active
           </label>
         </div>
         <div className="kb-field"><label>Comments / Notes</label><textarea rows={2} value={form.description} onChange={e => set({ description: e.target.value })} /></div>
 
-        {/* Offerings — day/time/location slots. Always edits this program's own array. */}
-        <div style={{ borderTop: '1px solid var(--line)', marginTop: 6, paddingTop: 14 }}>
-          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8 }}>Offerings</div>
+        {/* Offerings */}
+        <div style={{ borderTop: '1px solid #E7EBE7', marginTop: 6, paddingTop: 14 }}>
+          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8, color: '#5FA09E' }}>Offerings</div>
           {(form.offerings || []).length === 0 && (
-            <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', marginBottom: 8 }}>No offerings yet — add a day/time below.</div>
+            <div style={{ fontSize: 12, color: '#9A948A', fontStyle: 'italic', marginBottom: 8 }}>No offerings yet — add a day/time below.</div>
           )}
           {(form.offerings || []).map((o, idx) => (
             <div key={idx} style={{
@@ -606,7 +750,7 @@ function ProgramModal({ mode, initial, teacherOptions, onClose, onSave, onDelete
               gap: 6, alignItems: 'center', marginBottom: 6,
             }}>
               <input type="checkbox" checked={o.active !== false} onChange={e => setOffering(idx, { active: e.target.checked })}
-                style={{ accentColor: 'var(--logo-teal)' }} />
+                style={{ accentColor: '#5FA09E' }} />
               <select value={o.day} onChange={e => setOffering(idx, { day: e.target.value })} style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }}>
                 {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -621,7 +765,7 @@ function ProgramModal({ mode, initial, teacherOptions, onClose, onSave, onDelete
               <input list="progTeacherList" placeholder="Teacher" value={o.teacher || ''} onChange={e => setOffering(idx, { teacher: e.target.value })}
                 style={{ fontSize: 12, padding: '5px 4px', border: '1px solid #d5d0c4', borderRadius: 6 }} />
               <button onClick={() => removeOffering(idx)} title="Remove offering"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)' }}>×</button>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9A948A', fontSize: 16 }}>×</button>
             </div>
           ))}
           <datalist id="progTeacherList">
@@ -630,13 +774,30 @@ function ProgramModal({ mode, initial, teacherOptions, onClose, onSave, onDelete
           <button
             onClick={addOffering}
             style={{
-              marginTop: 4, background: 'transparent', border: '1px dashed var(--brand-dark-blue)',
+              marginTop: 4, background: 'transparent', border: '1px dashed #5FA09E',
               borderRadius: 8, padding: '8px 14px', fontSize: 13, fontWeight: 600,
-              color: 'var(--brand-dark-blue)', cursor: 'pointer', width: '100%',
+              color: '#5FA09E', cursor: 'pointer', width: '100%',
             }}>
             + Add offering
           </button>
         </div>
+
+        {/* Enrolled students */}
+        {mode === 'edit' && enrolledStudents.length > 0 && (
+          <div style={{ borderTop: '1px solid #E7EBE7', marginTop: 10, paddingTop: 12 }}>
+            <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6, color: '#5FA09E' }}>
+              Enrolled Students ({enrolledStudents.length})
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {enrolledStudents.map((name, idx) => (
+                <span key={idx} style={{
+                  background: '#E4EFF3', borderRadius: 6, padding: '4px 10px',
+                  fontSize: 12, color: '#2E2516', fontWeight: 500,
+                }}>{name}</span>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="kb-actions">
           {onDelete && <button className="del" onClick={onDelete}>Delete</button>}
