@@ -1587,12 +1587,9 @@ function ProgramsPage() {
                     <span className="lbl sortable" onClick={() => onSort(c.k)}>{c.l}</span>
                     <span className="thicons">
                       {arrow(c.k)}
-                      {c.gear && <span className="gear" title={`Manage ${c.l}`}
-                        onClick={e => {
-                          e.stopPropagation()
-                          if (c.gear === 'cat') setManaging('catsubj')
-                          else if (c.gear === 'loc') setManaging('locations')
-                        }}>⚙</span>}
+                      {c.gear && <span className="gear"
+                        title={`Manage ${c.gear === 'cat' ? 'Categories & Subjects' : (LIST_KINDS[c.gear]?.title || 'Locations')}`}
+                        onClick={e => { e.stopPropagation(); setManaging(c.gear) }}>⚙</span>}
                       <span className="eye" title="Hide Column"
                         onClick={e => { e.stopPropagation(); hideCol(c.k) }}>👁</span>
                     </span>
@@ -2587,9 +2584,8 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
               {subjectsOf(cat).map((s, si, subs) => (
                 <ManagerRow key={cat + '|' + s} sub>
                   <span className="grip" style={{ visibility: 'hidden' }}>⠿</span>
-                  <input type="color" value={subjColors[cat + '\u0000' + s] || DEFAULT_CAT_COLOR}
-                    onChange={e => recolourSubj(cat, s, e.target.value)}
-                    style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #d8d3c6', padding: 0 }} />
+                  <ColorDot size={20} color={subjColors[cat + '\u0000' + s] || DEFAULT_CAT_COLOR}
+                    onPick={c => recolourSubj(cat, s, c)} />
                   <input className="cnm" defaultValue={s} title="Rename Subject"
                     onBlur={e => { if (e.target.value !== s) renameSubj(cat, s, e.target.value) }}
                     onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }} />
