@@ -2088,8 +2088,11 @@ const FilterPop = React.forwardRef(function FilterPop(
 const ColsPop = React.forwardRef(function ColsPop(
   { rect, colOrder, hiddenCols, onToggle, onAll, onNone }, ref) {
   const style = { left: Math.min(rect.left, window.innerWidth - 210), top: rect.bottom + 6 }
-  const menuCols = colOrder.map(k => COL[k]).filter(c => c && c.l && c.k !== 'name')
-  COLS.filter(c => c.l && c.k !== 'name').forEach(c => { if (!menuCols.includes(c)) menuCols.push(c) })
+  /* Every column with a heading is listed, Program included. The template
+     leaves Program out, but its heading still carries a hide button — so
+     hiding it there is unrecoverable. */
+  const menuCols = colOrder.map(k => COL[k]).filter(c => c && c.l)
+  COLS.filter(c => c.l).forEach(c => { if (!menuCols.includes(c)) menuCols.push(c) })
   return (
     <div className="pgpop" ref={ref} style={style}>
       <div className="h">Show Columns</div>
