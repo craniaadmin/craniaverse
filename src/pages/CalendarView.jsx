@@ -1758,7 +1758,7 @@ function TodoEditModal({ item, lists, onClose, onSave }) {
               <option value="med">Medium</option>
               <option value="low">Low</option>
             </select></div>
-          <div className="field"><label>Due</label>
+          <div className="field" style={{ flex: 1 }}><label>Due</label>
             <input type="date" value={due} onChange={e => setDue(e.target.value)} /></div>
         </div>
         <div className="field"><label>Notes</label>
