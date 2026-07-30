@@ -605,6 +605,15 @@ export default function Programs() {
       catColors: raw.catColors && typeof raw.catColors === 'object' ? raw.catColors : defaultViewState.catColors,
       subjColors: raw.subjColors && typeof raw.subjColors === 'object' ? raw.subjColors : defaultViewState.subjColors,
     }
+    LIST_STATE_KEYS.forEach(k => {
+      merged[k] = (raw[k] && typeof raw[k] === 'object' && !Array.isArray(raw[k])) ? raw[k] : defaultViewState[k]
+    })
+    LIST_ORDER_KEYS.forEach(k => {
+      merged[k] = Array.isArray(raw[k]) ? raw[k] : defaultViewState[k]
+    })
+    /* Days are fixed, so their colour map must always be complete. */
+    merged.dayColors = { ...merged.dayColors }
+    DOW.forEach(d => { if (!merged.dayColors[String(d.n)]) merged.dayColors[String(d.n)] = DEFAULT_CAT_COLOR })
     const s = JSON.stringify(merged)
     if (loadedViewRef.current !== s) {
       loadedViewRef.current = s
