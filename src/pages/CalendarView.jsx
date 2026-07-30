@@ -314,7 +314,7 @@ const CSS = `
   color:var(--dark-brown);font-family:inherit;}
 
 /* layout — matches v22 */
-.calroot .layout{display:flex;gap:16px;padding:16px 0;align-items:flex-start;}
+.calroot .layout{display:flex;gap:16px;padding:16px 0;align-items:stretch;}
 .calroot .main{flex:1;min-width:0;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:14px;border-top:3px solid var(--light-blue);}
 .calroot .sidecol{width:290px;flex:none;display:flex;flex-direction:column;gap:16px;min-height:0;}
 
