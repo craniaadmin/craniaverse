@@ -1261,7 +1261,7 @@ function MonthGrid({ days, cur, today, eventsByDay, eventColor, calById, onNewEv
                  calendar it belongs to. Reds get a lighter wash — at 45% they
                  read as an alert. */
               const color = eventColor(ev)
-              const dotColor = (calById.get(ev.calId) || {}).color || color
+              const dotColor = (calById[ev.calId] || {}).color || color
               return (
                 <div
                   key={`${ev.id}-${dISO}-${j}`}

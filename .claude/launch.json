@@ -18,6 +18,18 @@
         "dev"
       ],
       "port": 5173
+    },
+    {
+      "name": "calpreview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "vite.calpreview.config.js",
+        "--port",
+        "5198"
+      ],
+      "port": 5198
     }
   ]
 }
