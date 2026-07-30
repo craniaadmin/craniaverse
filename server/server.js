@@ -34,6 +34,7 @@ import {
   loadRegistrations, saveRegistrations,
   loadStaff,         saveStaff,
   loadPrograms,      savePrograms,
+  loadProgramsState, saveProgramsState,
   loadRules,         saveRules,
   loadComments,      saveCommentsForTab,
   loadStaffBoard,    saveStaffBoard,
@@ -139,6 +140,7 @@ const cache = {
   registrations: null,
   staff:         null,
   programs:      null,
+  programsState: null,
   rules:         null,
   inventory:     null,
   forms:         null,
@@ -178,6 +180,16 @@ async function getPrograms() {
 async function commitPrograms(programs) {
   cache.programs = programs
   await savePrograms(programs)
+}
+
+async function getProgramsState() {
+  if (cache.programsState) return cache.programsState
+  cache.programsState = await loadProgramsState()
+  return cache.programsState
+}
+async function commitProgramsState(state) {
+  cache.programsState = state
+  await saveProgramsState(state)
 }
 
 async function getRules() {
@@ -638,6 +650,35 @@ app.put('/api/programs/decrement-spots', wrap(async (req, res) => {
 }))
 
 // ---- programs backups --------
+app.get('/api/programs-state', wrap(async (_req, res) => {
+  const state = await getProgramsState()
+  if (!state) {
+    // Fresh DB: seed from the bundled template file.
+    try {
+      const seedPath = path.join(__dirname, '..', 'src', 'data', 'programsData.json')
+      const parsed = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      const seeded = {
+        locations: Array.isArray(parsed.locations) ? parsed.locations : [],
+        colOrder: Array.isArray(parsed.colOrder) ? parsed.colOrder : [],
+        hiddenCols: parsed.hiddenCols || {},
+        categoryOrder: Array.isArray(parsed.categoryOrder) ? parsed.categoryOrder : [],
+        subjOrder: Array.isArray(parsed.subjOrder) ? parsed.subjOrder : [],
+        catColors: parsed.catColors || {},
+        subjColors: parsed.subjColors || {},
+      }
+      await commitProgramsState(seeded)
+      return res.json(seeded)
+    } catch {}
+  }
+  res.json(state || {})
+}))
+
+app.put('/api/programs-state', wrap(async (req, res) => {
+  if (!req.body || typeof req.body !== 'object') return res.status(400).json({ error: 'body must be an object' })
+  await commitProgramsState(req.body)
+  res.json({ ok: true })
+}))
+
 app.get('/api/programs/backups', wrap(async (_req, res) => res.json(await listProgramsBackups())))
 app.post('/api/programs/backup', wrap(async (req, res) => {
   const label = (req.body?.label || '').trim() || new Date().toLocaleString()

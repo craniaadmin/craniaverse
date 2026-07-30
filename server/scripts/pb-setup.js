@@ -151,6 +151,14 @@ const collectionSpecs = [
     indexes: [],
   },
   {
+    name: 'programs_state',
+    fields: [
+      { name: 'recordId', type: 'text', required: true, presentable: true },
+      { name: 'payload',  type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: ['CREATE UNIQUE INDEX `idx_programs_state_recordId` ON `programs_state` (`recordId`)'],
+  },
+  {
     name: 'boothSignups',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },   // = email (lowercase)
@@ -349,20 +357,21 @@ async function importPrograms() {
     // fall back to the bundled seed if no programs.json yet
     records = readJsonIfExists(path.join('..', 'src', 'data', 'programsData.json'))
   }
+  if (!Array.isArray(records)) {
+    // the bundled seed may be { locations, programs }
+    const bundled = readJsonIfExists(path.join('..', 'src', 'data', 'programsData.json'))
+    if (bundled && Array.isArray(bundled.programs)) records = bundled.programs
+  }
   if (!Array.isArray(records)) return
   let c = 0, u = 0, skipped = 0
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 9)
   for (let i = 0; i < records.length; i++) {
     const rec = records[i]
-    // The same catalog number legitimately appears on more than one
-    // row when a program is offered at multiple locations, each with
-    // its own offerings — so the key must include location, not just
-    // number, or the second location's row silently overwrites the
-    // first's. Some legacy rows also have a blank `number`; fall back
-    // to `code`, then a positional id, so every row still imports.
-    let recordId = String(rec.number || '').trim()
-    if (!recordId) recordId = String(rec.code || '').trim()
-    if (!recordId) recordId = `prog-${i}`
-    recordId = `${recordId}::${String(rec.location || '').trim()}`
+    // Each program row already has a stable id in the template data.
+    // Use it as the PocketBase record key so rows with the same catalog
+    // number but different offerings do not collapse.
+    const recordId = String(rec.id || '').trim() || `prog-${uid()}`
+    if (!rec.id) rec.id = recordId
     try {
       const action = await upsertByRecordId('programs', recordId, { recordId, payload: rec })
       if (action === 'created') c++; else u++
@@ -372,6 +381,25 @@ async function importPrograms() {
     }
   }
   console.log(`  · programs: ${c} created, ${u} updated${skipped ? `, ${skipped} skipped` : ''}`)
+}
+
+async function importProgramsState() {
+  let state = readJsonIfExists(path.join('..', 'src', 'data', 'programsData.json'))
+  if (!state || typeof state !== 'object') state = readJsonIfExists('programs.json')
+  if (!state || typeof state !== 'object' || Array.isArray(state)) return
+  const payload = {
+    locations: Array.isArray(state.locations) ? state.locations : [],
+    colOrder: Array.isArray(state.colOrder) ? state.colOrder : [],
+    hiddenCols: state.hiddenCols || {},
+    categoryOrder: Array.isArray(state.categoryOrder) ? state.categoryOrder : [],
+    subjOrder: Array.isArray(state.subjOrder) ? state.subjOrder : [],
+    catColors: state.catColors || {},
+    subjColors: state.subjColors || {},
+  }
+  // The bundled seed historically stored subjOrder as an object in some places.
+  if (!Array.isArray(payload.subjOrder)) payload.subjOrder = []
+  const action = await upsertByRecordId('programs_state', 'singleton', { recordId: 'singleton', payload })
+  console.log(`  · programs_state: 1 ${action}`)
 }
 
 async function importRules() {
@@ -441,6 +469,7 @@ async function main() {
   await importRegistrations()
   await importStaff()
   await importPrograms()
+  await importProgramsState()
   await importRules()
   await importComments()
   await importStaffBoard()

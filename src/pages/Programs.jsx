@@ -134,6 +134,80 @@ function gradeRank(g) {
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7) }
 
+/* ---------- auto-numbering / hours helpers from the v47 template ---------- */
+const CODE_MAP = {
+  'FLEX MATH - SINGLE': 'FM-S', 'FLEX MATH - DOUBLE': 'FM-D', 'FLEX MATH - UNLIMITED': 'FM-U',
+  'FLEX ENGLISH - SINGLE': 'FE-S', 'FLEX ENGLISH - DOUBLE': 'FE-D', 'FLEX ENGLISH - UNLIMITED': 'FE-U',
+  'FLEX KINDERGARTEN - SINGLE': 'FK-S', 'FLEX KINDERGARTEN - DOUBLE': 'FK-D',
+  'MATH ENRICHMENT - LEVEL 1': 'ME1', 'MATH ENRICHMENT - LEVEL 2': 'ME2',
+  'MATH ENRICHMENT - LEVEL 3': 'ME3', 'MATH ENRICHMENT - LEVEL 4': 'ME4',
+  'PRIVATE LESSONS - 55 MIN': 'PL-55',
+  'TEKNOKIDS CODING: SCRATCH': 'TKC-SCR', 'TEKNOKIDS CODING: HTML/CSS': 'TKC-HTM',
+  'TEKNOKIDS CODING: JAVASCRIPT/AI': 'TKC-JS', 'TEKNOKIDS CODING: PYTHON': 'TKC-PY',
+  'TEKNOKIDS EARLY': 'TKR-E', 'TEKNOKIDS JUNIOR': 'TKR-J',
+  'TEKNOKIDS INTERMEDIATE': 'TKR-I', 'TEKNOKIDS SENIOR': 'TKR-S',
+  'PIANO PRIVATE 30MIN - SR': 'PNO-SR', 'PIANO PRIVATE 30MIN - JR': 'PNO-JR',
+  'CONTEST - CMS CLMC': 'CLMC', 'CONTEST - CMS CJMC': 'CJMC', 'CONTEST - CMS COMC': 'COMC',
+  'CONTEST - MAA AMC 8': 'AMC8', 'CONTEST - MAA AMC 10A': 'AMC10A', 'CONTEST - MAA AMC 12A': 'AMC12A',
+  'CONTEST - MAA AMC 10B': 'AMC10B', 'CONTEST - MAA AMC 12B': 'AMC12B',
+  'CONTEST - MAA AIME': 'AIME', 'CONTEST - MAA US(J)MO': 'USJMO',
+  'CONTEST - CEMC BCC': 'BCC', 'CONTEST - CEMC GAUSS': 'GAU', 'CONTEST - CEMC PASCAL': 'PAS',
+  'CONTEST - CEMC CAYLEY': 'CAY', 'CONTEST - CEMC FERMAT': 'FER', 'CONTEST - CEMC FRYER': 'FRY',
+  'CONTEST - CEMC GALOIS': 'GAL', 'CONTEST - CEMC HYPATIA': 'HYP', 'CONTEST - CEMC CIMC': 'CIMC',
+  'FLEX MATH - HALF DAY': 'CMP-MTH-H', 'FLEX MATH - FULL DAY': 'CMP-MTH-F',
+  'FLEX TYPING - HALF DAY': 'CMP-TYP-H', 'FLEX TYPING - FULL DAY': 'CMP-TYP-F',
+  'FLEX HANDWRITING - HALF DAY': 'CMP-HWR-H', 'FLEX HANDWRITING - FULL DAY': 'CMP-HWR-F',
+  'FLEX SPELLING - HALF DAY': 'CMP-SPL-H', 'FLEX SPELLING - FULL DAY': 'CMP-SPL-F',
+  'SCIENCEKIDS BRAIN - FULL DAY': 'CMP-SCI-F',
+  'TEKNOKIDS ROBOTICS - HALF DAY': 'CMP-ROB-H', 'TEKNOKIDS ROBOTICS - FULL DAY': 'CMP-ROB-F',
+  'ARTSKIDS SEWING - FULL DAY': 'CMP-ART-F', 'ARTSKIDS SEWING - HALF DAY': 'CMP-ART-H',
+}
+
+function computeTotalHours(duration, sessions, period) {
+  const dur = Number(duration)
+  let n = Number(sessions)
+  if (!isFinite(dur) || dur <= 0) return ''
+  if (!isFinite(n) || n <= 0) n = 1
+  const weeks = period === '/week' ? 35 : 1
+  return Math.round(dur * n * weeks / 60 * 100) / 100
+}
+
+function locDigit(id, locations) {
+  const l = locations.find(x => x.id === id)
+  if (!l) return '0'
+  if (l.id === 'loc_boardwalk' || /board|^bw$/i.test(l.name || '')) return '1'
+  if (l.id === 'loc_waterloo' || /waterloo|^we$/i.test(l.name || '')) return '2'
+  return '0'
+}
+
+function genProgramIds(programs, categoryOrder, subjOrder, locations) {
+  const SUBJ = ['MATH', 'ENGLISH', 'ROBOTICS', 'CODING', 'PIANO', 'ARTS', 'SCIENCE', 'MATH/ENGLISH', 'ALL']
+  const pad2 = n => String(n).padStart(2, '0')
+  const subjNum = x => {
+    x = (x || '').trim().toUpperCase()
+    let i = SUBJ.indexOf(x)
+    if (i < 0) { i = SUBJ.length; SUBJ.push(x) }
+    return pad2(i + 1)
+  }
+  const seq = {}
+  const next = programs.map(p => {
+    const loc = (p.offerings && p.offerings[0]) ? locDigit(p.offerings[0].locationId, locations) : '0'
+    const ci = categoryOrder.indexOf(p.category)
+    const cat = pad2(ci < 0 ? 0 : ci + 1)
+    const sub = subjNum(p.subject)
+    const key = (p.category || '') + '|' + (p.subject || '')
+    seq[key] = (seq[key] || 0) + 1
+    const sp = pad2(seq[key])
+    return { ...p, number: loc + cat + sub + sp }
+  })
+  return next
+}
+
+function autoCode(name) {
+  const n = (name || '').trim().toUpperCase()
+  return CODE_MAP[n] || ''
+}
+
 /* ---------- row model ---------- */
 function offTimes(o) {
   if (o && Array.isArray(o.times) && o.times.length) return o.times
@@ -427,9 +501,66 @@ const CSS = `
 `
 
 export default function Programs() {
-  const { staff, programs, setPrograms, records: registrations } = useStore()
+  const { staff, programs, setPrograms, programsState, setProgramsState, records: registrations } = useStore()
 
-  /* ---------- view state ---------- */
+  /* ---------- persisted view state ---------- */
+  const defaultViewState = useMemo(() => ({
+    locations: SEED_LOCATIONS.map(l => ({ ...l })),
+    colOrder: SEED_COL_ORDER.slice(),
+    hiddenCols: { ...SEED_HIDDEN_COLS },
+    categoryOrder: SEED_CAT_ORDER.slice(),
+    subjOrder: [],
+    catColors: { ...SEED_CAT_COLORS },
+    subjColors: { ...SEED_SUBJ_COLORS },
+  }), [])
+
+  const [viewState, setViewState] = useState(defaultViewState)
+  const loadedViewRef = useRef(null)
+
+  // Load from store once available. `undefined` means the initial load has not
+  // returned yet; wait so we don't overwrite existing server state with defaults.
+  useEffect(() => {
+    if (programsState === undefined) return
+    const raw = programsState || {}
+    const merged = {
+      ...defaultViewState,
+      locations: Array.isArray(raw.locations) ? raw.locations : defaultViewState.locations,
+      colOrder: Array.isArray(raw.colOrder) ? raw.colOrder : defaultViewState.colOrder,
+      hiddenCols: raw.hiddenCols && typeof raw.hiddenCols === 'object' ? raw.hiddenCols : defaultViewState.hiddenCols,
+      categoryOrder: Array.isArray(raw.categoryOrder) ? raw.categoryOrder : defaultViewState.categoryOrder,
+      subjOrder: Array.isArray(raw.subjOrder) ? raw.subjOrder : defaultViewState.subjOrder,
+      catColors: raw.catColors && typeof raw.catColors === 'object' ? raw.catColors : defaultViewState.catColors,
+      subjColors: raw.subjColors && typeof raw.subjColors === 'object' ? raw.subjColors : defaultViewState.subjColors,
+    }
+    const s = JSON.stringify(merged)
+    if (loadedViewRef.current !== s) {
+      loadedViewRef.current = s
+      setViewState(prev => {
+        const ps = JSON.stringify(prev)
+        return ps === s ? prev : merged
+      })
+    }
+  }, [programsState, defaultViewState])
+
+  // Save local changes back to store (debounced inside setProgramsState).
+  // Only save after the initial load has completed.
+  useEffect(() => {
+    if (programsState === undefined) return
+    const s = JSON.stringify(viewState)
+    if (loadedViewRef.current !== s) {
+      loadedViewRef.current = s
+      setProgramsState(viewState)
+    }
+  }, [viewState, setProgramsState, programsState])
+
+  const updateView = useCallback((key, updater) => {
+    setViewState(vs => {
+      const next = typeof updater === 'function' ? updater(vs[key]) : updater
+      return { ...vs, [key]: next }
+    })
+  }, [])
+
+  /* ---------- local UI state ---------- */
   const [search, setSearch] = useState('')
   const [enrolFilter, setEnrolFilter] = useState('')
   const [filters, setFilters] = useState({
@@ -437,13 +568,12 @@ export default function Programs() {
     day: [], time: [], cost: [], dur: [], gen: {},
   })
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
-  const [hiddenCols, setHiddenCols] = useState(() => ({ ...SEED_HIDDEN_COLS }))
-  const [colOrder, setColOrder] = useState(() => SEED_COL_ORDER.slice())
   const [selected, setSelected] = useState(() => new Set())
   const [pop, setPop] = useState(null)        // {kind:'filter'|'cols', fk?, rect}
   const [editing, setEditing] = useState(null) // program modal
   const [bulkOpen, setBulkOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [managing, setManaging] = useState(null) // 'locations' | 'categories' | 'subjects'
   const [cellEdit, setCellEdit] = useState(null) // {row, col}
   const [history, setHistory] = useState({ undo: [], redo: [] })
   const dragCol = useRef(null)
@@ -453,9 +583,14 @@ export default function Programs() {
     () => staff.map(s => `${s.firstName} ${s.lastName}`.trim()).filter(Boolean).sort(),
     [staff])
 
-  /* ---------- locations (the seeded sites, plus anything the data introduces) ---------- */
+  const colOrder = viewState.colOrder
+  const hiddenCols = viewState.hiddenCols
+  const setColOrder = useCallback(u => updateView('colOrder', u), [updateView])
+  const setHiddenCols = useCallback(u => updateView('hiddenCols', u), [updateView])
+
+  /* ---------- locations (persisted sites, plus anything the data introduces) ---------- */
   const locations = useMemo(() => {
-    const base = SEED_LOCATIONS.map(l => ({ ...l }))
+    const base = viewState.locations.map(l => ({ ...l }))
     const seen = new Set(base.map(l => l.id))
     let i = base.length
     for (const p of programs) {
@@ -472,24 +607,38 @@ export default function Programs() {
       }
     }
     return base
-  }, [programs])
+  }, [viewState.locations, programs])
   const locIndex = useMemo(() => Object.fromEntries(locations.map(l => [l.id, l])), [locations])
   const locColor = useCallback(id => (locIndex[id]?.color) || '#5FA09E', [locIndex])
 
-  /* ---------- categories: the seeded order and colours, extended by anything new ---------- */
+  /* ---------- categories & subjects: persisted order/colours, extended by anything new ---------- */
   const categoryOrder = useMemo(() => {
     const present = [...new Set(programs.map(p => p.category).filter(Boolean))]
-    return SEED_CAT_ORDER.concat(
-      present.filter(c => !SEED_CAT_ORDER.includes(c)).sort((a, b) => a.localeCompare(b)))
-  }, [programs])
+    return viewState.categoryOrder.concat(
+      present.filter(c => !viewState.categoryOrder.includes(c)).sort((a, b) => a.localeCompare(b)))
+  }, [viewState.categoryOrder, programs])
+  const subjOrder = useMemo(() => {
+    const present = [...new Set(programs.map(p => p.subject).filter(Boolean))]
+    return viewState.subjOrder.concat(
+      present.filter(s => !viewState.subjOrder.includes(s)).sort((a, b) => a.localeCompare(b)))
+  }, [viewState.subjOrder, programs])
   const catColors = useMemo(() => {
     const out = {}
-    categoryOrder.forEach(c => { out[c] = SEED_CAT_COLORS[c] || DEFAULT_CAT_COLOR })
+    categoryOrder.forEach(c => { out[c] = viewState.catColors[c] || DEFAULT_CAT_COLOR })
     return out
-  }, [categoryOrder])
+  }, [categoryOrder, viewState.catColors])
+  const subjColors = useMemo(() => {
+    const out = {}
+    programs.forEach(p => {
+      if (p.category && p.subject) {
+        out[p.category + '\u0000' + p.subject] = viewState.subjColors[p.category + '\u0000' + p.subject] || DEFAULT_CAT_COLOR
+      }
+    })
+    return out
+  }, [programs, viewState.subjColors])
   const catColor = useCallback(c => catColors[c] || DEFAULT_CAT_COLOR, [catColors])
   const subjColor = useCallback(
-    (cat, s) => SEED_SUBJ_COLORS[(cat || '') + '\u0000' + (s || '')] || DEFAULT_CAT_COLOR, [])
+    (cat, s) => subjColors[(cat || '') + '\u0000' + (s || '')] || DEFAULT_CAT_COLOR, [subjColors])
   const catOrderIndex = useCallback(c => {
     const i = categoryOrder.indexOf(c)
     return i < 0 ? 999 : i
@@ -806,7 +955,17 @@ export default function Programs() {
     },
   })
   const saveProgram = (form) => {
-    mutate(list => editing.mode === 'new' ? [form, ...list] : list.map(p => p.id === form.id ? form : p))
+    if (!String(form.name || '').trim()) { window.alert('Please enter a program name.'); return }
+    mutate(list => {
+      const next = {
+        ...form,
+        name: String(form.name).trim(),
+        code: form.code || autoCode(form.name),
+        totalHours: computeTotalHours(form.duration, form.sessions, form.period),
+      }
+      const temp = editing.mode === 'new' ? [next, ...list] : list.map(p => p.id === next.id ? next : p)
+      return genProgramIds(temp, categoryOrder, subjOrder, locations)
+    })
     setEditing(null)
   }
   const duplicateProgram = (progId) => mutate(list => {
@@ -1129,6 +1288,9 @@ export default function Programs() {
           style={{ marginLeft: 'auto' }} onClick={createScheduleImage}>🖼 Create Schedule</button>
         <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}>👁 Columns</button>
+        <button title="Manage locations" onClick={() => setManaging('locations')}>📍 Locations</button>
+        <button title="Manage categories" onClick={() => setManaging('categories')}>🏷 Categories</button>
+        <button title="Manage subjects" onClick={() => setManaging('subjects')}>🏷 Subjects</button>
         <button title="Settings" onClick={() => setSettingsOpen(true)}>⚙</button>
         <button title="Download all programs as a CSV file" onClick={exportCsv}>⤓ Export CSV</button>
       </div>
@@ -1269,6 +1431,17 @@ export default function Programs() {
 
       {settingsOpen && (
         <SettingsModal onClose={() => setSettingsOpen(false)} setPrograms={setPrograms} />
+      )}
+
+      {managing && (
+        <ManageModal
+          kind={managing}
+          onClose={() => setManaging(null)}
+          programs={programs}
+          setPrograms={setPrograms}
+          viewState={viewState}
+          setViewState={setViewState}
+        />
       )}
     </div>
   )
@@ -1443,6 +1616,11 @@ function ProgramModal({ mode, initial, locations, teacherOptions, registrations,
     }
     return out
   }, [registrations, form.name])
+
+  useEffect(() => {
+    const h = computeTotalHours(form.duration, form.sessions, form.period)
+    if (h !== '') setForm(f => ({ ...f, totalHours: h }))
+  }, [form.duration, form.sessions, form.period])
 
   const save = () => {
     if (!String(form.name || '').trim()) { window.alert('Please enter a program name.'); return }
@@ -1733,6 +1911,211 @@ function BulkModal({ count, locations, categories, onClose, onApply }) {
         <div className="macts">
           <button className="cancel" onClick={onClose}>Cancel</button>
           <button onClick={apply}>Apply To Selected</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ================= managers ================= */
+function ManageModal({ kind, onClose, programs, setPrograms, viewState, setViewState }) {
+  if (kind === 'locations') return <LocationsManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+  if (kind === 'categories') return <CategoriesManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+  return <SubjectsManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+}
+
+function LocationsManager({ onClose, programs, setPrograms, viewState, setViewState }) {
+  const [locs, setLocs] = useState(viewState.locations.map(l => ({ ...l })))
+  const [msg, setMsg] = useState('')
+  const update = (nextLocs) => {
+    setLocs(nextLocs)
+    setViewState(vs => ({ ...vs, locations: nextLocs.map(l => ({ ...l })) }))
+  }
+  const add = () => {
+    const name = window.prompt('New location name')
+    if (!name || !name.trim()) return
+    const id = 'loc_' + name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
+    if (locs.some(l => l.id === id)) { setMsg('A location with that id already exists.'); return }
+    update([...locs, { id, name: name.trim(), color: LPAL[locs.length % LPAL.length] }])
+  }
+  const rename = (id, name) => update(locs.map(l => l.id === id ? { ...l, name } : l))
+  const recolour = (id, color) => update(locs.map(l => l.id === id ? { ...l, color } : l))
+  const remove = (id) => {
+    if (locs.length <= 1) { setMsg('You must keep at least one location.'); return }
+    const inUse = programs.some(p => (p.offerings || []).some(o => o.locationId === id))
+    if (inUse && !window.confirm('This location is used by some offerings. Reassign those offerings to the first remaining location?')) return
+    const fallback = locs.find(l => l.id !== id)?.id
+    setPrograms(list => list.map(p => ({
+      ...p,
+      offerings: (p.offerings || []).map(o => o.locationId === id ? { ...o, locationId: fallback } : o),
+    })))
+    update(locs.filter(l => l.id !== id))
+  }
+  return (
+    <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
+        <h2>Manage Locations</h2>
+        {msg && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10 }}>{msg}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+          {locs.map(l => (
+            <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input type="color" value={l.color} onChange={e => recolour(l.id, e.target.value)}
+                style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
+              <input value={l.name} onChange={e => rename(l.id, e.target.value)}
+                style={{ flex: 1 }} />
+              <button type="button" className="rmtime" onClick={() => remove(l.id)} title="Delete">×</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" className="addtime" onClick={add}>+ Add Location</button>
+        <div className="macts">
+          <button onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CategoriesManager({ onClose, programs, setPrograms, viewState, setViewState }) {
+  const [cats, setCats] = useState(viewState.categoryOrder.slice())
+  const [colors, setColors] = useState({ ...viewState.catColors })
+  const [msg, setMsg] = useState('')
+  const commit = (nextCats, nextColors) => {
+    setCats(nextCats)
+    setColors(nextColors)
+    setViewState(vs => ({ ...vs, categoryOrder: nextCats.slice(), catColors: { ...nextColors } }))
+  }
+  const add = () => {
+    const name = window.prompt('New category name')
+    if (!name || !name.trim()) return
+    const n = name.trim()
+    if (cats.includes(n)) { setMsg('That category already exists.'); return }
+    commit([...cats, n], { ...colors, [n]: DEFAULT_CAT_COLOR })
+  }
+  const rename = (oldName, newName) => {
+    if (!newName.trim() || cats.includes(newName.trim())) return
+    const nextCats = cats.map(c => c === oldName ? newName.trim() : c)
+    const nextColors = { ...colors }
+    nextColors[newName.trim()] = nextColors[oldName]
+    delete nextColors[oldName]
+    setPrograms(list => list.map(p => p.category === oldName ? { ...p, category: newName.trim() } : p))
+    commit(nextCats, nextColors)
+  }
+  const recolour = (name, color) => commit(cats, { ...colors, [name]: color })
+  const move = (i, dir) => {
+    if (i + dir < 0 || i + dir >= cats.length) return
+    const next = cats.slice()
+    ;[next[i], next[i + dir]] = [next[i + dir], next[i]]
+    commit(next, colors)
+  }
+  const remove = (name) => {
+    if (!window.confirm(`Delete category "${name}"? Programs using it will keep the text but it will no longer be in the category list.`)) return
+    setPrograms(list => list.map(p => p.category === name ? { ...p, category: '' } : p))
+    const nextCats = cats.filter(c => c !== name)
+    const nextColors = { ...colors }
+    delete nextColors[name]
+    commit(nextCats, nextColors)
+  }
+  return (
+    <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
+        <h2>Manage Categories</h2>
+        {msg && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10 }}>{msg}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+          {cats.map((c, i) => (
+            <div key={c} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <input type="color" value={colors[c] || DEFAULT_CAT_COLOR}
+                onChange={e => recolour(c, e.target.value)}
+                style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
+              <input defaultValue={c}
+                onBlur={e => { if (e.target.value !== c) rename(c, e.target.value) }}
+                onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
+                style={{ flex: 1 }} />
+              <button type="button" onClick={() => move(i, -1)} disabled={i === 0}>↑</button>
+              <button type="button" onClick={() => move(i, 1)} disabled={i === cats.length - 1}>↓</button>
+              <button type="button" className="rmtime" onClick={() => remove(c)} title="Delete">×</button>
+            </div>
+          ))}
+        </div>
+        <button type="button" className="addtime" onClick={add}>+ Add Category</button>
+        <div className="macts">
+          <button onClick={onClose}>Done</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SubjectsManager({ onClose, programs, setPrograms, viewState, setViewState }) {
+  const allSubs = useMemo(() => {
+    const present = [...new Set(programs.map(p => p.subject).filter(Boolean))]
+    return viewState.subjOrder.concat(present.filter(s => !viewState.subjOrder.includes(s)).sort((a, b) => a.localeCompare(b)))
+  }, [programs, viewState.subjOrder])
+  const [subs, setSubs] = useState(allSubs)
+  const [colors, setColors] = useState({ ...viewState.subjColors })
+  useEffect(() => {
+    setSubs(allSubs)
+    setColors({ ...viewState.subjColors })
+  }, [allSubs, viewState.subjColors])
+  const commit = (nextSubs, nextColors) => {
+    setSubs(nextSubs)
+    setColors(nextColors)
+    setViewState(vs => ({ ...vs, subjOrder: nextSubs.slice(), subjColors: { ...nextColors } }))
+  }
+  const rename = (oldName, newName) => {
+    if (!newName.trim() || subs.includes(newName.trim())) return
+    const n = newName.trim()
+    setPrograms(list => list.map(p => p.subject === oldName ? { ...p, subject: n } : p))
+    const nextSubs = subs.map(s => s === oldName ? n : s)
+    const nextColors = { ...colors }
+    programs.forEach(p => {
+      if (p.category && p.subject === oldName) {
+        nextColors[p.category + '\u0000' + n] = colors[p.category + '\u0000' + oldName]
+        delete nextColors[p.category + '\u0000' + oldName]
+      }
+    })
+    commit(nextSubs, nextColors)
+  }
+  const recolour = (subject, color) => {
+    const nextColors = { ...colors }
+    programs.forEach(p => {
+      if (p.category && p.subject === subject) {
+        nextColors[p.category + '\u0000' + subject] = color
+      }
+    })
+    commit(subs, nextColors)
+  }
+  const remove = (subject) => {
+    if (!window.confirm(`Delete subject "${subject}"? Programs using it will keep the text but it will no longer be in the subject list.`)) return
+    setPrograms(list => list.map(p => p.subject === subject ? { ...p, subject: '' } : p))
+    const nextSubs = subs.filter(s => s !== subject)
+    const nextColors = { ...colors }
+    Object.keys(nextColors).forEach(k => { if (k.endsWith('\u0000' + subject)) delete nextColors[k] })
+    commit(nextSubs, nextColors)
+  }
+  return (
+    <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
+        <h2>Manage Subjects</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+          {subs.map(s => {
+            const sampleCat = programs.find(p => p.subject === s)?.category || ''
+            const c = colors[sampleCat + '\u0000' + s] || DEFAULT_CAT_COLOR
+            return (
+              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input type="color" value={c} onChange={e => recolour(s, e.target.value)}
+                  style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
+                <input defaultValue={s}
+                  onBlur={e => { if (e.target.value !== s) rename(s, e.target.value) }}
+                  onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
+                  style={{ flex: 1 }} />
+                <button type="button" className="rmtime" onClick={() => remove(s)} title="Delete">×</button>
+              </div>
+            )
+          })}
+        </div>
+        <div className="macts">
+          <button onClick={onClose}>Done</button>
         </div>
       </div>
     </div>

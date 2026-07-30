@@ -51,8 +51,10 @@ export function StoreProvider({ children }) {
     { id: 'no-shirt', reason: 'No Shirt', delta: -5 },
   ])
   const [staff, setStaff] = useState([])
-  const [programs, setProgramsState] = useState([])
+  const [programs, setProgramsData] = useState([])
+  const [programsState, setProgramsStateData] = useState() // undefined until first load
   const programsSaveTimer = useRef(null)
+  const programsStateSaveTimer = useRef(null)
   const selectedRef = useRef(selectedId)
   selectedRef.current = selectedId
 
@@ -87,16 +89,40 @@ export function StoreProvider({ children }) {
       const res = await fetch(`${API_BASE}/api/programs`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
       if (!res.ok) return
       const data = await res.json()
-      if (Array.isArray(data)) setProgramsState(data)
+      if (Array.isArray(data)) setProgramsData(data)
+    } catch {}
+  }, [])
+
+  const refreshProgramsState = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/programs-state`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
+      if (!res.ok) return
+      const data = await res.json()
+      if (data && typeof data === 'object') setProgramsStateData(data)
     } catch {}
   }, [])
 
   const setPrograms = useCallback((updater) => {
-    setProgramsState(prev => {
+    setProgramsData(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater
       clearTimeout(programsSaveTimer.current)
       programsSaveTimer.current = setTimeout(() => {
         fetch(`${API_BASE}/api/programs`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+          body: JSON.stringify(next),
+        }).catch(() => {})
+      }, 400)
+      return next
+    })
+  }, [])
+
+  const setProgramsState = useCallback((updater) => {
+    setProgramsStateData(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      clearTimeout(programsStateSaveTimer.current)
+      programsStateSaveTimer.current = setTimeout(() => {
+        fetch(`${API_BASE}/api/programs-state`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
           body: JSON.stringify(next),
@@ -121,9 +147,10 @@ export function StoreProvider({ children }) {
     refreshRules()
     refreshStaff()
     refreshPrograms()
+    refreshProgramsState()
     const t = setInterval(refresh, POLL_MS)
     return () => clearInterval(t)
-  }, [refresh, refreshRules, refreshStaff, refreshPrograms])
+  }, [refresh, refreshRules, refreshStaff, refreshPrograms, refreshProgramsState])
 
   const updateCraniaCash = useCallback((recordId, newAmount) => {
     setRecords(prevRecords => prevRecords.map(r => r.id === recordId ? { ...r, student: { ...r.student, craniaCash: newAmount } } : r))
@@ -217,6 +244,8 @@ export function StoreProvider({ children }) {
     deleteStaff,
     programs,
     setPrograms,
+    programsState,
+    setProgramsState,
     selected: records.find((r) => r.id === selectedId) || records[0],
     select: (id) => setSelectedId(id),
     refresh,
@@ -253,7 +282,7 @@ export function StoreProvider({ children }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       await refresh()
     },
-  }), [records, selectedId, status, rules, staff, programs, refresh, updateCraniaCash, updateStudentField, updateCustomerField, addCashEntry, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms])
+  }), [records, selectedId, status, rules, staff, programs, programsState, refresh, updateCraniaCash, updateStudentField, updateCustomerField, addCashEntry, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms, setProgramsState])
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }

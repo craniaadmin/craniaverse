@@ -233,13 +233,19 @@ export async function saveStaff(staff) {
 }
 
 // ---- programs --------------------------------------------
-// Programs are keyed by "number" rather than "id".
+// Programs are keyed by their own id. If a record somehow arrives
+// without one, generate a stable random id so it does not collide.
 export async function loadPrograms() {
   const rows = await getFullList('programs')
   return rows.map(r => r.payload || {})
 }
 
-const programRecordId = (p) => p.id || `${p.number || ''}::${p.location || ''}`
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 9)
+const programRecordId = (p) => {
+  if (p && p.id) return String(p.id)
+  p.id = uid()
+  return p.id
+}
 
 export async function savePrograms(programs) {
   await ensureAuth()
@@ -260,6 +266,40 @@ export async function savePrograms(programs) {
   for (const row of existing) {
     if (!incomingIds.has(row.recordId)) {
       await pb().collection('programs').delete(row.id)
+    }
+  }
+}
+
+// ---- programs view state -------------------------------
+// One singleton row stores locations, column order, category/subject
+// colours and order, etc. so user layout changes survive reloads.
+const PROGRAMS_STATE_ID = 'singleton'
+
+export async function loadProgramsState() {
+  await ensureAuth()
+  try {
+    const record = await pb().collection('programs_state').getFirstListItem('recordId="singleton"')
+    return record?.payload || null
+  } catch (err) {
+    if (err?.status === 404) return null
+    logPbError('loadProgramsState', err)
+    throw err
+  }
+}
+
+export async function saveProgramsState(payload) {
+  await ensureAuth()
+  const existing = await loadProgramsState()
+  const data = { recordId: PROGRAMS_STATE_ID, payload }
+  try {
+    const record = await pb().collection('programs_state').getFirstListItem('recordId="singleton"')
+    await pb().collection('programs_state').update(record.id, data)
+  } catch (err) {
+    if (err?.status === 404) {
+      await pb().collection('programs_state').create(data)
+    } else {
+      logPbError('saveProgramsState', err)
+      throw err
     }
   }
 }
