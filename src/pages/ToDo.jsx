@@ -1289,6 +1289,8 @@ function ChecklistsView({
                   key={en.id}
                   entry={en}
                   index={idx}
+                  isFirst={idx === 0}
+                  isLast={idx === cl.entries.length - 1}
                   lists={state.lists}
                   onText={(v) => setEntryText(cl.id, en.id, v)}
                   onNote={(v) => updateEntrySimple(cl.id, en.id, { note: v })}
@@ -1296,6 +1298,8 @@ function ChecklistsView({
                   onListId={(v) => updateEntrySimple(cl.id, en.id, { listId: v })}
                   onActive={(v) => setEntryActive(cl.id, en.id, v)}
                   onSchedule={(patch) => updateEntrySchedule(cl.id, en.id, patch)}
+                  onMoveUp={() => moveEntry(cl.id, en.id, -1)}
+                  onMoveDown={() => moveEntry(cl.id, en.id, 1)}
                 />
               ))}
             </div>
