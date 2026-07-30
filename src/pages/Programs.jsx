@@ -320,6 +320,109 @@ function buildRows(programs, locIndex) {
   }
   return out
 }
+/* ---------- entries ----------
+   A row is one entry: one program, at one location, on one day, at one time.
+   The row controls act on that entry, never on the whole program — deleting a
+   Monday session must leave the Tuesday one alone. */
+const pid = () => 'p_' + uid()
+const oid = () => 's' + uid()
+const deep = (v) => JSON.parse(JSON.stringify(v))
+
+function entryCount(p) {
+  let n = 0
+  const offs = (p.offerings && p.offerings.length) ? p.offerings : [null]
+  offs.forEach(o => {
+    const d = (o && (o.days || []).length) ? o.days.length : 1
+    const t = (o && offTimes(o).length) ? offTimes(o).length : 1
+    n += d * t
+  })
+  return n
+}
+
+/* Take one day/time out of an offering. When the offering spans several days
+   AND several times, the remainder has to split into a sibling offering, or
+   removing one cell would take a whole row and column with it. */
+function removeEntryIn(pr, of, dayN, slotIndex) {
+  const idx = (pr.offerings || []).indexOf(of)
+  if (idx < 0) return
+  const days = (of.days || []).slice()
+  const ts = offTimes(of).slice()
+  const D = days.length || 1, T = ts.length || 1
+  if (D <= 1 && T <= 1) { pr.offerings.splice(idx, 1); return }
+  if (D <= 1) {
+    ts.splice(slotIndex == null ? 0 : slotIndex, 1)
+    of.times = ts; delete of.start; delete of.end
+    return
+  }
+  if (T <= 1) { of.days = days.filter(d => d !== dayN); return }
+  of.days = days.filter(d => d !== dayN)
+  const sib = deep(of)
+  sib.id = oid()
+  sib.days = [dayN]
+  sib.times = ts.filter((_, i) => i !== (slotIndex == null ? 0 : slotIndex))
+  delete sib.start; delete sib.end
+  pr.offerings.splice(idx + 1, 0, sib)
+}
+
+/* One entry, as its own single-offering program record. */
+function oneEntryOffering(of, dayN, slotIndex) {
+  const ts = offTimes(of)
+  const t = (slotIndex != null && ts[slotIndex]) ? ts[slotIndex] : (ts[0] || null)
+  const one = deep(of)
+  one.id = oid()
+  one.days = dayN == null ? [] : [dayN]
+  one.times = t ? [{ start: t.start || '', end: t.end || '' }] : []
+  delete one.start; delete one.end
+  return one
+}
+
+function deleteEntryList(list, progId, offId, dayN, slotIndex) {
+  const next = deep(list)
+  const pi = next.findIndex(p => p.id === progId)
+  if (pi < 0) return list
+  const pr = next[pi]
+  const of = (pr.offerings || []).find(o => o.id === offId) || null
+  if (of) removeEntryIn(pr, of, dayN, slotIndex); else pr.offerings = []
+  if (!(pr.offerings || []).length) next.splice(pi, 1)
+  return next
+}
+
+function duplicateEntryList(list, progId, offId, dayN, slotIndex) {
+  const next = deep(list)
+  const pi = next.findIndex(p => p.id === progId)
+  if (pi < 0) return list
+  const pr = next[pi]
+  const of = (pr.offerings || []).find(o => o.id === offId) || null
+  const copy = deep(pr)
+  copy.id = pid()
+  copy.offerings = of ? [oneEntryOffering(of, dayN, slotIndex)] : []
+  next.splice(pi + 1, 0, copy)
+  return next
+}
+
+/* Split an entry out into a record of its own, so a change lands on this row
+   only. Returns the list plus the ids the entry now lives under. */
+function isolateEntryList(list, progId, offId, dayN, slotIndex) {
+  const next = deep(list)
+  const pi = next.findIndex(p => p.id === progId)
+  if (pi < 0) return { list, progId, offId }
+  const pr = next[pi]
+  const of = (pr.offerings || []).find(o => o.id === offId) || null
+  if (entryCount(pr) <= 1) {
+    const only = of || (pr.offerings || [])[0] || null
+    return { list: next, progId: pr.id, offId: only ? only.id : null }
+  }
+  const copy = deep(pr)
+  copy.id = pid()
+  if (of) {
+    copy.offerings = [oneEntryOffering(of, dayN, slotIndex)]
+    removeEntryIn(pr, of, dayN, slotIndex)
+  } else copy.offerings = []
+  next.splice(pi + 1, 0, copy)
+  if (!(pr.offerings || []).length) next.splice(next.findIndex(p => p.id === pr.id), 1)
+  return { list: next, progId: copy.id, offId: (copy.offerings[0] || {}).id || null }
+}
+
 function famKey(r) { return String(r.number || r.name || r.progId) }
 function rowKey(r) {
   return r.progId + '||' + (r.offId || '') + '||' + (r.day == null ? '' : r.day) + '||' + (r.slotIndex == null ? '' : r.slotIndex)
