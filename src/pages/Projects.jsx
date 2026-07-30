@@ -52,6 +52,7 @@ const COLUMNS = [
 const COL_BY_ID = Object.fromEntries(COLUMNS.map(c => [c.id, c]))
 
 const DEFAULT_COLOR = '#5FA09E'
+const colName = (id) => (COLUMNS.find(c => c.id === id) || {}).name || ''
 const LIGHT_BLUE    = '#A6E2F9'
 const PALETTE       = ['#5FA09E', '#A6E2F9', '#E0DE85', '#2E2516', '#20BAB5']
 const COMMENT_MAX   = 140
