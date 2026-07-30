@@ -3,7 +3,7 @@
     {
       "id": "mri3q5hhexjmw",
       "name": "Personal",
-      "color": "#8C9294"
+      "color": "#20BAB5"
     },
     {
       "id": "mri84wz7wwr5a",
@@ -23,32 +23,32 @@
     {
       "id": "mri3qw8ky2ix2",
       "name": "Contests",
-      "color": "#2E2516"
+      "color": "#8C9294"
     },
     {
       "id": "mri3sme5ms0jf",
       "name": "Holidays",
-      "color": "#C00000"
+      "color": "#8C9294"
     },
     {
       "id": "mri3rzx1o75f1",
       "name": "Assessments",
-      "color": "#FFC000"
+      "color": "#8C9294"
     },
     {
       "id": "mri4f7njv54ww",
       "name": "Marketing",
-      "color": "#20BAB5"
+      "color": "#8C9294"
     },
     {
       "id": "mri7mn9b9zlki",
       "name": "Public - Elementary",
-      "color": "#00B0F0"
+      "color": "#8C9294"
     },
     {
       "id": "mri7n4vkdq26y",
       "name": "Public - High School",
-      "color": "#0070C0"
+      "color": "#8C9294"
     }
   ],
   "events": [
