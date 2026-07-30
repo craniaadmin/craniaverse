@@ -1332,6 +1332,7 @@ function ChecklistEntryRow({
 }) {
   return (
     <div className={'clentry' + (en.active === false ? ' inactive' : '')}>
+      <span className="clenthandle" title="Drag to reorder">⠿</span>
       <span className="clentmoves">
         <button className="clentmove" title="Up" disabled={isFirst} onClick={onMoveUp} style={{ opacity: isFirst ? 0.3 : 1 }}>▲</button>
         <button className="clentmove" title="Down" disabled={isLast} onClick={onMoveDown} style={{ opacity: isLast ? 0.3 : 1 }}>▼</button>
