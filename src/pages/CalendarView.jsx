@@ -305,19 +305,6 @@ function useCalendar(apiPath) {
     }, 350)
   }, [apiPath])
 
-  const recordHistory = useCallback((prev) => {
-    const snap = JSON.stringify(prev)
-    if (histBase.current === null) { histBase.current = snap; return }
-    if (snap !== histBase.current) {
-      undoStack.current.push(histBase.current)
-      if (undoStack.current.length > 100) undoStack.current.shift()
-      redoStack.current = []
-      histBase.current = snap
-      setUndoLen(undoStack.current.length)
-      setRedoLen(0)
-    }
-  }, [])
-
   const mutate = useCallback((mut) => {
     setData(prev => {
       /* Push the state we are leaving. The old code asked recordHistory to
