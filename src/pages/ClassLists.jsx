@@ -80,6 +80,25 @@ function matchSession(scheduleText, sessions) {
   }) || null
 }
 
+/* A program can carry thirty sessions across two locations, and listing them
+   all turns the summary line into a wall of times. Name the days it runs and
+   the span of start times instead, with locations if it has more than one. */
+function summarise(sessions) {
+  if (!sessions || sessions.length === 0) return 'No offerings scheduled'
+  const days = [...new Set(sessions.map((s) => s.session.day).filter((d) => d != null))]
+    .sort((a, b) => DOW_ORD[a] - DOW_ORD[b]).map((d) => DOW[d])
+  const starts = [...new Set(sessions.map((s) => s.session.start).filter(Boolean))].sort()
+  const locs = [...new Set(sessions.map((s) => s.session.locationId).filter(Boolean))]
+  const parts = []
+  if (days.length) parts.push(days.join(', '))
+  if (starts.length === 1) parts.push(fmtTime(starts[0]))
+  else if (starts.length > 1) parts.push(`${fmtTime(starts[0])}–${fmtTime(starts[starts.length - 1])}`)
+  if (locs.length > 1) parts.push(`${locs.length} locations`)
+  else if (locs.length === 1) parts.push(locName(locs[0]))
+  const label = parts.join('  ·  ')
+  return label ? `${label}  ·  ${sessions.length} session${sessions.length === 1 ? '' : 's'}` : 'Unscheduled'
+}
+
 function guardianContact(customer) {
   const g = customer?.guardian1 || {}
   const name = `${g['First Name'] || ''} ${g['Last Name'] || ''}`.trim()
