@@ -1441,7 +1441,7 @@ function ProgramsPage() {
           }
         })
       }
-      return genProgramIds(next, categoryOrder, subjOrder, locations)
+      return genProgramIds(next, categoryOrder, viewState.subjOrder, locations)
     })
     setEditing(null)
   }
