@@ -466,6 +466,30 @@ export default function Projects() {
     URL.revokeObjectURL(a.href)
   }
 
+  /* Pull every repeating card back to Daily Tasks now, without waiting for the
+     boundary. Undoable, since this one is a deliberate action. */
+  const resetDailyNow = () => mutateWithHistory(d => {
+    const today = isoLocal(new Date())
+    d.cards = d.cards.map(c => (c.days && c.days.length && c.col === 'done')
+      ? { ...c, col: 'daily', dayDate: today } : c)
+  })
+  const clearGoalsNow = () => mutateWithHistory(d => {
+    d.cards = d.cards.filter(c => c.col !== 'goals')
+  })
+
+  /* Archiving keeps the card and remembers where it came from, so restoring
+     puts it back in its own column rather than a default one. */
+  const archiveCard = (id) => mutateWithHistory(d => {
+    d.cards = d.cards.map(c => c.id === id
+      ? { ...c, archived: true, archivedFrom: c.col, archivedAt: new Date().toISOString() }
+      : c)
+  })
+  const restoreCard = (id) => mutateWithHistory(d => {
+    d.cards = d.cards.map(c => c.id === id
+      ? { ...c, archived: false, col: c.archivedFrom || c.col, archivedFrom: '', archivedAt: '' }
+      : c)
+  })
+
   /* Which columns are hidden is part of the board, not of this browser tab —
      it saves with everything else so it survives a reload. */
   const toggleCol = (colId) => mutate(d => {
