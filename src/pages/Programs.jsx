@@ -2458,6 +2458,27 @@ function ManageModal({ kind, onClose, programs, setPrograms, rows, viewState, se
   return null
 }
 
+/* Right-click menu, positioned at the pointer. */
+function CtxMenu({ x, y, items, onClose }) {
+  return (
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 300 }}
+        onClick={onClose} onContextMenu={e => { e.preventDefault(); onClose() }} />
+      <div className="ctxmenu" style={{
+        left: Math.min(x, window.innerWidth - 210),
+        top: Math.min(y, window.innerHeight - 40 - items.length * 36),
+      }}>
+        {items.map((it, i) => it.sep
+          ? <div className="sep" key={'s' + i} />
+          : (
+            <div key={it.label} className={it.danger ? 'del' : undefined}
+              onClick={() => { onClose(); it.on() }}>{it.label}</div>
+          ))}
+      </div>
+    </>
+  )
+}
+
 /* The 16-colour palette, offered as a popover from any colour dot — the
    template never opens the operating system's colour picker. */
 function SwatchPop({ x, y, current, onPick, onClose }) {
