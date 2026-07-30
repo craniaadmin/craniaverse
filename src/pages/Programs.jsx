@@ -1574,7 +1574,16 @@ function ProgramsPage() {
           style = { '--tint': mc, color: isDarkColor(mc) ? '#fff' : 'var(--dark-brown)' }
         }
       }
+      /* Right-clicking a category or location cell edits that label directly,
+         rather than going the long way round through a manager. */
+      let onCtx
+      if (k === 'category' && r.category) {
+        onCtx = e => { e.preventDefault(); e.stopPropagation(); setCatCtx({ x: e.clientX, y: e.clientY, cat: r.category }) }
+      } else if (k === 'location' && r.locId) {
+        onCtx = e => { e.preventDefault(); e.stopPropagation(); setLocCtx({ x: e.clientX, y: e.clientY, locId: r.locId }) }
+      }
       return <td key={k} className={cls} style={style} data-ek={editable ? k : undefined}
+        onContextMenu={onCtx}
         onClick={editable ? (e => {
           if (e.target.closest('button,input,select')) return
           setCellEdit({ key, col: k })
