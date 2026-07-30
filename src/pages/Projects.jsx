@@ -660,7 +660,7 @@ export default function Projects() {
 }
 
 // ---------- Board column ----------
-function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete, onDuplicate, onToggleGoal }) {
+function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete, onDuplicate, onArchive, onToggleGoal, onHide }) {
   const [over, setOver] = useState(false)
   return (
     <div
@@ -672,6 +672,7 @@ function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete,
       <div className="kb-col-head">
         {col.name}
         <span className="count">{cards.length}</span>
+        <button className="kb-colhide" title="Hide this column" onClick={onHide}>👁</button>
       </div>
       <div className="kb-cards">
         {cards.length === 0 && <div className="kb-empty">No cards</div>}
@@ -683,6 +684,7 @@ function BoardColumn({ col, cards, onDragStart, onDrop, onAdd, onEdit, onDelete,
             onEdit={onEdit}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
+            onArchive={onArchive}
             onToggleGoal={onToggleGoal}
           />
         ))}
