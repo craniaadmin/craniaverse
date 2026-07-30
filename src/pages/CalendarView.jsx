@@ -2291,6 +2291,31 @@ function CalSettingsPopover({ onClose }) {
   )
 }
 
+/* Palette popover for recolouring a calendar straight from its chip. */
+function CalColorPop({ x, y, current, onPick, onClose }) {
+  return (
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 300 }}
+        onClick={onClose} onContextMenu={e => { e.preventDefault(); onClose() }} />
+      <div className="cal-colorpop" style={{
+        left: Math.min(x, window.innerWidth - 190),
+        top: Math.min(y, window.innerHeight - 140),
+      }} onClick={e => e.stopPropagation()}>
+        {PALETTE.map(c => (
+          <button
+            key={c}
+            type="button"
+            className={`swatch${String(current || '').toLowerCase() === c.toLowerCase() ? ' sel' : ''}`}
+            style={{ background: c }}
+            title={c}
+            onClick={() => onPick(c)}
+          />
+        ))}
+      </div>
+    </>
+  )
+}
+
 function ContextMenu({ x, y, items }) {
   // Adjust position so it doesn't overflow viewport
   const style = { left: Math.min(x, window.innerWidth - 180), top: Math.min(y, window.innerHeight - 160) }
