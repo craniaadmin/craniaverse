@@ -915,6 +915,17 @@ app.put('/api/calendar', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- calendar backups --------
+app.get('/api/calendar/backups', wrap(async (_req, res) => res.json(await listCalendarBackups())))
+app.post('/api/calendar/backup', wrap(async (req, res) => {
+  await createCalendarBackup(req.body?.label)
+  res.json({ ok: true })
+}))
+app.post('/api/calendar/restore/:id', wrap(async (req, res) => {
+  const data = await restoreCalendarBackup(req.params.id)
+  res.json(data)
+}))
+
 // ---- marketing calendar (singleton payload — fully independent) ---
 // Same shape as /api/calendar above but its own PocketBase collection
 // (see loadMarketingCalendar/saveMarketingCalendar in pb.js) — no
