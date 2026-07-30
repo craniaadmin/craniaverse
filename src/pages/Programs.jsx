@@ -1296,22 +1296,28 @@ function ProgramsPage() {
     })
     setEditing(null)
   }
-  const duplicateProgram = (progId) => mutate(list => {
-    const i = list.findIndex(p => p.id === progId)
-    if (i < 0) return list
-    const o = list[i]
-    const dup = {
-      ...o, id: 'p_' + uid(), name: o.name,
-      offerings: (o.offerings || []).map(of => ({
-        ...of, id: 's' + uid(), days: [...(of.days || [])], times: (of.times || []).map(t => ({ ...t })),
-      })),
-    }
-    return [...list.slice(0, i + 1), dup, ...list.slice(i + 1)]
-  })
-  const deleteProgram = async (progId) => {
+  const duplicateEntry = (r) => mutate(list =>
+    genProgramIds(duplicateEntryList(list, r.progId, r.offId, r.day, r.slotIndex),
+      categoryOrder, subjOrder, locations))
+
+  /* Deleting a row takes that one session. The whole program only goes when
+     the row was its last entry. */
+  const deleteEntry = async (r) => {
+    const p = programs.find(x => x.id === r.progId)
+    if (!p) return
+    const n = entryCount(p)
+    const msg = n > 1
+      ? `Delete this one entry of “${p.name || 'Untitled'}”? Its other ${n - 1} ${n - 1 === 1 ? 'entry stays' : 'entries stay'} as they are.`
+      : `Delete “${p.name || 'Untitled'}”?`
+    if (!await dialog.confirm(msg)) return
+    mutate(list => deleteEntryList(list, r.progId, r.offId, r.day, r.slotIndex))
+  }
+
+  const deleteWholeProgram = async (progId) => {
     const p = programs.find(x => x.id === progId)
     if (!p) return
-    if (!await dialog.confirm(`Delete "${p.name || 'Untitled'}" and all its scheduled entries?`)) return
+    const n = entryCount(p)
+    if (!await dialog.confirm(`Delete “${p.name || 'Untitled'}” and all ${n} of its entries?`)) return
     mutate(list => list.filter(x => x.id !== progId))
   }
 
