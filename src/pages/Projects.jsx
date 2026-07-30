@@ -583,21 +583,55 @@ export default function Projects() {
         />
       )}
 
-      <div className="kanban" style={{ gridTemplateColumns: `repeat(${visibleCols.length || 1}, 1fr)` }}>
-        {visibleCols.map(col => (
-          <BoardColumn
-            key={col.id}
-            col={col}
-            cards={cardsByCol[col.id] || []}
-            onDragStart={onDragStart}
-            onDrop={() => onDropTo(col.id)}
-            onAdd={() => openNew(col.id)}
-            onEdit={openEdit}
-            onDelete={remove}
-            onDuplicate={duplicate}
-            onToggleGoal={toggleGoal}
-          />
-        ))}
+      {archiveMode ? (
+        <div className="pj-archive">
+          <h3>Archived Cards</h3>
+          <div className="sp-hint" style={{ marginBottom: 10 }}>
+            Restoring a card sends it back to the column it was archived from.
+          </div>
+          {archivedCards.length === 0 && (
+            <div className="pj-arch-empty">Nothing archived yet.</div>
+          )}
+          {archivedCards.map(c => (
+            <div key={c.id} className="pj-arch-row">
+              <span className="pj-arch-dot" style={{ background: c.color || DEFAULT_COLOR }} />
+              <span className="pj-arch-task">{c.task || '(untitled)'}</span>
+              {c.project && <span className="pj-arch-proj">{c.project}</span>}
+              <span className="pj-arch-when">
+                {colName(c.archivedFrom)}{c.archivedAt ? ` · ${fmtDateTime(c.archivedAt)}` : ''}
+              </span>
+              <button className="pj-arch-restore" onClick={() => restoreCard(c.id)}>↩ Restore</button>
+              <button className="kb-x" title="Delete for good" onClick={() => remove(c.id)}>×</button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="kanban" style={{ gridTemplateColumns: `repeat(${visibleCols.length || 1}, 1fr)` }}>
+          {visibleCols.map(col => (
+            <BoardColumn
+              key={col.id}
+              col={col}
+              cards={cardsByCol[col.id] || []}
+              onDragStart={onDragStart}
+              onDrop={() => onDropTo(col.id)}
+              onAdd={() => openNew(col.id)}
+              onEdit={openEdit}
+              onDelete={remove}
+              onDuplicate={duplicate}
+              onArchive={archiveCard}
+              onToggleGoal={toggleGoal}
+              onHide={() => toggleCol(col.id)}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="pj-footer">
+        <span>CraniaVerse · Projects</span>
+        {' · '}
+        <button className="pj-archlink" onClick={() => setArchiveMode(v => !v)}>
+          {archiveMode ? 'Back to board' : `Archived${archivedCards.length ? ` (${archivedCards.length})` : ''}`}
+        </button>
       </div>
 
       {editing && (
