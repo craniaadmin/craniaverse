@@ -105,6 +105,68 @@ const daysLabel = (days) => {
   return [1, 2, 3, 4, 5, 6, 0].filter(d => days.includes(d)).map(d => WD_ABBR[d]).join(', ')
 }
 
+/* The most recent time-of-day boundary that has already passed. */
+function passedBoundary(now, hm) {
+  const [hs, ms] = String(hm || '00:00').split(':')
+  const b = new Date(now)
+  b.setHours(Number(hs) || 0, Number(ms) || 0, 0, 0)
+  if (now < b) b.setDate(b.getDate() - 1)
+  return b
+}
+
+/* Recurring cards come back to Daily Tasks each day they are scheduled for.
+   Walks every boundary missed since the last run — up to 62 days — so a board
+   left closed over a break catches up rather than skipping straight to today.
+   Mutates `d`; returns whether anything changed. */
+function processResets(d) {
+  const now = new Date()
+  const boundary = passedBoundary(now, d.resetTime || '08:00')
+  const bTime = boundary.getTime()
+  if (d.lastResetAt && d.lastResetAt >= bTime) return false
+
+  const [hs, ms] = String(d.resetTime || '08:00').split(':')
+  const h = Number(hs) || 0, m = Number(ms) || 0
+  const bDay = new Date(boundary); bDay.setHours(0, 0, 0, 0)
+
+  const doDay = (dd) => {
+    const wd = dd.getDay(), diso = isoLocal(dd)
+    d.cards = d.cards.map(c => (c.days && c.days.includes(wd))
+      ? { ...c, col: c.col === 'done' ? 'daily' : c.col, dayDate: diso }
+      : c)
+  }
+
+  if (!d.lastResetAt) {
+    doDay(bDay)
+  } else {
+    const dd = new Date(d.lastResetAt); dd.setHours(0, 0, 0, 0)
+    for (let g = 0; g < 62; g++) {
+      const bd = new Date(dd); bd.setHours(h, m, 0, 0)
+      if (bd.getTime() > d.lastResetAt && bd.getTime() <= bTime) doDay(dd)
+      if (dd.getTime() >= bDay.getTime()) break
+      dd.setDate(dd.getDate() + 1)
+    }
+  }
+  d.lastResetAt = bTime
+  d.lastReset = isoLocal(bDay)
+  return true
+}
+
+/* Today's Goals empties at its own boundary. The first run only stamps the
+   time — otherwise opening the board for the first time would wipe goals that
+   were never given a chance to carry over. */
+function processGoalsClear(d) {
+  const boundary = passedBoundary(new Date(), d.clearGoalsTime || '00:00')
+  const bTime = boundary.getTime()
+  if (d.lastGoalsClearAt && d.lastGoalsClearAt >= bTime) return false
+  const first = !d.lastGoalsClearAt
+  d.lastGoalsClearAt = bTime
+  d.lastGoalsClear = isoLocal(boundary)
+  if (first) return false
+  const had = d.cards.some(c => c.col === 'goals')
+  d.cards = d.cards.filter(c => c.col !== 'goals')
+  return had
+}
+
 /* Only real column ids, so a stale id cannot hide a column that no longer
    matches anything. */
 function normalizeHiddenCols(x) {
