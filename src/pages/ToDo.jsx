@@ -1321,11 +1321,16 @@ const WEEKDAY_OPTIONS = [
 ]
 
 function ChecklistEntryRow({
-  entry: en, index, lists,
+  entry: en, index, isFirst, isLast, lists,
   onText, onNote, onPriority, onListId, onActive, onSchedule,
+  onMoveUp, onMoveDown,
 }) {
   return (
     <div className={'clentry' + (en.active === false ? ' inactive' : '')}>
+      <span className="clentmoves">
+        <button className="clentmove" title="Up" disabled={isFirst} onClick={onMoveUp} style={{ opacity: isFirst ? 0.3 : 1 }}>▲</button>
+        <button className="clentmove" title="Down" disabled={isLast} onClick={onMoveDown} style={{ opacity: isLast ? 0.3 : 1 }}>▼</button>
+      </span>
       <input className="clenttext" value={en.text} placeholder={`Item ${index + 1}`} onChange={e => onText(e.target.value)} />
       <input className="clentnote" value={en.note} placeholder="comment (optional)" onChange={e => onNote(e.target.value)} />
       <select className="clentfreq" value={en.freq} onChange={e => onSchedule({ freq: e.target.value })}>
