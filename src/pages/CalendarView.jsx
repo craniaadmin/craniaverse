@@ -416,7 +416,7 @@ const CSS = `
 
 /* sidebar */
 .calroot .side-title{margin:0 0 10px;font-size:14px;font-weight:700;color:var(--dark-blue);display:flex;align-items:center;gap:6px;flex:none;}
-.calroot .agenda-list{padding:8px 12px;max-height:340px;overflow-y:auto;}
+.calroot .agenda-list{max-height:340px;overflow-y:auto;flex:1;min-height:0;}
 .calroot .agenda-day-label{font-size:11px;font-weight:700;color:#8a8474;text-transform:uppercase;margin:8px 0 4px;letter-spacing:.5px;}
 .calroot .agenda-day-label:first-child{margin-top:0;}
 .calroot .agenda-ev{display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:6px;cursor:pointer;font-size:12px;margin-bottom:2px;}
