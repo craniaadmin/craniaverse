@@ -2407,6 +2407,9 @@ function GradeRange({ value, onCommit }) {
 }
 
 function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewState }) {
+  const dialog = useDialog()
+  const [drag, setDrag] = useState(null)
+  const [dropCat, setDropCat] = useState(null)
   const [cats, setCats] = useState(viewState.categoryOrder.slice())
   const [subjOrder, setSubjOrder] = useState({ ...viewState.subjOrder })
   const [catColors, setCatColors] = useState({ ...viewState.catColors })
