@@ -174,7 +174,7 @@ export default function ClassLists({ onNavigate }) {
   const q = search.trim().toLowerCase()
   const matchesSearch = (c) => {
     if (!q) return true
-    if ((c.program.title || '').toLowerCase().includes(q)) return true
+    if ((c.program.name || '').toLowerCase().includes(q)) return true
     if ((c.program.category || '').toLowerCase().includes(q)) return true
     if ((c.program.subject || '').toLowerCase().includes(q)) return true
     return c.roster.some((row) =>
@@ -186,8 +186,31 @@ export default function ClassLists({ onNavigate }) {
       .filter((c) => (category === 'all' ? true : c.program.category === category))
       .filter((c) => (hideEmpty ? c.roster.length > 0 : true))
       .filter(matchesSearch)
-      .sort((a, b) => b.roster.length - a.roster.length || a.program.title.localeCompare(b.program.title))
+      .sort((a, b) => b.roster.length - a.roster.length
+        || String(a.program.name || '').localeCompare(String(b.program.name || '')))
   }, [classes, category, hideEmpty, q])
+
+  /* Classes sit under their category heading, in the same running order the
+     Programs page uses. */
+  const grouped = useMemo(() => {
+    const buckets = new Map()
+    for (const c of visible) {
+      const cat = c.program.category || 'Uncategorised'
+      if (!buckets.has(cat)) buckets.set(cat, [])
+      buckets.get(cat).push(c)
+    }
+    const rank = (cat) => {
+      const i = CATEGORY_ORDER.indexOf(cat)
+      return i < 0 ? CATEGORY_ORDER.length : i
+    }
+    return [...buckets.entries()]
+      .sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]))
+      .map(([cat, items]) => ({
+        category: cat,
+        items,
+        students: items.reduce((n, c) => n + c.roster.length, 0),
+      }))
+  }, [visible])
 
   // ---- metrics ----
   const metrics = useMemo(() => {
