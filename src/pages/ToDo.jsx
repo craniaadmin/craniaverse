@@ -1326,16 +1326,13 @@ const WEEKDAY_OPTIONS = [
 ]
 
 function ChecklistEntryRow({
-  entry: en, index, isFirst, isLast, lists,
+  entry: en, index, lists,
   onText, onNote, onPriority, onListId, onActive, onSchedule,
-  onMoveUp, onMoveDown, onDuplicate, onRemove,
 }) {
   return (
     <div className={'clentry' + (en.active === false ? ' inactive' : '')}>
-      <button className="clentmove" title="Up" disabled={isFirst} onClick={onMoveUp} style={{ opacity: isFirst ? 0.3 : 1 }}>▲</button>
-      <button className="clentmove" title="Down" disabled={isLast} onClick={onMoveDown} style={{ opacity: isLast ? 0.3 : 1 }}>▼</button>
       <input className="clenttext" value={en.text} placeholder={`Item ${index + 1}`} onChange={e => onText(e.target.value)} />
-      <input className="clentnote" value={en.note} placeholder="comment" onChange={e => onNote(e.target.value)} />
+      <input className="clentnote" value={en.note} placeholder="comment (optional)" onChange={e => onNote(e.target.value)} />
       <select className="clentfreq" value={en.freq} onChange={e => onSchedule({ freq: e.target.value })}>
         <option value="daily">Daily</option>
         <option value="weekly">Weekly</option>
@@ -1394,12 +1391,10 @@ function ChecklistEntryRow({
         </span>
       )}
 
-      <span className="clentsep">|</span>
-      <span className="clentlistwrap">→
-        <select className="clentlist" value={en.listId} onChange={e => onListId(e.target.value)}>
-          {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-        </select>
-      </span>
+      <span className="clentsep">→</span>
+      <select className="clentlist" value={en.listId} onChange={e => onListId(e.target.value)}>
+        {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+      </select>
       <select
         className={'clentpri pri-' + (en.priority || 'high')}
         value={en.priority || 'high'}
@@ -1417,8 +1412,6 @@ function ChecklistEntryRow({
       <label className="clentactive">
         <input type="checkbox" checked={en.active !== false} onChange={e => onActive(e.target.checked)} /> Active
       </label>
-      <button className="clentdup" title="Duplicate" onClick={onDuplicate}>⧉</button>
-      <button className="clentdel" title="Remove" onClick={onRemove}>×</button>
     </div>
   )
 }
