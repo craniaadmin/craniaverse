@@ -2581,9 +2581,9 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
                   onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }} />
                 <span className="cuse" title="Programs using this category">{countCat(cat)}</span>
                 <button type="button" className="mv" onClick={() => moveCat(ci, -1)} disabled={ci === 0}>▲</button>
-                <button type="button" style={btnStyle} onClick={() => moveCat(ci, 1)} disabled={ci === cats.length - 1}>▼</button>
-                <button type="button" className="rmtime" onClick={() => deleteCat(cat)} title="Delete">×</button>
-              </div>
+                <button type="button" className="mv" onClick={() => moveCat(ci, 1)} disabled={ci === cats.length - 1}>▼</button>
+                <button type="button" className="del2" onClick={() => deleteCat(cat)} title="Delete Category">×</button>
+              </ManagerRow>
               {subjectsOf(cat).map((s, si) => (
                 <div key={cat + '|' + s} style={{ ...rowStyle, paddingLeft: 34 }}>
                   <span style={{ cursor: 'grab', color: '#9a948a', fontSize: 14 }}>☰</span>
