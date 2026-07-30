@@ -1234,7 +1234,7 @@ function ProgramsPage() {
     rs.forEach(r => { if (selected.has(rowKey(r))) ids.add(r.progId) })
     return ids
   }, [rs, selected])
-  const bulkDelete = () => {
+  const bulkDelete = async () => {
     if (!selectedProgIds.size) return
     if (!await dialog.confirm(`Delete ${selectedProgIds.size} program(s) and all their entries?`)) return
     mutate(list => list.filter(p => !selectedProgIds.has(p.id)))
