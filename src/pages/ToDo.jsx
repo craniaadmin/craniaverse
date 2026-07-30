@@ -588,7 +588,7 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       }
       downloadCsv(`crania-checklists-${stamp}.csv`, rows)
     } else {
-      const rows = [['List', 'Task', 'Priority', 'Due Date', 'Done', 'Notes']]
+      const rows = [['List', 'To-Do', 'Priority', 'Due Date', 'Done', 'Notes']]
       for (const list of state.lists) {
         for (const it of state.items.filter(i => i.listId === list.id)) {
           rows.push([
