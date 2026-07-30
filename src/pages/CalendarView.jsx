@@ -1246,20 +1246,27 @@ function MonthGrid({ days, cur, today, eventsByDay, eventColor, calById, onNewEv
           >
             <div className={`day-num${isToday ? ' today-circle' : ''}`}>{d.getDate()}</div>
             {shown.map((ev, j) => {
+              /* The chip is a wash of the event's own colour; the dot stays the
+                 calendar's, so an event given its own colour still says which
+                 calendar it belongs to. Reds get a lighter wash — at 45% they
+                 read as an alert. */
               const color = eventColor(ev)
+              const dotColor = (calById.get(ev.calId) || {}).color || color
               return (
                 <div
                   key={`${ev.id}-${dISO}-${j}`}
                   className="month-ev"
-                  style={{ background: color, color: textOn(color) }}
+                  style={{ background: `${color}${isRedColor(color) ? '55' : '73'}` }}
                   onClick={e => { e.stopPropagation(); onEditEvent(ev, dISO) }}
                   onContextMenu={e => onCtxEvent(e, ev, dISO)}
                   draggable
                   onDragStart={e => { e.stopPropagation(); onDragStart(e, ev, dISO) }}
-                  title={ev.title + (ev.allDay ? '' : ` (${fmtTime12(ev.start)}–${fmtTime12(ev.end)})`)}
+                  title={ev.notes || ''}
                 >
-                  {!ev.allDay && ev.start && <span style={{ opacity: .8, marginRight: 4, fontSize: 10 }}>{fmtTime12(ev.start)}</span>}
-                  {ev.title}
+                  <span className="month-ev-dot" style={{ background: dotColor }} />
+                  {!ev.allDay && ev.start
+                    ? `${fmtTime12(ev.start)}${ev.end ? '–' + fmtTime12(ev.end) : ''} ${ev.title}`
+                    : ev.title}
                 </div>
               )
             })}
