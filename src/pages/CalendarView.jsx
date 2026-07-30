@@ -249,13 +249,22 @@ function useCalendar(apiPath) {
       if (!r.ok) throw new Error(`HTTP ${r.status}`)
       const j = await r.json()
       const d = {
+        ...j,
         calendars: Array.isArray(j.calendars) ? j.calendars : [],
         events: Array.isArray(j.events) ? j.events : [],
         hidden: j.hidden && typeof j.hidden === 'object' ? j.hidden : {},
       }
+      const migrated = migrateCalendar(d)
       setData(d)
       histBase.current = JSON.stringify(d)
       setStatus('online')
+      if (migrated) {
+        fetch(`${API_BASE}${apiPath}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', ...HEADERS },
+          body: JSON.stringify(d),
+        }).catch(() => {})
+      }
     } catch {
       setStatus('offline')
     } finally {
