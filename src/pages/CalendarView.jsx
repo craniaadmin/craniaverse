@@ -396,8 +396,9 @@ const CSS = `
 .calroot .day-cell.is-today{background:#eefaff;}
 .calroot .day-num{font-size:12px;font-weight:700;margin-bottom:2px;}
 .calroot .day-num.today-circle{background:var(--dark-blue);color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;}
-.calroot .month-ev{font-size:11px;border-radius:4px;padding:1px 5px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+.calroot .month-ev{font-size:11px;border-radius:4px;padding:1px 5px;margin-bottom:2px;color:#2e2516;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
 .calroot .month-ev:hover{filter:brightness(.92);}
+.calroot .month-ev-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle;}
 .calroot .month-more{font-size:10px;color:#8a8474;font-weight:600;}
 .calroot .day-cell.drag-over-cell{outline:2px solid var(--dark-blue);outline-offset:-2px;}
 
