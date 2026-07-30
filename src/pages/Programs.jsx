@@ -1831,7 +1831,16 @@ function ProgramsPage() {
         {!programs.length ? (
           <div className="empty"><b>No programs yet.</b><br />Click “+ Add Program” to create your first one.</div>
         ) : !rs.length ? (
-          <div className="empty"><b>Nothing to show.</b><br />Your search or filter is too narrow.</div>
+          <div className="empty">
+            <b>Nothing to show.</b><br />Your search or filter is too narrow.
+            {anyFilterActive && (
+              /* The column filters live in the table head, which is not drawn
+                 when nothing matches — without this the view is a dead end. */
+              <div style={{ marginTop: 14 }}>
+                <button className="clearf" onClick={clearAllFilters}>Clear All Filters</button>
+              </div>
+            )}
+          </div>
         ) : (
           <table>
             <thead>
