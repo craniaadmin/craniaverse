@@ -1775,12 +1775,67 @@ function ProgramsPage() {
           onNone={() => setHiddenCols(Object.fromEntries(COLS.filter(c => c.l && c.k !== 'name').map(c => [c.k, true])))} />
       )}
 
+      {rowCtx && (
+        <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={(() => {
+          const p = programs.find(x => x.id === rowCtx.row.progId)
+          const n = p ? entryCount(p) : 1
+          const items = [
+            { label: 'Edit Entry', on: () => openEdit(rowCtx.row) },
+            { label: 'Duplicate Entry', on: () => duplicateEntry(rowCtx.row) },
+            { sep: true },
+            { label: 'Delete Entry', danger: true, on: () => deleteEntry(rowCtx.row) },
+          ]
+          if (n > 1) items.push({
+            label: `Delete Whole Program (${n} Entries)`, danger: true,
+            on: () => deleteWholeProgram(rowCtx.row.progId),
+          })
+          return items
+        })()} />
+      )}
+
+      {catCtx && (
+        <SwatchPop x={catCtx.x} y={catCtx.y} current={catColor(catCtx.cat)}
+          onClose={() => setCatCtx(null)}
+          onPick={c => {
+            setViewState(vs => ({ ...vs, catColors: { ...vs.catColors, [catCtx.cat]: c } }))
+            setCatCtx(null)
+          }} />
+      )}
+
+      {locCtx && (
+        <CtxMenu x={locCtx.x} y={locCtx.y} onClose={() => setLocCtx(null)} items={[
+          { label: 'Rename', on: () => renameLocation(locCtx.locId) },
+          { label: 'Change Colour', on: () => setLocColorAt({ x: locCtx.x, y: locCtx.y, locId: locCtx.locId }) },
+          { label: 'Delete', danger: true, on: () => deleteLocation(locCtx.locId) },
+        ]} />
+      )}
+
+      {locColorAt && (
+        <SwatchPop x={locColorAt.x} y={locColorAt.y} current={locColor(locColorAt.locId)}
+          onClose={() => setLocColorAt(null)}
+          onPick={c => {
+            setViewState(vs => ({
+              ...vs,
+              locations: vs.locations.map(l => l.id === locColorAt.locId ? { ...l, color: c } : l),
+            }))
+            setLocColorAt(null)
+          }} />
+      )}
+
       {editing && (
-        <ProgramModal mode={editing.mode} initial={editing.program} locations={locations}
-          teacherOptions={teacherOptions} registrations={registrations}
-          categories={categoryOrder}
-          onClose={() => setEditing(null)} onSave={saveProgram}
-          onDelete={editing.mode === 'edit' ? () => { deleteProgram(editing.program.id); setEditing(null) } : null} />
+        <EntryModal mode={editing.mode} initial={editing.program} ctx={editing.ctx}
+          locations={locations} teacherOptions={teacherOptions} registrations={registrations}
+          categories={categoryOrder} subjects={vocabList('subject')} years={vocabList('year')}
+          platforms={listOrdered('platform', programs, allRows, viewState.platformOrder)}
+          catColor={catColor} subjColor={subjColor}
+          onPickCatColor={(cat, c) => setViewState(vs => ({ ...vs, catColors: { ...vs.catColors, [cat]: c } }))}
+          onPickSubjColor={(cat, s, c) => setViewState(vs => ({
+            ...vs, subjColors: { ...vs.subjColors, [cat + ' ' + s]: c },
+          }))}
+          onClose={() => setEditing(null)} onSave={saveEntry}
+          onDelete={editing.mode === 'edit'
+            ? () => { deleteEntry(editing.ctx ? { ...editing.ctx, offId: editing.ctx.offId } : editing.program); setEditing(null) }
+            : null} />
       )}
 
       {bulkOpen && (
