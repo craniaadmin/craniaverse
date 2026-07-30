@@ -180,6 +180,16 @@ function fmtDuration(mins) {
   if (!h) return m + ' min'
   return h + ' h' + (m ? ' ' + m + ' min' : '')
 }
+/* "1–10" → {from:"1", to:"10"}; also handles "Up to 8" and "9+". */
+function parseGrade(a) {
+  a = (a || '').trim().replace(/^–|–$/g, '')
+  if (!a) return { from: '', to: '' }
+  if (/^up to/i.test(a)) return { from: '', to: a.replace(/^up to\s*(grade\s*)?/i, '').trim() }
+  if (/\+$/.test(a)) return { from: a.slice(0, -1).trim(), to: '' }
+  const parts = a.split(/[–-]/).map(x => x.replace(/grades?\s*/i, '').trim())
+  if (parts.length >= 2) return { from: parts[0], to: parts[1] }
+  return { from: parts[0] || '', to: '' }
+}
 function fmtGrade(a) {
   if (!a) return ''
   if (/grade/i.test(a)) return a
