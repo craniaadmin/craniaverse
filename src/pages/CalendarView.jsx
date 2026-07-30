@@ -95,7 +95,7 @@ function recurLabel(rc) {
   const iv = Math.max(1, rc.interval || 1)
   let s = (iv > 1 ? `Every ${iv} ` : '') + rc.freq
   if (rc.freq === 'weekly' && rc.days && rc.days.length) {
-    s += ' (' + rc.days.map(d => DOW_FULL[d]).join(', ') + ')'
+    s += ' (' + rc.days.map(d => DOW_BY_NUM[d]).join(', ') + ')'
   }
   if (rc.until) s += ' until ' + rc.until
   if (rc.count) s += ' ×' + rc.count
