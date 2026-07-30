@@ -418,13 +418,20 @@ export default function ClassLists({ onNavigate }) {
                         ))}
                         {c.unspecified.length > 0 && (
                           <div>
+                            {/* Naming the times on both sides turns this from a
+                                dead end into something you can act on. */}
                             <div style={{
-                              padding: '8px 16px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-                              letterSpacing: '.4px', color: 'var(--ink-soft)', background: '#fafaf7',
+                              padding: '8px 16px', fontSize: 11, fontWeight: 700,
+                              letterSpacing: '.3px', color: '#8a6a00', background: '#fffbf0',
+                              borderTop: '1px solid #f4e4bd',
                             }}>
-                              Schedule not matched to an offering
+                              SCHEDULE DOESN’T MATCH A LISTED SESSION
+                              <span style={{ fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>
+                                {' '}— this class runs {c.sessions.map((s) => sessionLabel(s.session)).join(', ')}.
+                                Check the registration or the program’s timetable.
+                              </span>
                             </div>
-                            <Roster rows={c.unspecified} onNavigate={onNavigate} />
+                            <Roster rows={c.unspecified} onNavigate={onNavigate} showSchedule />
                           </div>
                         )}
                       </>
