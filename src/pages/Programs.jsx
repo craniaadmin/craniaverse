@@ -2451,10 +2451,13 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
     ;[next[i], next[i + dir]] = [next[i + dir], next[i]]
     commit(next, subjOrder, catColors, subjColors)
   }
+  /* Move within the list actually on screen, not the stored order — that array
+     is empty until someone reorders, so indexing into it moved nothing. */
   const moveSubj = (cat, i, dir) => {
-    const arr = (subjOrder[cat] || []).slice()
-    if (i + dir < 0 || i + dir >= arr.length) return
-    ;[arr[i], arr[i + dir]] = [arr[i + dir], arr[i]]
+    const arr = subjectsOf(cat).slice()
+    const j = i + dir
+    if (i < 0 || j < 0 || j >= arr.length) return
+    arr.splice(j, 0, arr.splice(i, 1)[0])
     commit(cats, { ...subjOrder, [cat]: arr }, catColors, subjColors)
   }
 
