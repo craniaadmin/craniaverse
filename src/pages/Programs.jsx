@@ -582,6 +582,9 @@ const CSS = `
 .pg .actbtn{border:none;background:none;padding:0;font-size:12px;font-weight:400;cursor:pointer;line-height:inherit;font-family:inherit}
 .pg .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .pg .empty b{color:var(--dark-brown)}
+.pg .clearf{background:#fff;border:1px solid var(--field);border-radius:8px;padding:8px 12px;
+    font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;font-family:inherit}
+.pg .clearf:hover{background:#f1f5f4}
 .pg .hint{color:var(--faint);font-size:12px}
 .pg thead th.colh[data-col="active"],.pg thead th.colh[data-col="year"]{white-space:nowrap}
 .pg thead th.colh[data-col="active"] .lbl,.pg thead th.colh[data-col="year"] .lbl{padding:0 13px}
