@@ -1,0 +1,20 @@
+{
+  "cards": [
+    { "id": "n1", "col": "notes", "task": "SDFG", "project": "", "color": "#5FA09E",
+      "tags": ["sdfg"], "comments": [], "goals": [], "days": [], "created": "2026-07-30T19:18:00.000Z" },
+    { "id": "g1", "col": "goals", "task": "", "project": "", "color": "#5FA09E",
+      "goals": [{ "id": "x1", "text": "dfgsdfg", "done": true }, { "id": "x2", "text": "sdfgs", "done": false }, { "id": "x3", "text": "sdfg", "done": false }],
+      "tags": [], "comments": [], "days": [], "created": "2026-07-30T19:18:00.000Z" },
+    { "id": "d1", "col": "daily", "task": "JNKL", "project": "", "color": "#5FA09E",
+      "days": [0,1,2,3,4,5,6], "tags": ["dfgh"], "comments": [], "goals": [], "created": "2026-07-30T19:18:00.000Z" },
+    { "id": "t1", "col": "todo", "task": "hjbkn", "project": "FGHVJB", "color": "#5FA09E",
+      "tags": ["bhjn"], "comments": [], "goals": [], "days": [], "created": "2026-07-30T19:18:00.000Z" },
+    { "id": "t2", "col": "doing", "task": "sdfg", "project": "SDFG", "color": "#5FA09E",
+      "tags": ["sdfg"], "comments": [], "goals": [], "days": [], "created": "2026-07-30T19:18:00.000Z" },
+    { "id": "t3", "col": "done", "task": "sdfg", "project": "DFG", "color": "#5FA09E",
+      "tags": ["sdfg"], "comments": [], "goals": [], "days": [], "created": "2026-07-30T19:18:00.000Z" }
+  ],
+  "updatedAt": "2026-07-30T19:18:00.000Z",
+  "resetTime": "08:00", "clearGoals": false, "clearGoalsTime": "00:00",
+  "colOrder": ["notes", "goals", "daily", "todo", "doing", "done"], "hiddenCols": {}
+}

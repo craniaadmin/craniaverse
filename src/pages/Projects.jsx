@@ -39,8 +39,6 @@ const PJ_CSS = `
 .kb-col-head .kb-colhide{background:none;border:none;color:inherit;opacity:0;font-size:11px;padding:0 2px;margin-left:4px;cursor:pointer;transition:opacity .12s;}
 .kb-col-head:hover .kb-colhide{opacity:.75;}
 .kb-col-head .kb-colhide:hover{opacity:1;}
-.kb-card .kb-arch{background:none;border:none;color:inherit;opacity:.55;font-size:11px;padding:0 3px;cursor:pointer;}
-.kb-card .kb-arch:hover{opacity:1;}
 .pj-footer{text-align:center;font-size:12px;color:#9a948a;padding:16px 0 4px;}
 .pj-archlink{background:none;border:none;color:var(--brand-dark-blue);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:0;}
 .pj-archlink:hover{text-decoration:underline;}
@@ -55,6 +53,12 @@ const PJ_CSS = `
 .pj-arch-when{font-size:11px;color:#9a948a;flex:none;white-space:nowrap;}
 .pj-arch-restore{background:none;border:none;color:var(--brand-dark-blue);font:inherit;font-size:12px;font-weight:700;cursor:pointer;flex:none;}
 .pj-arch-restore:hover{text-decoration:underline;}
+.pj-ctx{position:fixed;z-index:300;display:flex;flex-direction:column;background:#fff;border:1px solid #e2ded2;
+  border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.18);overflow:hidden;min-width:140px;}
+.pj-ctx button{background:none;border:none;text-align:left;padding:8px 14px;font-size:13px;font-family:inherit;
+  cursor:pointer;color:var(--brand-dark-brown);}
+.pj-ctx button:hover{background:#f0efe7;}
+.pj-ctx button.danger:hover{background:#fdecea;color:#c0392b;}
 `
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -737,7 +741,6 @@ function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onArchive
         onDragStart={() => onDragStart(card.id)}
         onDoubleClick={() => onEdit(card)}
       >
-        <button className="kb-arch" title="Archive" onClick={(e) => { e.stopPropagation(); onArchive(card.id) }}>🗀</button>
         <button className="kb-dup" title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(card.id) }}>⧉</button>
         <button className="kb-x"   title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(card.id)    }}>×</button>
         {card.who && <div style={{ fontWeight: 700, fontSize: 14 }}>{card.who}</div>}
@@ -777,7 +780,6 @@ function BoardCard({ card, onDragStart, onEdit, onDelete, onDuplicate, onArchive
       onDragStart={() => onDragStart(card.id)}
       onDoubleClick={() => onEdit(card)}
     >
-      <button className="kb-arch" title="Archive" onClick={(e) => { e.stopPropagation(); onArchive(card.id) }}>🗀</button>
       <button className="kb-dup" title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(card.id) }}>⧉</button>
       <button className="kb-x"   title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(card.id)    }}>×</button>
       {card.project && !isDaily && <div className="project">{card.project}</div>}
