@@ -2584,9 +2584,9 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
                 <button type="button" className="mv" onClick={() => moveCat(ci, 1)} disabled={ci === cats.length - 1}>▼</button>
                 <button type="button" className="del2" onClick={() => deleteCat(cat)} title="Delete Category">×</button>
               </ManagerRow>
-              {subjectsOf(cat).map((s, si) => (
-                <div key={cat + '|' + s} style={{ ...rowStyle, paddingLeft: 34 }}>
-                  <span style={{ cursor: 'grab', color: '#9a948a', fontSize: 14 }}>☰</span>
+              {subjectsOf(cat).map((s, si, subs) => (
+                <ManagerRow key={cat + '|' + s} sub>
+                  <span className="grip" style={{ visibility: 'hidden' }}>⠿</span>
                   <input type="color" value={subjColors[cat + '\u0000' + s] || DEFAULT_CAT_COLOR}
                     onChange={e => recolourSubj(cat, s, e.target.value)}
                     style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #d8d3c6', padding: 0 }} />
