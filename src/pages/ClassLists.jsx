@@ -254,14 +254,11 @@ export default function ClassLists({ onNavigate }) {
       )}
 
       {/* Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
         <MetricTile label="Classes Running" value={metrics.classesRunning} hint="with at least one student" />
         <MetricTile label="Students Enrolled" value={metrics.uniqueStudents} hint={`${metrics.enrollments} enrollments`} />
         <MetricTile label="At Capacity" value={metrics.atCapacity}
           color={metrics.atCapacity > 0 ? '#a12626' : 'var(--ink)'} hint="sessions full or over" />
-        <MetricTile label="Needs Attention" value={metrics.needsAttention}
-          color={metrics.needsAttention > 0 ? '#a12626' : 'var(--ink)'}
-          hint="unmatched program names" />
       </div>
 
       {/* Toolbar */}
