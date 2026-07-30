@@ -50,6 +50,7 @@ import {
   loadTodo,          saveTodo,
   listTodoBackups,   createTodoBackup,  restoreTodoBackup,
   listChecklistBackups, createChecklistBackup, restoreChecklistBackup,
+  listProjectBackups, createProjectBackup, restoreProjectBackup,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
