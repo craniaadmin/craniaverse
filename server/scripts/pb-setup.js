@@ -135,6 +135,14 @@ const collectionSpecs = [
     indexes: [],
   },
   {
+    name: 'project_backups',
+    fields: [
+      { name: 'label',   type: 'text', required: false },
+      { name: 'payload', type: 'json', required: false, maxSize: 5242880 },
+    ],
+    indexes: [],
+  },
+  {
     name: 'boothSignups',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },   // = email (lowercase)
