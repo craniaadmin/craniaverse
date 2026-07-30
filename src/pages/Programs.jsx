@@ -2101,38 +2101,92 @@ function BulkModal({ count, locations, categories, onClose, onApply }) {
 }
 
 /* ================= managers ================= */
-function ManageModal({ kind, onClose, programs, setPrograms, viewState, setViewState }) {
-  if (kind === 'locations') return <LocationsManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
-  return <CatSubjManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+function ManageModal({ kind, onClose, programs, setPrograms, rows, viewState, setViewState }) {
+  if (kind === 'loc') return <LocationsManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+  if (kind === 'cat') return <CatSubjManager {...{ onClose, programs, setPrograms, viewState, setViewState }} />
+  if (LIST_KINDS[kind]) return <ListManager {...{ kind, onClose, programs, setPrograms, rows, viewState, setViewState }} />
+  return null
+}
+
+/* The 16-colour palette, offered as a popover from any colour dot — the
+   template never opens the operating system's colour picker. */
+function SwatchPop({ x, y, current, onPick, onClose }) {
+  return (
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 300 }} onClick={onClose} />
+      <div className="cpop" style={{ left: Math.min(x, window.innerWidth - 190), top: y }}>
+        {LPAL.map(c => (
+          <div key={c} className="sw" style={{
+            background: c,
+            outline: String(current || '').toLowerCase() === c.toLowerCase() ? '2px solid #2E2516' : undefined,
+          }} title={c} onClick={e => { e.stopPropagation(); onPick(c) }} />
+        ))}
+      </div>
+    </>
+  )
+}
+
+function ColorDot({ color, size = 24, title = 'Click To Change Colour', onPick }) {
+  const [pos, setPos] = useState(null)
+  return (
+    <>
+      <button type="button" className="cdot" title={title}
+        style={{ width: size, height: size, background: color || DEFAULT_CAT_COLOR }}
+        onClick={e => {
+          e.stopPropagation()
+          const r = e.currentTarget.getBoundingClientRect()
+          setPos({ x: r.left, y: r.bottom + 6 })
+        }} />
+      {pos && <SwatchPop x={pos.x} y={pos.y} current={color}
+        onPick={c => { onPick(c); setPos(null) }} onClose={() => setPos(null)} />}
+    </>
+  )
+}
+
+/* Reorderable rows shared by every manager: grip, colour dot, name, usage
+   count, ▲ ▼ and ×. */
+function ManagerRow({ sub, draggable, onDragStart, onDragOver, onDragLeave, onDrop, dropTarget, children }) {
+  return (
+    <div className={'catrow' + (sub ? ' subrow' : '') + (dropTarget ? ' dropt' : '')}
+      draggable={draggable}
+      onDragStart={onDragStart} onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
+      {children}
+    </div>
+  )
 }
 
 function LocationsManager({ onClose, programs, setPrograms, viewState, setViewState }) {
-  const [locs, setLocs] = useState(viewState.locations.map(l => ({ ...l })))
+  const dialog = useDialog()
+  const locs = viewState.locations
   const [msg, setMsg] = useState('')
-  useEffect(() => { setLocs(viewState.locations.map(l => ({ ...l }))) }, [viewState.locations])
-  const update = (nextLocs) => {
-    setLocs(nextLocs)
-    setViewState(vs => ({ ...vs, locations: nextLocs.map(l => ({ ...l })) }))
-  }
-  const add = () => {
-    const name = window.prompt('New location name')
-    if (!name || !name.trim()) return
+  const [drag, setDrag] = useState(null)
+  const [dropId, setDropId] = useState(null)
+  const update = (next) => setViewState(vs => ({ ...vs, locations: next.map(l => ({ ...l })) }))
+
+  const add = async () => {
+    const name = await dialog.prompt('Add Location', 'Location name')
+    if (!name) return
     const id = 'loc_' + name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
     if (locs.some(l => l.id === id)) { setMsg('A location with that id already exists.'); return }
+    setMsg('')
     update([...locs, { id, name: name.trim(), color: LPAL[locs.length % LPAL.length] }])
   }
   const rename = (id, name) => update(locs.map(l => l.id === id ? { ...l, name } : l))
   const recolour = (id, color) => update(locs.map(l => l.id === id ? { ...l, color } : l))
-  const move = (i, dir) => {
-    if (i + dir < 0 || i + dir >= locs.length) return
+  const move = (id, dir) => {
+    const i = locs.findIndex(l => l.id === id)
+    const j = i + dir
+    if (i < 0 || j < 0 || j >= locs.length) return
     const next = locs.slice()
-    ;[next[i], next[i + dir]] = [next[i + dir], next[i]]
+    next.splice(j, 0, next.splice(i, 1)[0])
     update(next)
   }
-  const remove = (id) => {
+  const remove = async (id) => {
     if (locs.length <= 1) { setMsg('You must keep at least one location.'); return }
     const inUse = programs.some(p => (p.offerings || []).some(o => o.locationId === id))
-    if (inUse && !window.confirm('This location is used by some offerings. Reassign those offerings to the first remaining location?')) return
+    if (inUse && !await dialog.confirm(
+      'This location is used by some offerings. Those offerings will be reassigned to the first remaining location.',
+      { title: 'Delete Location', button: 'Delete' })) return
     const fallback = locs.find(l => l.id !== id)?.id
     setPrograms(list => list.map(p => ({
       ...p,
@@ -2140,30 +2194,183 @@ function LocationsManager({ onClose, programs, setPrograms, viewState, setViewSt
     })))
     update(locs.filter(l => l.id !== id))
   }
+  const usage = (id) => programs.reduce(
+    (n, p) => n + (p.offerings || []).filter(o => o.locationId === id).length, 0)
+
+  const onDrop = (targetId, e) => {
+    e.preventDefault()
+    setDropId(null)
+    if (!drag || drag === targetId) return
+    const arr = locs.slice()
+    const from = arr.findIndex(l => l.id === drag)
+    if (from < 0) return
+    const [moved] = arr.splice(from, 1)
+    const at = arr.findIndex(l => l.id === targetId)
+    const r = e.currentTarget.getBoundingClientRect()
+    arr.splice(e.clientY > r.top + r.height / 2 ? at + 1 : at, 0, moved)
+    update(arr)
+    setDrag(null)
+  }
+
   return (
     <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
-        <h2>Manage Locations</h2>
+        <h2>Locations</h2>
+        <div className="mhint">
+          Reorder with ▲ ▼ (or drag), rename by clicking the name, recolour with the dot, or
+          remove with ×. Removing a location reassigns its offerings rather than deleting them.
+        </div>
         {msg && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10 }}>{msg}</div>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+        <div className="mlist">
           {locs.map((l, i) => (
-            <div key={l.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="color" value={l.color} onChange={e => recolour(l.id, e.target.value)}
-                style={{ width: 36, height: 28, border: '1px solid #d5d0c4', borderRadius: 6, padding: 0 }} />
-              <input value={l.name} onChange={e => rename(l.id, e.target.value)}
-                style={{ flex: 1 }} />
-              <button type="button" onClick={() => move(i, -1)} disabled={i === 0}>▲</button>
-              <button type="button" onClick={() => move(i, 1)} disabled={i === locs.length - 1}>▼</button>
-              <button type="button" className="rmtime" onClick={() => remove(l.id)} title="Delete">×</button>
-            </div>
+            <ManagerRow key={l.id} draggable dropTarget={dropId === l.id}
+              onDragStart={e => { if (e.target.tagName === 'INPUT') { e.preventDefault(); return } setDrag(l.id) }}
+              onDragOver={e => { e.preventDefault(); if (drag && drag !== l.id) setDropId(l.id) }}
+              onDragLeave={() => setDropId(null)}
+              onDrop={e => onDrop(l.id, e)}>
+              <span className="grip" title="Drag To Reorder">⠿</span>
+              <ColorDot color={l.color} onPick={c => recolour(l.id, c)} />
+              <input className="cnm" defaultValue={l.name} title="Rename"
+                onBlur={e => { const v = e.target.value.trim(); if (v && v !== l.name) rename(l.id, v); else e.target.value = l.name }}
+                onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }} />
+              <span className="cuse" title="Offerings at this location">{usage(l.id)}</span>
+              <button type="button" className="mv" onClick={() => move(l.id, -1)} disabled={i === 0}>▲</button>
+              <button type="button" className="mv" onClick={() => move(l.id, 1)} disabled={i === locs.length - 1}>▼</button>
+              <button type="button" className="del2" onClick={() => remove(l.id)} title="Delete">×</button>
+            </ManagerRow>
           ))}
         </div>
         <button type="button" className="addtime" onClick={add}>+ Add Location</button>
-        <div className="macts">
-          <button onClick={onClose}>Done</button>
-        </div>
+        <div className="macts"><button onClick={onClose}>Done</button></div>
       </div>
     </div>
+  )
+}
+
+/* Programs, Platforms, Grades, Times and Days all behave the same way, so they
+   share one box driven by LIST_KINDS. */
+function ListManager({ kind, onClose, programs, setPrograms, rows, viewState, setViewState }) {
+  const dialog = useDialog()
+  const K = LIST_KINDS[kind]
+  const [drag, setDrag] = useState(null)
+  const [dropVal, setDropVal] = useState(null)
+  const colours = viewState[K.colours] || {}
+  const orderArr = K.order ? (viewState[K.order] || []) : null
+  const vals = useMemo(
+    () => listOrdered(kind, programs, rows, orderArr),
+    [kind, programs, rows, orderArr])
+
+  const setOrder = (next) => { if (K.order) setViewState(vs => ({ ...vs, [K.order]: next })) }
+  const recolour = (v, c) => setViewState(vs => ({ ...vs, [K.colours]: { ...(vs[K.colours] || {}), [v]: c } }))
+
+  const move = (v, dir) => {
+    if (!K.order) return
+    const list = vals.slice()
+    const i = list.indexOf(v), j = i + dir
+    if (i < 0 || j < 0 || j >= list.length) return
+    list.splice(j, 0, list.splice(i, 1)[0])
+    setOrder(list)
+  }
+  const onDrop = (target, e) => {
+    e.preventDefault()
+    setDropVal(null)
+    if (!K.order || !drag || drag === target) return
+    const list = vals.slice()
+    const from = list.indexOf(drag)
+    if (from < 0) return
+    const [moved] = list.splice(from, 1)
+    const at = list.indexOf(target)
+    const r = e.currentTarget.getBoundingClientRect()
+    list.splice(e.clientY > r.top + r.height / 2 ? at + 1 : at, 0, moved)
+    setOrder(list)
+    setDrag(null)
+  }
+  const rename = (v, next) => {
+    const n = String(next).trim()
+    if (!n || n === v) return
+    if (K.field) setPrograms(list => list.map(p => ((p[K.field] || '') === v ? { ...p, [K.field]: n } : p)))
+    setViewState(vs => {
+      const cols = { ...(vs[K.colours] || {}) }
+      if (cols[v] !== undefined) { cols[n] = cols[v]; delete cols[v] }
+      const out = { ...vs, [K.colours]: cols }
+      if (K.order) out[K.order] = (vs[K.order] || []).map(x => (x === v ? n : x))
+      return out
+    })
+  }
+  const remove = async (v) => {
+    if (K.fixed) return
+    if (!await dialog.confirm(
+      `Remove "${listLabel(kind, v)}"? Programs keep their other details, they just lose this value.`,
+      { title: 'Remove', button: 'Remove' })) return
+    if (K.field) setPrograms(list => list.map(p => ((p[K.field] || '') === v ? { ...p, [K.field]: '' } : p)))
+    setViewState(vs => (K.order ? { ...vs, [K.order]: (vs[K.order] || []).filter(x => x !== v) } : vs))
+  }
+
+  return (
+    <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
+        <h2>{K.title}</h2>
+        <div className="mhint">
+          {K.fixed
+            ? 'Recolour the days and see how many entries fall on each. The seven days themselves are fixed.'
+            : 'Reorder with ▲ ▼ (or drag), rename by clicking the name, recolour with the dot, or remove with ×. Removing never deletes programs — they just lose that value.'}
+        </div>
+        <div className="mlist">
+          {!vals.length && <div className="mhint" style={{ margin: 0 }}>Nothing to show yet.</div>}
+          {vals.map((v, i) => (
+            <ManagerRow key={v} draggable={!K.fixed} dropTarget={dropVal === v}
+              onDragStart={e => { if (K.fixed) return; if (e.target.tagName === 'INPUT') { e.preventDefault(); return } setDrag(v) }}
+              onDragOver={e => { if (K.fixed) return; e.preventDefault(); if (drag && drag !== v) setDropVal(v) }}
+              onDragLeave={() => setDropVal(null)}
+              onDrop={e => onDrop(v, e)}>
+              <span className="grip" title={K.fixed ? '' : 'Drag To Reorder'}
+                style={K.fixed ? { visibility: 'hidden' } : undefined}>⠿</span>
+              <ColorDot color={colours[v] || DEFAULT_CAT_COLOR} onPick={c => recolour(v, c)} />
+              {K.range ? (
+                <GradeRange value={v} onCommit={next => rename(v, next)} />
+              ) : (K.fixed || K.time) ? (
+                <span className="cnm" style={{ padding: '2px 4px' }}>{listLabel(kind, v)}</span>
+              ) : (
+                <input className="cnm" defaultValue={v} title="Rename"
+                  onBlur={e => { const n = e.target.value.trim(); if (n && n !== v) rename(v, n); else e.target.value = v }}
+                  onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }} />
+              )}
+              <span className="cuse" title="Entries using this value">{listUsage(kind, v, programs, rows)}</span>
+              <button type="button" className="mv" onClick={() => move(v, -1)} disabled={K.fixed || i === 0}>▲</button>
+              <button type="button" className="mv" onClick={() => move(v, 1)} disabled={K.fixed || i === vals.length - 1}>▼</button>
+              <button type="button" className="del2" onClick={() => remove(v)} disabled={K.fixed} title="Remove">×</button>
+            </ManagerRow>
+          ))}
+        </div>
+        <div className="macts"><button onClick={onClose}>Done</button></div>
+      </div>
+    </div>
+  )
+}
+
+/* Grades read as a range, so they are edited as two fields rather than one. */
+function GradeRange({ value, onCommit }) {
+  const parts = String(value).split(/[–-]/)
+  const [from, setFrom] = useState(parts[0] || '')
+  const [to, setTo] = useState(parts[1] || '')
+  useEffect(() => {
+    const p = String(value).split(/[–-]/)
+    setFrom(p[0] || ''); setTo(p[1] || '')
+  }, [value])
+  const commit = () => {
+    const f = from.trim(), t = to.trim()
+    const next = f && t ? `${f}–${t}` : (f || t)
+    if (next && next !== value) onCommit(next)
+  }
+  const keys = e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }
+  return (
+    <>
+      <input className="cnm gfrom" value={from} title="From"
+        onChange={e => setFrom(e.target.value)} onBlur={commit} onKeyDown={keys} />
+      <span className="gdash">–</span>
+      <input className="cnm gto" value={to} title="To"
+        onChange={e => setTo(e.target.value)} onBlur={commit} onKeyDown={keys} />
+    </>
   )
 }
 
