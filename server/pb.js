@@ -239,13 +239,7 @@ export async function loadPrograms() {
   return rows.map(r => r.payload || {})
 }
 
-// recordId = number + location, not number alone: the same catalog
-// number legitimately appears on more than one row when a program is
-// offered at multiple locations (Boardwalk, Waterloo East, ...), each
-// getting its own row with its own offerings. Keying on number alone
-// would collide against the unique index and one location's row would
-// silently overwrite the other's.
-const programRecordId = (p) => `${p.number}::${p.location || ''}`
+const programRecordId = (p) => p.id || `${p.number || ''}::${p.location || ''}`
 
 export async function savePrograms(programs) {
   await ensureAuth()
