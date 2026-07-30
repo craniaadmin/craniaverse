@@ -959,81 +959,80 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
           </div>
         )}
 
-        {/* Calendar chips bar — colored backgrounds per calendar */}
-        <div className="cal-chips">
-          {data.calendars.map(c => {
-            const col = c.color || DEFAULT_CAL_COLOR
-            const hidden = !!data.hidden[c.id]
-            return (
-              <span
-                key={c.id}
-                className={`cal-chip${hidden ? ' hidden-cal' : ''}${chipDrag === c.id ? ' dragging-chip' : ''}${chipOver === c.id ? ' drag-over-chip' : ''}`}
-                style={hidden ? undefined : { background: col, color: textOn(col) }}
-                draggable
-                onDragStart={e => handleChipDragStart(e, c.id)}
-                onDragOver={e => handleChipDragOver(e, c.id)}
-                onDrop={e => handleChipDrop(e, c.id)}
-                onDragEnd={handleChipDragEnd}
-                onClick={() => toggleCalVisibility(c.id)}
-                onDoubleClick={() => setEditingCalendar({ mode: 'edit', cal: c })}
-                onContextMenu={e => showCalCtx(e, c.id)}
-                title={hidden ? 'Click to show' : 'Click to hide'}
-              >
-                <span className="chip-name">{c.name}</span>
-                <button className="chip-edit" style={hidden ? undefined : { color: textOn(col) }} onClick={e => { e.stopPropagation(); setEditingCalendar({ mode: 'edit', cal: c }) }} title="Edit calendar">
-                  <Edit2 size={11} />
+        {/* Actions row — matches v22: Undo Redo | Settings(pushed right) YearImage ExportCSV */}
+        <div className="actionsrow">
+          <button disabled={!undoLen} onClick={undo} title="Undo (Ctrl+Z)">{'↶'} Undo</button>
+          <button disabled={!redoLen} onClick={redo} title="Redo (Ctrl+Shift+Z)">{'↷'}</button>
+          <button className="settings-btn" title="Settings">{'⚙'}</button>
+          <button title="Save the whole year as a PNG image">{'🖼'} Year Image</button>
+          <button onClick={exportCSV} title="Download all events as a CSV file">{'⤓'} Export CSV</button>
+        </div>
+
+        {/* Calendar chips bar — matches v22 calbar2 */}
+        <div className="calbar2">
+          <div className="calchips">
+            {data.calendars.map(c => {
+              const visible = !data.hidden[c.id]
+              return (
+                <button
+                  key={c.id}
+                  className={`calchip${visible ? ' on' : ''}${chipDrag === c.id ? ' dragging' : ''}${chipOver === c.id ? ' drag-over' : ''}`}
+                  draggable
+                  onDragStart={e => handleChipDragStart(e, c.id)}
+                  onDragOver={e => handleChipDragOver(e, c.id)}
+                  onDrop={e => handleChipDrop(e, c.id)}
+                  onDragEnd={handleChipDragEnd}
+                  onClick={() => toggleCalVisibility(c.id)}
+                  onDoubleClick={() => setEditingCalendar({ mode: 'edit', cal: c })}
+                  onContextMenu={e => showCalCtx(e, c.id)}
+                  title="Click to show/hide &middot; double-click to edit"
+                >
+                  {c.name}
                 </button>
-              </span>
-            )
-          })}
-          <button className="addcal-btn" onClick={() => setEditingCalendar({ mode: 'new', cal: null })}>
-            + Add Calendar
-          </button>
+              )
+            })}
+          </div>
           {data.calendars.length > 0 && (
-            <button className="toggle-all-btn" onClick={toggleAllCals}>
-              {allHidden ? 'Show All' : 'Hide All'}
+            <button className="toggleall" onClick={toggleAllCals}>
+              {allHidden ? 'Show All' : 'Hide/Show All'}
             </button>
           )}
-        </div>
-
-        {/* Actions row — matches v22: Undo Redo | + New Event | CSV | spacer | date Go */}
-        <div className="actions-row">
-          <button className="act-btn" disabled={!undoLen} onClick={undo} title="Undo (Ctrl+Z)">Undo</button>
-          <button className="act-btn" disabled={!redoLen} onClick={redo} title="Redo (Ctrl+Shift+Z)">Redo</button>
-          <button className="act-btn primary" onClick={() => setEditingEvent({ mode: 'new', event: null, date: iso(today) })}>
-            + New Event
-          </button>
-          <button className="act-btn" onClick={exportCSV}>CSV</button>
-          <div style={{ flex: 1 }} />
-          <input type="date" className="goto-input" value={gotoDate} onChange={e => setGotoDate(e.target.value)} title="Go to date" />
-          <button className="act-btn" onClick={() => { if (gotoDate) { goTo(gotoDate); setGotoDate('') } }}>Go</button>
-        </div>
-
-        {/* Navigation toolbar — matches v22: < Today > Period | Month Week Day Year tabs */}
-        <div className="toolbar">
-          <button className="nav-btn" onClick={goPrev} title="Previous"><ChevronLeft size={18} /></button>
-          <button className="today-btn" onClick={goToday}>Today</button>
-          <button className="nav-btn" onClick={goNext} title="Next"><ChevronRight size={18} /></button>
-          <span className="period-label">{periodLabel}</span>
-          <span className="spacer" />
-          <div className="view-btns">
-            {[['month','Month'],['week','Week'],['day','Day'],['year','Year']].map(([v,l]) => (
-              <button key={v} className={`view-btn${view === v ? ' active' : ''}`} onClick={() => setView(v)}>
-                {l}
-              </button>
-            ))}
-          </div>
-          <button className="act-btn primary" onClick={() => setEditingEvent({ mode: 'new', event: null, date: iso(cur) })} style={{ marginLeft: 8 }}>
-            + New Event
+          <button className="addcal" onClick={() => setEditingCalendar({ mode: 'new', cal: null })}>
+            + Add Calendar
           </button>
         </div>
 
         {/* Main layout */}
         <div className="layout">
           <div className="main">
+            {/* Toolbar — inside main, matches v22 */}
+            <div className="toolbar">
+              <div className="navstack">
+                <div className="navrow">
+                  <button className="navbtn arrow" onClick={goPrev} title="Previous">{'‹'}</button>
+                  <button className="today-btn" onClick={goToday}>Today</button>
+                  <button className="navbtn arrow" onClick={goNext} title="Next">{'›'}</button>
+                  <span className="period-label">{periodLabel}</span>
+                </div>
+                <div className="gorow">
+                  <span className="golbl">Go To:</span>
+                  <input type="date" className="godate" value={gotoDate} onChange={e => setGotoDate(e.target.value)} title="Go to date" />
+                </div>
+              </div>
+              <div className="viewtabs">
+                {[['day','Day'],['week','Week'],['month','Month'],['year','Year']].map(([v,l]) => (
+                  <button key={v} className={view === v ? 'on' : ''} data-view={v} onClick={() => setView(v)}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              <button className="addev" onClick={() => setEditingEvent({ mode: 'new', event: null, date: iso(cur) })}>
+                + New Event
+              </button>
+            </div>
+
             {view === 'month' && (
-              <div className="card main-card">
-                <MonthGrid
+              <MonthGrid
                   days={monthDays}
                   cur={cur}
                   today={today}
