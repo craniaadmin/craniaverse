@@ -18,18 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "clpreview",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "vite",
-        "--config",
-        "vite.clpreview.config.js",
-        "--port",
-        "5195"
-      ],
-      "port": 5195
     }
   ]
 }
