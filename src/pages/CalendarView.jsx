@@ -313,16 +313,15 @@ const CSS = `
 .calroot{--light-blue:#A6E2F9;--dark-blue:#5FA09E;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--shadow:0 1px 3px rgba(46,37,22,.15);
   color:var(--dark-brown);font-family:inherit;}
 
-/* layout */
-.calroot .layout{display:flex;gap:16px;align-items:flex-start;}
-.calroot .main{flex:1;min-width:0;}
-.calroot .sidecol{width:290px;flex:none;display:flex;flex-direction:column;gap:14px;}
+/* layout — matches v22 */
+.calroot .layout{display:flex;gap:16px;padding:16px 0;align-items:flex-start;}
+.calroot .main{flex:1;min-width:0;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:14px;border-top:3px solid var(--light-blue);}
+.calroot .sidecol{width:290px;flex:none;display:flex;flex-direction:column;gap:16px;min-height:0;}
 
-/* card */
-.calroot .card{background:#fff;border-radius:10px;box-shadow:var(--shadow);overflow:hidden;}
-.calroot .card.main-card{border-top:3px solid var(--light-blue);}
-.calroot .card.upcoming-card{border-top:3px solid var(--light-brown);}
-.calroot .card.todo-card{border-top:3px solid var(--dark-blue);}
+/* sidebar boxes — matches v22 sidebox */
+.calroot .sidebox{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:14px;flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
+.calroot .sidebox.box-up{border-top:3px solid var(--light-brown);}
+.calroot .sidebox.box-td{border-top:3px solid var(--dark-blue);}
 
 /* header / toolbar */
 .calroot .toolbar{display:flex;align-items:center;gap:8px;padding:0;flex-wrap:wrap;margin-bottom:12px;}
