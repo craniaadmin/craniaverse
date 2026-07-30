@@ -1,4792 +1,3838 @@
-[
-  {
-    "number": "1020101",
-    "code": "FM-S",
-    "category": "FLEX",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "10",
-    "title": "FLEX MATH - SINGLE",
-    "year": "2026–27",
-    "ageRange": "1–10",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 199,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020101",
-    "code": "FM-S",
-    "category": "FLEX",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "10",
-    "title": "FLEX MATH - SINGLE",
-    "year": "2026–27",
-    "ageRange": "1–10",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 199,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "Online",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020102",
-    "code": "FM-D",
-    "category": "FLEX",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "10",
-    "title": "FLEX MATH - DOUBLE",
-    "year": "2026–27",
-    "ageRange": "1–10",
-    "duration": 55,
-    "sessions": 2,
-    "period": "/week",
-    "rateHr": 45.04,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 64.17,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020102",
-    "code": "FM-D",
-    "category": "FLEX",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "10",
-    "title": "FLEX MATH - DOUBLE",
-    "year": "2026–27",
-    "ageRange": "1–10",
-    "duration": 55,
-    "sessions": 2,
-    "period": "/week",
-    "rateHr": 45.04,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 64.17,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020103",
-    "code": "FM-U",
-    "category": "FLEX",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "10",
-    "title": "FLEX MATH - UNLIMITED",
-    "year": "2026–27",
-    "ageRange": "1–10",
-    "duration": 55,
-    "sessions": 5,
-    "period": "/week",
-    "rateHr": 21.76,
-    "fees": 329,
-    "costUnit": "",
-    "totalHours": 160.42,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020103",
-    "code": "FM-U",
-    "category": "FLEX",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "10",
-    "title": "FLEX MATH - UNLIMITED",
-    "year": "2026–27",
-    "ageRange": "1–10",
-    "duration": 55,
-    "sessions": 5,
-    "period": "/week",
-    "rateHr": 21.76,
-    "fees": 329,
-    "costUnit": "",
-    "totalHours": 160.42,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020201",
-    "code": "FE-S",
-    "category": "FLEX",
-    "subject": "ENGLISH",
-    "gradeFrom": "1",
-    "gradeTo": "12",
-    "title": "FLEX ENGLISH - SINGLE",
-    "year": "2026–27",
-    "ageRange": "G1-3",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 199,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020201",
-    "code": "FE-S",
-    "category": "FLEX",
-    "subject": "ENGLISH",
-    "gradeFrom": "1",
-    "gradeTo": "12",
-    "title": "FLEX ENGLISH - SINGLE",
-    "year": "2026–27",
-    "ageRange": "G1-3",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 199,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020202",
-    "code": "FE-D",
-    "category": "FLEX",
-    "subject": "ENGLISH",
-    "gradeFrom": "1",
-    "gradeTo": "3",
-    "title": "FLEX ENGLISH - DOUBLE",
-    "year": "2026–27",
-    "ageRange": "1–3",
-    "duration": 55,
-    "sessions": 2,
-    "period": "/week",
-    "rateHr": 45.04,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 64.17,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020202",
-    "code": "FE-D",
-    "category": "FLEX",
-    "subject": "ENGLISH",
-    "gradeFrom": "1",
-    "gradeTo": "3",
-    "title": "FLEX ENGLISH - DOUBLE",
-    "year": "2026–27",
-    "ageRange": "1–3",
-    "duration": 55,
-    "sessions": 2,
-    "period": "/week",
-    "rateHr": 45.04,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 64.17,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020203",
-    "code": "FE-U",
-    "category": "FLEX",
-    "subject": "ENGLISH",
-    "gradeFrom": "1",
-    "gradeTo": "3",
-    "title": "FLEX ENGLISH - UNLIMITED",
-    "year": "2026–27",
-    "ageRange": "1–3",
-    "duration": 55,
-    "sessions": 5,
-    "period": "/week",
-    "rateHr": 21.76,
-    "fees": 329,
-    "costUnit": "",
-    "totalHours": 160.42,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020203",
-    "code": "FE-U",
-    "category": "FLEX",
-    "subject": "ENGLISH",
-    "gradeFrom": "1",
-    "gradeTo": "3",
-    "title": "FLEX ENGLISH - UNLIMITED",
-    "year": "2026–27",
-    "ageRange": "1–3",
-    "duration": 55,
-    "sessions": 5,
-    "period": "/week",
-    "rateHr": 21.76,
-    "fees": 329,
-    "costUnit": "",
-    "totalHours": 160.42,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "18:30",
-        "end": "19:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020801",
-    "code": "FK-S",
-    "category": "FLEX",
-    "subject": "MATH/ENGLISH",
-    "gradeFrom": "JK",
-    "gradeTo": "SK",
-    "title": "FLEX KINDERGARTEN - SINGLE",
-    "year": "2026–27",
-    "ageRange": "JK–SK",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 199,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020801",
-    "code": "FK-S",
-    "category": "FLEX",
-    "subject": "MATH/ENGLISH",
-    "gradeFrom": "JK",
-    "gradeTo": "SK",
-    "title": "FLEX KINDERGARTEN - SINGLE",
-    "year": "2026–27",
-    "ageRange": "JK–SK",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 199,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020802",
-    "code": "FK-D",
-    "category": "FLEX",
-    "subject": "MATH/ENGLISH",
-    "gradeFrom": "JK",
-    "gradeTo": "SK",
-    "title": "FLEX KINDERGARTEN - DOUBLE",
-    "year": "2026–27",
-    "ageRange": "JK–SK",
-    "duration": 55,
-    "sessions": 2,
-    "period": "/week",
-    "rateHr": 45.04,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 64.17,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1020802",
-    "code": "FK-D",
-    "category": "FLEX",
-    "subject": "MATH/ENGLISH",
-    "gradeFrom": "JK",
-    "gradeTo": "SK",
-    "title": "FLEX KINDERGARTEN - DOUBLE",
-    "year": "2026–27",
-    "ageRange": "JK–SK",
-    "duration": 55,
-    "sessions": 2,
-    "period": "/week",
-    "rateHr": 45.04,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 64.17,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 3,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010101",
-    "code": "ME1",
-    "category": "PRIVATE PIANO LESSONS",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "2",
-    "title": "MATH ENRICHMENT - LEVEL 1",
-    "year": "2026–27",
-    "ageRange": "1–2",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010101",
-    "code": "ME1",
-    "category": "PRIVATE PIANO LESSONS",
-    "subject": "MATH",
-    "gradeFrom": "1",
-    "gradeTo": "2",
-    "title": "MATH ENRICHMENT - LEVEL 1",
-    "year": "2026–27",
-    "ageRange": "1–2",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010102",
-    "code": "ME2",
-    "category": "ENRICHMENT",
-    "subject": "MATH",
-    "gradeFrom": "3",
-    "gradeTo": "4",
-    "title": "MATH ENRICHMENT - LEVEL 2",
-    "year": "2026–27",
-    "ageRange": "3–4",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010102",
-    "code": "ME2",
-    "category": "ENRICHMENT",
-    "subject": "MATH",
-    "gradeFrom": "3",
-    "gradeTo": "4",
-    "title": "MATH ENRICHMENT - LEVEL 2",
-    "year": "2026–27",
-    "ageRange": "3–4",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010103",
-    "code": "ME3",
-    "category": "ENRICHMENT",
-    "subject": "MATH",
-    "gradeFrom": "5",
-    "gradeTo": "6",
-    "title": "MATH ENRICHMENT - LEVEL 3",
-    "year": "2026–27",
-    "ageRange": "5–6",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010103",
-    "code": "ME3",
-    "category": "ENRICHMENT",
-    "subject": "MATH",
-    "gradeFrom": "5",
-    "gradeTo": "6",
-    "title": "MATH ENRICHMENT - LEVEL 3",
-    "year": "2026–27",
-    "ageRange": "5–6",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010104",
-    "code": "ME4",
-    "category": "ENRICHMENT",
-    "subject": "MATH",
-    "gradeFrom": "7",
-    "gradeTo": "8",
-    "title": "MATH ENRICHMENT - LEVEL 4",
-    "year": "2026–27",
-    "ageRange": "7–8",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1010104",
-    "code": "ME4",
-    "category": "ENRICHMENT",
-    "subject": "MATH",
-    "gradeFrom": "7",
-    "gradeTo": "8",
-    "title": "MATH ENRICHMENT - LEVEL 4",
-    "year": "2026–27",
-    "ageRange": "7–8",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 41.29,
-    "fees": 289,
-    "costUnit": "",
-    "totalHours": 70,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "17:30",
-        "end": "19:30",
-        "spots": 12,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1050901",
-    "code": "PL-55",
-    "category": "PRIVATE LESSONS",
-    "subject": "ALL",
-    "gradeFrom": "JK",
-    "gradeTo": "12",
-    "title": "PRIVATE LESSONS - 55 MIN",
-    "year": "2026–27",
-    "ageRange": "JK–12",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 93.19,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "16:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1050901",
-    "code": "PL-55",
-    "category": "PRIVATE LESSONS",
-    "subject": "ALL",
-    "gradeFrom": "JK",
-    "gradeTo": "12",
-    "title": "PRIVATE LESSONS - 55 MIN",
-    "year": "2026–27",
-    "ageRange": "JK–12",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 93.19,
-    "fees": 299,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "15:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "15:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "15:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "15:30",
-        "end": "17:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040401",
-    "code": "TKC-SCR",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "3",
-    "gradeTo": "4",
-    "title": "TEKNOKIDS CODING: SCRATCH",
-    "year": "2026–27",
-    "ageRange": "3–4",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040401",
-    "code": "TKC-SCR",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "3",
-    "gradeTo": "4",
-    "title": "TEKNOKIDS CODING: SCRATCH",
-    "year": "2026–27",
-    "ageRange": "3–4",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040402",
-    "code": "TKC-HTM",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "5",
-    "gradeTo": "6",
-    "title": "TEKNOKIDS CODING: HTML/CSS",
-    "year": "2026–27",
-    "ageRange": "5–6",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040402",
-    "code": "TKC-HTM",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "5",
-    "gradeTo": "6",
-    "title": "TEKNOKIDS CODING: HTML/CSS",
-    "year": "2026–27",
-    "ageRange": "5–6",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040403",
-    "code": "TKC-JS",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "7",
-    "gradeTo": "10",
-    "title": "TEKNOKIDS CODING: JAVASCRIPT/AI",
-    "year": "2026–27",
-    "ageRange": "7–10",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040403",
-    "code": "TKC-JS",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "7",
-    "gradeTo": "10",
-    "title": "TEKNOKIDS CODING: JAVASCRIPT/AI",
-    "year": "2026–27",
-    "ageRange": "7–10",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040404",
-    "code": "TKC-PY",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "7",
-    "gradeTo": "10",
-    "title": "TEKNOKIDS CODING: PYTHON",
-    "year": "2026–27",
-    "ageRange": "7–10",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "12:30",
-        "end": "13:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1040404",
-    "code": "TKC-PY",
-    "category": "TEKNOKIDS CODING",
-    "subject": "CODING",
-    "gradeFrom": "7",
-    "gradeTo": "10",
-    "title": "TEKNOKIDS CODING: PYTHON",
-    "year": "2026–27",
-    "ageRange": "7–10",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "12:30",
-        "end": "13:25",
-        "spots": 7,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1030301",
-    "code": "TKR-E",
-    "category": "TEKNOKIDS ROBOTICS",
-    "subject": "ROBOTICS",
-    "gradeFrom": "JK",
-    "gradeTo": "2",
-    "title": "TEKNOKIDS EARLY",
-    "year": "2026–27",
-    "ageRange": "JK–2",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "09:30",
-        "end": "10:25",
-        "spots": 5,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1030302",
-    "code": "TKR-J",
-    "category": "TEKNOKIDS ROBOTICS",
-    "subject": "ROBOTICS",
-    "gradeFrom": "3",
-    "gradeTo": "4",
-    "title": "TEKNOKIDS JUNIOR",
-    "year": "2026–27",
-    "ageRange": "3–4",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "10:30",
-        "end": "11:25",
-        "spots": 5,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1030303",
-    "code": "TKR-I",
-    "category": "TEKNOKIDS ROBOTICS",
-    "subject": "ROBOTICS",
-    "gradeFrom": "5",
-    "gradeTo": "6",
-    "title": "TEKNOKIDS INTERMEDIATE",
-    "year": "2026–27",
-    "ageRange": "5–6",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "11:30",
-        "end": "12:25",
-        "spots": 5,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1030304",
-    "code": "TKR-S",
-    "category": "TEKNOKIDS ROBOTICS",
-    "subject": "ROBOTICS",
-    "gradeFrom": "7",
-    "gradeTo": "8",
-    "title": "TEKNOKIDS SENIOR",
-    "year": "2026–27",
-    "ageRange": "7–8",
-    "duration": 55,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 58.91,
-    "fees": 189,
-    "costUnit": "",
-    "totalHours": 32.08,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Sat",
-        "start": "12:30",
-        "end": "13:25",
-        "spots": 5,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1060501",
-    "code": "PNO-SR",
-    "category": "PRIVATE PIANO LESSONS",
-    "subject": "PIANO",
-    "gradeFrom": "1",
-    "gradeTo": "12",
-    "title": "PIANO PRIVATE 30MIN - SR",
-    "year": "2026–27",
-    "ageRange": "1–12",
-    "duration": 30,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 71.43,
-    "fees": 125,
-    "costUnit": "",
-    "totalHours": 17.5,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "15:00",
-        "end": "15:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "15:30",
-        "end": "16:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:00",
-        "end": "16:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:00",
-        "end": "17:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1060501",
-    "code": "PNO-SR",
-    "category": "PRIVATE PIANO LESSONS",
-    "subject": "PIANO",
-    "gradeFrom": "1",
-    "gradeTo": "12",
-    "title": "PIANO PRIVATE 30MIN - SR",
-    "year": "2026–27",
-    "ageRange": "1–12",
-    "duration": 30,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 71.43,
-    "fees": 125,
-    "costUnit": "",
-    "totalHours": 17.5,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "15:00",
-        "end": "15:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "15:30",
-        "end": "16:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:00",
-        "end": "16:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:00",
-        "end": "17:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1060502",
-    "code": "PNO-JR",
-    "category": "PRIVATE PIANO LESSONS",
-    "subject": "PIANO",
-    "gradeFrom": "1",
-    "gradeTo": "12",
-    "title": "PIANO PRIVATE 30MIN - JR",
-    "year": "2026–27",
-    "ageRange": "1–12",
-    "duration": 30,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 60,
-    "fees": 105,
-    "costUnit": "",
-    "totalHours": 17.5,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "15:30",
-        "end": "16:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:00",
-        "end": "16:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "16:30",
-        "end": "17:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:00",
-        "end": "17:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "17:30",
-        "end": "18:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "15:00",
-        "end": "15:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1060502",
-    "code": "PNO-JR",
-    "category": "PRIVATE PIANO LESSONS",
-    "subject": "PIANO",
-    "gradeFrom": "1",
-    "gradeTo": "12",
-    "title": "PIANO PRIVATE 30MIN - JR",
-    "year": "2026–27",
-    "ageRange": "1–12",
-    "duration": 30,
-    "sessions": 1,
-    "period": "/week",
-    "rateHr": 60,
-    "fees": 105,
-    "costUnit": "",
-    "totalHours": 17.5,
-    "description": "",
-    "location": "Waterloo East",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "15:00",
-        "end": "15:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "15:30",
-        "end": "16:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:00",
-        "end": "16:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "16:30",
-        "end": "17:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:00",
-        "end": "17:30",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "17:30",
-        "end": "18:00",
-        "spots": 1,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1070101",
-    "code": "CLMC",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "7",
-    "gradeTo": "12",
-    "title": "CONTEST - CMS CLMC",
-    "year": "2026–27",
-    "ageRange": "7–12",
-    "duration": 90,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 36.67,
-    "fees": 55,
-    "costUnit": "",
-    "totalHours": 1.5,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070102",
-    "code": "CJMC",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "5",
-    "gradeTo": "8",
-    "title": "CONTEST - CMS CJMC",
-    "year": "2026–27",
-    "ageRange": "5–8",
-    "duration": 90,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 36.67,
-    "fees": 55,
-    "costUnit": "",
-    "totalHours": 1.5,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070103",
-    "code": "COMC",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "9",
-    "gradeTo": "12",
-    "title": "CONTEST - CMS COMC",
-    "year": "2026–27",
-    "ageRange": "9–12",
-    "duration": 150,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26,
-    "fees": 65,
-    "costUnit": "",
-    "totalHours": 2.5,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070104",
-    "code": "AMC8",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "8",
-    "title": "CONTEST - MAA AMC 8",
-    "year": "2026–27",
-    "ageRange": "Up to 8",
-    "duration": 40,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 90,
-    "fees": 60,
-    "costUnit": "",
-    "totalHours": 0.67,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070105",
-    "code": "AMC10A",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "10",
-    "title": "CONTEST - MAA AMC 10A",
-    "year": "2026–27",
-    "ageRange": "Up to 10",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 48,
-    "fees": 60,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070106",
-    "code": "AMC12A",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "12",
-    "title": "CONTEST - MAA AMC 12A",
-    "year": "2026–27",
-    "ageRange": "Up to 12",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 48,
-    "fees": 60,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070107",
-    "code": "AMC10B",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "10",
-    "title": "CONTEST - MAA AMC 10B",
-    "year": "2026–27",
-    "ageRange": "Up to 10",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 48,
-    "fees": 60,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070108",
-    "code": "AMC12B",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "12",
-    "title": "CONTEST - MAA AMC 12B",
-    "year": "2026–27",
-    "ageRange": "Up to 12",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 48,
-    "fees": 60,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070109",
-    "code": "AIME",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "12",
-    "title": "CONTEST - MAA AIME",
-    "year": "2026–27",
-    "ageRange": "Up to 12",
-    "duration": 180,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 40,
-    "fees": 120,
-    "costUnit": "",
-    "totalHours": 3,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070110",
-    "code": "USJMO",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "12",
-    "title": "CONTEST - MAA US(J)MO",
-    "year": "2026–27",
-    "ageRange": "Up to 12",
-    "duration": 540,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 22.22,
-    "fees": 200,
-    "costUnit": "",
-    "totalHours": 9,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070111",
-    "code": "BCC",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "CONTEST - CEMC BCC",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 50,
-    "sessions": 2,
-    "period": "/year",
-    "rateHr": 46.67,
-    "fees": 35,
-    "costUnit": "",
-    "totalHours": 0.75,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070112",
-    "code": "GAU",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "8",
-    "title": "CONTEST - CEMC GAUSS",
-    "year": "2026–27",
-    "ageRange": "Up to 8",
-    "duration": 60,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 35,
-    "fees": 35,
-    "costUnit": "",
-    "totalHours": 1,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070113",
-    "code": "PAS",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "9",
-    "title": "CONTEST - CEMC PASCAL",
-    "year": "2026–27",
-    "ageRange": "Up to 9",
-    "duration": 60,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 35,
-    "fees": 35,
-    "costUnit": "",
-    "totalHours": 1,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070114",
-    "code": "CAY",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "10",
-    "title": "CONTEST - CEMC CAYLEY",
-    "year": "2026–27",
-    "ageRange": "Up to 10",
-    "duration": 60,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 35,
-    "fees": 35,
-    "costUnit": "",
-    "totalHours": 1,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070115",
-    "code": "FER",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "11",
-    "title": "CONTEST - CEMC FERMAT",
-    "year": "2026–27",
-    "ageRange": "Up to 11",
-    "duration": 60,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 35,
-    "fees": 35,
-    "costUnit": "",
-    "totalHours": 1,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070116",
-    "code": "FRY",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "9",
-    "title": "CONTEST - CEMC FRYER",
-    "year": "2026–27",
-    "ageRange": "Up to 9",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 36,
-    "fees": 45,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070117",
-    "code": "GAL",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "10",
-    "title": "CONTEST - CEMC GALOIS",
-    "year": "2026–27",
-    "ageRange": "Up to 10",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 36,
-    "fees": 45,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070118",
-    "code": "HYP",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "11",
-    "title": "CONTEST - CEMC HYPATIA",
-    "year": "2026–27",
-    "ageRange": "Up to 11",
-    "duration": 75,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 36,
-    "fees": 45,
-    "costUnit": "",
-    "totalHours": 1.25,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1070119",
-    "code": "CIMC",
-    "category": "CONTESTS",
-    "subject": "MATH",
-    "gradeFrom": "",
-    "gradeTo": "12",
-    "title": "CONTEST - CEMC CIMC",
-    "year": "2026–27",
-    "ageRange": "Up to 12",
-    "duration": 120,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 27.5,
-    "fees": 55,
-    "costUnit": "",
-    "totalHours": 2,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": []
-  },
-  {
-    "number": "1080101",
-    "code": "CMP-MTH-H",
-    "category": "SUMMER CAMP",
-    "subject": "MATH",
-    "gradeFrom": "3",
-    "gradeTo": "10",
-    "title": "FLEX MATH - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "3–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080102",
-    "code": "CMP-MTH-F",
-    "category": "SUMMER CAMP",
-    "subject": "MATH",
-    "gradeFrom": "3",
-    "gradeTo": "10",
-    "title": "FLEX MATH - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "3–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080201",
-    "code": "CMP-TYP-H",
-    "category": "SUMMER CAMP",
-    "subject": "ENGLISH",
-    "gradeFrom": "3",
-    "gradeTo": "5",
-    "title": "FLEX TYPING - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "3–5",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080202",
-    "code": "CMP-TYP-F",
-    "category": "SUMMER CAMP",
-    "subject": "ENGLISH",
-    "gradeFrom": "3",
-    "gradeTo": "5",
-    "title": "FLEX TYPING - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "3–5",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080203",
-    "code": "CMP-HWR-H",
-    "category": "SUMMER CAMP",
-    "subject": "ENGLISH",
-    "gradeFrom": "3",
-    "gradeTo": "5",
-    "title": "FLEX HANDWRITING - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "3–5",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080204",
-    "code": "CMP-HWR-F",
-    "category": "SUMMER CAMP",
-    "subject": "ENGLISH",
-    "gradeFrom": "3",
-    "gradeTo": "5",
-    "title": "FLEX HANDWRITING - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "3–5",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080205",
-    "code": "CMP-SPL-H",
-    "category": "SUMMER CAMP",
-    "subject": "ENGLISH",
-    "gradeFrom": "3",
-    "gradeTo": "6",
-    "title": "FLEX SPELLING - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "3–6",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080206",
-    "code": "CMP-SPL-F",
-    "category": "SUMMER CAMP",
-    "subject": "ENGLISH",
-    "gradeFrom": "3",
-    "gradeTo": "6",
-    "title": "FLEX SPELLING - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "3–6",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080701",
-    "code": "CMP-SCI-F",
-    "category": "SUMMER CAMP",
-    "subject": "SCIENCE",
-    "gradeFrom": "5",
-    "gradeTo": "8",
-    "title": "SCIENCEKIDS BRAIN - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "5–8",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080301",
-    "code": "CMP-ROB-H",
-    "category": "SUMMER CAMP",
-    "subject": "ROBOTICS",
-    "gradeFrom": "3",
-    "gradeTo": "8",
-    "title": "TEKNOKIDS ROBOTICS - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "3–8",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080302",
-    "code": "CMP-ROB-F",
-    "category": "SUMMER CAMP",
-    "subject": "ROBOTICS",
-    "gradeFrom": "3",
-    "gradeTo": "8",
-    "title": "TEKNOKIDS ROBOTICS - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "3–8",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080601",
-    "code": "CMP-SEW-H",
-    "category": "SUMMER CAMP",
-    "subject": "ARTS",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "ARTSKIDS SEWING - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080602",
-    "code": "CMP-SEW-F",
-    "category": "SUMMER CAMP",
-    "subject": "ARTS",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "ARTSKIDS SEWING - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080603",
-    "code": "CMP-KNT-H",
-    "category": "SUMMER CAMP",
-    "subject": "ARTS",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "ARTSKIDS KNITTING - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 180,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "Online",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "Online",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080604",
-    "code": "CMP-KNT-F",
-    "category": "SUMMER CAMP",
-    "subject": "ARTS",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "ARTSKIDS KNITTING - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080605",
-    "code": "CMP-CRO-H",
-    "category": "SUMMER CAMP",
-    "subject": "ARTS",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "ARTSKIDS CROCHET - HALF DAY",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 14.33,
-    "fees": 215,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "12:30",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  },
-  {
-    "number": "1080606",
-    "code": "CMP-CRO-F",
-    "category": "SUMMER CAMP",
-    "subject": "ARTS",
-    "gradeFrom": "5",
-    "gradeTo": "10",
-    "title": "ARTSKIDS CROCHET - FULL DAY",
-    "year": "2026–27",
-    "ageRange": "5–10",
-    "duration": 900,
-    "sessions": 1,
-    "period": "/year",
-    "rateHr": 26.33,
-    "fees": 395,
-    "costUnit": "",
-    "totalHours": 15,
-    "description": "",
-    "location": "Boardwalk",
-    "active": true,
-    "offerings": [
-      {
-        "active": true,
-        "day": "Mon",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Tue",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Wed",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Thu",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      },
-      {
-        "active": true,
-        "day": "Fri",
-        "start": "09:00",
-        "end": "16:00",
-        "spots": 20,
-        "platform": "In-Person",
-        "teacher": ""
-      }
-    ]
-  }
-]
+{
+  "locations": [
+    {
+      "id": "loc_boardwalk",
+      "name": "Boardwalk",
+      "color": "#5FA09E"
+    },
+    {
+      "id": "loc_waterloo",
+      "name": "Waterloo East",
+      "color": "#A6E2F9"
+    }
+  ],
+  "programs": [
+    {
+      "id": "p_0",
+      "number": "1020101",
+      "code": "FM-S",
+      "name": "FLEX MATH - SINGLE",
+      "subject": "MATH",
+      "category": "FLEX",
+      "ageRange": "1–10",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s3a5504c9",
+          "locationId": "loc_boardwalk",
+          "days": [
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "ms67xmcgxdcrn",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s6ca7804d",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s6f0b125f",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s783b321d",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "10",
+      "platform": "Online",
+      "cost": 199,
+      "costUnit": ""
+    },
+    {
+      "id": "ms67xmcgs73jx",
+      "number": "1020101",
+      "code": "FM-S",
+      "name": "FLEX MATH - SINGLE",
+      "subject": "MATH",
+      "category": "FLEX",
+      "ageRange": "1–10",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms67xmcg4qcaz",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 199,
+      "costUnit": ""
+    },
+    {
+      "id": "p_1",
+      "number": "1020102",
+      "code": "FM-D",
+      "name": "FLEX MATH - DOUBLE",
+      "subject": "MATH",
+      "category": "FLEX",
+      "ageRange": "1–10",
+      "duration": 55,
+      "sessions": "2",
+      "period": "/week",
+      "rate": 45.04,
+      "totalHours": 64.17,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s2b922454",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s29327ca9",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s245e26be",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s3b7664c6",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 299,
+      "costUnit": ""
+    },
+    {
+      "id": "p_2",
+      "number": "1020103",
+      "code": "FM-U",
+      "name": "FLEX MATH - UNLIMITED",
+      "subject": "MATH",
+      "category": "FLEX",
+      "ageRange": "1–10",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s65b10af1",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s335e8f6d",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s5e7d0d5b",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s2c2a91d7",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": ""
+    },
+    {
+      "id": "p_3",
+      "number": "1020201",
+      "code": "FE-S",
+      "name": "FLEX ENGLISH - SINGLE",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "G1-3",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s3bd5851b",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s7deeaf61",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s708b92b1",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s76bab1cb",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 199,
+      "costUnit": ""
+    },
+    {
+      "id": "p_4",
+      "number": "1020202",
+      "code": "FE-D",
+      "name": "FLEX ENGLISH - DOUBLE",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "2",
+      "period": "/week",
+      "rate": 45.04,
+      "totalHours": 64.17,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s8a041b9",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s4c245f44",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s16c4423",
+          "locationId": "loc_waterloo",
+          "days": [
+            2,
+            3,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "ms68gtv8mwzi7",
+          "locationId": "loc_waterloo",
+          "days": [
+            1
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s30e63761",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 299,
+      "costUnit": ""
+    },
+    {
+      "id": "ms68gtv83025p",
+      "number": "1020202",
+      "code": "FE-D",
+      "name": "FLEX ENGLISH - DOUBLE",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "2",
+      "period": "/week",
+      "rate": 45.04,
+      "totalHours": 64.17,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms68gtv8jo9hl",
+          "locationId": "loc_waterloo",
+          "days": [
+            1
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "18:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 299,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "p_5",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7fa22b65",
+          "locationId": "loc_boardwalk",
+          "days": [
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            }
+          ]
+        },
+        {
+          "id": "ms687m2ssccwp",
+          "locationId": "loc_boardwalk",
+          "days": [
+            3
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "18:25"
+            }
+          ]
+        },
+        {
+          "id": "ms687lbq5nyv7",
+          "locationId": "loc_boardwalk",
+          "days": [
+            2
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            }
+          ]
+        },
+        {
+          "id": "ms687jy5t1zh7",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            }
+          ]
+        },
+        {
+          "id": "s1fcd9fe1",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s4aec1dcf",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2,
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "17:30",
+              "end": "18:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "ms687tjgy74cz",
+          "locationId": "loc_waterloo",
+          "days": [
+            3
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            },
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        },
+        {
+          "id": "s1899a24b",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": ""
+    },
+    {
+      "id": "ms687tjgn6u03",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms687tjgmnltm",
+          "locationId": "loc_waterloo",
+          "days": [
+            3
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "18:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms687npzcilnr",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms687npzimrn8",
+          "locationId": "loc_boardwalk",
+          "days": [
+            3
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms687mv8by2iz",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms687mv8fm3fn",
+          "locationId": "loc_boardwalk",
+          "days": [
+            4
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms687m2stuf7u",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms687m2sqy5wc",
+          "locationId": "loc_boardwalk",
+          "days": [
+            3
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms687lbqsu8nu",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms687lbqbvzbl",
+          "locationId": "loc_boardwalk",
+          "days": [
+            2
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms687jy5jxcdv",
+      "number": "1020203",
+      "code": "FE-U",
+      "name": "FLEX ENGLISH - UNLIMITED",
+      "subject": "ENGLISH",
+      "category": "FLEX",
+      "ageRange": "1–3",
+      "duration": 55,
+      "sessions": "5",
+      "period": "/week",
+      "rate": 21.76,
+      "totalHours": 160.42,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms687jy5cchpl",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "18:30",
+              "end": "19:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "3",
+      "platform": "In-Person",
+      "cost": 329,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "p_6",
+      "number": "1020801",
+      "code": "FK-S",
+      "name": "FLEX KINDERGARTEN - SINGLE",
+      "subject": "MATH/ENGLISH",
+      "category": "FLEX",
+      "ageRange": "JK–SK",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s153fbd38",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        },
+        {
+          "id": "s7f861f9a",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        },
+        {
+          "id": "s6248bfa2",
+          "locationId": "loc_waterloo",
+          "days": [
+            3,
+            4
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        },
+        {
+          "id": "s1d771849",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "JK",
+      "gradeTo": "SK",
+      "platform": "In-Person",
+      "cost": 199,
+      "costUnit": ""
+    },
+    {
+      "id": "p_7",
+      "number": "1020802",
+      "code": "FK-D",
+      "name": "FLEX KINDERGARTEN - DOUBLE",
+      "subject": "MATH/ENGLISH",
+      "category": "FLEX",
+      "ageRange": "JK–SK",
+      "duration": 55,
+      "sessions": "2",
+      "period": "/week",
+      "rate": 45.04,
+      "totalHours": 64.17,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s597d6f60",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        },
+        {
+          "id": "s2b5573ce",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        },
+        {
+          "id": "s60b16cf6",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        },
+        {
+          "id": "s46939bb1",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 3,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "JK",
+      "gradeTo": "SK",
+      "platform": "In-Person",
+      "cost": 299,
+      "costUnit": ""
+    },
+    {
+      "id": "p_8",
+      "number": "1010101",
+      "code": "ME1",
+      "name": "MATH ENRICHMENT - LEVEL 1",
+      "subject": "MATH",
+      "category": "PRIVATE PIANO LESSONS",
+      "ageRange": "1–2",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s5bc223e8",
+          "locationId": "loc_waterloo",
+          "days": [
+            4
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "2",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms67qajgtyjix",
+      "number": "1010101",
+      "code": "ME1",
+      "name": "MATH ENRICHMENT - LEVEL 1",
+      "subject": "MATH",
+      "category": "FLEX",
+      "ageRange": "1–2",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms67qajgljbri",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "2",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "p_9",
+      "number": "1010102",
+      "code": "ME2",
+      "name": "MATH ENRICHMENT - LEVEL 2",
+      "subject": "MATH",
+      "category": "ENRICHMENT",
+      "ageRange": "3–4",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s5bf92df4",
+          "locationId": "loc_waterloo",
+          "days": [
+            3
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "4",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": ""
+    },
+    {
+      "id": "ms680hq4y0fx9",
+      "number": "1010102",
+      "code": "ME2",
+      "name": "MATH ENRICHMENT - LEVEL 2",
+      "subject": "MATH",
+      "category": "ENRICHMENT",
+      "ageRange": "3–4",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms680hq4z5z56",
+          "locationId": "loc_boardwalk",
+          "days": [
+            2
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "4",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "p_10",
+      "number": "1010103",
+      "code": "ME3",
+      "name": "MATH ENRICHMENT - LEVEL 3",
+      "subject": "MATH",
+      "category": "ENRICHMENT",
+      "ageRange": "5–6",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s364f25b4",
+          "locationId": "loc_waterloo",
+          "days": [
+            2
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "6",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": ""
+    },
+    {
+      "id": "ms680lqbnqa5r",
+      "number": "1010103",
+      "code": "ME3",
+      "name": "MATH ENRICHMENT - LEVEL 3",
+      "subject": "MATH",
+      "category": "ENRICHMENT",
+      "ageRange": "5–6",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms680lqb40dpc",
+          "locationId": "loc_boardwalk",
+          "days": [
+            3
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "6",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "p_11",
+      "number": "1010104",
+      "code": "ME4",
+      "name": "MATH ENRICHMENT - LEVEL 4",
+      "subject": "MATH",
+      "category": "ENRICHMENT",
+      "ageRange": "7–8",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s4d2950f",
+          "locationId": "loc_waterloo",
+          "days": [
+            1
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "7",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "ms680mdy8bye6",
+      "number": "1010104",
+      "code": "ME4",
+      "name": "MATH ENRICHMENT - LEVEL 4",
+      "subject": "MATH",
+      "category": "ENRICHMENT",
+      "ageRange": "7–8",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 41.29,
+      "totalHours": 70,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms680mdymoasp",
+          "locationId": "loc_boardwalk",
+          "days": [
+            4
+          ],
+          "capacity": 12,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "17:30",
+              "end": "19:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "7",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 289,
+      "costUnit": "",
+      "active": true
+    },
+    {
+      "id": "p_12",
+      "number": "1050901",
+      "code": "PL-55",
+      "name": "PRIVATE LESSONS - 55 MIN",
+      "subject": "ALL",
+      "category": "PRIVATE LESSONS",
+      "ageRange": "JK–12",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 93.19,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s589bdf26",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "16:30",
+              "end": "17:25"
+            }
+          ]
+        },
+        {
+          "id": "s13ca37cd",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s5167e190",
+          "locationId": "loc_waterloo",
+          "days": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "15:30",
+              "end": "17:25"
+            }
+          ]
+        },
+        {
+          "id": "s60d33a37",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            },
+            {
+              "start": "10:30",
+              "end": "11:25"
+            },
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "JK",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 299,
+      "costUnit": ""
+    },
+    {
+      "id": "p_13",
+      "number": "1040401",
+      "code": "TKC-SCR",
+      "name": "TEKNOKIDS CODING: SCRATCH",
+      "subject": "CODING",
+      "category": "TEKNOKIDS CODING",
+      "ageRange": "3–4",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s57606f7d",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        },
+        {
+          "id": "s451c8760",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "4",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_14",
+      "number": "1040402",
+      "code": "TKC-HTM",
+      "name": "TEKNOKIDS CODING: HTML/CSS",
+      "subject": "CODING",
+      "category": "TEKNOKIDS CODING",
+      "ageRange": "5–6",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s5c47608d",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "10:30",
+              "end": "11:25"
+            }
+          ]
+        },
+        {
+          "id": "s20542790",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "10:30",
+              "end": "11:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "6",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_15",
+      "number": "1040403",
+      "code": "TKC-JS",
+      "name": "TEKNOKIDS CODING: JAVASCRIPT/AI",
+      "subject": "CODING",
+      "category": "TEKNOKIDS CODING",
+      "ageRange": "7–10",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s3fa280ab",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        },
+        {
+          "id": "s51e668c8",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "7",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_16",
+      "number": "1040404",
+      "code": "TKC-PY",
+      "name": "TEKNOKIDS CODING: PYTHON",
+      "subject": "CODING",
+      "category": "TEKNOKIDS CODING",
+      "ageRange": "7–10",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s5ec2aa7c",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "12:30",
+              "end": "13:25"
+            }
+          ]
+        },
+        {
+          "id": "s578eace6",
+          "locationId": "loc_waterloo",
+          "days": [
+            6
+          ],
+          "capacity": 7,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "12:30",
+              "end": "13:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "7",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_17",
+      "number": "1030301",
+      "code": "TKR-E",
+      "name": "TEKNOKIDS EARLY",
+      "subject": "ROBOTICS",
+      "category": "TEKNOKIDS ROBOTICS",
+      "ageRange": "JK–2",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s24bd089b",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 5,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:30",
+              "end": "10:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "JK",
+      "gradeTo": "2",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_18",
+      "number": "1030302",
+      "code": "TKR-J",
+      "name": "TEKNOKIDS JUNIOR",
+      "subject": "ROBOTICS",
+      "category": "TEKNOKIDS ROBOTICS",
+      "ageRange": "3–4",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s123fff48",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 5,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "10:30",
+              "end": "11:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "4",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_19",
+      "number": "1030303",
+      "code": "TKR-I",
+      "name": "TEKNOKIDS INTERMEDIATE",
+      "subject": "ROBOTICS",
+      "category": "TEKNOKIDS ROBOTICS",
+      "ageRange": "5–6",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s21cb3951",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 5,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "11:30",
+              "end": "12:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "6",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_20",
+      "number": "1030304",
+      "code": "TKR-S",
+      "name": "TEKNOKIDS SENIOR",
+      "subject": "ROBOTICS",
+      "category": "TEKNOKIDS ROBOTICS",
+      "ageRange": "7–8",
+      "duration": 55,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 58.91,
+      "totalHours": 32.08,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s35d231e",
+          "locationId": "loc_boardwalk",
+          "days": [
+            6
+          ],
+          "capacity": 5,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "12:30",
+              "end": "13:25"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "7",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 189,
+      "costUnit": ""
+    },
+    {
+      "id": "p_21",
+      "number": "1060501",
+      "code": "PNO-SR",
+      "name": "PIANO PRIVATE 30MIN - SR",
+      "subject": "PIANO",
+      "category": "PRIVATE PIANO LESSONS",
+      "ageRange": "1–12",
+      "duration": 30,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 71.43,
+      "totalHours": 17.5,
+      "description": "",
+      "offerings": [
+        {
+          "id": "mrm36znr4lcwy",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "times": [
+            {
+              "start": "15:00",
+              "end": "15:30"
+            },
+            {
+              "start": "15:30",
+              "end": "16:00"
+            },
+            {
+              "start": "16:00",
+              "end": "16:30"
+            },
+            {
+              "start": "16:30",
+              "end": "17:00"
+            },
+            {
+              "start": "17:00",
+              "end": "17:30"
+            },
+            {
+              "start": "17:30",
+              "end": "18:00"
+            }
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": ""
+        },
+        {
+          "id": "mrm36znrqyn2q",
+          "locationId": "loc_waterloo",
+          "days": [
+            3
+          ],
+          "times": [
+            {
+              "start": "15:00",
+              "end": "15:30"
+            },
+            {
+              "start": "15:30",
+              "end": "16:00"
+            },
+            {
+              "start": "16:00",
+              "end": "16:30"
+            },
+            {
+              "start": "16:30",
+              "end": "17:00"
+            },
+            {
+              "start": "17:00",
+              "end": "17:30"
+            },
+            {
+              "start": "17:30",
+              "end": "18:00"
+            }
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": ""
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 125,
+      "costUnit": ""
+    },
+    {
+      "id": "p_22",
+      "number": "1060502",
+      "code": "PNO-JR",
+      "name": "PIANO PRIVATE 30MIN - JR",
+      "subject": "PIANO",
+      "category": "PRIVATE PIANO LESSONS",
+      "ageRange": "1–12",
+      "duration": 30,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 60,
+      "totalHours": 17.5,
+      "description": "",
+      "offerings": [
+        {
+          "id": "mrm36znrjq0tr",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "times": [
+            {
+              "start": "15:30",
+              "end": "16:00"
+            },
+            {
+              "start": "16:00",
+              "end": "16:30"
+            },
+            {
+              "start": "16:30",
+              "end": "17:00"
+            },
+            {
+              "start": "17:00",
+              "end": "17:30"
+            },
+            {
+              "start": "17:30",
+              "end": "18:00"
+            }
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": ""
+        },
+        {
+          "id": "mrm36znr4xfg9",
+          "locationId": "loc_waterloo",
+          "days": [
+            3
+          ],
+          "times": [
+            {
+              "start": "15:00",
+              "end": "15:30"
+            },
+            {
+              "start": "15:30",
+              "end": "16:00"
+            },
+            {
+              "start": "16:00",
+              "end": "16:30"
+            },
+            {
+              "start": "16:30",
+              "end": "17:00"
+            },
+            {
+              "start": "17:00",
+              "end": "17:30"
+            },
+            {
+              "start": "17:30",
+              "end": "18:00"
+            }
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": ""
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 105,
+      "costUnit": ""
+    },
+    {
+      "id": "ms689dps405mi",
+      "number": "1060502",
+      "code": "PNO-JR",
+      "name": "PIANO PRIVATE 30MIN - JR",
+      "subject": "PIANO",
+      "category": "PRIVATE PIANO LESSONS",
+      "ageRange": "1–12",
+      "duration": 30,
+      "sessions": "1",
+      "period": "/week",
+      "rate": 60,
+      "totalHours": 17.5,
+      "description": "",
+      "offerings": [
+        {
+          "id": "ms689dpspg3at",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1
+          ],
+          "times": [
+            {
+              "start": "15:00",
+              "end": "15:30"
+            }
+          ],
+          "capacity": 1,
+          "enrolled": "",
+          "instructor": ""
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "1",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 105,
+      "costUnit": ""
+    },
+    {
+      "id": "p_23",
+      "number": "1070101",
+      "code": "CLMC",
+      "name": "CONTEST - CMS CLMC",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "7–12",
+      "duration": 90,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 36.67,
+      "totalHours": 1.5,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s5a0135f0",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "7",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 55,
+      "costUnit": ""
+    },
+    {
+      "id": "p_24",
+      "number": "1070102",
+      "code": "CJMC",
+      "name": "CONTEST - CMS CJMC",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "5–8",
+      "duration": 90,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 36.67,
+      "totalHours": 1.5,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s2ef9f09c",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 55,
+      "costUnit": ""
+    },
+    {
+      "id": "p_25",
+      "number": "1070103",
+      "code": "COMC",
+      "name": "CONTEST - CMS COMC",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "9–12",
+      "duration": 150,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26,
+      "totalHours": 2.5,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s4245f92c",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "9",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 65,
+      "costUnit": ""
+    },
+    {
+      "id": "p_26",
+      "number": "1070104",
+      "code": "AMC8",
+      "name": "CONTEST - MAA AMC 8",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 8",
+      "duration": 40,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 90,
+      "totalHours": 0.67,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s402fdb1",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 60,
+      "costUnit": ""
+    },
+    {
+      "id": "p_27",
+      "number": "1070105",
+      "code": "AMC10A",
+      "name": "CONTEST - MAA AMC 10A",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 10",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 48,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s255ba68f",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 60,
+      "costUnit": ""
+    },
+    {
+      "id": "p_28",
+      "number": "1070106",
+      "code": "AMC12A",
+      "name": "CONTEST - MAA AMC 12A",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 12",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 48,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s2365437f",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 60,
+      "costUnit": ""
+    },
+    {
+      "id": "p_29",
+      "number": "1070107",
+      "code": "AMC10B",
+      "name": "CONTEST - MAA AMC 10B",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 10",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 48,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s17f3c6b7",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 60,
+      "costUnit": ""
+    },
+    {
+      "id": "p_30",
+      "number": "1070108",
+      "code": "AMC12B",
+      "name": "CONTEST - MAA AMC 12B",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 12",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 48,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s271a7e8e",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 60,
+      "costUnit": ""
+    },
+    {
+      "id": "p_31",
+      "number": "1070109",
+      "code": "AIME",
+      "name": "CONTEST - MAA AIME",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 12",
+      "duration": 180,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 40,
+      "totalHours": 3,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s651a8a22",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 120,
+      "costUnit": ""
+    },
+    {
+      "id": "p_32",
+      "number": "1070110",
+      "code": "USJMO",
+      "name": "CONTEST - MAA US(J)MO",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 12",
+      "duration": 540,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 22.22,
+      "totalHours": 9,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s2d3b8d68",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 200,
+      "costUnit": ""
+    },
+    {
+      "id": "p_33",
+      "number": "1070111",
+      "code": "BCC",
+      "name": "CONTEST - CEMC BCC",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "5–10",
+      "duration": 50,
+      "sessions": "2",
+      "period": "/year",
+      "rate": 46.67,
+      "totalHours": 0.75,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7956bbc8",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 35,
+      "costUnit": ""
+    },
+    {
+      "id": "p_34",
+      "number": "1070112",
+      "code": "GAU",
+      "name": "CONTEST - CEMC GAUSS",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 8",
+      "duration": 60,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 35,
+      "totalHours": 1,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7306fc5",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 35,
+      "costUnit": ""
+    },
+    {
+      "id": "p_35",
+      "number": "1070113",
+      "code": "PAS",
+      "name": "CONTEST - CEMC PASCAL",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 9",
+      "duration": 60,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 35,
+      "totalHours": 1,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s423c55c0",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "9",
+      "platform": "In-Person",
+      "cost": 35,
+      "costUnit": ""
+    },
+    {
+      "id": "p_36",
+      "number": "1070114",
+      "code": "CAY",
+      "name": "CONTEST - CEMC CAYLEY",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 10",
+      "duration": 60,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 35,
+      "totalHours": 1,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s600ce9ed",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 35,
+      "costUnit": ""
+    },
+    {
+      "id": "p_37",
+      "number": "1070115",
+      "code": "FER",
+      "name": "CONTEST - CEMC FERMAT",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 11",
+      "duration": 60,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 35,
+      "totalHours": 1,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7381a76a",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "11",
+      "platform": "In-Person",
+      "cost": 35,
+      "costUnit": ""
+    },
+    {
+      "id": "p_38",
+      "number": "1070116",
+      "code": "FRY",
+      "name": "CONTEST - CEMC FRYER",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 9",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 36,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7ac0f46",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "9",
+      "platform": "In-Person",
+      "cost": 45,
+      "costUnit": ""
+    },
+    {
+      "id": "p_39",
+      "number": "1070117",
+      "code": "GAL",
+      "name": "CONTEST - CEMC GALOIS",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 10",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 36,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s54ff5c3f",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 45,
+      "costUnit": ""
+    },
+    {
+      "id": "p_40",
+      "number": "1070118",
+      "code": "HYP",
+      "name": "CONTEST - CEMC HYPATIA",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 11",
+      "duration": 75,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 36,
+      "totalHours": 1.25,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s445ae568",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "11",
+      "platform": "In-Person",
+      "cost": 45,
+      "costUnit": ""
+    },
+    {
+      "id": "p_41",
+      "number": "1070119",
+      "code": "CIMC",
+      "name": "CONTEST - CEMC CIMC",
+      "subject": "MATH",
+      "category": "CONTESTS",
+      "ageRange": "Up to 12",
+      "duration": 120,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 27.5,
+      "totalHours": 2,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s1a76059d",
+          "locationId": "loc_boardwalk",
+          "days": [],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": []
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "",
+      "gradeTo": "12",
+      "platform": "In-Person",
+      "cost": 55,
+      "costUnit": ""
+    },
+    {
+      "id": "p_42",
+      "number": "1080101",
+      "code": "CMP-MTH-H",
+      "name": "FLEX MATH - HALF DAY",
+      "subject": "MATH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s6af3a65a",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_43",
+      "number": "1080102",
+      "code": "CMP-MTH-F",
+      "name": "FLEX MATH - FULL DAY",
+      "subject": "MATH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s3b1320bf",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_44",
+      "number": "1080201",
+      "code": "CMP-TYP-H",
+      "name": "FLEX TYPING - HALF DAY",
+      "subject": "ENGLISH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–5",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7b7c6d3d",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "5",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_45",
+      "number": "1080202",
+      "code": "CMP-TYP-F",
+      "name": "FLEX TYPING - FULL DAY",
+      "subject": "ENGLISH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–5",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s11d6be33",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "5",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_46",
+      "number": "1080203",
+      "code": "CMP-HWR-H",
+      "name": "FLEX HANDWRITING - HALF DAY",
+      "subject": "ENGLISH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–5",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s4d302d53",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "5",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_47",
+      "number": "1080204",
+      "code": "CMP-HWR-F",
+      "name": "FLEX HANDWRITING - FULL DAY",
+      "subject": "ENGLISH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–5",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s72aba726",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "5",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_48",
+      "number": "1080205",
+      "code": "CMP-SPL-H",
+      "name": "FLEX SPELLING - HALF DAY",
+      "subject": "ENGLISH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–6",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7c139921",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "6",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_49",
+      "number": "1080206",
+      "code": "CMP-SPL-F",
+      "name": "FLEX SPELLING - FULL DAY",
+      "subject": "ENGLISH",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–6",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s74211e4e",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "6",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_50",
+      "number": "1080701",
+      "code": "CMP-SCI-F",
+      "name": "SCIENCEKIDS BRAIN - FULL DAY",
+      "subject": "SCIENCE",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–8",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "sd0cc4ac",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_51",
+      "number": "1080301",
+      "code": "CMP-ROB-H",
+      "name": "TEKNOKIDS ROBOTICS - HALF DAY",
+      "subject": "ROBOTICS",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–8",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s59652377",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_52",
+      "number": "1080302",
+      "code": "CMP-ROB-F",
+      "name": "TEKNOKIDS ROBOTICS - FULL DAY",
+      "subject": "ROBOTICS",
+      "category": "SUMMER CAMP",
+      "ageRange": "3–8",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7fff9c58",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "3",
+      "gradeTo": "8",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_53",
+      "number": "1080601",
+      "code": "CMP-SEW-H",
+      "name": "ARTSKIDS SEWING - HALF DAY",
+      "subject": "ARTS",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s63ccb27b",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_54",
+      "number": "1080602",
+      "code": "CMP-SEW-F",
+      "name": "ARTSKIDS SEWING - FULL DAY",
+      "subject": "ARTS",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s1c58e310",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_55",
+      "number": "1080603",
+      "code": "CMP-KNT-H",
+      "name": "ARTSKIDS KNITTING - HALF DAY",
+      "subject": "ARTS",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–10",
+      "duration": 180,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s2dc13060",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "Online",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_56",
+      "number": "1080604",
+      "code": "CMP-KNT-F",
+      "name": "ARTSKIDS KNITTING - FULL DAY",
+      "subject": "ARTS",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s36f77d3c",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": ""
+    },
+    {
+      "id": "p_57",
+      "number": "1080605",
+      "code": "CMP-CRO-H",
+      "name": "ARTSKIDS CROCHET - HALF DAY",
+      "subject": "ARTS",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 14.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s7a70d5d4",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "12:30"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 215,
+      "costUnit": ""
+    },
+    {
+      "id": "p_58",
+      "number": "1080606",
+      "code": "CMP-CRO-F",
+      "name": "ARTSKIDS CROCHET - FULL DAY",
+      "subject": "ARTS",
+      "category": "SUMMER CAMP",
+      "ageRange": "5–10",
+      "duration": 900,
+      "sessions": "1",
+      "period": "/year",
+      "rate": 26.33,
+      "totalHours": 15,
+      "description": "",
+      "offerings": [
+        {
+          "id": "s4aedd329",
+          "locationId": "loc_boardwalk",
+          "days": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "capacity": 20,
+          "enrolled": "",
+          "instructor": "",
+          "times": [
+            {
+              "start": "09:00",
+              "end": "16:00"
+            }
+          ]
+        }
+      ],
+      "year": "2026–27",
+      "gradeFrom": "5",
+      "gradeTo": "10",
+      "platform": "In-Person",
+      "cost": 395,
+      "costUnit": "",
+      "active": true
+    }
+  ],
+  "hidden": {},
+  "catColors": {
+    "ENRICHMENT": "#F1F3F4",
+    "FLEX": "#F1F3F4",
+    "TEKNOKIDS ROBOTICS": "#F1F3F4",
+    "TEKNOKIDS CODING": "#F1F3F4",
+    "PRIVATE LESSONS": "#F1F3F4",
+    "PRIVATE PIANO LESSONS": "#F1F3F4",
+    "CONTESTS": "#F1F3F4",
+    "SUMMER CAMP": "#F1F3F4",
+    "CLUBS": "#F1F3F4"
+  },
+  "categoryOrder": [
+    "ENRICHMENT",
+    "FLEX",
+    "TEKNOKIDS ROBOTICS",
+    "TEKNOKIDS CODING",
+    "PRIVATE LESSONS",
+    "PRIVATE PIANO LESSONS",
+    "CONTESTS",
+    "SUMMER CAMP",
+    "CLUBS"
+  ],
+  "_seed": "xlsx-v2",
+  "hiddenCols": {},
+  "vocab": {
+    "year": [
+      "2017–18",
+      "2018–19",
+      "2019–20",
+      "2020–21",
+      "2021–22",
+      "2022–23",
+      "2023–24",
+      "2024–25",
+      "2025–26",
+      "2026–27",
+      "2027–28",
+      "2028–29"
+    ],
+    "subject": [],
+    "time": [],
+    "cost": []
+  },
+  "colOrder": [
+    "year",
+    "category",
+    "subject",
+    "number",
+    "code",
+    "name",
+    "age",
+    "active",
+    "days",
+    "time",
+    "platform",
+    "duration",
+    "lessons",
+    "location",
+    "cost",
+    "rate",
+    "hours",
+    "spots",
+    "instructor"
+  ],
+  "_campDays": "v1",
+  "_codeSeed": "short",
+  "_ageFixFM": "v1",
+  "_yearSeed": "v1",
+  "_yearList": "v1",
+  "_mergeTimes": "v1",
+  "_gradeFT": "v1",
+  "_platform": "v1",
+  "_pianoSched": "v1",
+  "_activeFirst": "v1",
+  "_platAfterTime": "v1",
+  "_autoHours": "v1",
+  "_costUp": "v1",
+  "_progIdGen": "v2",
+  "_flexFee": "v1",
+  "subjColors": {},
+  "subjOrder": {},
+  "platformColors": {},
+  "gradeColors": {},
+  "timeColors": {},
+  "dayColors": {
+    "0": "#F1F3F4",
+    "1": "#F1F3F4",
+    "2": "#F1F3F4",
+    "3": "#F1F3F4",
+    "4": "#F1F3F4",
+    "5": "#F1F3F4",
+    "6": "#F1F3F4"
+  },
+  "platformOrder": [
+    "sdfgfdsg"
+  ],
+  "gradeOrder": [],
+  "timeOrder": [],
+  "progColors": {},
+  "progOrder": []
+}

@@ -597,7 +597,8 @@ app.get('/api/programs', wrap(async (_req, res) => {
     try {
       const seedPath = path.join(__dirname, '..', 'src', 'data', 'programsData.json')
       const raw = fs.readFileSync(seedPath, 'utf8')
-      const arr = JSON.parse(raw)
+      const parsed = JSON.parse(raw)
+      const arr = Array.isArray(parsed) ? parsed : (parsed.programs || [])
       if (Array.isArray(arr) && arr.length > 0) {
         await commitPrograms(arr)
         programs = arr
