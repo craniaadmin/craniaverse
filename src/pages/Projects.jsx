@@ -162,7 +162,7 @@ function useProjects() {
     })
   }, [])
 
-  return { state, loading, status, refresh, mutate }
+  return { state, setState, loading, status, refresh, mutate }
 }
 
 // ---------- Projects page ----------
