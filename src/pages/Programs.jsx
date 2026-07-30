@@ -519,7 +519,10 @@ const CSS = `
 .pg thead th.colh.hasgear .lbl{padding:0 42px}
 .pg thead th.colh .thicons{position:absolute;right:3px;top:50%;transform:translateY(-50%);
     display:inline-flex;align-items:center;gap:2px;line-height:1}
-.pg thead th.selcol,.pg thead th.blankhead,.pg tbody td.selcol,.pg tbody td.actcell{background:transparent}
+/* Nothing empty draws a pill — including the placeholder cells the filter row
+   puts above the checkbox and the row-action buttons. */
+.pg thead th.selcol,.pg thead th:empty,.pg thead th.blankhead,
+.pg tbody td.selcol,.pg tbody td.actcell{background:transparent}
 .pg thead th.selcol input,.pg tbody td.selcol input{width:12px;height:12px;margin:0;
     accent-color:var(--teal);vertical-align:middle;cursor:pointer}
 .pg tbody td.actcell{white-space:nowrap;text-align:center}
