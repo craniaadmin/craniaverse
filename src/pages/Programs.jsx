@@ -563,7 +563,106 @@ const CSS = `
 .pgmodal .sblock .brow span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455}
 `
 
+/* ================= in-app dialogs =================
+   The template never uses the browser's own confirm/prompt/alert, so neither
+   do we — every question is asked in a styled overlay instead. */
+const DialogContext = React.createContext(null)
+function useDialog() {
+  const ctx = React.useContext(DialogContext)
+  if (!ctx) throw new Error('useDialog must be used inside <DialogHost>')
+  return ctx
+}
+
+function DialogHost({ children }) {
+  const [dlg, setDlg] = useState(null)
+  const resolver = useRef(null)
+  const [draft, setDraft] = useState('')
+  const inputRef = useRef(null)
+
+  const finish = useCallback((value) => {
+    setDlg(null)
+    const r = resolver.current
+    resolver.current = null
+    if (r) r(value)
+  }, [])
+
+  const api = useMemo(() => ({
+    confirm: (message, opts = {}) => new Promise(res => {
+      resolver.current = res
+      setDlg({ type: 'confirm', message, title: opts.title || 'Delete', button: opts.button || 'Delete', danger: opts.danger !== false })
+    }),
+    prompt: (title, label, value = '') => new Promise(res => {
+      resolver.current = res
+      setDraft(value)
+      setDlg({ type: 'prompt', title, label: label || 'Name' })
+    }),
+    alert: (title, message) => new Promise(res => {
+      resolver.current = res
+      setDlg({ type: 'alert', title, message })
+    }),
+  }), [])
+
+  useEffect(() => {
+    if (dlg?.type === 'prompt') {
+      const t = setTimeout(() => { inputRef.current?.focus(); inputRef.current?.select() }, 30)
+      return () => clearTimeout(t)
+    }
+  }, [dlg])
+
+  useEffect(() => {
+    if (!dlg) return
+    const onKey = e => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); finish(dlg.type === 'confirm' ? false : null) }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [dlg, finish])
+
+  const cancelValue = dlg?.type === 'confirm' ? false : null
+
+  return (
+    <DialogContext.Provider value={api}>
+      {children}
+      {dlg && (
+        <div className="pgov" style={{ zIndex: 400, alignItems: 'center' }}
+          onClick={e => { if (e.target === e.currentTarget) finish(cancelValue) }}>
+          <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
+            <h2>{dlg.title || 'Notice'}</h2>
+            {dlg.type === 'prompt' ? (
+              <div className="field">
+                <label>{dlg.label}</label>
+                <input ref={inputRef} value={draft} onChange={e => setDraft(e.target.value)}
+                  onKeyDown={e => {
+                    e.stopPropagation()
+                    if (e.key === 'Enter') { e.preventDefault(); finish(draft.trim() || null) }
+                  }} />
+              </div>
+            ) : (
+              <p style={{ fontSize: 14, margin: '6px 0 10px', lineHeight: 1.45 }}>{dlg.message}</p>
+            )}
+            <div className="macts">
+              {dlg.type !== 'alert' && (
+                <button className="cancel" onClick={() => finish(cancelValue)}>Cancel</button>
+              )}
+              <button
+                style={dlg.type === 'confirm' && dlg.danger ? { background: '#C0392B' } : undefined}
+                onClick={() => finish(dlg.type === 'confirm' ? true : dlg.type === 'prompt' ? (draft.trim() || null) : undefined)}>
+                {dlg.type === 'confirm' ? dlg.button : dlg.type === 'prompt' ? 'Save' : 'OK'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </DialogContext.Provider>
+  )
+}
+
 export default function Programs() {
+  return <DialogHost><ProgramsPage /></DialogHost>
+}
+
+function ProgramsPage() {
+  const dialog = useDialog()
   const { staff, programs, setPrograms, programsState, setProgramsState, records: registrations } = useStore()
 
   /* ---------- persisted view state ---------- */
