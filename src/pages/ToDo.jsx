@@ -1030,7 +1030,13 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         </div>
       )}
 
-      {settingsOpen && <SettingsPopover
+      {settingsOpen && view === 'checklists' && <ChecklistSettingsPopover
+        onClose={() => setSettingsOpen(false)}
+        state={state}
+        setState={setState}
+        runChecklists={runChecklists}
+      />}
+      {settingsOpen && view !== 'checklists' && <SettingsPopover
         onClose={() => setSettingsOpen(false)}
         state={state}
         setState={setState}
