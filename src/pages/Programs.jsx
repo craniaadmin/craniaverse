@@ -1131,23 +1131,21 @@ function ProgramsPage() {
     if (key === 'cat') return usedCategories.map(c => ({ value: c, label: c }))
     if (key === 'prog') return [...new Set(programs.map(p => p.name).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b)).map(x => ({ value: x, label: x }))
-    if (key === 'sub') return [...new Set(programs.map(p => p.subject).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b)).map(x => ({ value: x, label: x }))
-    if (key === 'year') return [...new Set(programs.map(p => p.year).filter(Boolean))]
-      .sort().map(x => ({ value: x, label: x }))
+    /* These four read from the vocab, so a value can be added before any
+       program uses it. */
+    if (key === 'sub') return vocabList('subject').map(x => ({ value: x, label: x }))
+    if (key === 'year') return vocabList('year').map(x => ({ value: x, label: x }))
+    if (key === 'time') return vocabList('time').map(x => ({ value: x, label: fmtTime(x) }))
+    if (key === 'cost') return vocabList('cost').map(x => ({ value: x, label: money(Number(x)) }))
     if (key === 'grade') return [...new Set(programs.map(p => p.ageRange).filter(Boolean))]
       .sort().map(v => ({ value: v, label: fmtGrade(v) }))
     if (key === 'locf') return locations.map(l => ({ value: l.id, label: l.name }))
     if (key === 'platform') return PLATFORMS.map(x => ({ value: x, label: x }))
     if (key === 'day') return DOW.map(d => ({ value: String(d.n), label: d.l }))
-    if (key === 'time') return [...new Set(allRows.map(r => r.slot?.start).filter(Boolean))]
-      .sort().map(x => ({ value: x, label: fmtTime(x) }))
-    if (key === 'cost') return [...new Set(allRows.map(r => r.cost).filter(v => v != null).map(String))]
-      .sort((a, b) => Number(a) - Number(b)).map(x => ({ value: x, label: money(Number(x)) }))
     if (key === 'dur') return [...new Set(allRows.map(r => r.duration).filter(v => v !== '' && v != null).map(String))]
       .sort((a, b) => Number(a) - Number(b)).map(v => ({ value: v, label: fmtDuration(v) }))
     return []
-  }, [allRows, programs, locations, usedCategories])
+  }, [allRows, programs, locations, usedCategories, vocabList])
 
   const matchRow = useCallback((r) => {
     if (filters.prog.length && !filters.prog.includes(r.name)) return false
