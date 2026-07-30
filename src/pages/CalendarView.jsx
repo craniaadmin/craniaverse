@@ -597,6 +597,7 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
   const [scopeModal, setScopeModal] = useState(null) // { action, event, date }
   const [confirmDialog, setConfirmDialog] = useState(null) // { msg, onYes }
   const [ctxMenu, setCtxMenu] = useState(null) // { x, y, items }
+  const [colorPick, setColorPick] = useState(null) // { x, y, calId }
   const [dragEv, setDragEv] = useState(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const timeGridRef = useRef(null)
