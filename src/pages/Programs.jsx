@@ -1750,6 +1750,7 @@ function CellEditor({ row, col, locations, programs, categories, teacherOptions,
 
 /* ================= program modal ================= */
 function ProgramModal({ mode, initial, locations, teacherOptions, registrations, categories, onClose, onSave, onDelete }) {
+  const dialog = useDialog()
   const [form, setForm] = useState(initial)
   const [activeOff, setActiveOff] = useState(0)
   const set = patch => setForm(f => ({ ...f, ...patch }))
