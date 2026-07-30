@@ -2542,34 +2542,45 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
     commit(cats, nextSubjOrder, catColors, nextSubjColors)
   }
 
-  const rowStyle = { display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px', borderBottom: '1px solid #f2efe6' }
-  const inputStyle = { flex: 1, padding: '2px 4px', border: '1px solid transparent', borderRadius: 6, fontSize: 13.5, fontWeight: 600, color: 'var(--dark-brown)', background: 'none' }
-  const subInputStyle = { ...inputStyle, fontWeight: 400, color: '#6b6455' }
-  const btnStyle = { background: 'none', border: 'none', color: '#9a948a', padding: '0 6px', fontSize: 15, cursor: 'pointer' }
-  const countStyle = { fontSize: 11, color: 'var(--muted)', fontWeight: 600, minWidth: 18, textAlign: 'center' }
+  /* Dragging a category re-seats it relative to the row it was dropped on. */
+  const onCatDrop = (target, e) => {
+    e.preventDefault()
+    setDropCat(null)
+    if (!drag || drag === target) return
+    const arr = cats.slice()
+    const from = arr.indexOf(drag)
+    if (from < 0) return
+    const [moved] = arr.splice(from, 1)
+    const at = arr.indexOf(target)
+    const r = e.currentTarget.getBoundingClientRect()
+    arr.splice(e.clientY > r.top + r.height / 2 ? at + 1 : at, 0, moved)
+    commit(arr, subjOrder, catColors, subjColors)
+    setDrag(null)
+  }
 
   return (
     <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="pgmodal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
         <h2>Categories</h2>
-        <div style={{ fontSize: 12, color: '#6b6455', marginBottom: 14, lineHeight: 1.4 }}>
+        <div className="mhint">
           Reorder or delete categories and subjects with ▲ ▼ and × (or drag). Click a name to edit it, or the colour dot to recolour it — for categories and subjects alike. Deleting never removes programs — they just lose that label.
         </div>
         {msg && <div style={{ fontSize: 12, color: '#c0392b', marginBottom: 10 }}>{msg}</div>}
-        <div style={{ maxHeight: '60vh', overflow: 'auto', marginBottom: 8 }}>
+        <div className="mlist">
           {cats.map((cat, ci) => (
             <React.Fragment key={cat}>
-              <div style={rowStyle}>
-                <span style={{ cursor: 'grab', color: '#9a948a', fontSize: 14 }}>☰</span>
-                <input type="color" value={catColors[cat] || DEFAULT_CAT_COLOR}
-                  onChange={e => recolourCat(cat, e.target.value)}
-                  style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #d8d3c6', padding: 0 }} />
-                <input defaultValue={cat}
+              <ManagerRow draggable dropTarget={dropCat === cat}
+                onDragStart={e => { if (e.target.tagName === 'INPUT') { e.preventDefault(); return } setDrag(cat) }}
+                onDragOver={e => { e.preventDefault(); if (drag && drag !== cat) setDropCat(cat) }}
+                onDragLeave={() => setDropCat(null)}
+                onDrop={e => onCatDrop(cat, e)}>
+                <span className="grip" title="Drag To Reorder">⠿</span>
+                <ColorDot color={catColors[cat] || DEFAULT_CAT_COLOR} onPick={c => recolourCat(cat, c)} />
+                <input className="cnm" defaultValue={cat} title="Rename Category"
                   onBlur={e => { if (e.target.value !== cat) renameCat(cat, e.target.value) }}
-                  onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                  style={inputStyle} />
-                <span style={countStyle}>{countCat(cat)}</span>
-                <button type="button" style={btnStyle} onClick={() => moveCat(ci, -1)} disabled={ci === 0}>▲</button>
+                  onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }} />
+                <span className="cuse" title="Programs using this category">{countCat(cat)}</span>
+                <button type="button" className="mv" onClick={() => moveCat(ci, -1)} disabled={ci === 0}>▲</button>
                 <button type="button" style={btnStyle} onClick={() => moveCat(ci, 1)} disabled={ci === cats.length - 1}>▼</button>
                 <button type="button" className="rmtime" onClick={() => deleteCat(cat)} title="Delete">×</button>
               </div>
