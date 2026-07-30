@@ -102,22 +102,17 @@ function useClassLists() {
   return useMemo(() => {
     const realRecords = records.filter((r) => r.id !== 'seed')
 
-    // The same program title can have more than one row — one per
-    // location (Boardwalk, Waterloo East, ...), each with its own
-    // offerings. Keying this map by title alone would let the last
-    // location's row silently shadow every earlier one, so students
-    // registered at "the other" location would either attribute to
-    // the wrong location's roster or vanish from theirs entirely.
-    // Keep every location's row as a candidate, then route each
-    // student to whichever one's offerings actually match their
-    // schedule text (falling back to the first candidate when no
-    // offering matches, same as the single-location case always did).
-    const classes = programs.map((p) => ({ program: p, roster: [] }))
-    const byTitle = new Map() // norm(title) -> class wrapper[]
+    // A registration names its program as free text, so classes are keyed by
+    // name. The same name can appear on more than one program record, so keep
+    // every one as a candidate and route each student to whichever record has
+    // a session matching their schedule text, falling back to the first.
+    const classes = programs.map((p) => ({ program: p, roster: [], allSessions: sessionsOf(p) }))
+    const byName = new Map() // norm(name) -> class wrapper[]
     for (const c of classes) {
-      const key = norm(c.program.title)
-      if (!byTitle.has(key)) byTitle.set(key, [])
-      byTitle.get(key).push(c)
+      const key = norm(c.program.name)
+      if (!key) continue
+      if (!byName.has(key)) byName.set(key, [])
+      byName.get(key).push(c)
     }
     const unlistedByTitle = new Map()
 
@@ -125,12 +120,11 @@ function useClassLists() {
       for (const entry of (r.programs || [])) {
         if (!entry.program) continue
         const row = { record: r, entry }
-        const candidates = byTitle.get(norm(entry.program))
+        const candidates = byName.get(norm(entry.program))
         if (candidates && candidates.length > 0) {
           let cls = candidates[0]
           if (candidates.length > 1) {
-            const matched = candidates.find((c) =>
-              matchOffering(entry.schedule, (c.program.offerings || []).filter((o) => o.active !== false)))
+            const matched = candidates.find((c) => matchSession(entry.schedule, c.allSessions))
             if (matched) cls = matched
           }
           cls.roster.push(row)
@@ -142,21 +136,18 @@ function useClassLists() {
       }
     }
 
-    // Sub-group each class's roster by matched offering.
+    // Sub-group each class's roster by matched session.
     for (const cls of classes) {
-      const offerings = (cls.program.offerings || []).filter((o) => o.active !== false)
-      const groups = new Map() // offering (or null) -> rows
+      const all = cls.allSessions
+      const groups = new Map() // session key (or null) -> rows
       for (const row of cls.roster) {
-        const o = matchOffering(row.entry.schedule, offerings)
-        const key = o || null
+        const s = matchSession(row.entry.schedule, all)
+        const key = s ? s.key : null
         if (!groups.has(key)) groups.set(key, [])
         groups.get(key).push(row)
       }
-      const sessions = offerings
-        .map((o) => ({ offering: o, rows: groups.get(o) || [] }))
-      const unspecified = groups.get(null) || []
-      cls.sessions = sessions
-      cls.unspecified = unspecified
+      cls.sessions = all.map((s) => ({ session: s, rows: groups.get(s.key) || [] }))
+      cls.unspecified = groups.get(null) || []
     }
 
     const unlisted = Array.from(unlistedByTitle.entries()).map(([title, roster]) => ({ title, roster }))
