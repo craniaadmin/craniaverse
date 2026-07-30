@@ -889,7 +889,10 @@ function ProgramsPage() {
   const [editing, setEditing] = useState(null) // program modal
   const [bulkOpen, setBulkOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [managing, setManaging] = useState(null) // 'locations' | 'categories' | 'subjects'
+  const [managing, setManaging] = useState(null)  // gear key: cat | loc | prog | platform | grade | day | time
+  const [rowCtx, setRowCtx] = useState(null)      // {x, y, row}
+  const [catCtx, setCatCtx] = useState(null)      // {x, y, cat}
+  const [locCtx, setLocCtx] = useState(null)      // {x, y, locId}
   const [cellEdit, setCellEdit] = useState(null) // {row, col}
   const [history, setHistory] = useState({ undo: [], redo: [] })
   const dragCol = useRef(null)
