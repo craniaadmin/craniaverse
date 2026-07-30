@@ -303,12 +303,29 @@ export default function ClassLists({ onNavigate }) {
           No classes match your filters.
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {visible.map((c) => {
-            const key = c.program.title + c.program.number + c.program.location
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+          {grouped.map((group) => (
+            <section key={group.category}>
+              <div style={{
+                display: 'flex', alignItems: 'baseline', gap: 10,
+                padding: '0 2px 7px', marginBottom: 10,
+                borderBottom: '2px solid var(--brand-dark-blue)',
+              }}>
+                <h3 style={{
+                  margin: 0, fontSize: 13, fontWeight: 800, letterSpacing: '.6px',
+                  textTransform: 'uppercase', color: 'var(--brand-dark-blue)',
+                }}>{group.category}</h3>
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>
+                  {group.items.length} class{group.items.length === 1 ? '' : 'es'} · {group.students} enrolled
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {group.items.map((c) => {
+            const key = c.program.id || (c.program.name + c.program.number)
             const isOpen = expanded.has(key)
-            const capacity = c.sessions.reduce((sum, s) => sum + (s.offering.spots != null ? s.offering.spots : 0), 0)
-            const hasCapacity = c.sessions.some((s) => s.offering.spots != null)
+            const capacity = c.sessions.reduce((sum, s) => sum + (s.session.capacity != null ? s.session.capacity : 0), 0)
+            const hasCapacity = c.sessions.some((s) => s.session.capacity != null)
             return (
               <div key={key} style={{ background: '#fff', borderRadius: 10, overflow: 'hidden', ...cardShadow, opacity: c.program.active === false ? 0.6 : 1 }}>
                 <div
