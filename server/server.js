@@ -982,6 +982,18 @@ app.put('/api/projects', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+// ---- project backups --------
+app.get('/api/projects/backups', wrap(async (_req, res) => res.json(await listProjectBackups())))
+app.post('/api/projects/backup', wrap(async (req, res) => {
+  const label = (req.body?.label || '').trim() || new Date().toLocaleString()
+  await createProjectBackup(label)
+  res.json({ ok: true })
+}))
+app.post('/api/projects/restore/:id', wrap(async (req, res) => {
+  const payload = await restoreProjectBackup(req.params.id)
+  res.json(payload)
+}))
+
 // ---- forms (custom form builder) ------------------------
 // A "form" is a definition: title + ordered field list. Anyone
 // with the form's shareable URL (/form/:slug) can submit it, and
