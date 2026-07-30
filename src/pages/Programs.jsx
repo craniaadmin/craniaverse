@@ -2461,8 +2461,8 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
     commit(cats, { ...subjOrder, [cat]: arr }, catColors, subjColors)
   }
 
-  const addCat = () => {
-    const name = window.prompt('New category name')
+  const addCat = async () => {
+    const name = await dialog.prompt('Add Category', 'Category name')
     if (!name || !name.trim()) return
     const n = name.trim()
     if (cats.includes(n)) { setMsg('That category already exists.'); return }
