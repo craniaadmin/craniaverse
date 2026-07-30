@@ -1894,6 +1894,30 @@ function ProgramsPage() {
             const cur = filterSel(pop.fk)
             setFilterSel(pop.fk, on ? [...cur, v] : cur.filter(x => x !== v))
           }}
+          onAdd={FILTER_ADD[pop.fk] ? (async () => {
+            const title = FILTER_ADD[pop.fk]
+            let v = await dialog.prompt('Add ' + title, 'New ' + title.toLowerCase())
+            if (!v) return
+            v = v.trim()
+            if (pop.fk === 'locf') {
+              const id = 'loc_' + v.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
+              if (locations.some(l => l.id === id)) return
+              setViewState(vs => ({
+                ...vs,
+                locations: [...vs.locations, { id, name: v, color: LPAL[vs.locations.length % LPAL.length] }],
+              }))
+              setFilterSel('locf', [...filterSel('locf'), id])
+              return
+            }
+            if (pop.fk === 'cost') {
+              const n = Number(v.replace(/[^0-9.]/g, ''))
+              if (!isFinite(n)) return
+              v = String(n)
+            }
+            const vk = { sub: 'subject', year: 'year', time: 'time', cost: 'cost' }[pop.fk]
+            addVocab(vk, v)
+            if (!filterSel(pop.fk).includes(v)) setFilterSel(pop.fk, [...filterSel(pop.fk), v])
+          }) : null}
           onSelectAll={() => setFilterSel(pop.fk, filterOptions(pop.fk).map(o => o.value))}
           onClear={() => setFilterSel(pop.fk, [])} />
       )}
