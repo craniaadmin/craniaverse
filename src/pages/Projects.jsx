@@ -1003,7 +1003,30 @@ const ProjectSettingsPopover = forwardRef(function ProjectSettingsPopover({ onCl
         <button style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6b6455' }} onClick={onClose}>✕</button>
       </div>
 
-      <div className="sp-card-title" style={{ fontSize: 12.5 }}>Backups</div>
+      <div className="sp-card-title" style={{ fontSize: 12.5 }}>Daily Tasks</div>
+      <div className="sp-hint">
+        Cards with repeat days return to Daily Tasks at this time each day.
+      </div>
+      <div className="sp-btnrow">
+        <input type="time" className="sp-time" value={state.resetTime || '08:00'}
+          onChange={e => mutate(d => { d.resetTime = e.target.value || '08:00' })} />
+        <button className="sp-btn" onClick={onResetNow}>Reset Now</button>
+      </div>
+      {state.lastResetAt && (
+        <div className="sp-hint" style={{ marginTop: 4 }}>
+          Last reset {fmtDateTime(new Date(state.lastResetAt).toISOString())}
+        </div>
+      )}
+
+      <div className="sp-card-title" style={{ fontSize: 12.5, marginTop: 12 }}>Today’s Goals</div>
+      <div className="sp-hint">Goals cards are cleared out at this time each day.</div>
+      <div className="sp-btnrow">
+        <input type="time" className="sp-time" value={state.clearGoalsTime || '00:00'}
+          onChange={e => mutate(d => { d.clearGoalsTime = e.target.value || '00:00' })} />
+        <button className="sp-btn" onClick={onClearGoalsNow}>Clear Now</button>
+      </div>
+
+      <div className="sp-card-title" style={{ fontSize: 12.5, marginTop: 12 }}>Backups</div>
       <div className="sp-hint">Keep up to 14 snapshots. Restore replaces current data.</div>
       <div className="sp-btnrow">
         <button className="sp-btn" disabled={busy} onClick={backUp}>Back Up Now</button>
