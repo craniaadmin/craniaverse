@@ -127,6 +127,7 @@ function useProjects() {
       setState({
         cards:            Array.isArray(j.cards) ? j.cards : [],
         colOrder:         Array.isArray(j.colOrder) && j.colOrder.length ? j.colOrder : COLUMNS.map(c => c.id),
+        hiddenCols:       normalizeHiddenCols(j.hiddenCols),
         updatedAt:        j.updatedAt || null,
         resetTime:        j.resetTime || '08:00',
         clearGoalsTime:   j.clearGoalsTime || '00:00',
