@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../data/store'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
