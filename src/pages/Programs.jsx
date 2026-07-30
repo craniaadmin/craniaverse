@@ -2512,9 +2512,11 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
     commit(cats, { ...subjOrder, [cat]: arr }, catColors, nextSubjColors)
   }
 
-  const deleteCat = (cat) => {
+  const deleteCat = async (cat) => {
     const n = countCat(cat)
-    if (!window.confirm(`Delete category "${cat}"? ${n} program(s) will keep their data but lose this category label.`)) return
+    if (!await dialog.confirm(
+      `Delete category "${cat}"? ${n} program(s) will keep their data but lose this category label.`,
+      { title: 'Delete Category' })) return
     setPrograms(list => list.map(p => p.category === cat ? { ...p, category: '' } : p))
     const nextCats = cats.filter(c => c !== cat)
     const nextColors = { ...catColors }
