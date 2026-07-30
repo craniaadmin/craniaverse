@@ -2625,6 +2625,7 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
 
 /* ================= settings (backups) ================= */
 function SettingsModal({ onClose, setPrograms }) {
+  const dialog = useDialog()
   const [backups, setBackups] = useState(null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
