@@ -188,7 +188,7 @@ export default function Projects() {
   const { state, setState, loading, status, mutate } = useProjects()
   const [filter, setFilter] = useState('')
   const [editing, setEditing] = useState(null)
-  const [hiddenCols, setHiddenCols] = useState({})
+  const hiddenCols = state.hiddenCols || {}
   const [colsOpen, setColsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const dragCardId = useRef(null)
