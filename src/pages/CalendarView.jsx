@@ -85,6 +85,20 @@ function downloadCsv(filename, rows) {
   setTimeout(() => URL.revokeObjectURL(a.href), 5000)
 }
 
+/* "Every 2 weekly (Mon, Wed) until 2027-06-30" — the CSV should say what the
+   repeat actually is, not just its frequency. */
+function recurLabel(rc) {
+  if (!rc || !rc.freq) return ''
+  const iv = Math.max(1, rc.interval || 1)
+  let s = (iv > 1 ? `Every ${iv} ` : '') + rc.freq
+  if (rc.freq === 'weekly' && rc.days && rc.days.length) {
+    s += ' (' + rc.days.map(d => DOW_FULL[d]).join(', ') + ')'
+  }
+  if (rc.until) s += ' until ' + rc.until
+  if (rc.count) s += ' ×' + rc.count
+  return s
+}
+
 // ─── Recurrence ───
 function occursOn(ev, d) {
   if (!ev.date) return false
