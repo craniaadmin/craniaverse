@@ -962,6 +962,60 @@ function ProgramsPage() {
   const catColor = useCallback(c => catColors[c] || DEFAULT_CAT_COLOR, [catColors])
   const subjColor = useCallback(
     (cat, s) => subjColors[subjKey(cat, s)] || DEFAULT_CAT_COLOR, [subjColors])
+  /* Values the user has added by hand, unioned with what the data already has,
+     so a year or subject can exist before any program uses it. */
+  const vocabList = useCallback((key) => {
+    const set = new Set((viewState.vocab && viewState.vocab[key]) || [])
+    if (key === 'subject') programs.forEach(p => { if (p.subject) set.add(p.subject) })
+    if (key === 'year') programs.forEach(p => { if (p.year) set.add(p.year) })
+    if (key === 'time') allRows.forEach(r => { if (r.slot && r.slot.start) set.add(r.slot.start) })
+    if (key === 'cost') programs.forEach(p => { if (p.cost != null && p.cost !== '') set.add(String(p.cost)) })
+    const out = [...set]
+    return key === 'cost'
+      ? out.sort((a, b) => Number(a) - Number(b))
+      : out.sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }))
+  }, [viewState.vocab, programs, allRows])
+
+  const addVocab = useCallback((key, value) => setViewState(vs => {
+    const cur = (vs.vocab && vs.vocab[key]) || []
+    if (cur.includes(value)) return vs
+    return { ...vs, vocab: { ...(vs.vocab || {}), [key]: [...cur, value] } }
+  }), [])
+
+  /* ---------- location edits from the table ---------- */
+  const [locColorAt, setLocColorAt] = useState(null)
+  const renameLocation = useCallback(async (locId) => {
+    const cur = locations.find(l => l.id === locId)
+    if (!cur) return
+    const name = await dialog.prompt('Rename Location', 'Location name', cur.name)
+    if (!name) return
+    setViewState(vs => ({
+      ...vs,
+      locations: vs.locations.some(l => l.id === locId)
+        ? vs.locations.map(l => l.id === locId ? { ...l, name: name.trim() } : l)
+        : [...vs.locations, { ...cur, name: name.trim() }],
+    }))
+  }, [locations, dialog])
+
+  const deleteLocation = useCallback(async (locId) => {
+    if (locations.length <= 1) {
+      dialog.alert('Cannot Delete', 'You must keep at least one location.')
+      return
+    }
+    const used = programs.reduce(
+      (n, p) => n + (p.offerings || []).filter(o => o.locationId === locId).length, 0)
+    const msg = used
+      ? `Delete this location? Its ${used} offering${used === 1 ? '' : 's'} will move to the first remaining location.`
+      : 'Delete this location?'
+    if (!await dialog.confirm(msg, { title: 'Delete Location' })) return
+    const fallback = locations.find(l => l.id !== locId)?.id
+    mutate(list => list.map(p => ({
+      ...p,
+      offerings: (p.offerings || []).map(o => o.locationId === locId ? { ...o, locationId: fallback } : o),
+    })))
+    setViewState(vs => ({ ...vs, locations: vs.locations.filter(l => l.id !== locId) }))
+  }, [locations, programs, dialog, mutate])
+
   /* Colour a managed list assigns to one of its values. */
   const managedColor = useCallback((kind, v) => {
     const K = LIST_KINDS[kind]
