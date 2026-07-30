@@ -387,8 +387,9 @@ export default function ClassLists({ onNavigate }) {
                               padding: '8px 16px', fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
                               letterSpacing: '.4px', color: 'var(--ink-soft)', background: '#fafaf7',
                             }}>
-                              {offeringLabel(s.offering)}{s.offering.teacher ? ` — ${s.offering.teacher}` : ''}
-                              {s.offering.spots != null && ` (${s.rows.length}/${s.offering.spots})`}
+                              {sessionLabel(s.session)}{s.session.instructor ? ` — ${s.session.instructor}` : ''}
+                              {s.session.locationId ? ` · ${locName(s.session.locationId)}` : ''}
+                              {s.session.capacity != null && ` (${s.rows.length}/${s.session.capacity})`}
                             </div>
                             <Roster rows={s.rows} onNavigate={onNavigate} />
                           </div>
