@@ -128,7 +128,7 @@ function offeringWeeklyHours(prog) {
 }
 
 export default function Programs() {
-  const { staff, programs, setPrograms, registrations } = useStore()
+  const { staff, programs, setPrograms, records: registrations } = useStore()
   const teacherOptions = useMemo(
     () => staff.map(s => `${s.firstName} ${s.lastName}`.trim()).filter(Boolean).sort(),
     [staff],
