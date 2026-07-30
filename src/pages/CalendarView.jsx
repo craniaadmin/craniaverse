@@ -428,7 +428,7 @@ const CSS = `
 .calroot .agenda-empty{padding:16px;text-align:center;color:#9a948a;font-size:13px;}
 
 /* todo sidebar */
-.calroot .todo-list{padding:8px 12px;max-height:340px;overflow-y:auto;}
+.calroot .todo-list{max-height:340px;overflow-y:auto;flex:1;min-height:0;}
 .calroot .todo-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;font-size:12px;margin-bottom:2px;border-left:3px solid var(--dark-blue);}
 .calroot .todo-item input[type=checkbox]{width:14px;height:14px;flex:none;cursor:pointer;accent-color:var(--dark-blue);}
 .calroot .todo-item .todo-text{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
