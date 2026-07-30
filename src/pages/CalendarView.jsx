@@ -1751,8 +1751,8 @@ function TodoEditModal({ item, lists, onClose, onSave }) {
           <select value={listId} onChange={e => setListId(e.target.value)}>
             {lists.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
           </select></div>
-        <div className="row-2">
-          <div className="field"><label>Priority</label>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div className="field" style={{ flex: 1 }}><label>Priority</label>
             <select value={priority} onChange={e => setPriority(e.target.value)}>
               <option value="high">High</option>
               <option value="med">Medium</option>
