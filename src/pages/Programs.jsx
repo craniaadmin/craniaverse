@@ -25,6 +25,20 @@ const COST_UNITS = ['', '/week', '/month', '/term', '/year', '/session', '/class
 const DEFCOLS = ['active', 'number', 'code', 'year', 'name', 'subject', 'category', 'age',
   'location', 'days', 'time', 'platform', 'duration', 'lessons', 'cost', 'rate', 'hours', 'spots', 'instructor']
 
+/* The order the columns actually sit in on screen, as saved in the seed. */
+const SEED_COL_ORDER = (() => {
+  const saved = Array.isArray(SEED.colOrder) ? SEED.colOrder.filter(k => DEFCOLS.includes(k)) : []
+  return saved.concat(DEFCOLS.filter(k => !saved.includes(k)))
+})()
+const SEED_LOCATIONS = Array.isArray(SEED.locations) && SEED.locations.length
+  ? SEED.locations
+  : [{ id: 'loc_boardwalk', name: 'Boardwalk', color: '#5FA09E' },
+    { id: 'loc_waterloo', name: 'Waterloo East', color: '#A6E2F9' }]
+const SEED_CAT_COLORS = (SEED.catColors && typeof SEED.catColors === 'object') ? SEED.catColors : {}
+const SEED_SUBJ_COLORS = (SEED.subjColors && typeof SEED.subjColors === 'object') ? SEED.subjColors : {}
+const SEED_CAT_ORDER = Array.isArray(SEED.categoryOrder) ? SEED.categoryOrder : DEFCAT
+const SEED_HIDDEN_COLS = (SEED.hiddenCols && typeof SEED.hiddenCols === 'object') ? SEED.hiddenCols : {}
+
 const COLS = [
   { k: 'number', l: 'Program ID' }, { k: 'code', l: 'Program Code' }, { k: 'name', l: 'Program', gear: 'prog' },
   { k: 'active', l: 'Active' }, { k: 'subject', l: 'Subject', gear: 'cat' }, { k: 'category', l: 'Category', gear: 'cat' },
