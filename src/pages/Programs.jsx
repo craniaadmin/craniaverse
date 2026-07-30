@@ -476,21 +476,29 @@ export default function Programs() {
   const locIndex = useMemo(() => Object.fromEntries(locations.map(l => [l.id, l])), [locations])
   const locColor = useCallback(id => (locIndex[id]?.color) || '#5FA09E', [locIndex])
 
-  /* ---------- category colours: LPAL walked in category order, as the template does ---------- */
-  const catColors = useMemo(() => {
+  /* ---------- categories: the seeded order and colours, extended by anything new ---------- */
+  const categoryOrder = useMemo(() => {
     const present = [...new Set(programs.map(p => p.category).filter(Boolean))]
-    const ordered = DEFCAT.filter(c => present.includes(c))
-      .concat(present.filter(c => !DEFCAT.includes(c)).sort((a, b) => a.localeCompare(b)))
-    const out = {}
-    ordered.forEach((c, i) => { out[c] = LPAL[i % LPAL.length] })
-    return out
+    return SEED_CAT_ORDER.concat(
+      present.filter(c => !SEED_CAT_ORDER.includes(c)).sort((a, b) => a.localeCompare(b)))
   }, [programs])
+  const catColors = useMemo(() => {
+    const out = {}
+    categoryOrder.forEach(c => { out[c] = SEED_CAT_COLORS[c] || DEFAULT_CAT_COLOR })
+    return out
+  }, [categoryOrder])
   const catColor = useCallback(c => catColors[c] || DEFAULT_CAT_COLOR, [catColors])
+  const subjColor = useCallback(
+    (cat, s) => SEED_SUBJ_COLORS[(cat || '') + ' ' + (s || '')] || DEFAULT_CAT_COLOR, [])
   const catOrderIndex = useCallback(c => {
-    const keys = Object.keys(catColors)
-    const i = keys.indexOf(c)
+    const i = categoryOrder.indexOf(c)
     return i < 0 ? 999 : i
-  }, [catColors])
+  }, [categoryOrder])
+  /* Only the categories actually in use appear in the Category filter. */
+  const usedCategories = useMemo(() => {
+    const present = new Set(programs.map(p => p.category).filter(Boolean))
+    return categoryOrder.filter(c => present.has(c))
+  }, [categoryOrder, programs])
 
   /* ---------- mutation with undo history ---------- */
   const mutate = useCallback((fn) => {
