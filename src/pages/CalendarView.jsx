@@ -1972,6 +1972,7 @@ function CalSettingsPopover({ onClose }) {
           Back up before big changes, or restore to roll back.
         </div>
         <div className="sp-meta">{lastLine}</div>
+        {err && <div className="sp-err">{err}</div>}
         <div className="sp-btnrow">
           <button type="button" className="sp-btn" disabled={busy} onClick={backupNow}>
             {busy ? 'Saving…' : 'Back Up Now'}
