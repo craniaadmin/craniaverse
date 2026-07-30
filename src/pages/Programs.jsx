@@ -2590,15 +2590,14 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
                   <input type="color" value={subjColors[cat + '\u0000' + s] || DEFAULT_CAT_COLOR}
                     onChange={e => recolourSubj(cat, s, e.target.value)}
                     style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #fff', boxShadow: '0 0 0 1px #d8d3c6', padding: 0 }} />
-                  <input defaultValue={s}
+                  <input className="cnm" defaultValue={s} title="Rename Subject"
                     onBlur={e => { if (e.target.value !== s) renameSubj(cat, s, e.target.value) }}
-                    onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
-                    style={subInputStyle} />
-                  <span style={countStyle}>{countSubj(cat, s)}</span>
-                  <button type="button" style={btnStyle} onClick={() => moveSubj(cat, si, -1)} disabled={si === 0}>▲</button>
-                  <button type="button" style={btnStyle} onClick={() => moveSubj(cat, si, 1)} disabled={si === subjectsOf(cat).length - 1}>▼</button>
-                  <button type="button" className="rmtime" onClick={() => deleteSubj(cat, s)} title="Delete">×</button>
-                </div>
+                    onKeyDown={e => { e.stopPropagation(); if (e.key === 'Enter') e.currentTarget.blur() }} />
+                  <span className="cuse" title="Programs using this subject">{countSubj(cat, s)}</span>
+                  <button type="button" className="mv" onClick={() => moveSubj(cat, si, -1)} disabled={si === 0}>▲</button>
+                  <button type="button" className="mv" onClick={() => moveSubj(cat, si, 1)} disabled={si === subs.length - 1}>▼</button>
+                  <button type="button" className="del2" onClick={() => deleteSubj(cat, s)} title="Remove Subject">×</button>
+                </ManagerRow>
               ))}
             </React.Fragment>
           ))}
