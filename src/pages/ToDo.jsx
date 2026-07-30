@@ -302,16 +302,16 @@ const CSS = `
 .tdroot .td-footer{text-align:center;font-size:12px;color:#9a948a;padding:16px 0 4px;}
 
 /* checklists view */
-.tdroot .cl-wrap{max-width:820px;margin:0 auto;}
+.tdroot .cl-wrap{margin:0 auto;}
 .tdroot .clhint{font-size:13px;color:#6b6455;margin-bottom:0;line-height:1.5;flex:1;}
 .tdroot .cltoprow{display:flex;gap:12px;align-items:center;margin-bottom:16px;}
-.tdroot .clcard{background:#fff;border-radius:12px 12px 0 0;padding:14px 16px;box-shadow:var(--tshadow);margin-bottom:16px;border-left:3px solid var(--light-blue);border-right:3px solid var(--light-brown);border-bottom:3px solid var(--dark-blue);}
+.tdroot .clcard{background:#fff;border-radius:10px;padding:0 0 10px;box-shadow:var(--tshadow);margin-bottom:16px;border-left:4px solid var(--light-brown);overflow:hidden;}
 .tdroot .clcard.inactive{opacity:.55;}
-.tdroot .clhead{display:flex;gap:8px;align-items:center;margin:-14px -19px 12px;padding:10px 16px;border-radius:12px 12px 0 0;border-bottom:2px solid #cfcabb;cursor:pointer;}
-.tdroot .clhead .count{background:#fff;border-radius:20px;font-size:12px;padding:1px 9px;font-weight:700;color:var(--dark-brown);flex:none;}
+.tdroot .clhead{display:flex;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid #e8e4d8;cursor:pointer;background:#faf8f2;}
+.tdroot .clhead .count{background:#fff;border:1px solid #d5d0c4;border-radius:20px;font-size:11px;padding:1px 8px;font-weight:700;color:var(--dark-brown);flex:none;}
 .tdroot .clhead.darkhead{color:#fff;}
-.tdroot .clhead.darkhead .clname,.tdroot .clhead.darkhead .clactive,.tdroot .clhead.darkhead .clhandle,.tdroot .clhead.darkhead .clmove,.tdroot .clhead.darkhead .cldel{color:#fff;}
-.tdroot .clname{flex:1;padding:8px 10px;border:none;border-radius:8px;font:inherit;font-weight:700;font-size:15px;background:transparent;color:inherit;cursor:pointer;}
+.tdroot .clhead.darkhead .clname,.tdroot .clhead.darkhead .clactive,.tdroot .clhead.darkhead .clmove,.tdroot .clhead.darkhead .cldel{color:#fff;}
+.tdroot .clname{flex:1;padding:4px 8px;border:none;border-radius:6px;font:inherit;font-weight:700;font-size:15px;background:transparent;color:inherit;cursor:pointer;}
 .tdroot .clcustwrap,.tdroot .clmonthwrap,.tdroot .clweekwrap{font-size:12px;color:#6b6455;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-wrap:wrap;}
 .tdroot .clmonthwrap select,.tdroot .clmonthwrap input,.tdroot .clcustwrap select,.tdroot .clcustwrap input,.tdroot .clweekwrap select{padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;font-size:12px;}
 .tdroot .clcustom{width:52px;padding:6px;border:1px solid #d5d0c4;border-radius:6px;font:inherit;}
