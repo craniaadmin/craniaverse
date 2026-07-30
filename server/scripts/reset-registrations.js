@@ -95,7 +95,9 @@ function makeStudent({ id, first, last, gender, dob, age, grade, programs }) {
     },
     programs: programs.map(p => ({
       active: true, status: 'Active', year: '26_27',
-      program: p.name, rate: `$${p.cost}`, rateUnit: p.costUnit || '/term',
+      /* Take the catalogue's own unit — these programs carry a flat cost with
+         no unit, and inventing one would misstate the fee. */
+      program: p.name, rate: `$${p.cost}`, rateUnit: p.costUnit || '',
       fees: freshFees(), payment: 'Pending',
     })),
     cashLog: [],
