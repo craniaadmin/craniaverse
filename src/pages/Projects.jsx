@@ -673,6 +673,33 @@ export default function Projects() {
         </div>
       )}
 
+      {cardCtx && (() => {
+        const card = state.cards.find(c => c.id === cardCtx.id)
+        if (!card) return null
+        const close = () => setCardCtx(null)
+        const items = [
+          { label: 'Edit', on: () => openEdit(card) },
+          { label: 'Duplicate', on: () => duplicate(card.id) },
+          { label: 'Archive', on: () => archiveCard(card.id) },
+          { label: 'Delete', danger: true, on: () => remove(card.id) },
+        ]
+        return (
+          <>
+            <div style={{ position: 'fixed', inset: 0, zIndex: 299 }}
+              onClick={close} onContextMenu={e => { e.preventDefault(); close() }} />
+            <div className="pj-ctx" style={{
+              left: Math.min(cardCtx.x, window.innerWidth - 160),
+              top: Math.min(cardCtx.y, window.innerHeight - 170),
+            }}>
+              {items.map(it => (
+                <button key={it.label} type="button" className={it.danger ? 'danger' : undefined}
+                  onClick={() => { close(); it.on() }}>{it.label}</button>
+              ))}
+            </div>
+          </>
+        )
+      })()}
+
       <div className="pj-footer">
         <span>CraniaVerse · Projects</span>
         {' · '}
