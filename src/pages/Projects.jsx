@@ -942,7 +942,8 @@ function CardModal({ mode, initial, col, onClose, onSave, onDelete }) {
 }
 
 // ---------- Project settings popover ----------
-const ProjectSettingsPopover = forwardRef(function ProjectSettingsPopover({ onClose, state, setState }, ref) {
+const ProjectSettingsPopover = forwardRef(function ProjectSettingsPopover(
+  { onClose, state, setState, mutate, onResetNow, onClearGoalsNow }, ref) {
   const [backups, setBackups] = useState(null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
