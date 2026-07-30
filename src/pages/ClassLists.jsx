@@ -14,7 +14,17 @@ import { useStore } from '../data/store'
 
 const norm = (s) => String(s || '').trim().toUpperCase()
 
-// "16:30:00" -> "4:30 pm"
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const DOW_ORD = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 }
+const LOCATIONS = { loc_boardwalk: 'Boardwalk', loc_waterloo: 'Waterloo East' }
+const locName = (id) => LOCATIONS[id] || String(id || '').replace(/^loc_/, '').replace(/_/g, ' ')
+
+/* Category running order, matching the Programs page. Anything new sorts
+   alphabetically after these. */
+const CATEGORY_ORDER = ['ENRICHMENT', 'FLEX', 'TEKNOKIDS ROBOTICS', 'TEKNOKIDS CODING',
+  'PRIVATE LESSONS', 'PRIVATE PIANO LESSONS', 'CONTESTS', 'SUMMER CAMP', 'CLUBS']
+
+// "16:30" -> "4:30 pm"
 function fmtTime(t) {
   if (!t) return ''
   const m = String(t).match(/^(\d{1,2}):(\d{2})/)
@@ -27,20 +37,43 @@ function fmtTime(t) {
   return `${h}:${min} ${ampm}`
 }
 
-function offeringLabel(o) {
-  return [o.day, fmtTime(o.start)].filter(Boolean).join(' ') || 'Unscheduled'
+/* An offering covers several days and several times at one location, so it is
+   not itself a class session. Flatten it the way the Programs page does — one
+   session per day × time — or every roster lumps together. */
+function sessionsOf(program) {
+  const out = []
+  for (const o of (program.offerings || [])) {
+    const days = (o.days || []).length ? [...o.days].sort((a, b) => DOW_ORD[a] - DOW_ORD[b]) : [null]
+    const times = (o.times || []).length ? o.times : [null]
+    for (const day of days) {
+      for (const t of times) {
+        out.push({
+          key: `${o.id}|${day}|${t ? t.start : ''}`,
+          day, start: t ? t.start : '', end: t ? t.end : '',
+          locationId: o.locationId, instructor: o.instructor || '',
+          capacity: o.capacity == null || o.capacity === '' ? null : Number(o.capacity),
+        })
+      }
+    }
+  }
+  return out
+}
+
+function sessionLabel(s) {
+  const day = s.day == null ? '' : DOW[s.day]
+  return [day, fmtTime(s.start)].filter(Boolean).join(' ') || 'Unscheduled'
 }
 
 // Best-effort match of a student's free-text schedule ("Mon 4:30 pm")
-// to one of the program's offerings, so rosters split by actual class
+// to one of the program's sessions, so rosters split by actual class
 // session rather than lumping every enrollee together.
-function matchOffering(scheduleText, offerings) {
+function matchSession(scheduleText, sessions) {
   const s = String(scheduleText || '').toLowerCase()
-  if (!s || !offerings || offerings.length === 0) return null
-  return offerings.find((o) => {
-    if (!o.day) return false
-    const day = s.includes(o.day.toLowerCase())
-    const time = o.start ? s.includes(fmtTime(o.start).toLowerCase()) : true
+  if (!s || !sessions || sessions.length === 0) return null
+  return sessions.find((sess) => {
+    if (sess.day == null) return false
+    const day = s.includes(DOW[sess.day].toLowerCase())
+    const time = sess.start ? s.includes(fmtTime(sess.start).toLowerCase()) : true
     return day && time
   }) || null
 }
