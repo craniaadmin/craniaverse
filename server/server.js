@@ -1032,6 +1032,7 @@ app.put('/api/projects', wrap(async (req, res) => {
     colOrder:         Array.isArray(body.colOrder) && body.colOrder.length
                         ? body.colOrder
                         : ['notes', 'goals', 'daily', 'todo', 'doing', 'done'],
+    hiddenCols:       body.hiddenCols && typeof body.hiddenCols === 'object' ? body.hiddenCols : {},
   }
   await saveProjects(payload)
   res.json({ ok: true })
