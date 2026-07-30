@@ -6,7 +6,7 @@
 // context menus, sidebar (upcoming + to-do), recurring event
 // scope editing, CSV export, and more.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Edit2, Trash2, Copy, Calendar, List } from 'lucide-react'
+import { Edit2, Trash2, Copy, Calendar, List, Palette } from 'lucide-react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
