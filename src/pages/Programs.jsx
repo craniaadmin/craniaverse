@@ -1382,6 +1382,60 @@ function ProgramsPage() {
     mutate(list => list.filter(x => x.id !== progId))
   }
 
+  /* Saving the entry editor. An existing entry is split out of its program
+     first, so changing this session's day or time leaves its siblings alone. */
+  const saveEntry = (form) => {
+    if (!String(form.name || '').trim()) { dialog.alert('Missing Name', 'Please enter a program name.'); return }
+    const ctx = editing.ctx
+    mutate(list => {
+      const fields = {
+        number: form.number, code: form.code || autoCode(form.name),
+        name: String(form.name).trim(), subject: form.subject, category: form.category,
+        year: form.year, gradeFrom: form.gradeFrom, gradeTo: form.gradeTo,
+        ageRange: (form.gradeFrom && form.gradeTo) ? `${form.gradeFrom}–${form.gradeTo}`
+          : (form.gradeFrom || form.gradeTo || form.ageRange || ''),
+        platform: form.platform, description: form.description, active: form.active !== false,
+        duration: form.duration === '' ? '' : Number(form.duration),
+        sessions: form.sessions, period: form.period,
+        cost: form.cost === '' || form.cost == null ? null : Number(form.cost),
+        costUnit: form.costUnit,
+        rate: form.rate === '' || form.rate == null ? null : Number(form.rate),
+        totalHours: computeTotalHours(form.duration, form.sessions, form.period),
+      }
+      const offFields = {
+        locationId: form.locationId,
+        capacity: form.capacity === '' || form.capacity == null ? null : Number(form.capacity),
+        enrolled: form.enrolled,
+        instructor: form.instructor,
+      }
+      const times = (form.start || form.end) ? [{ start: form.start || '', end: form.end || '' }] : []
+      const days = form.day === '' || form.day == null ? [] : [Number(form.day)]
+
+      let next
+      if (editing.mode === 'new') {
+        next = [{
+          ...fields, id: pid(),
+          offerings: [{ id: oid(), ...offFields, days, times }],
+        }, ...list]
+      } else {
+        const iso = isolateEntryList(list, ctx.progId, ctx.offId, ctx.day, ctx.slotIndex)
+        next = iso.list.map(p => {
+          if (p.id !== iso.progId) return p
+          const offs = (p.offerings || [])
+          const target = offs.find(o => o.id === iso.offId) || offs[0]
+          return {
+            ...p, ...fields,
+            offerings: target
+              ? offs.map(o => o === target ? { ...o, ...offFields, days, times } : o)
+              : [{ id: oid(), ...offFields, days, times }],
+          }
+        })
+      }
+      return genProgramIds(next, categoryOrder, subjOrder, locations)
+    })
+    setEditing(null)
+  }
+
   /* inline cell commit */
   const commitCell = (r, k, raw) => {
     const spec = CELL_EDIT[k]
