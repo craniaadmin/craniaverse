@@ -445,6 +445,38 @@ export async function restoreTodoBackup(backupId) {
   return row.payload
 }
 
+// ---- checklist backups (timestamped snapshots, last 14 kept) --------
+const MAX_CHECKLIST_BACKUPS = 14
+
+export async function listChecklistBackups() {
+  await ensureAuth()
+  const rows = await pb().collection('checklist_backups').getFullList()
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  return rows.map(r => ({ id: r.id, label: r.label || '', created: r.created }))
+}
+
+export async function createChecklistBackup(label) {
+  await ensureAuth()
+  const todo = await loadTodo()
+  const payload = { checklists: todo.checklists || [] }
+  await pb().collection('checklist_backups').create({ label: label || '', payload })
+  const all = await pb().collection('checklist_backups').getFullList()
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  for (const old of all.slice(MAX_CHECKLIST_BACKUPS)) {
+    await pb().collection('checklist_backups').delete(old.id)
+  }
+}
+
+export async function restoreChecklistBackup(backupId) {
+  await ensureAuth()
+  const row = await pb().collection('checklist_backups').getOne(backupId)
+  if (!row?.payload) throw new Error('Backup not found or empty')
+  const todo = await loadTodo()
+  const merged = { ...todo, checklists: row.payload.checklists || [] }
+  await saveTodo(merged)
+  return merged
+}
+
 // ---- projects (kanban board — singleton payload) --------
 // Schema mirrors the "crania-projects.json" file the client's
 // v20 kanban mockup writes to disk, so exports/imports round-trip.
