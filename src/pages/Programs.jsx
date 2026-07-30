@@ -665,7 +665,7 @@ function ProgramModal({ mode, initial, teacherOptions, registrations, onClose, o
       const payload = r.payload || r
       const progs = payload.programs || payload.enrolledPrograms || []
       return progs.some(pg => {
-        const name = typeof pg === 'string' ? pg : (pg.name || pg.title || '')
+        const name = typeof pg === 'string' ? pg : (pg.program || pg.name || pg.title || '')
         return name.toLowerCase().includes(form.title.toLowerCase())
       })
     }).map(r => {
