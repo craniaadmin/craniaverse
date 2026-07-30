@@ -861,6 +861,9 @@ function ProgramsPage() {
       catColors: raw.catColors && typeof raw.catColors === 'object' ? raw.catColors : defaultViewState.catColors,
       subjColors: raw.subjColors && typeof raw.subjColors === 'object' ? raw.subjColors : defaultViewState.subjColors,
     }
+    merged.vocab = (raw.vocab && typeof raw.vocab === 'object' && !Array.isArray(raw.vocab))
+      ? { ...defaultViewState.vocab, ...raw.vocab }
+      : defaultViewState.vocab
     LIST_STATE_KEYS.forEach(k => {
       merged[k] = (raw[k] && typeof raw[k] === 'object' && !Array.isArray(raw[k])) ? raw[k] : defaultViewState[k]
     })
