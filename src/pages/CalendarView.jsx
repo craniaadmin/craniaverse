@@ -320,16 +320,26 @@ function useCalendar(apiPath) {
 
   const mutate = useCallback((mut) => {
     setData(prev => {
-      recordHistory(prev)
+      /* Push the state we are leaving. The old code asked recordHistory to
+         compare `prev` against histBase, but histBase was set to the new state
+         at the end of every mutate — so the two were always equal and nothing
+         was ever pushed. Undo and Redo sat permanently disabled. */
+      const prevSnap = JSON.stringify(prev)
       const next = { calendars: [...prev.calendars], events: [...prev.events], hidden: { ...prev.hidden } }
       mut(next)
       const snap = JSON.stringify(next)
+      if (snap !== prevSnap) {
+        undoStack.current.push(prevSnap)
+        if (undoStack.current.length > 100) undoStack.current.shift()
+        redoStack.current = []
+        setRedoLen(0)
+      }
       histBase.current = snap
       setUndoLen(undoStack.current.length)
       persist(next)
       return next
     })
-  }, [apiPath, recordHistory, persist])
+  }, [persist])
 
   const undo = useCallback(() => {
     if (!undoStack.current.length) return
