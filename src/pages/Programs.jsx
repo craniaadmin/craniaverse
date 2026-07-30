@@ -1136,7 +1136,7 @@ function ProgramsPage() {
     },
   })
   const saveProgram = (form) => {
-    if (!String(form.name || '').trim()) { window.alert('Please enter a program name.'); return }
+    if (!String(form.name || '').trim()) { dialog.alert('Missing Name', 'Please enter a program name.'); return }
     mutate(list => {
       const next = {
         ...form,
