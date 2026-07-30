@@ -696,6 +696,14 @@ const CSS = `
     line-height:1;padding:0 6px;cursor:pointer;font-family:inherit;flex:none}
 .pgmodal .catrow .del2:hover:not(:disabled){color:#C0392B}
 .pgmodal .catrow .del2:disabled{opacity:.3;cursor:default}
+.ctxmenu{position:fixed;z-index:301;background:#fff;border:1px solid #E7EBE7;border-radius:10px;
+    box-shadow:0 8px 24px rgba(46,37,22,.2);overflow:hidden;min-width:170px;color:#2E2516;
+    font-family:inherit}
+.ctxmenu div{padding:9px 15px;font-size:13px;cursor:pointer;font-weight:600}
+.ctxmenu div:hover{background:#f1f5f4}
+.ctxmenu div.del{color:#C0392B}
+.ctxmenu .sep{height:1px;background:#E7EBE7;padding:0;margin:2px 0;cursor:default}
+.ctxmenu .sep:hover{background:#E7EBE7}
 .cpop{position:fixed;z-index:301;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
     box-shadow:0 8px 24px rgba(46,37,22,.22);padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:172px}
 .cpop .sw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid #fff;
