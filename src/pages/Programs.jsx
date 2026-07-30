@@ -1335,12 +1335,15 @@ function ProgramsPage() {
     if (p) setEditing({ mode: 'edit', ctx: ctxOf(r), program: deep(p) })
   }
   const addProgram = () => setEditing({
-    mode: 'new',
+    mode: 'new', ctx: null,
     program: {
-      id: 'p_' + uid(), number: '', code: '', name: '', subject: '', category: '', ageRange: '',
+      id: pid(), number: '', code: '', name: '', subject: '', category: '', ageRange: '',
       duration: 55, sessions: '1', period: '/week', rate: null, totalHours: null, description: '',
       year: '', gradeFrom: '', gradeTo: '', platform: 'In-Person', cost: null, costUnit: '', active: true,
-      offerings: [{ id: 's' + uid(), locationId: locations[0]?.id || 'loc_boardwalk', days: [], times: [], capacity: null, enrolled: '', instructor: '' }],
+      offerings: [{
+        id: oid(), locationId: locations[0]?.id || 'loc_boardwalk',
+        days: [], times: [], capacity: null, enrolled: '', instructor: '',
+      }],
     },
   })
   const saveProgram = (form) => {
