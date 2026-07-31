@@ -1118,9 +1118,11 @@ function EditModal({ row, onClose, onSave, onDelete }) {
           </div>
         </div>
         <div className="macts">
-          <button className="btn-del" onClick={onDelete}>{row.fromProgram ? 'Hide Row' : 'Delete'}</button>
+          {!row.isNew && (
+            <button className="btn-del" onClick={onDelete}>{row.fromProgram ? 'Hide Row' : 'Delete'}</button>
+          )}
           <button className="cancel" onClick={onClose}>Cancel</button>
-          <button onClick={() => onSave(f)}>Save</button>
+          <button onClick={() => onSave(f)}>{row.isNew ? 'Add' : 'Save'}</button>
         </div>
       </div>
     </div>
