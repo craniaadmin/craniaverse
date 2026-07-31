@@ -1325,7 +1325,9 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
       const rows = document.querySelectorAll('.pg tbody tr[data-prog]')
       for (const el of rows) {
         if (el.dataset.prog === focusProg) {
-          el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+          // Instant, not smooth: the table runs to a few hundred rows and a
+          // smooth scroll across it is slow enough to look broken.
+          el.scrollIntoView({ block: 'center', behavior: 'auto' })
           break
         }
       }
