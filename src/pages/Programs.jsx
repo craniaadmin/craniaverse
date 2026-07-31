@@ -1802,8 +1802,10 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
     }
     const isSel = selected.has(key)
     bodyRows.push(
-      <tr key={key} className={[isSel ? 'sel' : '', r.active ? '' : (deadRun[ri] ? 'rdead' : 'rinactive')]
-        .filter(Boolean).join(' ')}
+      <tr key={key} data-prog={r.progId}
+        className={[isSel ? 'sel' : '', r.active ? '' : (deadRun[ri] ? 'rdead' : 'rinactive'),
+          focusProg && String(r.progId) === focusProg ? 'rfocus' : '']
+          .filter(Boolean).join(' ')}
         title="Click a cell to edit it; ✎ opens the full box"
         onDoubleClick={() => openEdit(r)}
         onContextMenu={e => {
