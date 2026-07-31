@@ -502,7 +502,7 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
                   fontSize: 11, fontWeight: 700, letterSpacing: '.3px', textTransform: 'uppercase',
                 }}>{entry.status || 'Active'}</span>
               </td>
-              <td style={{ padding: '6px 12px', textAlign: 'center' }}>
+              <td style={{ padding: '6px 4px', textAlign: 'center' }}>
                 <button
                   onClick={() => onNavigate && onNavigate('Students')}
                   title="View in Students"
