@@ -50,7 +50,8 @@ const ROUTES = {
   'home:Checklists':         (nav) => <ToDo initialView="checklists" onNavigate={nav} />,
   'home:Projects':           () => <Projects />,
 
-  'programs:Programs':       () => <Programs />,
+  'programs:Programs':       (nav, recId, clearRecId) =>
+    <Programs initialProgramId={recId} onConsumeInitialProgram={clearRecId} />,
   'programs:Class Lists':    (nav) => <ClassLists onNavigate={nav} />,
   'programs:Contests':       (nav) => <Contests onNavigate={nav} />,
 
