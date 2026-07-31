@@ -39,14 +39,16 @@ const COLS = [
 ]
 const LOCKED_COL = 'contest'
 
-/* Proportions, not fixed pixels, so the columns share out whatever the card
-   gives them. They deliberately fall short of 100% — the checkbox and action
-   columns take their pixels first, and a fixed layout hands the remainder
-   back in these ratios, so hiding a column widens the others instead of
+/* Text columns take proportions so they share out whatever the card gives
+   them; Ordered and Status take pixels because their contents don't scale —
+   a percentage Status clips the "CANCELLED" pill as soon as the window
+   narrows. The proportions are sized against the 720px min-width so nothing
+   overflows there; above it a fixed layout hands the slack back in these
+   same ratios, which is also why hiding a column widens the rest instead of
    leaving a gap. */
 const COL_W = {
-  org: '17%', contest: '25%', regDeadline: '16%',
-  contestDate: '16%', numOrdered: '9%', status: '13%',
+  org: '13%', contest: '20%', regDeadline: '13%',
+  contestDate: '12%', numOrdered: 74, status: 118,
 }
 
 /* Computed per call rather than once at module load — a tab left open
@@ -761,7 +763,7 @@ function ContestsPage({ onNavigate }) {
     if (prevOrg !== null && prevOrg !== orgKey) {
       bodyRows.push(
         <tr className="grpsep" key={'sep-' + r.id}>
-          <td className="nosep" /><td colSpan={orderedCols.length + 2} />
+          <td className="nosep" /><td colSpan={orderedCols.length + 1} />
         </tr>
       )
     }
@@ -852,7 +854,6 @@ function ContestsPage({ onNavigate }) {
           <button className="rowbtn rb-del" title={r.fromProgram ? 'Hide this program row' : 'Delete row'}
             onClick={() => removeRow(r)}><Trash2 size={12} /></button>
         </td>
-        <td className="filler" />
       </tr>
     )
   })
@@ -966,7 +967,6 @@ function ContestsPage({ onNavigate }) {
                   </th>
                 ))}
                 <th className="blankhead" />
-                <th className="filler" />
               </tr>
             </thead>
             <tbody>{bodyRows}</tbody>
