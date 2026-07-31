@@ -939,6 +939,11 @@ function ContestsPage({ onNavigate }) {
           </div>
         ) : (
           <table>
+            <colgroup>
+              <col style={{ width: 30 }} />
+              {orderedCols.map(c => <col key={c.k} style={{ width: COL_W[c.k] }} />)}
+              <col style={{ width: 74 }} />
+            </colgroup>
             <thead>
               <tr>
                 <th className="selcol">
