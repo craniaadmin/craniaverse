@@ -1,173 +1,752 @@
-﻿import { useState, useEffect, useRef } from 'react'
+// Customers — a list of families and a per-student detail view.
+//
+// The layout follows the Programs page: scoped CSS block, an actions
+// toolbar, accent-barred metric tiles, a filters row, and a pill-cell
+// table with sortable, reorderable, hideable columns. The dialog host
+// and popover styling are duplicated rather than shared with Programs —
+// its `.pgov`/`.pgmodal` rules only exist while that page is mounted.
+//
+// The list gives each student its own row and blanks the guardian cells
+// on repeats, the way Programs blanks repeated values within a program.
+// The old layout stacked siblings inside one tall cell and lined them up
+// with a hard-coded 28px line-height, which came apart the moment a
+// guardian name was long enough to wrap.
+//
+// Column layout lives in localStorage, not on the server: there is no
+// per-page state collection for this page the way `programs_state` backs
+// Programs, and adding one is a migration on maya-pc for a preference
+// that is per-browser anyway.
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ChevronLeft, Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
+
+const API_BASE = import.meta.env?.VITE_API_URL || ''
+const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
+
+/* Shared with Contests and Class Lists. The page used to carry its own
+   greens and yellows, which read as a different product. */
+const STATUS_STYLE = {
+  Active:       { bg: '#dff5e0', fg: '#2b7a2e' },
+  'Late Start': { bg: '#fff4d6', fg: '#8a6a00' },
+  'On-Hold':    { bg: '#eef1f4', fg: '#6B6455' },
+  Completed:    { bg: '#e4f2fb', fg: '#1c6ea4' },
+  Cancelled:    { bg: '#fde0e0', fg: '#a12626' },
+  Inactive:     { bg: '#eef1f4', fg: '#6B6455' },
+}
+const statusStyle = (s) => STATUS_STYLE[s] || STATUS_STYLE.Inactive
+
+const COLS = [
+  { k: 'g1',      l: 'Guardian 1' },
+  { k: 'g2',      l: 'Guardian 2' },
+  { k: 'student', l: 'Student' },   // never hideable — it names the row
+  { k: 'grade',   l: 'Grade' },
+  { k: 'classes', l: 'Classes' },
+]
+const LOCKED_COL = 'student'
+
+/* Proportions rather than pixels, and they sum to 100 — a fixed layout
+   hands leftover space to any pixel column, which starves the text ones
+   on a wide screen. Sized so nothing is squeezed at the 820px min-width. */
+const SEL_W = '3%'
+const ACT_W = '7%'
+const COL_W = { g1: '20%', g2: '18%', student: '19%', grade: '7%', classes: '26%' }
+
+const CPREF_KEY = 'customers-cols'
+function loadColPrefs() {
+  try {
+    const v = JSON.parse(localStorage.getItem(CPREF_KEY) || '{}')
+    return {
+      hiddenCols: v.hiddenCols && typeof v.hiddenCols === 'object' ? v.hiddenCols : {},
+      colOrder: Array.isArray(v.colOrder) ? v.colOrder : [],
+    }
+  } catch { return { hiddenCols: {}, colOrder: [] } }
+}
+function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ } }
+
+/* A record with no guardian name and no email has no family identity yet
+   (a just-added blank student), so it stands on its own keyed by its id
+   rather than collapsing with every other guardian-less record into one
+   fake family. */
+function guardianIdentity(r) {
+  const g1 = r.customer?.guardian1 || {}
+  return `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
+}
+const personName = (p) => p ? `${p['First Name'] || ''} ${p['Last Name'] || ''}`.trim() : ''
+
+function classesOf(record) {
+  const seen = new Set()
+  const out = []
+  for (const p of (record.programs || [])) {
+    if (!p.program || seen.has(p.program)) continue
+    seen.add(p.program)
+    out.push(p.program)
+  }
+  return out
+}
+
+const CSS = `
+.cu{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
+    --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
+    --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
+.cu .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.cu .actions button{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:6px 12px;
+    font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:5px}
+.cu .actions button:hover:not(:disabled){background:#f4f2ea}
+.cu .actions button:disabled{opacity:.4;cursor:default}
+.cu .actions button.danger{color:var(--danger);border-color:#eecfca}
+.cu .actions button.danger:hover{background:#fdf3f1}
+
+.cu .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:14px}
+.cu .metric{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);
+    border-bottom:3px solid var(--teal);cursor:default}
+.cu .metric.clickable{cursor:pointer}
+.cu .metric.clickable:hover{outline:2px solid var(--light-blue);outline-offset:1px}
+.cu .metric.on{outline:2px solid var(--teal);outline-offset:1px}
+.cu .metric.mstu{border-bottom-color:var(--yellow)}
+.cu .metric.menr{border-bottom-color:var(--light-blue)}
+.cu .metric.mnone{border-bottom-color:#c0392b}
+.cu .metric .label{font-size:12.5px;color:#6b6455;font-weight:600;margin-bottom:4px}
+.cu .metric .value{font-size:24px;font-weight:700;color:var(--dark-brown);font-variant-numeric:tabular-nums}
+.cu .metric .hint{font-size:11.5px;color:#9a948a;margin-top:3px}
+
+.cu .filters{display:flex;align-items:center;gap:8px;padding:8px 0 14px;flex-wrap:wrap}
+.cu .filters input[type=search],.cu .filters select{padding:7px 12px;border:1px solid var(--field);
+    border-radius:8px;font-size:13px;color:var(--dark-brown);background:#fff;font-family:inherit}
+.cu .filters input[type=search]:focus,.cu .filters select:focus{outline:none;border-color:var(--teal)}
+.cu .filters input[type=search]{width:240px}
+/* Scoped to this input. The old rule was a bare input::placeholder in a
+   page-level <style>, which turned every placeholder on the page white. */
+.cu .filters input[type=search]::placeholder{color:var(--faint)}
+.cu .filters .addbtn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;
+    background:var(--light-blue);color:var(--dark-brown);cursor:pointer;font-family:inherit;margin-left:auto;
+    display:inline-flex;align-items:center;gap:5px}
+.cu .filters .addbtn:hover{filter:brightness(1.08)}
+.cu .clearf{background:#fff;border:1px solid var(--field);border-radius:8px;padding:8px 12px;
+    font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;font-family:inherit}
+.cu .clearf:hover{background:#f1f5f4}
+
+.cu .bulkbar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#eef7f6;
+    border:1px solid var(--line);border-radius:10px;margin-bottom:12px}
+.cu .bulkbar .n{font-weight:700;font-size:13px;margin-right:14px}
+.cu .bulkbar button{border:none;border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;
+    cursor:pointer;font-family:inherit}
+.cu .bulkbar .del{background:#c0392b;color:#fff}
+.cu .bulkbar .clr{background:transparent;border:1px solid var(--field);color:var(--muted)}
+.cu .bulkbar .acts{display:inline-flex;align-items:center;gap:8px}
+
+.cu .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
+    border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
+    border-bottom:3px solid var(--teal);overflow-x:auto}
+.cu table{width:100%;min-width:820px;table-layout:fixed;border-collapse:separate;
+    border-spacing:5px 5px;background:#fff}
+.cu thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
+    user-select:none;border-radius:6px;position:relative}
+.cu thead th.colh .lbl{display:block;text-align:center;padding:0 30px}
+.cu thead th.selcol,.cu thead th:empty,.cu thead th.blankhead,
+.cu tbody td.selcol,.cu tbody td.actcell{background:transparent}
+.cu thead th.selcol input,.cu tbody td.selcol input{width:12px;height:12px;margin:0;
+    accent-color:var(--teal);vertical-align:middle;cursor:pointer}
+.cu tbody td.actcell{white-space:nowrap;text-align:center}
+.cu .selcol{text-align:center}
+.cu thead th .arw{opacity:.85;font-size:10px}
+.cu thead th.colh{cursor:grab}
+.cu thead th.colh .thicons{position:absolute;right:3px;top:50%;transform:translateY(-50%);
+    display:inline-flex;align-items:center;gap:2px;line-height:1}
+.cu thead th.colh .eye{cursor:pointer;opacity:0;font-size:11px;transition:opacity .12s}
+.cu thead th.colh:hover .eye{opacity:1}
+.cu thead th .sortable{cursor:pointer}
+
+.cu tbody td{padding:0 7px;background:var(--pill);border-radius:5px;font-size:12px;font-weight:400;
+    vertical-align:middle;white-space:nowrap;line-height:1.35;height:22px;overflow:hidden;text-overflow:ellipsis}
+.cu tbody td.rep{background:transparent !important}
+.cu tbody tr.grpsep td{background:transparent;height:1px;padding:0;border-radius:0;
+    border-top:1px solid #CFD6D8}
+.cu tbody tr.grpsep td.nosep{border-top:none}
+.cu tbody tr{cursor:pointer}
+.cu tbody tr:hover td{background:#E4EFF3}
+.cu tbody tr.sel td{background:#DCEEEC}
+.cu td.col-grade{text-align:center}
+.cu .sname{font-weight:700;color:#3d7f7d}
+.cu button.clink{background:none;border:none;padding:0;margin:0;font:inherit;font-size:12px;
+    color:#3d7f7d;cursor:pointer;text-align:left}
+.cu button.clink:hover{text-decoration:underline}
+.cu .dash{color:var(--faint)}
+.cu .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;margin:0;line-height:1;
+    cursor:pointer;transition:color .15s;display:inline-flex;vertical-align:middle}
+.cu .rowbtn.rb-add:hover{color:var(--teal)}
+.cu .rowbtn.rb-del:hover{color:#c0392b}
+.cu .empty{text-align:center;color:var(--muted);padding:60px 20px}
+.cu .empty b{color:var(--dark-brown)}
+.cu .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
+
+/* ---- detail view ---- */
+.cu .back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;
+    color:var(--teal);font-weight:700;font-size:13.5px;margin-bottom:10px;padding:0;font-family:inherit}
+.cu .back:hover{text-decoration:underline}
+.cu .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px}
+.cu .sec-h{font-size:13px;font-weight:700;color:var(--teal);margin:0 0 12px;padding-bottom:7px;
+    border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.4px}
+.cu .frow{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center;margin-bottom:8px}
+.cu .frow label{text-align:right;font-size:12px;font-weight:600;color:var(--muted);line-height:1.2}
+.cu .frow input,.cu .frow .ro{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--field);
+    border-radius:8px;font:inherit;font-size:13px;background:#fff;color:var(--dark-brown)}
+.cu .frow input:focus{outline:none;border-color:var(--teal)}
+.cu .frow .ro{background:var(--pill);color:var(--muted)}
+.cu .frow input.warn{background:#fffbf0;border-color:#f4d67a}
+.cu .frow input.bad{background:#fde0e0;border-color:#e8b4b4;color:#a12626;font-weight:600}
+.cu .sibs{margin-bottom:12px}
+.cu .sib{cursor:pointer;font-size:13px;font-weight:600;color:var(--teal);padding:5px 9px;
+    border-radius:7px;margin-bottom:3px;background:transparent}
+.cu .sib:hover{background:#f1f5f4}
+.cu .sib.on{background:#DCEEEC;color:var(--dark-brown);font-weight:700}
+.cu .addsib{background:transparent;border:1px dashed var(--teal);color:var(--teal);border-radius:8px;
+    padding:6px 11px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:5px;margin-top:4px}
+.cu .progh{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:26px 0 10px;
+    padding-bottom:7px;border-bottom:1px solid var(--line)}
+.cu .progh .t{font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px}
+.cu .progh label{font-size:12.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:7px;cursor:pointer}
+.cu .progh label input{accent-color:var(--teal);cursor:pointer}
+.cu .ptable{width:100%;border-collapse:separate;border-spacing:5px 5px;background:#fff}
+.cu .ptable thead th{background:var(--teal);color:#fff;font-size:10.5px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.3px;padding:6px 8px;border-radius:6px;white-space:nowrap}
+.cu .ptable tbody td{background:var(--pill);border-radius:5px;font-size:12px;padding:5px 8px;
+    text-align:center;vertical-align:middle;white-space:nowrap}
+.cu .ptable tbody tr:hover td{background:#E4EFF3}
+.cu .ptable .pname{font-weight:600;text-transform:uppercase;text-align:left}
+.cu .pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:700;
+    letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.cu .feelab{font-size:9px;color:#fff;font-weight:700;width:16px;display:inline-block;text-align:center}
+
+.cupop{position:fixed;z-index:220;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
+    box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;
+    overflow:auto;color:#2E2516;font-family:inherit}
+.cupop .h{font-size:12px;color:#6B6455;font-weight:700;margin:2px 2px 7px}
+.cupop .ch{display:flex;align-items:center;gap:9px;padding:5px 3px;font-size:13px;font-weight:600;cursor:pointer}
+.cupop .ch:hover{background:#f4f2ea;border-radius:6px}
+.cupop .ch input{margin:0;accent-color:#5FA09E}
+.cupop .ch.locked{opacity:.5;cursor:default}
+.cupop .allrow{border-top:1px solid #EDEAE2;margin-top:4px;padding-top:4px;display:flex;gap:4px;
+    position:sticky;bottom:0;background:#fff}
+.cupop .allrow button{background:none;border:none;color:#5FA09E;font-weight:700;font-size:12.5px;
+    text-align:center;padding:6px 8px;border-radius:6px;flex:1;cursor:pointer;font-family:inherit}
+.cupop .allrow button:hover{background:#f4f2ea}
+
+.cumenu{position:fixed;z-index:301;background:#fff;border:1px solid #E7EBE7;border-radius:10px;
+    box-shadow:0 8px 24px rgba(46,37,22,.2);overflow:hidden;min-width:190px;color:#2E2516;font-family:inherit}
+.cumenu div{padding:9px 15px;font-size:13px;cursor:pointer;font-weight:600}
+.cumenu div:hover{background:#f1f5f4}
+.cumenu div.del{color:#C0392B}
+.cumenu .sep{height:1px;background:#E7EBE7;padding:0;margin:2px 0;cursor:default}
+.cumenu .sep:hover{background:#E7EBE7}
+
+.cuov{position:fixed;inset:0;background:rgba(46,37,22,.45);display:flex;align-items:center;
+    justify-content:center;z-index:400;overflow:auto;padding:40px 16px}
+.cumodal{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.3);width:100%;
+    max-width:420px;margin:auto;padding:22px;color:#2E2516;font-family:inherit}
+.cumodal h2{font-size:18px;margin:0 0 14px;color:#2E2516}
+.cumodal .msg{font-size:13.5px;line-height:1.5;margin-bottom:18px}
+.cumodal .macts{display:flex;gap:10px;justify-content:flex-end}
+.cumodal .macts button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;
+    background:#5FA09E;color:#fff;font-weight:600}
+.cumodal .macts button:hover{filter:brightness(1.06)}
+.cumodal .macts button.cancel{background:#eee;color:#2E2516}
+`
+
+/* ================= in-app dialogs ================= */
+const DialogContext = React.createContext(null)
+function useDialog() {
+  const ctx = React.useContext(DialogContext)
+  if (!ctx) throw new Error('useDialog must be used inside <DialogHost>')
+  return ctx
+}
+
+function DialogHost({ children }) {
+  const [dlg, setDlg] = useState(null)
+  const resolver = useRef(null)
+
+  const finish = useCallback((value) => {
+    setDlg(null)
+    const r = resolver.current
+    resolver.current = null
+    if (r) r(value)
+  }, [])
+
+  const api = useMemo(() => ({
+    confirm: (message, opts = {}) => new Promise(res => {
+      resolver.current = res
+      setDlg({
+        type: 'confirm', message,
+        title: opts.title || 'Delete',
+        button: opts.button || 'Delete',
+        danger: opts.danger !== false,
+      })
+    }),
+    alert: (title, message) => new Promise(res => {
+      resolver.current = res
+      setDlg({ type: 'alert', title, message })
+    }),
+  }), [])
+
+  useEffect(() => {
+    if (!dlg) return
+    const onKey = e => {
+      if (e.key === 'Escape') {
+        e.preventDefault(); e.stopPropagation()
+        finish(dlg.type === 'confirm' ? false : null)
+      }
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [dlg, finish])
+
+  return (
+    <DialogContext.Provider value={api}>
+      {children}
+      {dlg && (
+        <div className="cuov"
+          onClick={e => { if (e.target === e.currentTarget) finish(dlg.type === 'confirm' ? false : null) }}>
+          <div className="cumodal" onClick={e => e.stopPropagation()}>
+            <h2>{dlg.title || 'Notice'}</h2>
+            <div className="msg">{dlg.message}</div>
+            <div className="macts">
+              {dlg.type === 'confirm' && <button className="cancel" onClick={() => finish(false)}>Cancel</button>}
+              <button style={dlg.danger ? { background: '#c0392b' } : undefined}
+                onClick={() => finish(dlg.type === 'confirm' ? true : null)}
+              >{dlg.type === 'confirm' ? dlg.button : 'OK'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </DialogContext.Provider>
+  )
+}
+
+// ─── Shared bits ───────────────────────────────────────────────────────────
+
+const ColsPop = React.forwardRef(function ColsPop({ rect, hiddenCols, onToggle, onAll, onNone }, ref) {
+  const style = {
+    top: Math.min(rect.bottom + 6, window.innerHeight - 300),
+    left: Math.max(8, Math.min(rect.left, window.innerWidth - 230)),
+  }
+  return (
+    <div className="cupop" ref={ref} style={style}>
+      <div className="h">Show Columns</div>
+      {COLS.map(c => {
+        const locked = c.k === LOCKED_COL
+        return (
+          <label key={c.k} className={'ch' + (locked ? ' locked' : '')}
+            title={locked ? 'The student name always stays visible' : undefined}>
+            <input type="checkbox" disabled={locked} checked={locked || !hiddenCols[c.k]}
+              onChange={e => onToggle(c.k, e.target.checked)} />
+            {c.l}
+          </label>
+        )
+      })}
+      <div className="allrow">
+        <button onClick={onAll}>Show All</button>
+        <button onClick={onNone}>Hide All</button>
+      </div>
+    </div>
+  )
+})
+
+function CtxMenu({ x, y, items, onClose }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const onDown = e => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const onKey = e => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [onClose])
+  const style = {
+    top: Math.min(y, window.innerHeight - 20 - items.length * 38),
+    left: Math.min(x, window.innerWidth - 210),
+  }
+  return (
+    <div className="cumenu" ref={ref} style={style}>
+      {items.map((it, i) => it.sep
+        ? <div key={i} className="sep" />
+        : <div key={i} className={it.danger ? 'del' : ''} onClick={() => { onClose(); it.on() }}>{it.label}</div>)}
+    </div>
+  )
+}
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
-function CustomerList({ onSelect, onAdd }) {
-  const { records } = useStore()
+function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
+  const { records, programs } = useStore()
+  const dialog = useDialog()
   const [search, setSearch] = useState('')
+  const [noClassesOnly, setNoClassesOnly] = useState(false)
+  const [sort, setSort] = useState({ key: 'g1', dir: 1 })
+  const [selected, setSelected] = useState(() => new Set())
+  const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
+  const [pop, setPop] = useState(null)
+  const [rowCtx, setRowCtx] = useState(null)
+  const dragCol = useRef(null)
+  const popRef = useRef(null)
 
-  // Group records by family (guardian1 name + email as key). A record
-  // whose guardian1 has no name AND no email has no family identity yet
-  // (e.g. a just-added blank student), so it must stand on its own —
-  // keyed by its record id — rather than collapsing together with every
-  // other guardian-less record into one giant fake "family".
-  const grouped = records.reduce((acc, r) => {
-    const g1 = r.customer?.guardian1 || {}
-    const identity = `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
-    const parentKey = identity || `unknown-${r.id}`
-    if (!acc[parentKey]) acc[parentKey] = []
-    acc[parentKey].push(r)
-    return acc
-  }, {})
+  const setPrefs = useCallback((mut) => {
+    setColPrefs(prev => {
+      const next = { hiddenCols: { ...prev.hiddenCols }, colOrder: [...prev.colOrder] }
+      mut(next)
+      saveColPrefs(next)
+      return next
+    })
+  }, [])
 
-  const customerUnits = Object.entries(grouped).map(([_, students]) => {
-    const first = students[0]
-    const g1 = first.customer?.guardian1
-    const g2 = first.customer?.guardian2
-    const g1Name = g1 ? `${g1['First Name'] || ''} ${g1['Last Name'] || ''}`.trim() : '—'
-    const g2Name = g2 ? `${g2['First Name'] || ''} ${g2['Last Name'] || ''}`.trim() : ''
-    return {
-      students: [...students].sort((a, b) => (a.student.firstName || '').localeCompare(b.student.firstName || '', undefined, { sensitivity: 'base' })),
-      g1Name,
-      g1Email: g1?.['Email'] || '',
-      g2Name,
+  const orderedCols = useMemo(() => {
+    const byK = new Map(COLS.map(c => [c.k, c]))
+    const seen = new Set()
+    const out = []
+    for (const k of colOrder) {
+      const c = byK.get(k)
+      if (c && !seen.has(k)) { seen.add(k); out.push(c) }
     }
-  })
+    for (const c of COLS) if (!seen.has(c.k)) out.push(c)
+    return out.filter(c => !hiddenCols[c.k])
+  }, [colOrder, hiddenCols])
 
-  customerUnits.sort((a, b) => (a.g1Name || '').localeCompare(b.g1Name || '', undefined, { sensitivity: 'base' }))
+  const hideCol = (k) => {
+    if (k === LOCKED_COL) return
+    setPrefs(p => { p.hiddenCols = { ...p.hiddenCols, [k]: true } })
+  }
 
-  const filtered = customerUnits.filter(unit => {
-    const q = search.toLowerCase()
-    if (!q) return true
-    const g1Match = unit.g1Name.toLowerCase().includes(q) || unit.g1Email.toLowerCase().includes(q)
-    const g2Match = unit.g2Name.toLowerCase().includes(q)
-    const studentMatch = unit.students.some(s =>
-      `${s.student.firstName} ${s.student.lastName}`.toLowerCase().includes(q)
+  const onDrop = (target) => {
+    const from = dragCol.current
+    dragCol.current = null
+    if (!from || from === target) return
+    setPrefs(p => {
+      const base = p.colOrder.length ? p.colOrder.filter(k => COLS.some(c => c.k === k)) : COLS.map(c => c.k)
+      const full = [...base, ...COLS.map(c => c.k).filter(k => !base.includes(k))]
+      const next = full.filter(k => k !== from)
+      next.splice(full.indexOf(target) > full.indexOf(from) ? next.indexOf(target) + 1 : next.indexOf(target), 0, from)
+      p.colOrder = next
+    })
+  }
+
+  const onSort = (k) => setSort(s => s.key === k ? { key: k, dir: -s.dir } : { key: k, dir: 1 })
+
+  // Programs are named as free text on a registration; map back to a
+  // program record so a class can link to it.
+  const progByName = useMemo(() => {
+    const m = new Map()
+    for (const p of (programs || [])) if (p.name) m.set(String(p.name).trim().toUpperCase(), p)
+    return m
+  }, [programs])
+
+  /* One row per student. Guardian identity groups them into families so
+     the guardian cells can be blanked on repeats. */
+  const allRows = useMemo(() => {
+    const real = records.filter(r => r.id !== 'seed')
+    const byFamily = new Map()
+    for (const r of real) {
+      const key = guardianIdentity(r) || `unknown-${r.id}`
+      if (!byFamily.has(key)) byFamily.set(key, [])
+      byFamily.get(key).push(r)
+    }
+    const rows = []
+    for (const [key, students] of byFamily) {
+      const first = students[0]
+      const g1 = personName(first.customer?.guardian1)
+      const g2 = personName(first.customer?.guardian2)
+      const g1Email = first.customer?.guardian1?.['Email'] || ''
+      const sorted = [...students].sort((a, b) =>
+        (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
+      for (const s of sorted) {
+        rows.push({
+          id: s.id, record: s, familyKey: key,
+          g1, g2, g1Email,
+          student: `${s.student?.firstName || ''} ${s.student?.lastName || ''}`.trim(),
+          grade: s.student?.grade || '',
+          classList: classesOf(s),
+        })
+      }
+    }
+    return rows
+  }, [records])
+
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    const out = allRows.filter(r => {
+      if (noClassesOnly && r.classList.length > 0) return false
+      if (!q) return true
+      return r.g1.toLowerCase().includes(q) || r.g2.toLowerCase().includes(q) ||
+             r.g1Email.toLowerCase().includes(q) || r.student.toLowerCase().includes(q) ||
+             r.classList.some(c => c.toLowerCase().includes(q))
+    })
+    const val = (r) => {
+      if (sort.key === 'classes') return r.classList.join(', ').toLowerCase()
+      if (sort.key === 'grade') {
+        const n = parseFloat(String(r.grade).replace(/[^0-9.]/g, ''))
+        return isFinite(n) ? n : 999
+      }
+      return String(r[sort.key] || '').toLowerCase()
+    }
+    /* Ties fall back to guardian then student, so siblings stay together
+       and the repeat-blanking below has runs to work with. */
+    return [...out].sort((a, b) => {
+      const av = val(a), bv = val(b)
+      if (av < bv) return -sort.dir
+      if (av > bv) return sort.dir
+      const g = a.g1.localeCompare(b.g1, undefined, { sensitivity: 'base' })
+      if (g) return g
+      return a.student.localeCompare(b.student, undefined, { sensitivity: 'base' })
+    })
+  }, [allRows, search, noClassesOnly, sort])
+
+  const metrics = useMemo(() => {
+    const fams = new Set(allRows.map(r => r.familyKey))
+    let enrolments = 0, noClasses = 0
+    for (const r of allRows) {
+      enrolments += (r.record.programs || []).filter(p => p.active).length
+      if (r.classList.length === 0) noClasses++
+    }
+    return { families: fams.size, students: allRows.length, enrolments, noClasses }
+  }, [allRows])
+
+  const anyFilterActive = !!search || noClassesOnly
+  const clearAllFilters = () => { setSearch(''); setNoClassesOnly(false) }
+  const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
+  const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
+
+  const bulkDelete = async () => {
+    const n = selectedRows.length
+    const ok = await dialog.confirm(
+      `Delete ${n} student${n === 1 ? '' : 's'}? This also removes their linked customer and guardian information, and cannot be undone.`,
+      { title: 'Delete Selected' })
+    if (!ok) return
+    for (const r of selectedRows) await onDelete(r.record, { silent: true })
+    setSelected(new Set())
+  }
+
+  const exportCsv = () => {
+    const esc = (v) => {
+      const s = String(v ?? '')
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+    }
+    const head = ['Guardian 1', 'Guardian 1 Email', 'Guardian 2', 'Student', 'Grade', 'School', 'Classes']
+    const lines = [head.join(',')]
+    for (const r of allRows) {
+      lines.push([r.g1, r.g1Email, r.g2, r.student, r.grade,
+        r.record.student?.school || '', r.classList.join('; ')].map(esc).join(','))
+    }
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `crania-customers-export-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  useEffect(() => {
+    if (!pop) return
+    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
+    window.addEventListener('mousedown', onDown)
+    return () => window.removeEventListener('mousedown', onDown)
+  }, [pop])
+
+  const arrow = k => sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null
+
+  // ---- body rows, with repeated guardians blanked ----
+  const bodyRows = []
+  let prevFam = null
+  visible.forEach((r) => {
+    const sameFam = prevFam !== null && prevFam === r.familyKey
+    if (prevFam !== null && prevFam !== r.familyKey) {
+      bodyRows.push(
+        <tr className="grpsep" key={'sep-' + r.id}>
+          <td className="nosep" /><td colSpan={orderedCols.length + 1} />
+        </tr>
+      )
+    }
+    prevFam = r.familyKey
+
+    const isSel = selected.has(r.id)
+    const tds = orderedCols.map(c => {
+      const k = c.k
+      if ((k === 'g1' || k === 'g2') && sameFam) return <td key={k} className={`col-${k} rep`} />
+
+      let content
+      if (k === 'student') {
+        content = <span className="sname">{r.student || <span className="dash">—</span>}</span>
+      } else if (k === 'classes') {
+        content = r.classList.length === 0 ? <span className="dash">—</span> : r.classList.map((c, i) => {
+          const prog = progByName.get(c.trim().toUpperCase())
+          return (
+            <React.Fragment key={c}>
+              {i > 0 && ', '}
+              {prog ? (
+                <button className="clink" title={`Open ${c} in Programs`}
+                  onClick={e => { e.stopPropagation(); onNavigate && onNavigate('Programs', prog.id) }}
+                >{c}</button>
+              ) : <span title="Not in the Programs list">{c}</span>}
+            </React.Fragment>
+          )
+        })
+      } else {
+        content = r[k] === '' || r[k] == null ? <span className="dash">—</span> : r[k]
+      }
+
+      const title = k === 'classes' ? r.classList.join(', ') : String(r[k] || '')
+      return <td key={k} className={`col-${k}`} title={title}>{content}</td>
+    })
+
+    bodyRows.push(
+      <tr key={r.id} className={isSel ? 'sel' : ''}
+        title="Click to open this student; right-click for more"
+        onClick={() => onSelect(r.id)}
+        onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: r }) }}>
+        <td className="selcol" onClick={e => e.stopPropagation()}>
+          <input type="checkbox" checked={isSel} onChange={e => setSelected(s => {
+            const n = new Set(s)
+            if (e.target.checked) n.add(r.id); else n.delete(r.id)
+            return n
+          })} />
+        </td>
+        {tds}
+        <td className="actcell" onClick={e => e.stopPropagation()}>
+          <button className="rowbtn rb-add" title="Add a sibling to this family"
+            onClick={() => onAddSibling(r.record)}><UserPlus size={12} /></button>
+          <button className="rowbtn rb-del" title="Delete this student"
+            onClick={() => onDelete(r.record)}><Trash2 size={12} /></button>
+        </td>
+      </tr>
     )
-    return g1Match || g2Match || studentMatch
   })
-
-  const getClasses = (r) =>
-    Array.from(new Set((r.programs || []).map(p => p.program).filter(Boolean))).join(', ') || '—'
 
   return (
-    <div className="page" style={{ paddingBottom: 40 }}>
-      <div className="page-head" style={{ marginBottom: 0 }}>
-        <h2 className="page-title" style={{ marginBottom: 0 }}>Customers</h2>
-        <button
-          onClick={onAdd}
-          style={{
-            background: 'var(--logo-teal)', color: '#fff', border: 'none',
-            padding: '7px 14px', fontSize: 13, fontWeight: 700, borderRadius: 8,
-            cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
-          }}
-        >+ Add Family</button>
+    <div className="page cu" style={{ paddingBottom: 32 }}>
+      <style>{CSS}</style>
+      <h2 className="page-title">Customers</h2>
+
+      <div className="actions">
+        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
+          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
+        ><Eye size={13} /> Columns</button>
+        <button title="Download every student as a CSV file" onClick={exportCsv}>
+          <Download size={13} /> Export CSV
+        </button>
       </div>
 
-      {/* Search bar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        background: 'var(--logo-teal)', borderRadius: '10px 10px 0 0', padding: '14px 20px', marginTop: 14,
-      }}>
-        <svg width="18" height="18" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2.2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="7" /><line x1="16.5" y1="16.5" x2="22" y2="22" />
-        </svg>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Search parents or students…"
-          style={{
-            flex: 1, border: 'none', background: 'transparent', outline: 'none',
-            fontSize: 14, color: '#fff', fontFamily: 'inherit', letterSpacing: '.2px',
-          }}
-        />
-        <style>{`input::placeholder { color: rgba(255,255,255,0.6); }`}</style>
-      </div>
-
-      {/* Table */}
-      <div style={{ border: '2px solid var(--logo-teal)', borderTop: 'none', borderRadius: '0 0 10px 10px', overflow: 'hidden', background: '#fff' }}>
-
-        {/* Header */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: '140px 140px 180px 60px 1fr',
-          background: '#3d8e90', padding: '10px 20px',
-          borderBottom: '1px solid rgba(255,255,255,.15)',
-        }}>
-          {['Guardian 1', 'Guardian 2', 'Student Names', 'Grade', 'Classes'].map((h, idx) => (
-            <div key={idx} style={{ color: '#fff', fontWeight: 700, fontSize: 12, letterSpacing: '.6px', textTransform: 'uppercase' }}>{h}</div>
-          ))}
+      <div className="metrics">
+        <div className="metric">
+          <div className="label">Families</div><div className="value">{metrics.families}</div>
+          <div className="hint">grouped by guardian</div>
         </div>
+        <div className="metric mstu">
+          <div className="label">Students</div><div className="value">{metrics.students}</div>
+          <div className="hint">across all families</div>
+        </div>
+        <div className="metric menr">
+          <div className="label">Active Enrolments</div><div className="value">{metrics.enrolments}</div>
+          <div className="hint">programs marked active</div>
+        </div>
+        <div className={'metric mnone clickable' + (noClassesOnly ? ' on' : '')}
+          title="Click to show only students with no classes"
+          onClick={() => setNoClassesOnly(v => !v)}>
+          <div className="label">No Classes</div><div className="value">{metrics.noClasses}</div>
+          <div className="hint">not enrolled in anything</div>
+        </div>
+      </div>
 
-        {/* Rows */}
-        {filtered.length === 0 ? (
-          <div style={{ padding: '24px', textAlign: 'center', color: 'var(--muted)', fontSize: 14, fontStyle: 'italic' }}>
-            No families found.
+      <div className="filters">
+        <input type="search" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search guardians, students or classes…" autoComplete="off" />
+        {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
+        <button className="addbtn" onClick={onAdd}><UserPlus size={14} /> Add Family</button>
+      </div>
+
+      {selected.size > 0 && (
+        <div className="bulkbar">
+          <span className="n">{selected.size} selected</span>
+          <span className="acts">
+            <button className="del" onClick={bulkDelete}>Delete Selected</button>
+            <button className="clr" onClick={() => setSelected(new Set())}>Clear Selection</button>
+          </span>
+        </div>
+      )}
+
+      <div className="card">
+        {allRows.length === 0 ? (
+          <div className="empty"><b>No families yet.</b><br />Click “Add Family” to create your first one.</div>
+        ) : visible.length === 0 ? (
+          <div className="empty">
+            <b>Nothing to show.</b><br />Your search or filter is too narrow.
+            {anyFilterActive && (
+              <div style={{ marginTop: 14 }}>
+                <button className="clearf" onClick={clearAllFilters}>Clear All Filters</button>
+              </div>
+            )}
           </div>
         ) : (
-          filtered.map((unit, i) => {
-            const ROW_H = 28 // px per student row
-            return (
-              <div
-                key={`${unit.g1Name}-${unit.g1Email}-${i}`}
-                onClick={() => onSelect(unit.students[0].id)}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '140px 140px 180px 60px 1fr',
-                  padding: '10px 20px',
-                  alignItems: 'start',
-                  borderBottom: i < filtered.length - 1 ? '1px solid var(--line)' : 'none',
-                  background: i % 2 === 0 ? '#fff' : '#fafbfb',
-                  minHeight: unit.students.length * ROW_H + 20,
-                  cursor: 'pointer',
-                }}
-              >
-                {/* Guardian 1 — vertically centred in the row */}
-                <div style={{ fontSize: 13, color: 'var(--ink)', lineHeight: `${ROW_H}px` }}>
-                  {unit.g1Name || '—'}
-                </div>
-
-                {/* Guardian 2 */}
-                <div style={{ fontSize: 13, color: 'var(--ink-soft)', lineHeight: `${ROW_H}px` }}>
-                  {unit.g2Name || '—'}
-                </div>
-
-                {/* Student names stacked — clickable */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {unit.students.map(r => (
-                    <div
-                      key={r.id}
-                      onClick={() => onSelect(r.id)}
-                      style={{ fontSize: 13, fontWeight: 600, color: 'var(--logo-teal)', lineHeight: `${ROW_H}px`, cursor: 'pointer' }}
-                    >
-                      {r.student.firstName} {r.student.lastName}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Grades stacked */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {unit.students.map(r => (
-                    <div key={r.id} style={{ fontSize: 13, color: 'var(--ink-soft)', lineHeight: `${ROW_H}px` }}>
-                      {r.student.grade || '—'}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Classes stacked */}
-                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                  {unit.students.map(r => (
-                    <div key={r.id} style={{ fontSize: 13, color: 'var(--ink-soft)', lineHeight: `${ROW_H}px`, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'uppercase' }}>
-                      {getClasses(r)}
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            )
-          })
+          <table>
+            <colgroup>
+              <col style={{ width: SEL_W }} />
+              {orderedCols.map(c => <col key={c.k} style={{ width: COL_W[c.k] }} />)}
+              <col style={{ width: ACT_W }} />
+            </colgroup>
+            <thead>
+              <tr>
+                <th className="selcol">
+                  <input type="checkbox" checked={allSel} onChange={e =>
+                    setSelected(e.target.checked ? new Set(visible.map(r => r.id)) : new Set())} />
+                </th>
+                {orderedCols.map(c => (
+                  <th key={c.k} className="colh" draggable data-col={c.k}
+                    onDragStart={() => { dragCol.current = c.k }}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={() => onDrop(c.k)}>
+                    <span className="lbl sortable" onClick={() => onSort(c.k)}>{c.l}</span>
+                    <span className="thicons">
+                      {arrow(c.k)}
+                      {c.k !== LOCKED_COL && (
+                        <span className="eye" title="Hide Column"
+                          onClick={e => { e.stopPropagation(); hideCol(c.k) }}>👁</span>
+                      )}
+                    </span>
+                  </th>
+                ))}
+                <th className="blankhead" />
+              </tr>
+            </thead>
+            <tbody>{bodyRows}</tbody>
+          </table>
         )}
       </div>
+      <div className="tcount">
+        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
+      </div>
+
+      {pop && pop.kind === 'cols' && (
+        <ColsPop ref={popRef} rect={pop.rect} hiddenCols={hiddenCols}
+          onToggle={(k, on) => setPrefs(p => {
+            const n = { ...p.hiddenCols }
+            if (on) delete n[k]; else n[k] = true
+            p.hiddenCols = n
+          })}
+          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+          onNone={() => setPrefs(p => {
+            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+          })} />
+      )}
+
+      {rowCtx && (
+        <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[
+          { label: 'Open Student', on: () => onSelect(rowCtx.row.id) },
+          { label: 'Add Sibling', on: () => onAddSibling(rowCtx.row.record) },
+          { sep: true },
+          { label: 'Delete Student', danger: true, on: () => onDelete(rowCtx.row.record) },
+        ]} />
+      )}
     </div>
   )
 }
@@ -177,44 +756,18 @@ function CustomerList({ onSelect, onAdd }) {
 const FEE_LABELS = ['REG', 'MAT', 'A', 'S', 'O', 'N', 'D', 'J', 'F', 'M', 'A', 'M', 'J', 'J']
 const FEE_KEYS   = ['reg', 'mat', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul']
 
-const STATUS_STYLE = {
-  'Completed': { background: '#e0e4e8', color: '#6B6455' },
-  'Late Start': { background: '#cfe6b4', color: '#3a6020' },
-  'On-Hold':   { background: '#f6e3a1', color: '#7a5c00' },
-  'Cancelled': { background: '#f6b0b0', color: '#8b1a1a' },
-  'Active':    { background: '#cfe6b4', color: '#3a6020' },
-}
+const SECTIONS = ['student', 'guardian1', 'guardian2', 'emergency']
 
 function Field({ label, value, readOnly, onChange, highlightEmail = true }) {
-  let cls = 'field-val'
-  if (label === 'Email' && highlightEmail) cls += ' highlight'
-  if (label === 'Medical Conditions' && value) cls += ' danger'
-  const isLink = value === 'link'
-  if (isLink) cls = 'field-val link'
+  let cls = ''
+  if (label === 'Email' && highlightEmail) cls = 'warn'
+  if (label === 'Medical Conditions' && value) cls = 'bad'
   return (
-    <div className="field-row" style={{ gridTemplateColumns: '92px 1fr' }}>
+    <div className="frow">
       <label>{label}:</label>
-      {(readOnly || isLink) ? (
-        <div className={cls}>{value || ' '}</div>
-      ) : (
-        <input
-          className={cls}
-          value={value || ''}
-          onChange={e => onChange && onChange(e.target.value)}
-          style={{ width: '100%', fontFamily: 'inherit', fontSize: 'inherit', cursor: 'text', boxSizing: 'border-box' }}
-        />
-      )}
-    </div>
-  )
-}
-
-function Column({ title, data, readOnlyKeys, onChange, highlightEmail = true }) {
-  return (
-    <div>
-      <div className="panel-teal-head">{title}</div>
-      {Object.entries(data).map(([k, v]) => (
-        <Field key={k} label={k} value={v} readOnly={readOnlyKeys?.includes(k)} highlightEmail={highlightEmail} onChange={val => onChange && onChange(k, val)} />
-      ))}
+      {readOnly
+        ? <div className="ro">{value || ' '}</div>
+        : <input className={cls} value={value || ''} onChange={e => onChange && onChange(e.target.value)} />}
     </div>
   )
 }
@@ -223,15 +776,12 @@ function FeeSquare({ state, onChange }) {
   const colors = { paid: '#cfe6b4', pending: '#f6e3a1', overdue: '#e8503f', empty: '#e8ecef' }
   const next = { paid: 'pending', pending: 'overdue', overdue: 'empty', empty: 'paid' }
   return (
-    <button
-      type="button"
-      onClick={() => onChange(next[state] || 'paid')}
+    <button type="button" onClick={() => onChange(next[state] || 'paid')}
       style={{
         width: 16, height: 16, borderRadius: 3, border: 'none',
         background: colors[state] || colors.empty, cursor: 'pointer', padding: 0, flexShrink: 0,
       }}
-      title={state}
-    />
+      title={state} />
   )
 }
 
@@ -244,259 +794,255 @@ function derivedPayment(fees) {
   return ''
 }
 
+const PAYMENT_STYLE = {
+  Paid:    { bg: '#dff5e0', fg: '#2b7a2e' },
+  Pending: { bg: '#fff4d6', fg: '#8a6a00' },
+  Overdue: { bg: '#fde0e0', fg: '#a12626' },
+}
+
 function ProgramRow({ prog, onToggleActive, onFeeChange }) {
   const status = prog.active ? 'Active' : 'Inactive'
-  const statusStyle = prog.active
-    ? { background: '#cfe6b4', color: '#3a6020' }
-    : { background: '#e0e4e8', color: '#6B6455' }
+  const ss = statusStyle(status)
   const payment = derivedPayment(prog.fees)
-  const paymentColor = payment === 'Paid' ? '#cfe6b4' : payment === 'Pending' ? '#f6e3a1' : payment === 'Overdue' ? '#e8503f' : '#e8ecef'
-  const paymentTextColor = payment === 'Overdue' ? '#fff' : '#6B6455'
-
+  const ps = PAYMENT_STYLE[payment]
   return (
-    <tr className="cust-prog-row">
-      <td className="cust-prog-cell" style={{ textAlign: 'center', padding: '10px' }}>
+    <tr>
+      <td>
         <input type="checkbox" checked={prog.active || false} onChange={() => onToggleActive(prog)}
-          style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#5FA09E' }} />
+          style={{ width: 14, height: 14, cursor: 'pointer', accentColor: '#5FA09E', margin: 0 }} />
       </td>
-      <td className="cust-prog-cell">
-        <span className="cust-pill" style={statusStyle}>{status}</span>
+      <td><span className="pill" style={{ background: ss.bg, color: ss.fg }}>{status}</span></td>
+      <td>{prog.year || '—'}</td>
+      <td className="pname">{prog.program || '—'}</td>
+      <td>
+        {prog.rate
+          ? <><b>{prog.rate}</b>{prog.rateUnit && <span style={{ color: '#9A948A' }}> {prog.rateUnit}</span>}</>
+          : <span style={{ color: '#9A948A' }}>—</span>}
       </td>
-      <td className="cust-prog-cell">{prog.year}</td>
-      <td className="cust-prog-cell" style={{ fontWeight: 600, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-        {prog.program}
-      </td>
-      <td className="cust-prog-cell" style={{ whiteSpace: 'nowrap' }}>
-        {prog.rate && (
-          <><b>{prog.rate}</b>{prog.rateUnit && <span style={{ color: '#9A948A', fontSize: 12 }}> {prog.rateUnit}</span>}</>
-        )}
-      </td>
-      <td className="cust-prog-cell">
+      <td>
         <div style={{ display: 'flex', gap: 3, alignItems: 'center', justifyContent: 'center' }}>
-          {FEE_KEYS.map((k) => (
-            <FeeSquare key={k} state={prog.fees?.[k] || 'empty'} onChange={(state) => onFeeChange(prog, k, state)} />
+          {FEE_KEYS.map(k => (
+            <FeeSquare key={k} state={prog.fees?.[k] || 'empty'} onChange={s => onFeeChange(prog, k, s)} />
           ))}
         </div>
       </td>
-      <td className="cust-prog-cell">
-        {payment && <span className="cust-pill" style={{ background: paymentColor, color: paymentTextColor }}>{payment}</span>}
-      </td>
+      <td>{payment && <span className="pill" style={{ background: ps.bg, color: ps.fg }}>{payment}</span>}</td>
     </tr>
   )
 }
 
-function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDelete }) {
+function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDelete, onNavigate }) {
   const { records, updateCustomerField, updateStudentField } = useStore()
   const selected = records.find(r => r.id === recordId) || records[0]
 
-  // Find all siblings (same guardian1 identity). If this record's
-  // guardian1 has no name/email yet (a just-added blank student), it has
-  // no family identity — so it's a family of one, not a sibling of every
-  // other guardian-less record. Match on a normalized identity string.
-  const guardianIdentity = (r) => {
-    const g1 = r.customer?.guardian1 || {}
-    return `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
-  }
   const selectedIdentity = guardianIdentity(selected)
   const siblings = (selectedIdentity
     ? records.filter(r => guardianIdentity(r) === selectedIdentity)
     : [selected]
-  ).sort((a, b) => (a.student.firstName || '').localeCompare(b.student.firstName || '', undefined, { sensitivity: 'base' }))
+  ).sort((a, b) => (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
 
-  const siblingIdx = siblings.findIndex(s => s.id === recordId)
-
-  const allPrograms = selected.programs || []
   const [showOnlyActive, setShowOnlyActive] = useState(false)
-  const [progs, setProgs] = useState(allPrograms)
+  const [progs, setProgs] = useState(selected.programs || [])
   const [custFields, setCustFields] = useState(selected.customer)
-  const API_BASE = import.meta.env?.VITE_API_URL || ''
   const saveTimers = useRef({})
+  const latest = useRef(custFields)
+  latest.current = custFields
+
+  // Undo covers field edits only. Deleting a student is a server-side
+  // delete that would come back with a different id, so it is not undoable
+  // and deliberately not on the stack.
+  const undoStack = useRef([])
+  const redoStack = useRef([])
+  const [undoLen, setUndoLen] = useState(0)
+  const [redoLen, setRedoLen] = useState(0)
+  const editingKey = useRef(null)
 
   useEffect(() => {
-    setProgs(allPrograms)
+    setProgs(selected.programs || [])
     setCustFields(selected.customer)
-  }, [recordId])
+    undoStack.current = []; redoStack.current = []
+    setUndoLen(0); setRedoLen(0); editingKey.current = null
+  }, [recordId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const customerToStudentKey = (key) => {
-    const map = {
-      'First Name': 'firstName',
-      'Last Name': 'lastName',
-      'Gender': 'gender',
-      'DOB': 'dob',
-      'Email': 'email',
-      'Current Grade': 'grade',
-      'School': 'school',
-      'Medical Conditions': 'medical',
-    }
-    return map[key] || key
-  }
+  const customerToStudentKey = (key) => ({
+    'First Name': 'firstName', 'Last Name': 'lastName', 'Gender': 'gender', 'DOB': 'dob',
+    'Email': 'email', 'Current Grade': 'grade', 'School': 'school', 'Medical Conditions': 'medical',
+  })[key] || key
+
+  const persistSection = useCallback((section, data) => {
+    fetch(`${API_BASE}/api/registrations/${selected.id}/customer`, {
+      method: 'PUT', headers: HEADERS, body: JSON.stringify({ [section]: data }),
+    }).catch(() => {})
+  }, [selected.id])
 
   const updateCustField = (section, key, val) => {
+    /* One undo step per field rather than per keystroke — push a snapshot
+       only when the field being edited changes. */
+    const id = section + '|' + key
+    if (editingKey.current !== id) {
+      undoStack.current.push(JSON.stringify(latest.current))
+      if (undoStack.current.length > 50) undoStack.current.shift()
+      redoStack.current = []
+      setRedoLen(0); setUndoLen(undoStack.current.length)
+      editingKey.current = id
+    }
     setCustFields(prev => ({ ...prev, [section]: { ...prev[section], [key]: val } }))
     updateCustomerField(selected.id, section, key, val)
-    // Also sync student edits to the main student record
-    if (section === 'student') {
-      const studentKey = customerToStudentKey(key)
-      updateStudentField(selected.id, studentKey, val)
-    }
+    if (section === 'student') updateStudentField(selected.id, customerToStudentKey(key), val)
     clearTimeout(saveTimers.current[section])
     saveTimers.current[section] = setTimeout(() => {
-      setCustFields(current => {
-        fetch(`${API_BASE}/api/registrations/${selected.id}/customer`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-          body: JSON.stringify({ [section]: current[section] }),
-        }).catch(() => {})
-        return current
-      })
+      persistSection(section, latest.current[section])
     }, 600)
   }
 
-  const { student, guardian1, guardian2, emergency } = custFields
+  // Undo/redo replays every section, so the store and the server both end
+  // up matching what is on screen rather than a half-applied mixture.
+  const applyFields = useCallback((next) => {
+    setCustFields(next)
+    latest.current = next
+    for (const section of SECTIONS) {
+      const data = next[section] || {}
+      for (const [k, v] of Object.entries(data)) {
+        updateCustomerField(selected.id, section, k, v)
+        if (section === 'student') updateStudentField(selected.id, customerToStudentKey(k), v)
+      }
+      persistSection(section, data)
+    }
+    editingKey.current = null
+  }, [selected.id, updateCustomerField, updateStudentField, persistSection])
 
-  const displayedPrograms = showOnlyActive ? progs.filter(p => p.active) : progs
+  const doUndo = useCallback(() => {
+    const snap = undoStack.current.pop()
+    if (!snap) return
+    redoStack.current.push(JSON.stringify(latest.current))
+    applyFields(JSON.parse(snap))
+    setUndoLen(undoStack.current.length); setRedoLen(redoStack.current.length)
+  }, [applyFields])
 
-  const toggleActive = (prog) => {
-    const updated = progs.map(p => p === prog ? { ...p, active: !p.active } : p)
-    setProgs(updated)
-    persistPrograms(updated)
-  }
+  const doRedo = useCallback(() => {
+    const snap = redoStack.current.pop()
+    if (!snap) return
+    undoStack.current.push(JSON.stringify(latest.current))
+    applyFields(JSON.parse(snap))
+    setUndoLen(undoStack.current.length); setRedoLen(redoStack.current.length)
+  }, [applyFields])
 
-  const updateFee = (prog, key, state) => {
-    const updated = progs.map(p => p === prog ? { ...p, fees: { ...p.fees, [key]: state } } : p)
-    setProgs(updated)
-    persistPrograms(updated)
-  }
+  useEffect(() => {
+    const onKey = e => {
+      const t = e.target
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault()
+        if (e.shiftKey) doRedo(); else doUndo()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [doUndo, doRedo])
 
-  const persistPrograms = (newPrograms) => {
+  const persistPrograms = (next) => {
     fetch(`${API_BASE}/api/registrations/${selected.id}/programs`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-      body: JSON.stringify(newPrograms),
+      method: 'PUT', headers: HEADERS, body: JSON.stringify(next),
     }).catch(() => {})
   }
+  const toggleActive = (prog) => {
+    const updated = progs.map(p => p === prog ? { ...p, active: !p.active } : p)
+    setProgs(updated); persistPrograms(updated)
+  }
+  const updateFee = (prog, key, state) => {
+    const updated = progs.map(p => p === prog ? { ...p, fees: { ...p.fees, [key]: state } } : p)
+    setProgs(updated); persistPrograms(updated)
+  }
+
+  const { student, guardian1, guardian2, emergency } = custFields
+  const displayed = showOnlyActive ? progs.filter(p => p.active) : progs
+
+  const panel = (title, data, opts = {}) => (
+    <div>
+      <div className="sec-h">{title}</div>
+      {Object.entries(data || {}).map(([k, v]) => (
+        <Field key={k} label={k} value={v}
+          readOnly={opts.readOnlyKeys?.includes(k)}
+          highlightEmail={opts.highlightEmail !== false}
+          onChange={val => updateCustField(opts.section, k, val)} />
+      ))}
+    </div>
+  )
 
   return (
-    <div className="page" style={{ paddingBottom: 40 }}>
-      {/* Back button */}
-      <button
-        onClick={onBack}
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: 'var(--logo-teal)', fontWeight: 700, fontSize: 14,
-          marginBottom: 12, padding: 0,
-        }}
-      >
-        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-          <polyline points="15 18 9 12 15 6" />
-        </svg>
-        All Customers
-      </button>
+    <div className="page cu" style={{ paddingBottom: 32 }}>
+      <style>{CSS}</style>
 
-      <div className="page-head" style={{ marginBottom: 20 }}>
-        <h2 className="page-title" style={{ marginTop: 0, marginBottom: 0 }}>Customers</h2>
-        <button
-          onClick={() => onDelete(selected)}
-          style={{
-            background: 'transparent', color: '#c62828', border: '1px solid #c62828',
-            padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
-          }}
-        >Delete Student</button>
+      <button className="back" onClick={onBack}><ChevronLeft size={16} /> All Customers</button>
+      <h2 className="page-title">Customers</h2>
+
+      <div className="actions">
+        <button title="Undo (Ctrl+Z)" disabled={!undoLen} onClick={doUndo}><Undo2 size={13} /> Undo</button>
+        <button title="Redo (Ctrl+Shift+Z)" disabled={!redoLen} onClick={doRedo}><Redo2 size={13} /></button>
+        <button title="Open this student on the Students page" style={{ marginLeft: 'auto' }}
+          onClick={() => onNavigate && onNavigate('Students', selected.id)}>
+          <ExternalLink size={13} /> View in Students
+        </button>
+        <button className="danger" title="Delete this student" onClick={() => onDelete(selected)}>
+          <Trash2 size={13} /> Delete Student
+        </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 22 }}>
-        <Column title="Guardian 1" data={guardian1} onChange={(k, v) => updateCustField('guardian1', k, v)} />
-        <Column title="Guardian 2" data={guardian2} onChange={(k, v) => updateCustField('guardian2', k, v)} />
-        <Column title="Emergency Contact" data={emergency} highlightEmail={false} onChange={(k, v) => updateCustField('emergency', k, v)} />
+      <div className="panels">
+        {panel('Guardian 1', guardian1, { section: 'guardian1' })}
+        {panel('Guardian 2', guardian2, { section: 'guardian2' })}
+        {panel('Emergency Contact', emergency, { section: 'emergency', highlightEmail: false })}
         <div>
-          <div className="panel-teal-head">Students</div>
-          <div style={{ padding: '4px 0 10px' }}>
-            {siblings.map(s => {
-              const isActive = s.id === recordId
-              return (
-                <div
-                  key={s.id}
-                  onClick={() => onSelectRecord?.(s.id)}
-                  style={{
-                    cursor: 'pointer',
-                    fontSize: 14,
-                    fontWeight: isActive ? 700 : 600,
-                    color: isActive ? 'var(--ink)' : 'var(--logo-teal)',
-                    background: isActive ? 'rgba(61,142,144,.10)' : 'transparent',
-                    padding: '4px 8px',
-                    borderRadius: 4,
-                    marginBottom: 2,
-                  }}
-                >
-                  {s.student.firstName} {s.student.lastName}
-                </div>
-              )
-            })}
-            <div
-              onClick={() => onAddSibling(selected)}
-              style={{
-                cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'var(--logo-teal)',
-                padding: '4px 8px', marginTop: 2,
-              }}
-            >+ Add Sibling</div>
+          <div className="sec-h">Students</div>
+          <div className="sibs">
+            {siblings.map(s => (
+              <div key={s.id} className={'sib' + (s.id === recordId ? ' on' : '')}
+                onClick={() => onSelectRecord?.(s.id)}>
+                {s.student?.firstName} {s.student?.lastName}
+              </div>
+            ))}
+            <button className="addsib" onClick={() => onAddSibling(selected)}>
+              <UserPlus size={13} /> Add Sibling
+            </button>
           </div>
-          {Object.entries(student).map(([k, v]) => (
-            <Field key={k} label={k} value={v} readOnly={['Current Age'].includes(k)} highlightEmail={false} onChange={val => updateCustField('student', k, val)} />
+          {Object.entries(student || {}).map(([k, v]) => (
+            <Field key={k} label={k} value={v} readOnly={k === 'Current Age'} highlightEmail={false}
+              onChange={val => updateCustField('student', k, val)} />
           ))}
         </div>
       </div>
 
-      {/* Programs */}
-      <div style={{ marginTop: 32 }}>
-        <div style={{
-          background: '#1e1e1e', color: '#fff',
-          fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 600,
-          padding: '14px 18px', borderRadius: '9px 9px 0 0', letterSpacing: '.3px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        }}>
-          <span>Programs – {student['First Name']} {student['Last Name']}</span>
-          <label style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input type="checkbox" checked={showOnlyActive} onChange={(e) => setShowOnlyActive(e.target.checked)}
-              style={{ accentColor: '#fff', cursor: 'pointer' }} />
-            Active only
-          </label>
-        </div>
-        <div style={{ background: '#fff', border: '1px solid var(--line)', borderTop: 'none', borderRadius: '0 0 9px 9px', overflowX: 'auto' }}>
-          <table className="cust-prog-table">
-            <thead>
-              <tr>
-                <th className="cust-prog-th">ACTIVE</th>
-                <th className="cust-prog-th">STATUS</th>
-                <th className="cust-prog-th">YEAR</th>
-                <th className="cust-prog-th">PROGRAM</th>
-                <th className="cust-prog-th">RATE</th>
-                <th className="cust-prog-th">
-                  <div style={{ fontSize: 10, color: '#9A948A', marginBottom: 3, textAlign: 'center', letterSpacing: 1 }}>FEE SCHEDULE</div>
-                  <div style={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
-                    {FEE_LABELS.map((m, i) => (
-                      <span key={i} style={{ width: 16, textAlign: 'center', fontSize: 9, color: '#9A948A', fontWeight: 700 }}>{m}</span>
-                    ))}
-                  </div>
-                </th>
-                <th className="cust-prog-th">PAYMENT</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedPrograms.length === 0 ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '22px', color: '#9A948A', fontStyle: 'italic', fontSize: 14 }}>
-                    {showOnlyActive ? 'No active programs.' : 'No programs registered.'}
-                  </td>
-                </tr>
-              ) : (
-                displayedPrograms.map((p, i) => (
-                  <ProgramRow key={i} prog={p} onToggleActive={toggleActive} onFeeChange={updateFee} />
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="progh">
+        <span className="t">Programs — {student?.['First Name']} {student?.['Last Name']}</span>
+        <label>
+          <input type="checkbox" checked={showOnlyActive} onChange={e => setShowOnlyActive(e.target.checked)} />
+          Active only
+        </label>
+      </div>
+      <div className="card">
+        <table className="ptable">
+          <thead>
+            <tr>
+              <th>Active</th><th>Status</th><th>Year</th><th>Program</th><th>Rate</th>
+              <th>
+                <div style={{ marginBottom: 3, letterSpacing: 1 }}>Fee Schedule</div>
+                <div style={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+                  {FEE_LABELS.map((m, i) => <span key={i} className="feelab">{m}</span>)}
+                </div>
+              </th>
+              <th>Payment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayed.length === 0 ? (
+              <tr><td colSpan={7} style={{ background: 'transparent', padding: '26px', color: 'var(--muted)' }}>
+                {showOnlyActive ? 'No active programs.' : 'No programs registered.'}
+              </td></tr>
+            ) : displayed.map((p, i) => (
+              <ProgramRow key={i} prog={p} onToggleActive={toggleActive} onFeeChange={updateFee} />
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
@@ -504,35 +1050,36 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
 
 // ─── Root: switches between list and detail ────────────────────────────────
 
-export default function Customers({ initialRecordId, onConsumeInitialRecord }) {
+export default function Customers(props) {
+  return <DialogHost><CustomersPage {...props} /></DialogHost>
+}
+
+function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) {
   const { records, select, addRegistration, deleteRegistration } = useStore()
+  const dialog = useDialog()
   const [detailId, setDetailId] = useState(null)
 
-  const handleSelect = (id) => {
-    select(id)
-    setDetailId(id)
-  }
+  const handleSelect = (id) => { select(id); setDetailId(id) }
 
-  // Opened via onNavigate('Customers', recordId) from another page (e.g.
-  // Emergency Contacts) — jump straight to that customer's detail view.
+  // Opened via onNavigate('Customers', recordId) from another page.
   useEffect(() => {
     if (initialRecordId) {
       handleSelect(initialRecordId)
       onConsumeInitialRecord && onConsumeInitialRecord()
     }
-  }, [initialRecordId])
+  }, [initialRecordId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAdd = async () => {
     try {
       const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student', forceNew: true })
       if (id) setDetailId(id)
     } catch (err) {
-      alert('Could not add family: ' + err.message)
+      dialog.alert('Could not add family', String(err.message || err))
     }
   }
 
-  // Adds a second (or third...) child under the same guardians/emergency
-  // contact as an existing family, so it groups as a sibling automatically.
+  // Adds another child under the same guardians and emergency contact, so
+  // it groups as a sibling automatically.
   const handleAddSibling = async (record) => {
     try {
       const g1 = record.customer?.guardian1 || {}
@@ -553,35 +1100,37 @@ export default function Customers({ initialRecordId, onConsumeInitialRecord }) {
       })
       if (id) setDetailId(id)
     } catch (err) {
-      alert('Could not add sibling: ' + err.message)
+      dialog.alert('Could not add sibling', String(err.message || err))
     }
   }
 
-  const handleDelete = async (record) => {
+  const handleDelete = async (record, opts = {}) => {
     const name = `${record.student?.firstName || ''} ${record.student?.lastName || ''}`.trim() || 'this student'
-    if (!confirm(`Delete ${name}? This also removes their linked customer/guardian info. This can't be undone.`)) return
+    if (!opts.silent) {
+      const ok = await dialog.confirm(
+        `Delete ${name}? This also removes their linked customer and guardian information, and cannot be undone.`)
+      if (!ok) return
+    }
     try {
       await deleteRegistration(record.id)
-      // Jump to a remaining sibling if there is one, else back to the list.
-      // Only match on a real guardian identity — a blank student has none,
-      // so it should return to the list rather than jump to another blank.
-      const g1 = record.customer?.guardian1 || {}
-      const identity = `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
-      const sibling = identity && records.find(r => {
-        if (r.id === record.id) return false
-        const rg1 = r.customer?.guardian1 || {}
-        return `${rg1['First Name'] || ''} ${rg1['Last Name'] || ''} ${rg1['Email'] || ''}`.trim().toLowerCase() === identity
-      })
-      setDetailId(sibling ? sibling.id : null)
+      if (detailId === record.id || !opts.silent) {
+        // Jump to a remaining sibling if there is one, else back to the list.
+        // Only match a real guardian identity — a blank student has none, so
+        // it should return to the list rather than jump to another blank.
+        const identity = guardianIdentity(record)
+        const sibling = identity && records.find(r => r.id !== record.id && guardianIdentity(r) === identity)
+        setDetailId(sibling && detailId === record.id ? sibling.id : null)
+      }
     } catch (err) {
-      alert('Could not delete: ' + err.message)
+      dialog.alert('Could not delete', String(err.message || err))
     }
   }
 
   if (detailId) {
     return <CustomerDetail recordId={detailId} onBack={() => setDetailId(null)} onSelectRecord={setDetailId}
-      onAddSibling={handleAddSibling} onDelete={handleDelete} />
+      onAddSibling={handleAddSibling} onDelete={handleDelete} onNavigate={onNavigate} />
   }
 
-  return <CustomerList onSelect={handleSelect} onAdd={handleAdd} />
+  return <CustomerList onSelect={handleSelect} onAdd={handleAdd} onAddSibling={handleAddSibling}
+    onDelete={handleDelete} onNavigate={onNavigate} />
 }
