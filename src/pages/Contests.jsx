@@ -39,6 +39,16 @@ const COLS = [
 ]
 const LOCKED_COL = 'contest'
 
+/* Proportions, not fixed pixels, so the columns share out whatever the card
+   gives them. They deliberately fall short of 100% — the checkbox and action
+   columns take their pixels first, and a fixed layout hands the remainder
+   back in these ratios, so hiding a column widens the others instead of
+   leaving a gap. */
+const COL_W = {
+  org: '17%', contest: '25%', regDeadline: '16%',
+  contestDate: '16%', numOrdered: '9%', status: '13%',
+}
+
 /* Computed per call rather than once at module load — a tab left open
    overnight would otherwise keep measuring deadlines against yesterday. */
 function deadlineStyle(dateStr) {
