@@ -450,7 +450,7 @@ export default function ClassLists({ onNavigate }) {
   )
 }
 
-function Roster({ rows, onNavigate }) {
+function Roster({ rows, onNavigate, showSchedule = false }) {
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
       <thead>
@@ -459,6 +459,7 @@ function Roster({ rows, onNavigate }) {
           <Th>Grade</Th>
           <Th>School</Th>
           <Th>Guardian Contact</Th>
+          {showSchedule && <Th>Says</Th>}
           <Th>Year</Th>
           <Th align="center">Status</Th>
           <Th></Th>
@@ -479,6 +480,11 @@ function Roster({ rows, onNavigate }) {
                 {contact.phone && <span> · {contact.phone}</span>}
                 {contact.email && <span> · {contact.email}</span>}
               </td>
+              {showSchedule && (
+                <td style={{ padding: '6px 12px', color: '#8a6a00', whiteSpace: 'nowrap' }}>
+                  {entry.schedule || <span style={{ color: 'var(--muted)' }}>no schedule set</span>}
+                </td>
+              )}
               <td style={{ padding: '6px 12px' }}>{entry.year || '—'}</td>
               <td style={{ padding: '6px 12px', textAlign: 'center' }}>
                 <span style={{
