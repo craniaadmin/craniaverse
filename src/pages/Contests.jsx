@@ -155,7 +155,12 @@ const CSS = `
 .ct .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
     border-bottom:3px solid var(--teal);overflow-x:auto}
-.ct table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:5px 5px;background:#fff}
+/* Programs sizes its table to its contents and scrolls, because it carries
+   twenty columns. Six columns fit, so this one fills the card instead and
+   the widths come from the colgroup. min-width keeps it from being crushed
+   on a narrow window — below that the card scrolls as before. */
+.ct table{width:100%;min-width:720px;table-layout:fixed;border-collapse:separate;
+    border-spacing:5px 5px;background:#fff}
 .ct thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
     user-select:none;border-radius:6px;position:relative}
