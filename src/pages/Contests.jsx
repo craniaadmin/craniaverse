@@ -972,8 +972,18 @@ function ContestsPage({ onNavigate }) {
       {editing && (
         <EditModal row={editing.row}
           onClose={() => setEditing(null)}
-          onSave={patch => { updateMany(editing.row, patch); setEditing(null) }}
-          onDelete={() => { setEditing(null); removeRow(editing.row) }} />
+          onSave={patch => {
+            if (editing.row.isNew) {
+              if (!isBlankRow(patch)) mutate(d => d.manual.push({ id: editing.row.id, ...patch }))
+            } else {
+              updateMany(editing.row, patch)
+            }
+            setEditing(null)
+          }}
+          onDelete={() => {
+            setEditing(null)
+            if (!editing.row.isNew) removeRow(editing.row)
+          }} />
       )}
 
       {bulkOpen && (
