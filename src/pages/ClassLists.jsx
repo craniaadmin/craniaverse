@@ -427,7 +427,7 @@ export default function ClassLists({ onNavigate }) {
                             }}>
                               SCHEDULE DOESN’T MATCH A LISTED SESSION
                               <span style={{ fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>
-                                {' '}— this class runs {[...new Set(c.sessions.map((s) => sessionLabel(s.session)))].join(', ')}.
+                                {' '}— this class runs {sessionsPhrase(c.sessions)}.
                                 Check the registration or the program’s timetable.
                               </span>
                             </div>
