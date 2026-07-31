@@ -829,11 +829,15 @@ function DialogHost({ children }) {
   )
 }
 
-export default function Programs() {
-  return <DialogHost><ProgramsPage /></DialogHost>
+export default function Programs({ initialProgramId, onConsumeInitialProgram }) {
+  return (
+    <DialogHost>
+      <ProgramsPage initialProgramId={initialProgramId} onConsumeInitialProgram={onConsumeInitialProgram} />
+    </DialogHost>
+  )
 }
 
-function ProgramsPage() {
+function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
   const dialog = useDialog()
   const { staff, programs, setPrograms, programsState, setProgramsState, records: registrations } = useStore()
 
