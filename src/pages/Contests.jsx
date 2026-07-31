@@ -45,15 +45,16 @@ const LOCKED_COL = 'contest'
    wide screen Status and Ordered ballooned while the text columns stayed
    put. Proportions keep the slack going where it is worth something.
 
-   The floor is the 720px min-width: at that size Status still clears the
-   width of the "CANCELLED" pill and the button column still holds three
-   icons. Because these are ratios, hiding a column widens the rest rather
-   than leaving a gap. */
+   The floor is the 720px min-width. Status gets 16% because the pill is a
+   <select>, so it is sized by its widest option — "Cancelled" — not by the
+   value on show; that needs 108px, which is what 16% comes to at the floor.
+   Because these are ratios, hiding a column widens the rest rather than
+   leaving a gap. */
 const SEL_W = '3%'
-const ACT_W = '9%'
+const ACT_W = '10%'
 const COL_W = {
-  org: '16%', contest: '23%', regDeadline: '15%',
-  contestDate: '13%', numOrdered: '8%', status: '13%',
+  org: '15%', contest: '22%', regDeadline: '14%',
+  contestDate: '12%', numOrdered: '8%', status: '16%',
 }
 
 /* Computed per call rather than once at module load — a tab left open
