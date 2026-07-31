@@ -170,9 +170,7 @@ const CSS = `
 .ct thead th.selcol input,.ct tbody td.selcol input{width:12px;height:12px;margin:0;
     accent-color:var(--teal);vertical-align:middle;cursor:pointer}
 .ct tbody td.actcell{white-space:nowrap;text-align:center}
-.ct td.actcell,.ct th.blankhead{width:70px;min-width:70px;max-width:70px}
-.ct th.filler,.ct td.filler{width:100%;padding:0;background:transparent !important;border:none}
-.ct .selcol{width:34px;text-align:center}
+.ct .selcol{text-align:center}
 .ct thead th .arw{opacity:.85;font-size:10px}
 .ct thead th.colh{cursor:grab}
 .ct thead th.colh.dropt{outline:2px dashed var(--light-blue);outline-offset:-2px}
