@@ -34,7 +34,6 @@ const LOCKED_COL = 'contact'
 /* Proportions rather than pixels, summing to 100 — a fixed layout gives
    leftover space to any pixel column, starving the text ones on a wide
    screen. Sized so nothing is squeezed at the 900px min-width. */
-const ACT_W = '0%'
 const COL_W = {
   contact: '18%', relationship: '11%', phone: '12%',
   email: '21%', customer: '16%', students: '22%',
