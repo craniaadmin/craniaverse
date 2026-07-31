@@ -1353,46 +1353,6 @@
     "costUnit": ""
   },
   {
-    "id": "p_8",
-    "number": "1010101",
-    "code": "ME1",
-    "name": "MATH ENRICHMENT - LEVEL 1",
-    "subject": "MATH",
-    "category": "PRIVATE PIANO LESSONS",
-    "ageRange": "1–2",
-    "duration": 120,
-    "sessions": "1",
-    "period": "/week",
-    "rate": 41.29,
-    "totalHours": 70,
-    "description": "",
-    "offerings": [
-      {
-        "id": "s5bc223e8",
-        "locationId": "loc_waterloo",
-        "days": [
-          4
-        ],
-        "capacity": 12,
-        "enrolled": "",
-        "instructor": "",
-        "times": [
-          {
-            "start": "17:30",
-            "end": "19:30"
-          }
-        ]
-      }
-    ],
-    "year": "2026–27",
-    "gradeFrom": "1",
-    "gradeTo": "2",
-    "platform": "In-Person",
-    "cost": 289,
-    "costUnit": "",
-    "active": true
-  },
-  {
     "id": "ms67qajgtyjix",
     "number": "1010101",
     "code": "ME1",

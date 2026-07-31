@@ -60,6 +60,32 @@ const freshFees = () => ({
   jan: '', feb: '', mar: '', apr: '', may: '', jun: '', jul: '',
 })
 
+/* Class Lists routes a student to a session by matching this free text
+   against the program's timetable, so a blank schedule strands them in the
+   "doesn't match a listed session" bucket. Take the program's first session
+   and write it in the same shape the page parses: "Mon 4:30 pm". */
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+function fmtTime(t) {
+  const m = String(t || '').match(/^(\d{1,2}):(\d{2})/)
+  if (!m) return ''
+  let h = parseInt(m[1], 10)
+  const ampm = h >= 12 ? 'pm' : 'am'
+  if (h === 0) h = 12
+  else if (h > 12) h -= 12
+  return `${h}:${m[2]} ${ampm}`
+}
+
+function firstSchedule(program) {
+  for (const o of (program.offerings || [])) {
+    const day = (o.days || [])[0]
+    const time = (o.times || [])[0]
+    if (day == null && !time) continue
+    return [day == null ? '' : DOW[day], fmtTime(time && time.start)].filter(Boolean).join(' ')
+  }
+  return ''
+}
+
 const guardian = (first, last, rel, email) => ({
   'First Name': first, 'Last Name': last, 'Relationship': rel,
   'Phone (Home)': '(519) 555-0100', 'Phone (Mobile)': '(519) 555-0101',
