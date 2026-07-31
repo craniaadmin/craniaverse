@@ -196,8 +196,6 @@ const CSS = `
     box-shadow:inset 0 0 0 1px var(--teal);outline:none;display:block}
 .ct td.tint{background:var(--tint) !important}
 .ct tbody tr:hover td.tint{filter:brightness(.96)}
-.ct td.col-org{max-width:180px}
-.ct td.col-contest{max-width:280px}
 .ct td.col-numOrdered,.ct td.col-status{text-align:center}
 .ct td.col-regDeadline,.ct td.col-contestDate{text-align:center;white-space:nowrap}
 .ct .cname{font-weight:700;color:#3d7f7d}
