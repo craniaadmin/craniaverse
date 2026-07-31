@@ -450,16 +450,28 @@ export default function ClassLists({ onNavigate }) {
   )
 }
 
+/* Every roster on the page uses this one column geometry, and the table is
+   laid out fixed rather than sized to its contents. Otherwise each class
+   measures its own students and the columns land somewhere different in
+   every block. The "Says" column is always present, so a class with a
+   schedule mismatch lines up with the ones without. */
+const COLS = ['19%', '7%', '17%', '27%', '12%', '7%', '9%', '44px']
+
+const CELL = {
+  padding: '6px 12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+}
+
 function Roster({ rows, onNavigate, showSchedule = false }) {
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
+      <colgroup>{COLS.map((w, i) => <col key={i} style={{ width: w }} />)}</colgroup>
       <thead>
         <tr style={{ textAlign: 'left' }}>
           <Th>Student</Th>
           <Th>Grade</Th>
           <Th>School</Th>
           <Th>Guardian Contact</Th>
-          {showSchedule && <Th>Says</Th>}
+          <Th>Says</Th>
           <Th>Year</Th>
           <Th align="center">Status</Th>
           <Th></Th>
@@ -470,23 +482,21 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
           const { record: r, entry } = row
           const contact = guardianContact(r.customer)
           const style = statusStyle(entry.status)
+          const name = `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim()
+          const contactLine = [contact.name, contact.phone, contact.email].filter(Boolean).join(' · ')
           return (
-            <tr key={r.id + i} style={{ borderTop: '1px solid #f0ede3', background: i % 2 ? '#fafaf7' : '#fff' }}>
-              <td style={{ padding: '6px 12px', fontWeight: 600 }}>{r.student?.firstName} {r.student?.lastName}</td>
-              <td style={{ padding: '6px 12px' }}>{r.student?.grade || '—'}</td>
-              <td style={{ padding: '6px 12px' }}>{r.student?.school || '—'}</td>
-              <td style={{ padding: '6px 12px', color: 'var(--ink-soft)' }}>
-                {contact.name || '—'}
-                {contact.phone && <span> · {contact.phone}</span>}
-                {contact.email && <span> · {contact.email}</span>}
+            <tr key={r.id + i} style={{ borderTop: '1px solid #f0ede3', background: i % 2 ? '#fafaf7' : '#fff', height: 34 }}>
+              <td style={{ ...CELL, fontWeight: 600 }} title={name}>{name || '—'}</td>
+              <td style={CELL}>{r.student?.grade || '—'}</td>
+              <td style={CELL} title={r.student?.school || ''}>{r.student?.school || '—'}</td>
+              <td style={{ ...CELL, color: 'var(--ink-soft)' }} title={contactLine}>
+                {contactLine || '—'}
               </td>
-              {showSchedule && (
-                <td style={{ padding: '6px 12px', color: '#8a6a00', whiteSpace: 'nowrap' }}>
-                  {entry.schedule || <span style={{ color: 'var(--muted)' }}>no schedule set</span>}
-                </td>
-              )}
-              <td style={{ padding: '6px 12px' }}>{entry.year || '—'}</td>
-              <td style={{ padding: '6px 12px', textAlign: 'center' }}>
+              <td style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }} title={entry.schedule || ''}>
+                {entry.schedule || (showSchedule ? 'no schedule set' : '—')}
+              </td>
+              <td style={CELL}>{entry.year || '—'}</td>
+              <td style={{ ...CELL, textAlign: 'center' }}>
                 <span style={{
                   background: style.bg, color: style.fg, borderRadius: 999, padding: '3px 10px',
                   fontSize: 11, fontWeight: 700, letterSpacing: '.3px', textTransform: 'uppercase',
