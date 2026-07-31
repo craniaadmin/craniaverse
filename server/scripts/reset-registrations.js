@@ -177,7 +177,11 @@ async function main() {
   console.log('Will create:')
   resolved.forEach((pair, i) => {
     const who = i === 0 ? 'Test Studentone' : 'Test Studenttwo'
-    console.log(`  ${who} → ${pair.map(p => p.name).join('  +  ')}`)
+    console.log(`  ${who}`)
+    for (const p of pair) {
+      const when = firstSchedule(p)
+      console.log(`      ${p.name} — ${when || '(no timetable — will show as unmatched)'}`)
+    }
   })
   console.log()
 
