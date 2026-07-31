@@ -596,7 +596,17 @@ function ContestsPage({ onNavigate }) {
     })
   }, [programs, extras, hidden])
 
-  const allRows = useMemo(() => [...programRows, ...manual], [programRows, manual])
+  /* Blank program-derived rows can't be pruned the way blank manual rows
+     are — they are generated from the catalogue on every load, so the
+     only place to drop them is here. Counted so the footer can say why
+     they aren't listed. */
+  const { allRows, blankProgramRows } = useMemo(() => {
+    const keptProgram = programRows.filter(r => !isBlankRow(r))
+    return {
+      allRows: [...keptProgram, ...manual.filter(r => !isBlankRow(r))],
+      blankProgramRows: programRows.length - keptProgram.length,
+    }
+  }, [programRows, manual])
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase()
