@@ -185,8 +185,10 @@ const CSS = `
 .ct td.col-numOrdered,.ct td.col-status{text-align:center}
 .ct td.col-regDeadline,.ct td.col-contestDate{text-align:center;white-space:nowrap}
 .ct .cname{font-weight:700;color:#3d7f7d}
-.ct .clink{background:none;border:none;padding:0 0 0 5px;color:#3d7f7d;cursor:pointer;
-    display:inline-flex;vertical-align:middle}
+.ct button.clink{background:none;border:none;padding:0;margin:0;font:inherit;font-weight:700;
+    font-size:12px;color:#3d7f7d;cursor:pointer;text-align:left;max-width:100%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.ct button.clink:hover{text-decoration:underline}
 .ct .dash{color:var(--faint)}
 .ct .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;margin:0;line-height:1;
     cursor:pointer;transition:color .15s;display:inline-flex;vertical-align:middle}
