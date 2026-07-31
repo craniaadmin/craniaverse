@@ -521,6 +521,7 @@ function Th({ children, align = 'left' }) {
   return <th style={{
     fontSize: 11, fontWeight: 700, letterSpacing: '.5px', textTransform: 'uppercase', color: 'var(--muted)',
     padding: '8px 12px', textAlign: align, whiteSpace: 'nowrap',
+    overflow: 'hidden', textOverflow: 'ellipsis',
   }}>{children}</th>
 }
 
