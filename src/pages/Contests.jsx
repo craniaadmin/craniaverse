@@ -83,10 +83,15 @@ function tryLoad(key, fallback) {
 
 const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 
-/* The old "+ Add Row" wrote an empty row straight to the server before
-   asking for anything, so a mis-click left a blank line sitting at the
-   bottom of the table forever. Status alone doesn't count as content —
-   every new row started as "Waiting". */
+/* A row with nothing in it can neither be read nor acted on, so it is not
+   shown — whichever end it came from. Two ends produce them:
+
+   - the old "+ Add Row", which wrote an empty row to the server before
+     asking for anything, so a mis-click left a blank line behind;
+   - a program sitting in a contest category with no name, which is a
+     broken record over on Programs rather than anything this page owns.
+
+   Status alone is not content — every blank row starts as "Waiting". */
 const isBlankRow = (r) =>
   !String(r.org || '').trim() && !String(r.contest || '').trim() &&
   !r.regDeadline && !r.contestDate && String(r.numOrdered ?? '').trim() === ''
