@@ -82,6 +82,14 @@ function tryLoad(key, fallback) {
 }
 
 const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
+
+/* The old "+ Add Row" wrote an empty row straight to the server before
+   asking for anything, so a mis-click left a blank line sitting at the
+   bottom of the table forever. Status alone doesn't count as content —
+   every new row started as "Waiting". */
+const isBlankRow = (r) =>
+  !String(r.org || '').trim() && !String(r.contest || '').trim() &&
+  !r.regDeadline && !r.contestDate && String(r.numOrdered ?? '').trim() === ''
 const EMPTY = { extras: {}, manual: [], hidden: [], hiddenCols: {}, colOrder: [] }
 
 const clone = (d) => ({
