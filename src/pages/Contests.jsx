@@ -498,13 +498,14 @@ function ContestsPage({ onNavigate }) {
     }
   }, [mutate])
 
-  const addRow = () => {
-    const id = uid('manual-')
-    mutate(d => {
-      d.manual.push({ id, org: '', contest: '', regDeadline: '', contestDate: '', numOrdered: '', status: 'Waiting' })
-    })
-    setEditing({ row: { id, fromProgram: false, org: '', contest: '', regDeadline: '', contestDate: '', numOrdered: '', status: 'Waiting' } })
-  }
+  /* Nothing is written until Save — cancelling out of the box leaves no
+     trace, which is what stops blank rows accumulating at the bottom. */
+  const addRow = () => setEditing({
+    row: {
+      id: uid('manual-'), fromProgram: false, isNew: true,
+      org: '', contest: '', regDeadline: '', contestDate: '', numOrdered: '', status: 'Waiting',
+    },
+  })
 
   /* A program-derived row has no life of its own to copy, so duplicating
      one lifts its current values into a standalone manual row. */
