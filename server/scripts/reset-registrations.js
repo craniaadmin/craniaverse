@@ -123,7 +123,8 @@ function makeStudent({ id, first, last, gender, dob, age, grade, programs }) {
       active: true, status: 'Active', year: '26_27',
       /* Take the catalogue's own unit — these programs carry a flat cost with
          no unit, and inventing one would misstate the fee. */
-      program: p.name, rate: `$${p.cost}`, rateUnit: p.costUnit || '',
+      program: p.name, schedule: firstSchedule(p),
+      rate: `$${p.cost}`, rateUnit: p.costUnit || '',
       fees: freshFees(), payment: 'Pending',
     })),
     cashLog: [],
