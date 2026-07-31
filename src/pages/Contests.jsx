@@ -39,16 +39,21 @@ const COLS = [
 ]
 const LOCKED_COL = 'contest'
 
-/* Text columns take proportions so they share out whatever the card gives
-   them; Ordered and Status take pixels because their contents don't scale —
-   a percentage Status clips the "CANCELLED" pill as soon as the window
-   narrows. The proportions are sized against the 720px min-width so nothing
-   overflows there; above it a fixed layout hands the slack back in these
-   same ratios, which is also why hiding a column widens the rest instead of
-   leaving a gap. */
+/* Every column is a proportion, including the checkbox and the row buttons,
+   and they sum to 100. Mixing in pixel widths looks tidier but isn't: a
+   fixed layout hands all the leftover space to the pixel columns, so on a
+   wide screen Status and Ordered ballooned while the text columns stayed
+   put. Proportions keep the slack going where it is worth something.
+
+   The floor is the 720px min-width: at that size Status still clears the
+   width of the "CANCELLED" pill and the button column still holds three
+   icons. Because these are ratios, hiding a column widens the rest rather
+   than leaving a gap. */
+const SEL_W = '3%'
+const ACT_W = '9%'
 const COL_W = {
-  org: '13%', contest: '20%', regDeadline: '13%',
-  contestDate: '12%', numOrdered: 74, status: 118,
+  org: '16%', contest: '23%', regDeadline: '15%',
+  contestDate: '13%', numOrdered: '8%', status: '13%',
 }
 
 /* Computed per call rather than once at module load — a tab left open
