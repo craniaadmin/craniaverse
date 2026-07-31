@@ -18,6 +18,20 @@
         "dev"
       ],
       "port": 5173
+    },
+    {
+      "name": "ctpreview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "vite.ctpreview.config.js",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "5196"
+      ],
+      "port": 5196
     }
   ]
 }

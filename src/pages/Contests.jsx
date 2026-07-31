@@ -1140,7 +1140,9 @@ function StatusSelect({ value, onChange }) {
         border: 'none', outline: 'none', cursor: 'pointer',
         borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 700,
         letterSpacing: '.4px', textTransform: 'uppercase', fontFamily: 'inherit',
-        background: style.bg, color: style.fg,
+        /* backgroundColor, not the `background` shorthand — mixing it with the
+           longhands below makes React warn on every re-render. */
+        backgroundColor: style.bg, color: style.fg,
         appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none',
         paddingRight: 20,
         backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 3l3 4 3-4' stroke='${encodeURIComponent(style.fg)}' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>")`,
