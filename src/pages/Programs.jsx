@@ -1301,6 +1301,36 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
     setEnrolFilter('')
   }, [])
 
+  /* ---------- arriving from another page ----------
+     onNavigate('Programs', programId) — e.g. clicking a contest name on
+     the Contests page. Whatever was filtered before would likely hide
+     the program we were sent to find, so clear the filters first, then
+     scroll its rows into view and mark them for a moment. */
+  const [focusProg, setFocusProg] = useState(null)
+
+  useEffect(() => {
+    if (!initialProgramId) return
+    clearAllFilters()
+    setFocusProg(String(initialProgramId))
+    onConsumeInitialProgram && onConsumeInitialProgram()
+  }, [initialProgramId, clearAllFilters, onConsumeInitialProgram])
+
+  useEffect(() => {
+    if (!focusProg) return
+    // One frame for the cleared filters to render the rows back in.
+    const scroll = setTimeout(() => {
+      const rows = document.querySelectorAll('.pg tbody tr[data-prog]')
+      for (const el of rows) {
+        if (el.dataset.prog === focusProg) {
+          el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+          break
+        }
+      }
+    }, 80)
+    const fade = setTimeout(() => setFocusProg(null), 2800)
+    return () => { clearTimeout(scroll); clearTimeout(fade) }
+  }, [focusProg])
+
   const orderedCols = useMemo(
     () => colOrder.map(k => COL[k]).filter(c => c && c.l && !hiddenCols[c.k]),
     [colOrder, hiddenCols])
