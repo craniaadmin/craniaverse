@@ -740,16 +740,20 @@ function ContestsPage({ onNavigate }) {
   // ---- body rows, with adjacent equal organisations collapsed ----
   const bodyRows = []
   let prevOrg = null
-  visible.forEach((r, i) => {
-    const sameOrg = prevOrg !== null && prevOrg === (r.org || '') && !!r.org
-    if (!sameOrg && i > 0) {
+  visible.forEach((r) => {
+    const orgKey = r.org || ''
+    // Blank the repeated cell only within a real, named organisation…
+    const sameOrg = prevOrg !== null && prevOrg === orgKey && !!orgKey
+    // …but draw the divider whenever the organisation actually changes,
+    // so a run of rows with no organisation isn't sliced up row by row.
+    if (prevOrg !== null && prevOrg !== orgKey) {
       bodyRows.push(
         <tr className="grpsep" key={'sep-' + r.id}>
           <td className="nosep" /><td colSpan={orderedCols.length + 2} />
         </tr>
       )
     }
-    prevOrg = r.org || ''
+    prevOrg = orgKey
 
     const isSel = selected.has(r.id)
     const tds = orderedCols.map(c => {
