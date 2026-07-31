@@ -956,7 +956,8 @@ app.put('/api/stock', wrap(async (req, res) => {
 // Shape:
 //   { extras: {[rowKey]: {org, contest, regDeadline, contestDate, numOrdered, status}},
 //     manual: [{id, org, contest, regDeadline, contestDate, numOrdered, status}],
-//     hidden: [rowKey] }
+//     hidden: [rowKey], hiddenCols: {[colKey]: true}, colOrder: [colKey] }
+// `hidden` hides program-derived rows; `hiddenCols` hides table columns.
 app.get('/api/contests', wrap(async (_req, res) => res.json(await loadContests())))
 app.put('/api/contests', wrap(async (req, res) => {
   const body = req.body || {}
@@ -964,6 +965,8 @@ app.put('/api/contests', wrap(async (req, res) => {
     extras: body.extras && typeof body.extras === 'object' ? body.extras : {},
     manual: Array.isArray(body.manual) ? body.manual : [],
     hidden: Array.isArray(body.hidden) ? body.hidden : [],
+    hiddenCols: body.hiddenCols && typeof body.hiddenCols === 'object' ? body.hiddenCols : {},
+    colOrder: Array.isArray(body.colOrder) ? body.colOrder : [],
   }
   await saveContests(payload)
   res.json({ ok: true })
