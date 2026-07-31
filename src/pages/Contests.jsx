@@ -746,17 +746,22 @@ function ContestsPage({ onNavigate }) {
 
       let cls = `col-${k}`, style, content
 
-      if (k === 'contest') {
-        content = (
-          <>
-            <span className="cname">{r.contest || <span className="dash">—</span>}</span>
-            {r.fromProgram && (
-              <button className="clink" title={`View "${r.programName}" in Programs`}
-                onClick={e => { e.stopPropagation(); onNavigate && onNavigate('Programs') }}
-              ><ExternalLink size={12} /></button>
-            )}
-          </>
+      /* The contest name is the link to its program, so this is the one
+         cell that doesn't edit in place — use ✎, double-click or the
+         right-click menu to change it. Manual rows have no program to
+         link to, so they stay inline-editable. */
+      if (k === 'contest' && r.fromProgram) {
+        return (
+          <td key={k} className="col-contest">
+            <button className="cname clink" title={`Open ${r.programName} in Programs`}
+              onClick={e => { e.stopPropagation(); onNavigate && onNavigate('Programs', r.id) }}
+            >{r.contest || r.programName || '—'}</button>
+          </td>
         )
+      }
+
+      if (k === 'contest') {
+        content = <span className="cname">{r.contest || <span className="dash">—</span>}</span>
       } else if (k === 'regDeadline' || k === 'contestDate') {
         const ds = k === 'regDeadline' ? deadlineStyle(r.regDeadline) : null
         if (ds) { cls += ' tint'; style = { '--tint': ds.bg, color: ds.fg, fontWeight: 700 } }
