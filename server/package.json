@@ -10,7 +10,8 @@
     "pb-setup": "node scripts/pb-setup.js",
     "cleanup-test-records": "node scripts/cleanup-test-records.js",
     "reset-calendar": "node scripts/reset-calendar.js",
-    "reset-registrations": "node scripts/reset-registrations.js"
+    "reset-registrations": "node scripts/reset-registrations.js",
+    "tidy-class-lists": "node scripts/tidy-class-lists.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",

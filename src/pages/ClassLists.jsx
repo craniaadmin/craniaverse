@@ -464,7 +464,7 @@ export default function ClassLists({ onNavigate }) {
    measures its own students and the columns land somewhere different in
    every block. The "Says" column is always present, so a class with a
    schedule mismatch lines up with the ones without. */
-const COLS = ['19%', '7%', '17%', '27%', '12%', '7%', '9%', '44px']
+const COLS = ['20%', '64px', '16%', '26%', '13%', '78px', '120px', '44px']
 
 const CELL = {
   padding: '6px 12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
