@@ -99,6 +99,15 @@ function summarise(sessions) {
   return label ? `${label}  ·  ${sessions.length} session${sessions.length === 1 ? '' : 's'}` : 'Unscheduled'
 }
 
+/* A class like FLEX MATH runs twenty-nine sessions, and spelling every one
+   of them out wraps the mismatch banner onto three lines. Name a few and
+   count the rest — the class header above already carries the full summary. */
+function sessionsPhrase(sessions, max = 4) {
+  const labels = [...new Set(sessions.map((s) => sessionLabel(s.session)))]
+  if (labels.length <= max) return labels.join(', ')
+  return `${labels.slice(0, max).join(', ')} and ${labels.length - max} other times`
+}
+
 function guardianContact(customer) {
   const g = customer?.guardian1 || {}
   const name = `${g['First Name'] || ''} ${g['Last Name'] || ''}`.trim()
