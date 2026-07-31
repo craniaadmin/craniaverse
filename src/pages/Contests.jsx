@@ -393,7 +393,18 @@ function useContests() {
           }
         }
 
-        apply({ extras, manual, hidden, hiddenCols, colOrder })
+        // Sweep out blank rows left behind by the old add-row behaviour,
+        // and write the tidied list straight back so they stay gone.
+        const kept = manual.filter(r => !isBlankRow(r))
+        const next = { extras, manual: kept, hidden, hiddenCols, colOrder }
+        apply(next)
+        if (kept.length !== manual.length) {
+          fetch(`${API_BASE}/api/contests`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...HEADERS },
+            body: JSON.stringify(next),
+          }).catch(() => {})
+        }
         setStatus('online')
       })
       .catch(() => alive && setStatus('offline'))
