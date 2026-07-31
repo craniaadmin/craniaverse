@@ -1077,7 +1077,7 @@ function EditModal({ row, onClose, onSave, onDelete }) {
   return (
     <div className="ctov" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="ctmodal" onClick={e => e.stopPropagation()}>
-        <h2>{row.fromProgram ? 'Edit Contest Row' : 'Edit Manual Row'}</h2>
+        <h2>{row.isNew ? 'Add Contest' : row.fromProgram ? 'Edit Contest Row' : 'Edit Manual Row'}</h2>
         {row.fromProgram && (
           <div className="mhint">
             Backed by the program <b>{row.programName}</b>. Editing here overrides what
