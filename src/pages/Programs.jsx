@@ -559,6 +559,9 @@ const CSS = `
 .pg tbody tr.progsep td.nosep{border-top:none}
 .pg tbody tr:hover td{background:#E4EFF3}
 .pg tbody tr.sel td{background:#DCEEEC}
+/* Marks the program another page sent us to, then fades out on its own. */
+.pg tbody tr.rfocus td{background:#CDEAF8;animation:pgfocus 2.8s ease-out forwards}
+@keyframes pgfocus{0%{background:#A6E2F9}70%{background:#CDEAF8}100%{background:var(--pill)}}
 .pg tbody tr.rinactive td:not(.col-year):not(.col-category):not(.col-subject):not(.col-number):not(.col-code):not(.col-name):not(.col-active){color:#b0a99e}
 .pg tbody tr.rinactive td.tint:not(.col-category):not(.col-subject):not(.col-active){background:var(--pill) !important;color:#b0a99e !important}
 .pg tbody tr.rinactive td.col-active.tint{background:#FADBD8 !important;color:#922B21 !important}
