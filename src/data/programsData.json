@@ -147,30 +147,7 @@
               "end": "12:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "10",
-      "platform": "Online",
-      "cost": 199,
-      "costUnit": ""
-    },
-    {
-      "id": "ms67xmcgs73jx",
-      "number": "1020101",
-      "code": "FM-S",
-      "name": "FLEX MATH - SINGLE",
-      "subject": "MATH",
-      "category": "FLEX",
-      "ageRange": "1–10",
-      "duration": 55,
-      "sessions": "1",
-      "period": "/week",
-      "rate": 58.91,
-      "totalHours": 32.08,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms67xmcg4qcaz",
           "locationId": "loc_boardwalk",
@@ -191,7 +168,7 @@
       "year": "2026–27",
       "gradeFrom": "1",
       "gradeTo": "10",
-      "platform": "In-Person",
+      "platform": "Online",
       "cost": 199,
       "costUnit": ""
     },
@@ -705,30 +682,7 @@
               "end": "12:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 299,
-      "costUnit": ""
-    },
-    {
-      "id": "ms68gtv83025p",
-      "number": "1020202",
-      "code": "FE-D",
-      "name": "FLEX ENGLISH - DOUBLE",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "2",
-      "period": "/week",
-      "rate": 45.04,
-      "totalHours": 64.17,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms68gtv8jo9hl",
           "locationId": "loc_waterloo",
@@ -938,30 +892,7 @@
               "end": "12:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 329,
-      "costUnit": ""
-    },
-    {
-      "id": "ms687tjgn6u03",
-      "number": "1020203",
-      "code": "FE-U",
-      "name": "FLEX ENGLISH - UNLIMITED",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "5",
-      "period": "/week",
-      "rate": 21.76,
-      "totalHours": 160.42,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms687tjgmnltm",
           "locationId": "loc_waterloo",
@@ -977,31 +908,7 @@
               "end": "18:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 329,
-      "costUnit": "",
-      "active": true
-    },
-    {
-      "id": "ms687npzcilnr",
-      "number": "1020203",
-      "code": "FE-U",
-      "name": "FLEX ENGLISH - UNLIMITED",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "5",
-      "period": "/week",
-      "rate": 21.76,
-      "totalHours": 160.42,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms687npzimrn8",
           "locationId": "loc_boardwalk",
@@ -1017,31 +924,7 @@
               "end": "17:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 329,
-      "costUnit": "",
-      "active": true
-    },
-    {
-      "id": "ms687mv8by2iz",
-      "number": "1020203",
-      "code": "FE-U",
-      "name": "FLEX ENGLISH - UNLIMITED",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "5",
-      "period": "/week",
-      "rate": 21.76,
-      "totalHours": 160.42,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms687mv8fm3fn",
           "locationId": "loc_boardwalk",
@@ -1057,31 +940,7 @@
               "end": "19:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 329,
-      "costUnit": "",
-      "active": true
-    },
-    {
-      "id": "ms687m2stuf7u",
-      "number": "1020203",
-      "code": "FE-U",
-      "name": "FLEX ENGLISH - UNLIMITED",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "5",
-      "period": "/week",
-      "rate": 21.76,
-      "totalHours": 160.42,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms687m2sqy5wc",
           "locationId": "loc_boardwalk",
@@ -1097,31 +956,7 @@
               "end": "19:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 329,
-      "costUnit": "",
-      "active": true
-    },
-    {
-      "id": "ms687lbqsu8nu",
-      "number": "1020203",
-      "code": "FE-U",
-      "name": "FLEX ENGLISH - UNLIMITED",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "5",
-      "period": "/week",
-      "rate": 21.76,
-      "totalHours": 160.42,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms687lbqbvzbl",
           "locationId": "loc_boardwalk",
@@ -1137,31 +972,7 @@
               "end": "19:25"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "3",
-      "platform": "In-Person",
-      "cost": 329,
-      "costUnit": "",
-      "active": true
-    },
-    {
-      "id": "ms687jy5jxcdv",
-      "number": "1020203",
-      "code": "FE-U",
-      "name": "FLEX ENGLISH - UNLIMITED",
-      "subject": "ENGLISH",
-      "category": "FLEX",
-      "ageRange": "1–3",
-      "duration": 55,
-      "sessions": "5",
-      "period": "/week",
-      "rate": 21.76,
-      "totalHours": 160.42,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms687jy5cchpl",
           "locationId": "loc_boardwalk",
@@ -1435,30 +1246,7 @@
               "end": "19:30"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "3",
-      "gradeTo": "4",
-      "platform": "In-Person",
-      "cost": 289,
-      "costUnit": ""
-    },
-    {
-      "id": "ms680hq4y0fx9",
-      "number": "1010102",
-      "code": "ME2",
-      "name": "MATH ENRICHMENT - LEVEL 2",
-      "subject": "MATH",
-      "category": "ENRICHMENT",
-      "ageRange": "3–4",
-      "duration": 120,
-      "sessions": "1",
-      "period": "/week",
-      "rate": 41.29,
-      "totalHours": 70,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms680hq4z5z56",
           "locationId": "loc_boardwalk",
@@ -1514,30 +1302,7 @@
               "end": "19:30"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "5",
-      "gradeTo": "6",
-      "platform": "In-Person",
-      "cost": 289,
-      "costUnit": ""
-    },
-    {
-      "id": "ms680lqbnqa5r",
-      "number": "1010103",
-      "code": "ME3",
-      "name": "MATH ENRICHMENT - LEVEL 3",
-      "subject": "MATH",
-      "category": "ENRICHMENT",
-      "ageRange": "5–6",
-      "duration": 120,
-      "sessions": "1",
-      "period": "/week",
-      "rate": 41.29,
-      "totalHours": 70,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms680lqb40dpc",
           "locationId": "loc_boardwalk",
@@ -1593,31 +1358,7 @@
               "end": "19:30"
             }
           ]
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "7",
-      "gradeTo": "8",
-      "platform": "In-Person",
-      "cost": 289,
-      "costUnit": "",
-      "active": true
-    },
-    {
-      "id": "ms680mdy8bye6",
-      "number": "1010104",
-      "code": "ME4",
-      "name": "MATH ENRICHMENT - LEVEL 4",
-      "subject": "MATH",
-      "category": "ENRICHMENT",
-      "ageRange": "7–8",
-      "duration": 120,
-      "sessions": "1",
-      "period": "/week",
-      "rate": 41.29,
-      "totalHours": 70,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms680mdymoasp",
           "locationId": "loc_boardwalk",
@@ -2305,30 +2046,7 @@
           "capacity": 1,
           "enrolled": "",
           "instructor": ""
-        }
-      ],
-      "year": "2026–27",
-      "gradeFrom": "1",
-      "gradeTo": "12",
-      "platform": "In-Person",
-      "cost": 105,
-      "costUnit": ""
-    },
-    {
-      "id": "ms689dps405mi",
-      "number": "1060502",
-      "code": "PNO-JR",
-      "name": "PIANO PRIVATE 30MIN - JR",
-      "subject": "PIANO",
-      "category": "PRIVATE PIANO LESSONS",
-      "ageRange": "1–12",
-      "duration": 30,
-      "sessions": "1",
-      "period": "/week",
-      "rate": 60,
-      "totalHours": 17.5,
-      "description": "",
-      "offerings": [
+        },
         {
           "id": "ms689dpspg3at",
           "locationId": "loc_boardwalk",
