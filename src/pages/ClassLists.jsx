@@ -176,31 +176,45 @@ function useClassLists() {
   return useMemo(() => {
     const realRecords = records.filter((r) => r.id !== 'seed')
 
-    // A registration names its program as free text, so classes are keyed by
-    // name. The same name can appear on more than one program record, so keep
-    // every one as a candidate and route each student to whichever record has
-    // a session matching their schedule text, falling back to the first.
-    const classes = programs.map((p) => ({ program: p, roster: [], allSessions: sessionsOf(p) }))
-    const byName = new Map() // norm(name) -> class wrapper[]
-    for (const c of classes) {
-      const key = norm(c.program.name)
-      if (!key) continue
-      if (!byName.has(key)) byName.set(key, [])
-      byName.get(key).push(c)
+    /* One card per class name. The catalogue holds the same name as several
+       program records — FLEX ENGLISH - UNLIMITED exists seven times — and
+       giving each its own card split one class across repeated headings.
+       Merge their sessions instead, so the class appears once and every
+       session it runs is a heading underneath it.
+
+       A record with no name can't be merged by name, so it stays on its own
+       keyed by id rather than collapsing every unnamed program into one. */
+    const byName = new Map()
+    for (const p of programs) {
+      const key = norm(p.name) || ` id:${p.id}`
+      if (!byName.has(key)) byName.set(key, { program: p, records: [], roster: [], allSessions: [] })
+      const c = byName.get(key)
+      c.records.push(p)
+      /* Two records describing the same physical session — same site, day and
+         time — are one class, so collapse them or the merge just moves the
+         duplication down a level. Fill in details the winner happens to lack. */
+      for (const sess of sessionsOf(p)) {
+        const sig = `${sess.locationId}|${sess.day}|${sess.start}|${sess.end}`
+        const seen = c.allSessions.find((x) => x.sig === sig)
+        if (seen) {
+          if (!seen.instructor && sess.instructor) seen.instructor = sess.instructor
+          if (seen.capacity == null && sess.capacity != null) seen.capacity = sess.capacity
+          continue
+        }
+        c.allSessions.push({ ...sess, sig })
+      }
+      // Show the fullest record's details in the header and deep link.
+      if ((p.offerings || []).length > (c.program.offerings || []).length) c.program = p
     }
+    const classes = [...byName.values()]
     const unlistedByTitle = new Map()
 
     for (const r of realRecords) {
       for (const entry of (r.programs || [])) {
         if (!entry.program) continue
         const row = { record: r, entry }
-        const candidates = byName.get(norm(entry.program))
-        if (candidates && candidates.length > 0) {
-          let cls = candidates[0]
-          if (candidates.length > 1) {
-            const matched = candidates.find((c) => matchSession(entry, c.allSessions, locNameOf))
-            if (matched) cls = matched
-          }
+        const cls = byName.get(norm(entry.program))
+        if (cls) {
           cls.roster.push(row)
         } else {
           const key = entry.program
