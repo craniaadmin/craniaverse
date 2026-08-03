@@ -543,7 +543,9 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       enrolments += (r.record.programs || []).filter(p => p.active).length
       if (r.classList.length === 0) noClasses++
     }
-    return { families: fams.size, students: allRows.length, enrolments, noClasses }
+    // Real money still to collect, from the same engine the fee panel uses.
+    const owed = outstandingFor(allRows.map(r => r.record))
+    return { families: fams.size, students: allRows.length, enrolments, noClasses, owed }
   }, [allRows])
 
   const anyFilterActive = !!search || noClassesOnly
