@@ -523,15 +523,24 @@ export default function ClassLists({ onNavigate }) {
                               letterSpacing: '.3px', color: '#8a6a00', background: '#fffbf0',
                               borderTop: '1px solid #f4e4bd',
                             }}>
-                              {c.unspecified.every((r) => r.why === 'location')
-                                ? 'BOOKED AT A SITE THAT DOESN’T RUN THIS CLASS THEN'
-                                : 'SCHEDULE DOESN’T MATCH A LISTED SESSION'}
+                              {c.unspecified.every((r) => r.why === 'nosite')
+                                ? 'NO SITE ON THE REGISTRATION'
+                                : c.unspecified.every((r) => r.why === 'location')
+                                  ? 'BOOKED AT A SITE THAT DOESN’T RUN THIS CLASS THEN'
+                                  : 'SCHEDULE DOESN’T MATCH A LISTED SESSION'}
                               <span style={{ fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>
-                                {' '}— this class runs {sessionsPhrase(c.sessions)}.
-                                {c.unspecified.some((r) => r.why === 'location') &&
-                                  ' The site each registration names is shown below; that day and time'
-                                  + ' runs somewhere else.'}
-                                {' '}Check the registration or the program’s timetable.
+                                {c.unspecified.every((r) => r.why === 'nosite')
+                                  ? ` — that day and time runs at ${
+                                      [...new Set(c.unspecified.flatMap((r) => r.slotSites || []))].join(' and ')
+                                    }, and the registration doesn’t say which. Set it on the`
+                                    + ' registration and they will drop into the right roster.'
+                                  : <>
+                                      {' '}— this class runs {sessionsPhrase(c.sessions)}.
+                                      {c.unspecified.some((r) => r.why === 'location') &&
+                                        ' The site each registration names is shown below; that day and time'
+                                        + ' runs somewhere else.'}
+                                      {' '}Check the registration or the program’s timetable.
+                                    </>}
                               </span>
                             </div>
                             <Roster rows={c.unspecified} onNavigate={onNavigate} showSchedule />
