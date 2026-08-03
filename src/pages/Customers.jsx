@@ -1114,6 +1114,12 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
   )
 }
 
+/* Our payment squares hold four states — paid / pending / overdue / empty —
+   where the template holds a boolean, so "has this been paid" is a string
+   test, not truthiness. Only `paid` is money actually received. */
+const paidMonth = (prog, key) =>
+  String((prog?.fees || {})[String(key).toLowerCase()] || '').toLowerCase() === 'paid'
+
 /* The calculator, matching the Customers template: ten billed months of
    3.5 lessons, first month pro-rated by the starting lesson. */
 function FeePanel({ prog, fc, engine, setCalc, onBilling, onSessions, onPdf, pdfBusy }) {
