@@ -618,8 +618,14 @@ function CtxMenu({ x, y, items, onClose }) {
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
+/* No Undo/Redo on this view, unlike the template's toolbar. Nothing here is
+   an editable field — the only mutations are add, duplicate and delete, and
+   delete is a server-side DELETE with no restore endpoint. Re-posting the
+   record would give it a new id and lose its enrolments and fee history, so
+   an Undo button here would quietly destroy data rather than recover it.
+   Field edits are undoable where they happen, in the detail view. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
-  onNavigate, familyIds, undo, redo }) {
+  onNavigate, familyIds }) {
   const { records, programs } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
