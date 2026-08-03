@@ -122,6 +122,17 @@ const CSS = `
 .cu .metric.menr{border-bottom-color:var(--light-blue)}
 .cu .metric.mnone{border-bottom-color:#c0392b}
 .cu .metric.mowed{border-bottom-color:#8a6a00}
+.cu .famref{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);font-weight:600}
+.cu .filters .toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    color:var(--muted);cursor:pointer}
+.cu .filters .toggle input{accent-color:var(--teal);cursor:pointer;margin:0}
+.cu .frow .selin{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--field);
+    border-radius:8px;font:inherit;font-size:13px;background:#fff;color:var(--dark-brown)}
+.cu .frow .selin:focus{outline:none;border-color:var(--teal)}
+.cu .consents{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;
+    border-top:1px solid var(--line)}
+.cu .consent{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dark-brown);cursor:pointer}
+.cu .consent input{accent-color:var(--teal);cursor:pointer;margin:0}
 .cu .metric .label{font-size:12.5px;color:#6b6455;font-weight:600;margin-bottom:4px}
 .cu .metric .value{font-size:24px;font-weight:700;color:var(--dark-brown);font-variant-numeric:tabular-nums}
 .cu .metric .hint{font-size:11.5px;color:#9a948a;margin-top:3px}
@@ -1197,6 +1208,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
   }
 
   const { student, guardian1, guardian2, emergency } = custFields
+  const meta = custFields.meta || {}
   const displayed = showOnlyActive ? progs.filter(p => p.active) : progs
 
   const panel = (title, data, opts = {}) => (
