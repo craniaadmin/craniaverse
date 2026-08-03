@@ -110,7 +110,7 @@ const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
    on a wide screen. Sized so nothing is squeezed at the 820px min-width. */
 const SEL_W = '3%'
 const ACT_W = '7%'
-const COL_W = { family: '10%', g1: '16%', g2: '15%', student: '18%', grade: '7%', classes: '21%' }
+const COL_W = { family: '12%', g1: '15%', g2: '14%', student: '17%', grade: '9%', classes: '20%' }
 
 const CPREF_KEY = 'customers-cols'
 function loadColPrefs() {
@@ -218,13 +218,17 @@ const CSS = `
     user-select:none;border-radius:6px;position:relative}
 /* Icons are pinned to the right only, so padding belongs on that side.
    Reserving 30px each way left "Family ID" about 30px and it read "FAMIL". */
-.cu thead th.colh .lbl{display:block;text-align:center;padding:0 24px 0 6px;
+.cu thead th.colh .lbl{display:block;text-align:center;padding:0 20px 0 4px;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cu thead th.selcol,.cu thead th:empty,.cu thead th.blankhead,
 .cu tbody td.selcol,.cu tbody td.actcell{background:transparent}
 .cu thead th.selcol input,.cu tbody td.selcol input{width:12px;height:12px;margin:0;
     accent-color:var(--teal);vertical-align:middle;cursor:pointer}
 .cu tbody td.actcell{white-space:nowrap;text-align:center}
+/* A student in two classes must show both names, not the first and an
+   ellipsis — which class the second one is, is the whole point of the
+   column. Only this column wraps; the row grows to fit. */
+.cu tbody td.col-classes{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px}
 .cu .selcol{text-align:center}
 .cu thead th .arw{opacity:.85;font-size:10px}
 .cu thead th.colh{cursor:grab}
@@ -1059,7 +1063,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
     ? (e.total > 0 && e.paid >= e.total - 0.005 ? 'Paid' : e.paid > 0 ? 'Partial' : 'Unpaid')
     : derivedPayment(prog.fees)
   const ps = PAYMENT_STYLE[payment] || { bg: '#eef1f4', fg: '#6B6455' }
-  const fc = prog.feeCalc || DEFAULT_FEE_CALC
+  const fc = feeCalcFor(prog)
   const setCalc = (patch) => onCalcChange(prog, { ...fc, ...patch })
 
   return (
@@ -1319,9 +1323,9 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
   }
 
   const [openFees, setOpenFees] = useState(() => new Set())
-  const toggleFees = (i) => setOpenFees(s => {
+  const toggleFees = (k) => setOpenFees(s => {
     const n = new Set(s)
-    if (n.has(i)) n.delete(i); else n.add(i)
+    if (n.has(k)) n.delete(k); else n.add(k)
     return n
   })
 
@@ -1485,7 +1489,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
               </td></tr>
             ) : displayed.map((p, i) => (
               <ProgramRow key={i} prog={p} onToggleActive={toggleActive} onFeeChange={updateFee}
-                onCalcChange={updateCalc} onSessionsChange={updateSessions} expanded={openFees.has(i)} onToggleExpand={() => toggleFees(i)}
+                onCalcChange={updateCalc} onSessionsChange={updateSessions} expanded={openFees.has(progKey(p, i))} onToggleExpand={() => toggleFees(progKey(p, i))}
                 onPdf={downloadPdf} pdfBusy={pdfBusy} />
             ))}
           </tbody>
