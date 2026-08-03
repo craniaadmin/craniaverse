@@ -110,7 +110,7 @@ const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
    on a wide screen. Sized so nothing is squeezed at the 820px min-width. */
 const SEL_W = '3%'
 const ACT_W = '7%'
-const COL_W = { family: '12%', g1: '15%', g2: '14%', student: '17%', grade: '9%', classes: '20%' }
+const COL_W = { family: '13%', g1: '15%', g2: '14%', student: '16%', grade: '10%', classes: '19%' }
 
 const CPREF_KEY = 'customers-cols'
 function loadColPrefs() {
@@ -218,7 +218,7 @@ const CSS = `
     user-select:none;border-radius:6px;position:relative}
 /* Icons are pinned to the right only, so padding belongs on that side.
    Reserving 30px each way left "Family ID" about 30px and it read "FAMIL". */
-.cu thead th.colh .lbl{display:block;text-align:center;padding:0 20px 0 4px;
+.cu thead th.colh .lbl{display:block;text-align:center;padding:0 30px 0 4px;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cu thead th.selcol,.cu thead th:empty,.cu thead th.blankhead,
 .cu tbody td.selcol,.cu tbody td.actcell{background:transparent}
