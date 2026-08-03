@@ -1020,6 +1020,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           <div className="label">Active Enrolments</div><div className="value">{metrics.enrolments}</div>
           <div className="hint">programs marked active</div>
         </div>
+        <div className="metric mpend">
+          <div className="label">New / On Hold</div><div className="value">{metrics.pending}</div>
+          <div className="hint">programs not yet active</div>
+        </div>
         <div className={'metric mnone clickable' + (noClassesOnly ? ' on' : '')}
           title="Click to show only students with no classes"
           onClick={() => setNoClassesOnly(v => !v)}>
