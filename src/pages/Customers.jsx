@@ -1058,6 +1058,52 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
     setProgs(updated); persistPrograms(updated)
   }
 
+  /* Fee inputs and billing cadence. `billing` sits beside feeCalc rather
+     than inside it — `schedule` on a program entry is already the class
+     time, so the cadence needs its own field. */
+  const updateCalc = (prog, feeCalc, billing) => {
+    const updated = progs.map(p => p === prog
+      ? { ...p, feeCalc, ...(billing != null ? { billing } : {}) }
+      : p)
+    setProgs(updated); persistPrograms(updated)
+  }
+
+  const [openFees, setOpenFees] = useState(() => new Set())
+  const toggleFees = (i) => setOpenFees(s => {
+    const n = new Set(s)
+    if (n.has(i)) n.delete(i); else n.add(i)
+    return n
+  })
+
+  const [pdfBusy, setPdfBusy] = useState(false)
+  const downloadPdf = async (prog, fc) => {
+    setPdfBusy(true)
+    try {
+      const res = await fetch(`${API_BASE}/api/fee-schedule/pdf`, {
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({
+          studentName: `${selected.student?.firstName || ''} ${selected.student?.lastName || ''}`.trim(),
+          programName: prog.program || '', year: prog.year || '',
+          firstLesson: fc.firstLesson, monthly: fc.monthlyFee,
+          regFee: fc.regFee, matFee: fc.matFee,
+          discount: fc.discount, discountType: fc.discountType,
+          billing: prog.billing || 'Monthly',
+        }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const blob = await res.blob()
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `fee-schedule-${(prog.program || 'program').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`
+      a.click()
+      URL.revokeObjectURL(a.href)
+    } catch {
+      dialog.alert('Could not build the PDF', 'The fee schedule service did not respond. The figures on screen are still correct.')
+    } finally {
+      setPdfBusy(false)
+    }
+  }
+
   const { student, guardian1, guardian2, emergency } = custFields
   const displayed = showOnlyActive ? progs.filter(p => p.active) : progs
 
