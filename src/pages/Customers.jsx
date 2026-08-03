@@ -586,6 +586,12 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     const out = allRows.filter(r => {
       if (noClassesOnly && r.classList.length > 0) return false
       if (!showInactive && r.inactive) return false
+      for (const [k, want] of Object.entries(colFilters)) {
+        if (!want) continue
+        // Classes is a list, so a row matches if any of them is the one picked.
+        if (k === 'classes') { if (!r.classList.includes(want)) return false }
+        else if (String(r[k] || '') !== want) return false
+      }
       if (!q) return true
       return r.g1.toLowerCase().includes(q) || r.g2.toLowerCase().includes(q) ||
              r.g1Email.toLowerCase().includes(q) || r.student.toLowerCase().includes(q) ||
