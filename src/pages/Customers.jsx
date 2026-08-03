@@ -307,15 +307,15 @@ const CSS = `
 .cu tbody td{padding:0 7px;background:var(--pill);border-radius:5px;font-size:12px;font-weight:400;
     vertical-align:middle;white-space:nowrap;line-height:1.35;height:22px;overflow:hidden;text-overflow:ellipsis}
 .cu tbody td.rep{background:transparent !important}
-/* Banded cells: one block per child, all student-scoped columns emitting the
-   same count in the same order, so a child's name, grade and programs line
-   up straight across the row. Fixed band height is what holds that
-   alignment — a taller cell elsewhere must not shift the rows out of step. */
-.cu tbody td.banded{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px;
-    vertical-align:top;overflow:visible;text-overflow:clip}
-.cu tbody td.banded .band{min-height:20px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.cu tbody td.banded.center .band{justify-content:center}
-.cu tbody td.banded .band + .band{margin-top:3px}
+/* A family's shared cells span its children's rows, so they sit level with
+   the whole group rather than with the first child. */
+.cu tbody td.famcell{vertical-align:middle}
+.cu tbody td.center{text-align:center}
+/* Programs is the one cell that may hold several pills; it wraps and the
+   table row grows, which is safe now that rowSpan holds the alignment. */
+.cu tbody td.col-classes{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px;
+    display:table-cell}
+.cu tbody td.col-classes .stupill{margin:1px 3px 1px 0}
 .cu .stupill{display:inline-block;max-width:100%;background:#E4EFF3;color:var(--dark-brown);
     border:none;border-radius:5px;padding:1px 7px;font:inherit;font-size:11.5px;font-weight:600;
     line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
