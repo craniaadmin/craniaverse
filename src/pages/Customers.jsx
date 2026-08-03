@@ -110,7 +110,7 @@ const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
    on a wide screen. Sized so nothing is squeezed at the 820px min-width. */
 const SEL_W = '3%'
 const ACT_W = '7%'
-const COL_W = { family: '8%', g1: '17%', g2: '15%', student: '18%', grade: '6%', classes: '23%' }
+const COL_W = { family: '10%', g1: '16%', g2: '15%', student: '18%', grade: '7%', classes: '21%' }
 
 const CPREF_KEY = 'customers-cols'
 function loadColPrefs() {
@@ -216,7 +216,10 @@ const CSS = `
 .cu thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
     user-select:none;border-radius:6px;position:relative}
-.cu thead th.colh .lbl{display:block;text-align:center;padding:0 30px}
+/* Icons are pinned to the right only, so padding belongs on that side.
+   Reserving 30px each way left "Family ID" about 30px and it read "FAMIL". */
+.cu thead th.colh .lbl{display:block;text-align:center;padding:0 24px 0 6px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cu thead th.selcol,.cu thead th:empty,.cu thead th.blankhead,
 .cu tbody td.selcol,.cu tbody td.actcell{background:transparent}
 .cu thead th.selcol input,.cu tbody td.selcol input{width:12px;height:12px;margin:0;
@@ -308,15 +311,21 @@ const CSS = `
 .cu .pdfbtn{background:var(--pill);border:1px solid var(--field);border-radius:7px;padding:4px 10px;
     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--dark-brown)}
 .cu .pdfbtn:disabled{opacity:.5;cursor:default}
-.cu .feegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+/* minmax(0,…) not (140px,…): a 1fr track keeps an automatic minimum of its
+   content, and a <select> measures to its longest option ("Every 3 Months"),
+   so the tracks refused to shrink and overflowed the panel. */
+.cu .feegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px 12px;margin-bottom:14px}
+.cu .feegrid > label{min-width:0}
 .cu .feegrid label{display:block;font-size:11.5px;font-weight:600;color:var(--muted)}
-.cu .feegrid input,.cu .feegrid select{width:100%;box-sizing:border-box;margin-top:4px;padding:6px 9px;
+.cu .feegrid input,.cu .feegrid select{width:100%;min-width:0;box-sizing:border-box;margin-top:4px;padding:6px 9px;
     border:1px solid var(--field);border-radius:7px;font:inherit;font-size:12.5px;background:#fff;color:var(--dark-brown)}
 .cu .feegrid input:focus,.cu .feegrid select:focus{outline:none;border-color:var(--teal)}
-.cu .feegrid .discrow{display:flex;gap:5px}
-.cu .feegrid .discrow input{flex:1}
+.cu .feegrid .discrow{display:flex;gap:5px;min-width:0}
+.cu .feegrid .discrow input{flex:1;min-width:0}
 .cu .feegrid .discrow select{width:56px;flex:none}
-.cu .feetotals{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:5px 18px;font-size:12.5px}
+.cu .feetotals{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:5px 22px;font-size:12.5px}
+.cu .feetotals div{min-width:0}
 .cu .feetotals div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
 .cu .feetotals span{color:var(--muted)}
 .cu .feetotals .paidline b{color:#2b7a2e}
@@ -335,7 +344,7 @@ const CSS = `
 .cu .sessadd{background:transparent;border:1px dashed var(--teal);color:var(--teal);border-radius:7px;
     padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:3px}
 .cu .feenote{font-size:11.5px;color:var(--muted);margin:10px 0 8px;line-height:1.4}
-.cu .feeinst{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:4px 14px;
+.cu .feeinst{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:4px 14px;
     border-top:1px solid var(--line);padding-top:10px}
 .cu .feeinst .irow{display:flex;justify-content:space-between;gap:10px;font-size:12px;
     background:var(--pill);border-radius:6px;padding:4px 9px}
@@ -985,7 +994,17 @@ const PAYMENT_STYLE = {
   Overdue: { bg: '#fde0e0', fg: '#a12626' },
 }
 
-const DEFAULT_FEE_CALC = { firstLesson: 1, monthlyFee: 0, regFee: 79, matFee: 59, discount: 0, discountType: '%' }
+/* Opening the panel on a program that has never been costed should show the
+   price it is sold at, not zero — a total of $138 beside a row reading
+   "$289 /wk" looks like the calculator is broken when it is only unfilled. */
+const feeCalcFor = (prog) => {
+  if (prog && prog.feeCalc) return prog.feeCalc
+  const n = Number(String((prog && prog.rate) || '').replace(/[^\d.]/g, ''))
+  return { firstLesson: 1, monthlyFee: Number.isFinite(n) ? n : 0, regFee: 79, matFee: 59, discount: 0, discountType: '%' }
+}
+
+// Stable across filtering, unlike a position in the visible array.
+const progKey = (prog, i) => `${prog?.program || ''}|${prog?.year || ''}|${i}`
 
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
