@@ -856,7 +856,8 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded,
       {expanded && (
         <tr>
           <td colSpan={8} style={{ background: 'transparent', padding: '0 0 10px' }}>
-            <FeePanel prog={prog} fc={fc} engine={e} setCalc={setCalc} onPdf={onPdf} pdfBusy={pdfBusy} />
+            <FeePanel prog={prog} fc={fc} engine={e} setCalc={setCalc}
+              onBilling={v => onCalcChange(prog, fc, v)} onPdf={onPdf} pdfBusy={pdfBusy} />
           </td>
         </tr>
       )}
