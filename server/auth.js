@@ -129,6 +129,13 @@ const PUBLIC_MATCHERS = [
   (m, p) => m === 'POST' && p === '/api/booth-signup',
   (m, p) => m === 'GET'  && /^\/api\/forms\/[^/]+$/.test(p),
   (m, p) => m === 'POST' && /^\/api\/forms\/[^/]+\/submit$/.test(p),
+  //   - The registration form builds its class list and its day/time
+  //     options from the live catalogue. Without these it renders an
+  //     empty form for everyone except a logged-in admin, whose session
+  //     cookie makes it look like it works. Both are reads of what the
+  //     school publicly offers; /api/locations returns ids and names only.
+  (m, p) => m === 'GET'  && p === '/api/programs',
+  (m, p) => m === 'GET'  && p === '/api/locations',
   // Test-runner status: names + error strings only, no credentials.
   // Public so the scheduled Claude agent can poll without a stored password.
   (m, p) => m === 'GET'  && p === '/api/tests/last-run',
