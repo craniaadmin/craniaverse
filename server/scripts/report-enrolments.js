@@ -41,6 +41,7 @@ const PB_URL = process.env.PB_URL || 'http://127.0.0.1:8090'
 const EMAIL = process.env.PB_ADMIN_EMAIL
 const PASSWORD = process.env.PB_ADMIN_PASSWORD
 const APPLY = process.argv.includes('--apply')
+const DELETE = process.argv.includes('--delete')
 
 // --map "Old=New" may be repeated.
 const MAP = new Map()
