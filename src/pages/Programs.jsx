@@ -1352,7 +1352,15 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
 
   /* ---------- cell content ---------- */
   const cellsFor = useCallback((r) => {
-    const cap = Number(r.capacity), en = Number(r.enrolled)
+    const cap = Number(r.capacity)
+    /* Enrolment follows the register. The stored `enrolled` field is a manual
+       override for classes tracked outside the system — blank means count the
+       students actually booked into this session, using the same matcher
+       Class Lists builds its rosters with so the two pages cannot disagree. */
+    const typed = String(r.enrolled ?? '').trim()
+    const en = typed !== ''
+      ? Number(typed)
+      : (enrolIndex.get(sessionKey(r.name, r.locId, r.day, r.slot && r.slot.start)) || 0)
     let spots
     if (isFinite(cap) && cap > 0) {
       const left = cap - (isFinite(en) ? en : 0)

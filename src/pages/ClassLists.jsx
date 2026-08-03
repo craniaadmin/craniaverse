@@ -13,11 +13,10 @@
 import { useMemo, useState } from 'react'
 import { Search, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
+import {
+  DOW, DOW_ORD, norm, fmtTime, sessionsOf, statedLocationId, matchSession,
+} from '../data/enrolment'
 
-const norm = (s) => String(s || '').trim().toUpperCase()
-
-const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const DOW_ORD = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 }
 /* Fallback only. The real list lives in programs_state and the Programs
    page lets it be renamed and added to, so `useLocName` below prefers
    that and only falls back here. */
@@ -40,97 +39,9 @@ function useLocName() {
 const CATEGORY_ORDER = ['ENRICHMENT', 'FLEX', 'TEKNOKIDS ROBOTICS', 'TEKNOKIDS CODING',
   'PRIVATE LESSONS', 'PRIVATE PIANO LESSONS', 'CONTESTS', 'SUMMER CAMP', 'CLUBS']
 
-// "16:30" -> "4:30 pm"
-function fmtTime(t) {
-  if (!t) return ''
-  const m = String(t).match(/^(\d{1,2}):(\d{2})/)
-  if (!m) return t
-  let h = parseInt(m[1], 10)
-  const min = m[2]
-  const ampm = h >= 12 ? 'pm' : 'am'
-  if (h === 0) h = 12
-  else if (h > 12) h -= 12
-  return `${h}:${min} ${ampm}`
-}
-
-/* An offering covers several days and several times at one location, so it is
-   not itself a class session. Flatten it the way the Programs page does — one
-   session per day × time — or every roster lumps together. */
-function sessionsOf(program) {
-  const out = []
-  for (const o of (program.offerings || [])) {
-    const days = (o.days || []).length ? [...o.days].sort((a, b) => DOW_ORD[a] - DOW_ORD[b]) : [null]
-    const times = (o.times || []).length ? o.times : [null]
-    for (const day of days) {
-      for (const t of times) {
-        out.push({
-          key: `${o.id}|${day}|${t ? t.start : ''}`,
-          day, start: t ? t.start : '', end: t ? t.end : '',
-          locationId: o.locationId, instructor: o.instructor || '',
-          capacity: o.capacity == null || o.capacity === '' ? null : Number(o.capacity),
-        })
-      }
-    }
-  }
-  return out
-}
-
 function sessionLabel(s) {
   const day = s.day == null ? '' : DOW[s.day]
   return [day, fmtTime(s.start)].filter(Boolean).join(' ') || 'Unscheduled'
-}
-
-/* The site a registration names. The public form writes it into
-   `platform` as "Boardwalk (In-Person)" / "Waterloo East (Online)" —
-   `location` exists in the record shape but comes through empty — so
-   read both. A bare "Online" names no site and must not be read as one,
-   which is why this matches against the locations actually on offer
-   rather than looking for a bracket. */
-function statedLocationId(entry, sessions, locNameOf) {
-  const hint = `${entry?.location || ''} ${entry?.platform || ''}`.trim().toLowerCase()
-  if (!hint) return null
-  const ids = [...new Set(sessions.map((s) => s.locationId).filter(Boolean))]
-  /* Longest name first. Sites whose names nest — "Waterloo" alongside
-     "Waterloo East" — would otherwise resolve to whichever came first in
-     the array rather than the one actually named. */
-  const named = ids
-    .map((id) => ({ id, name: String(locNameOf(id) || '').toLowerCase() }))
-    .filter((x) => x.name)
-    .sort((a, b) => b.name.length - a.name.length)
-  for (const { id, name } of named) if (hint.includes(name)) return id
-  return null
-}
-
-/* Match a student's free-text schedule ("Mon 4:30 pm") to one of the
-   program's sessions so rosters split by real session.
-
-   Location is part of the match, not decoration. FLEX MATH runs the same
-   day and time at both sites, so matching on day and time alone returned
-   whichever offering happened to sit first in the array and quietly filed
-   students at the wrong campus. When a registration names a site and that
-   site has no session at the stated time, this returns null rather than
-   guessing — the row then lands in the "doesn't match" bucket where the
-   conflict is visible and fixable. */
-function matchSession(entry, sessions, locNameOf) {
-  const s = String(entry?.schedule || '').toLowerCase()
-  if (!s || !sessions || sessions.length === 0) return null
-  const dayTime = sessions.filter((sess) => {
-    if (sess.day == null) return false
-    const day = s.includes(DOW[sess.day].toLowerCase())
-    const time = sess.start ? s.includes(fmtTime(sess.start).toLowerCase()) : true
-    return day && time
-  })
-  if (dayTime.length === 0) return null
-
-  const wantLoc = statedLocationId(entry, sessions, locNameOf)
-  if (wantLoc) return dayTime.find((sess) => sess.locationId === wantLoc) || null
-
-  /* No site on the registration. If this slot only runs at one site there
-     is nothing to get wrong; if it runs at several, picking one would be a
-     guess shown as fact — which is how a Waterloo East student ended up
-     listed under Boardwalk. Leave it unplaced and say so instead. */
-  const sites = new Set(dayTime.map((sess) => sess.locationId).filter(Boolean))
-  return sites.size > 1 ? null : dayTime[0]
 }
 
 /* A program can carry thirty sessions across two locations, and listing them
@@ -196,7 +107,7 @@ function useClassLists() {
        keyed by id rather than collapsing every unnamed program into one. */
     const byName = new Map()
     for (const p of programs) {
-      const key = norm(p.name) || ` id:${p.id}`
+      const key = norm(p.name) || `#unnamed:${p.id}`
       if (!byName.has(key)) byName.set(key, { program: p, records: [], roster: [], allSessions: [] })
       const c = byName.get(key)
       c.records.push(p)
