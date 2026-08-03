@@ -251,11 +251,14 @@ function useClassLists() {
              site" rather than blaming the time when the time was fine. */
           const wantLoc = statedLocationId(row.entry, all, locNameOf)
           const txt = String(row.entry.schedule || '').toLowerCase()
-          const dayTimeExists = txt && all.some((sess) => sess.day != null &&
+          const slot = txt ? all.filter((sess) => sess.day != null &&
             txt.includes(DOW[sess.day].toLowerCase()) &&
-            (sess.start ? txt.includes(fmtTime(sess.start).toLowerCase()) : true))
-          row.why = wantLoc && dayTimeExists ? 'location' : 'schedule'
+            (sess.start ? txt.includes(fmtTime(sess.start).toLowerCase()) : true)) : []
+          row.why = slot.length === 0 ? 'schedule' : wantLoc ? 'location' : 'nosite'
           row.wantLocName = wantLoc ? locNameOf(wantLoc) : ''
+          // Which sites do run that slot — the choice a human has to make.
+          row.slotSites = [...new Set(slot.map((sess) => sess.locationId).filter(Boolean))]
+            .map(locNameOf).sort()
         }
         // A class that runs one session has nowhere else to put anyone, so
         // stale or missing schedule text should not strand them.
