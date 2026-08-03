@@ -20,6 +20,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
+import {
+  engineForEntry, outstandingFor, money, MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
+} from '../data/fees'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
