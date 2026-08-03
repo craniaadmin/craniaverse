@@ -883,7 +883,7 @@ function FeePanel({ prog, fc, engine, setCalc, onBilling, onPdf, pdfBusy }) {
       </div>
       <div className="feegrid">
         <label>Billing
-          <select value={prog.billing || 'Monthly'} onChange={ev => setCalc({ __billing: ev.target.value })}>
+          <select value={prog.billing || 'Monthly'} onChange={ev => onBilling(ev.target.value)}>
             {SCHEDULE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
           </select>
         </label>
