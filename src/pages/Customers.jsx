@@ -597,7 +597,8 @@ function CtxMenu({ x, y, items, onClose }) {
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
-function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onNavigate, familyIds }) {
+function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
+  onNavigate, familyIds, undo, redo }) {
   const { records, programs } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
