@@ -313,6 +313,23 @@ const CSS = `
 .cu tbody td{padding:0 7px;background:var(--pill);border-radius:5px;font-size:12px;font-weight:400;
     vertical-align:middle;white-space:nowrap;line-height:1.35;height:22px;overflow:hidden;text-overflow:ellipsis}
 .cu tbody td.rep{background:transparent !important}
+/* Banded cells: one block per child, all student-scoped columns emitting the
+   same count in the same order, so a child's name, grade and programs line
+   up straight across the row. Fixed band height is what holds that
+   alignment — a taller cell elsewhere must not shift the rows out of step. */
+.cu tbody td.banded{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px;
+    vertical-align:top;overflow:visible;text-overflow:clip}
+.cu tbody td.banded .band{min-height:20px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.cu tbody td.banded.center .band{justify-content:center}
+.cu tbody td.banded .band + .band{margin-top:3px}
+.cu .stupill{display:inline-block;max-width:100%;background:#E4EFF3;color:var(--dark-brown);
+    border:none;border-radius:5px;padding:1px 7px;font:inherit;font-size:11.5px;font-weight:600;
+    line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.cu .stupill.stuname{background:transparent;color:#3d7f7d;font-weight:700;padding-left:0;cursor:pointer}
+.cu .stupill.stuname:hover{text-decoration:underline}
+.cu button.stupill{cursor:pointer;font-family:inherit}
+.cu .cp{display:inline-block;border-radius:5px;padding:1px 8px;font-size:11px;font-weight:600;
+    line-height:1.5;white-space:nowrap}
 .cu tbody tr.grpsep td{background:transparent;height:1px;padding:0;border-radius:0;
     border-top:1px solid #CFD6D8}
 .cu tbody tr.grpsep td.nosep{border-top:none}
