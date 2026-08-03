@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { ChevronDown, X, Mail, Download } from 'lucide-react'
+ import { feeEngine, TOTAL_LESSONS, BILLED_MONTHS } from '../data/fees'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
