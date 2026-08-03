@@ -49,12 +49,57 @@ const COLS = [
 ]
 const LOCKED_COL = 'student'
 
-/* How a family gets a number. Nothing stores one, so it is derived from
-   the order families first appear — oldest record wins — which keeps a
-   given family on the same number between sessions. Deleting an older
-   family renumbers the ones after it, so this is a reference for reading
-   a list aloud, not an identifier to write on anything durable. */
+/* A family reference is an identifier, so it is written to the record and
+   never recomputed. Once F0003 belongs to a family it stays theirs even if
+   F0002 is deleted — numbers are consumed, not reused. */
 const familyRef = (n) => 'F' + String(n).padStart(4, '0')
+const refNumber = (ref) => {
+  const m = /^F(\d+)$/.exec(String(ref || '').trim())
+  return m ? Number(m[1]) : 0
+}
+
+/* Give every family a stored reference, assigning above the highest ever
+   issued. Runs once per record that lacks one; siblings inherit whatever
+   the family already has rather than taking a fresh number. */
+function useFamilyIds(records, assign) {
+  const done = useRef(new Set())
+  const byFamily = useMemo(() => {
+    const m = new Map()
+    for (const r of (records || [])) {
+      if (r.id === 'seed') continue
+      const key = guardianIdentity(r) || `unknown-${r.id}`
+      if (!m.has(key)) m.set(key, [])
+      m.get(key).push(r)
+    }
+    return m
+  }, [records])
+
+  const refs = useMemo(() => {
+    let highest = 0
+    for (const r of (records || [])) highest = Math.max(highest, refNumber(r.customer?.meta?.familyId))
+    const out = new Map()
+    for (const [key, members] of byFamily) {
+      const existing = members.map(m => m.customer?.meta?.familyId).find(v => refNumber(v) > 0)
+      out.set(key, existing || familyRef(++highest))
+    }
+    return out
+  }, [byFamily, records])
+
+  useEffect(() => {
+    if (!assign) return
+    for (const [key, members] of byFamily) {
+      const ref = refs.get(key)
+      for (const m of members) {
+        if (m.customer?.meta?.familyId === ref) continue
+        if (done.current.has(m.id)) continue
+        done.current.add(m.id)
+        assign(m.id, ref)
+      }
+    }
+  }, [byFamily, refs, assign])
+
+  return refs
+}
 
 const SOURCES = ['Website', 'Walk-in', 'Phone', 'Email', 'Referral', 'Returning Family', 'Event', 'Other']
 const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
