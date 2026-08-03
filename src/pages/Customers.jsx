@@ -18,7 +18,7 @@
 // that is per-browser anyway.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
+import { ChevronLeft, Trash2, Copy, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
 import {
   engineForEntry, outstandingFor, money, MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
@@ -247,7 +247,12 @@ const CSS = `
 .cu .dash{color:var(--faint)}
 .cu .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;margin:0;line-height:1;
     cursor:pointer;transition:color .15s;display:inline-flex;vertical-align:middle}
-.cu .rowbtn.rb-add:hover{color:var(--teal)}
+.cu .rowbtn.rb-add:hover,.cu .rowbtn.rb-dup:hover{color:var(--teal)}
+.cu thead tr.frow th{background:#eaf3f2;padding:5px 6px;border-radius:0}
+.cu thead tr.frow th:empty{background:transparent}
+.cu .colf{width:100%;background:#fff;border:1px solid var(--field);border-radius:7px;padding:4px 6px;
+    font-size:11.5px;color:var(--dark-brown);font-weight:600;cursor:pointer;font-family:inherit}
+.cu .colf.on{background:var(--light-blue);border-color:var(--light-blue)}
 .cu .rowbtn.rb-del:hover{color:#c0392b}
 .cu .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .cu .empty b{color:var(--dark-brown)}
@@ -615,7 +620,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       if (g) return g
       return a.student.localeCompare(b.student, undefined, { sensitivity: 'base' })
     })
-  }, [allRows, search, noClassesOnly, showInactive, sort])
+  }, [allRows, search, noClassesOnly, showInactive, colFilters, sort])
 
   const metrics = useMemo(() => {
     const fams = new Set(allRows.map(r => r.familyKey))
@@ -629,8 +634,22 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     return { families: fams.size, students: allRows.length, enrolments, noClasses, owed }
   }, [allRows])
 
-  const anyFilterActive = !!search || noClassesOnly || showInactive
-  const clearAllFilters = () => { setSearch(''); setNoClassesOnly(false); setShowInactive(false) }
+  /* Values actually present, so a filter never offers a dead end. */
+  const filterOptions = useMemo(() => {
+    const out = {}
+    for (const c of COLS) {
+      const vals = new Set()
+      for (const r of allRows) {
+        if (c.k === 'classes') r.classList.forEach(v => v && vals.add(v))
+        else if (r[c.k]) vals.add(String(r[c.k]))
+      }
+      out[c.k] = [...vals].sort((x, y) => x.localeCompare(y, undefined, { numeric: true }))
+    }
+    return out
+  }, [allRows])
+
+  const anyFilterActive = !!search || noClassesOnly || showInactive || Object.values(colFilters).some(Boolean)
+  const clearAllFilters = () => { setSearch(''); setNoClassesOnly(false); setShowInactive(false); setColFilters({}) }
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
