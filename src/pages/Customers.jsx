@@ -64,7 +64,7 @@ const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
    on a wide screen. Sized so nothing is squeezed at the 820px min-width. */
 const SEL_W = '3%'
 const ACT_W = '7%'
-const COL_W = { g1: '20%', g2: '18%', student: '19%', grade: '7%', classes: '26%' }
+const COL_W = { family: '8%', g1: '17%', g2: '15%', student: '18%', grade: '6%', classes: '23%' }
 
 const CPREF_KEY = 'customers-cols'
 function loadColPrefs() {
@@ -431,6 +431,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
   const dialog = useDialog()
   const [search, setSearch] = useState('')
   const [noClassesOnly, setNoClassesOnly] = useState(false)
+  const [showInactive, setShowInactive] = useState(false)
   const [sort, setSort] = useState({ key: 'g1', dir: 1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
@@ -538,6 +539,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
     const q = search.trim().toLowerCase()
     const out = allRows.filter(r => {
       if (noClassesOnly && r.classList.length > 0) return false
+      if (!showInactive && r.inactive) return false
       if (!q) return true
       return r.g1.toLowerCase().includes(q) || r.g2.toLowerCase().includes(q) ||
              r.g1Email.toLowerCase().includes(q) || r.student.toLowerCase().includes(q) ||
@@ -561,7 +563,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       if (g) return g
       return a.student.localeCompare(b.student, undefined, { sensitivity: 'base' })
     })
-  }, [allRows, search, noClassesOnly, sort])
+  }, [allRows, search, noClassesOnly, showInactive, sort])
 
   const metrics = useMemo(() => {
     const fams = new Set(allRows.map(r => r.familyKey))
@@ -575,8 +577,8 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
     return { families: fams.size, students: allRows.length, enrolments, noClasses, owed }
   }, [allRows])
 
-  const anyFilterActive = !!search || noClassesOnly
-  const clearAllFilters = () => { setSearch(''); setNoClassesOnly(false) }
+  const anyFilterActive = !!search || noClassesOnly || showInactive
+  const clearAllFilters = () => { setSearch(''); setNoClassesOnly(false); setShowInactive(false) }
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
@@ -635,10 +637,15 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
     const isSel = selected.has(r.id)
     const tds = orderedCols.map(c => {
       const k = c.k
-      if ((k === 'g1' || k === 'g2') && sameFam) return <td key={k} className={`col-${k} rep`} />
+      // Family reference belongs to the family, not each sibling.
+      if ((k === 'g1' || k === 'g2' || k === 'family') && sameFam) {
+        return <td key={k} className={`col-${k} rep`} />
+      }
 
       let content
-      if (k === 'student') {
+      if (k === 'family') {
+        content = r.family ? <span className="famref">{r.family}</span> : <span className="dash">—</span>
+      } else if (k === 'student') {
         content = <span className="sname">{r.student || <span className="dash">—</span>}</span>
       } else if (k === 'classes') {
         content = r.classList.length === 0 ? <span className="dash">—</span> : r.classList.map((c, i) => {
