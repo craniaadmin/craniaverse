@@ -555,17 +555,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       if (!byFamily.has(key)) byFamily.set(key, [])
       byFamily.get(key).push(r)
     }
-    /* Number families by when they first joined, so the reference is the
-       same each time the page loads rather than following the sort. */
-    const earliest = (list) => list.reduce((min, r) => {
-      const t = String(r.createdAt || r.id || '')
-      return min === null || t < min ? t : min
-    }, null)
-    const famOrder = new Map(
-      [...byFamily.entries()]
-        .sort((a, b) => String(earliest(a[1])).localeCompare(String(earliest(b[1]))))
-        .map(([k], i) => [k, familyRef(i + 1)]))
-
     const rows = []
     for (const [key, students] of byFamily) {
       const first = students[0]
