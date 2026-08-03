@@ -1085,6 +1085,7 @@ function FeePanel({ prog, fc, engine, setCalc, onBilling, onPdf, pdfBusy }) {
         <div className="paidline"><span>Paid so far</span><b>{money(e.paid)}</b></div>
         <div className="owedline"><span>Outstanding</span><b>{money(Math.max(0, e.total - e.paid))}</b></div>
       </div>
+      <SessionRows prog={prog} onChange={onSessions} />
       <div className="feenote">
         The first month is pro-rated by lessons remaining; following months are the full monthly fee.
       </div>
