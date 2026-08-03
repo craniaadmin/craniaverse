@@ -1202,10 +1202,17 @@ function derivedPayment(fees) {
   return ''
 }
 
+/* Two vocabularies share this palette. Pending/Overdue come from the month
+   squares — what a marked installment says. Partial/Unpaid come from the
+   money itself, comparing what the fee engine totals against what has been
+   received; that is what the list column shows. Paid means the same in
+   both. */
 const PAYMENT_STYLE = {
   Paid:    { bg: '#dff5e0', fg: '#2b7a2e' },
   Pending: { bg: '#fff4d6', fg: '#8a6a00' },
+  Partial: { bg: '#fbf3ce', fg: '#7a6417' },
   Overdue: { bg: '#fde0e0', fg: '#a12626' },
+  Unpaid:  { bg: '#fadbd8', fg: '#922b21' },
 }
 
 /* Opening the panel on a program that has never been costed should show the
