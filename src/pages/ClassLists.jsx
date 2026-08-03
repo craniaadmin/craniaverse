@@ -530,10 +530,16 @@ export default function ClassLists({ onNavigate }) {
                                   : 'SCHEDULE DOESN’T MATCH A LISTED SESSION'}
                               <span style={{ fontWeight: 500, textTransform: 'none', letterSpacing: 0 }}>
                                 {c.unspecified.every((r) => r.why === 'nosite')
-                                  ? ` — that day and time runs at ${
-                                      [...new Set(c.unspecified.flatMap((r) => r.slotSites || []))].join(' and ')
-                                    }, and the registration doesn’t say which. Set it on the`
-                                    + ' registration and they will drop into the right roster.'
+                                  ? (() => {
+                                      /* Only name the sites when every row here is
+                                         choosing between the same ones — otherwise the
+                                         sentence would merge two different slots. */
+                                      const lists = [...new Set(c.unspecified.map((r) => (r.slotSites || []).join(' and ')))]
+                                      const where = lists.length === 1 ? lists[0] : 'more than one site'
+                                      return ` — that day and time runs at ${where}, and the registration`
+                                        + ' doesn’t say which. Set it on the registration and they will drop'
+                                        + ' into the right roster.'
+                                    })()
                                   : <>
                                       {' '}— this class runs {sessionsPhrase(c.sessions)}.
                                       {c.unspecified.some((r) => r.why === 'location') &&
