@@ -50,15 +50,53 @@ const PAYMENT_STYLE = {
   Unpaid:  { bg: '#fadbd8', fg: '#922b21' },
 }
 
+/* A row is a family. `scope` decides how a cell fills:
+
+     'family'  — one value for the whole row (the guardians, the address)
+     'student' — one band per child, so Students, Grade and Programs stay
+                 aligned with each other all the way down the row
+
+   Most of these start hidden; DEFAULT_SHOWN is what a new user sees. */
 const COLS = [
-  { k: 'family',  l: 'Family ID' },
-  { k: 'g1',      l: 'Guardian 1' },
-  { k: 'g2',      l: 'Guardian 2' },
-  { k: 'student', l: 'Student' },   // never hideable — it names the row
-  { k: 'grade',   l: 'Grade' },
-  { k: 'classes', l: 'Classes' },
+  { k: 'family',    l: 'Family ID',                      scope: 'family' },
+  { k: 'received',  l: 'Received',                       scope: 'family' },
+  { k: 'source',    l: 'Source',                         scope: 'family' },
+  { k: 'g1',        l: 'Guardian 1',                     scope: 'family' },
+  { k: 'g1rel',     l: 'Guardian 1 Relationship',        scope: 'family' },
+  { k: 'g1phone',   l: 'Guardian 1 Phone',               scope: 'family' },
+  { k: 'g1email',   l: 'Guardian 1 Email',               scope: 'family' },
+  { k: 'g1occ',     l: 'Guardian 1 Occupation',          scope: 'family' },
+  { k: 'g2',        l: 'Guardian 2',                     scope: 'family' },
+  { k: 'g2rel',     l: 'Guardian 2 Relationship',        scope: 'family' },
+  { k: 'g2phone',   l: 'Guardian 2 Phone',               scope: 'family' },
+  { k: 'g2email',   l: 'Guardian 2 Email',               scope: 'family' },
+  { k: 'g2occ',     l: 'Guardian 2 Occupation',          scope: 'family' },
+  { k: 'address',   l: 'Address',                        scope: 'family' },
+  { k: 'kids',      l: 'Number Of Students',             scope: 'family',  cls: 'center' },
+  { k: 'student',   l: 'Students',                       scope: 'student' }, // never hideable
+  { k: 'grade',     l: 'Grade',                          scope: 'student', cls: 'center' },
+  { k: 'classes',   l: 'Programs',                       scope: 'student' },
+  { k: 'payment',   l: 'Payment',                        scope: 'student', cls: 'center' },
+  { k: 'progstatus',l: 'Program Status',                 scope: 'student' },
+  { k: 'year',      l: 'Year',                           scope: 'student', cls: 'center' },
+  { k: 'billing',   l: 'Fee Schedule',                   scope: 'student' },
+  { k: 'rate',      l: 'Rate',                           scope: 'student', cls: 'center' },
+  { k: 'fees',      l: 'Fees',                           scope: 'student', cls: 'center' },
+  { k: 'paid',      l: 'Paid',                           scope: 'student', cls: 'center' },
+  { k: 'balance',   l: 'Balance',                        scope: 'student', cls: 'center' },
+  { k: 'school',    l: 'School',                         scope: 'student' },
+  { k: 'dob',       l: 'Date of Birth',                  scope: 'student', cls: 'center' },
+  { k: 'allergies', l: 'Allergies / Medical',            scope: 'student' },
+  { k: 'notes',     l: 'Notes',                          scope: 'student' },
+  { k: 'ec1',       l: 'Emergency Contact',              scope: 'family' },
+  { k: 'ec1rel',    l: 'Emergency Contact Relationship', scope: 'family' },
+  { k: 'ec1phone',  l: 'Emergency Contact Phone',        scope: 'family' },
+  { k: 'ec1email',  l: 'Emergency Contact Email',        scope: 'family' },
+  { k: 'consents',  l: 'Consents',                       scope: 'family' },
 ]
 const LOCKED_COL = 'student'
+const DEFAULT_SHOWN = ['family', 'g1', 'g2', 'student', 'grade', 'classes', 'payment']
+const COL_BY_KEY = new Map(COLS.map(c => [c.k, c]))
 
 /* A family reference is an identifier, so it is written to the record and
    never recomputed. Once F0003 belongs to a family it stays theirs even if
