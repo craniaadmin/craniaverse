@@ -847,11 +847,16 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       const s = String(v ?? '')
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
     }
-    const head = ['Guardian 1', 'Guardian 1 Email', 'Guardian 2', 'Student', 'Grade', 'School', 'Classes']
-    const lines = [head.join(',')]
+    /* Every column, not just the shown ones — a spreadsheet is where you go
+       precisely for the fields you did not put on screen. One line per
+       student, since that is the grain the data actually has. */
+    const lines = [COLS.map(c => c.l).join(',')]
     for (const r of allRows) {
-      lines.push([r.g1, r.g1Email, r.g2, r.student, r.grade,
-        r.record.student?.school || '', r.classList.join('; ')].map(esc).join(','))
+      lines.push(COLS.map(c => {
+        if (c.k === 'classes') return r.classList.join('; ')
+        if (c.k === 'fees' || c.k === 'paid' || c.k === 'balance') return r[c.k] > 0 ? r[c.k].toFixed(2) : ''
+        return r[c.k]
+      }).map(esc).join(','))
     }
     const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
     const a = document.createElement('a')
