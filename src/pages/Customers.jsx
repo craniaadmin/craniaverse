@@ -747,7 +747,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       }
       if (!q) return true
       return r.g1.toLowerCase().includes(q) || r.g2.toLowerCase().includes(q) ||
-             r.g1Email.toLowerCase().includes(q) || r.student.toLowerCase().includes(q) ||
+             r.g1email.toLowerCase().includes(q) || r.g2email.toLowerCase().includes(q) ||
+             r.g1phone.toLowerCase().includes(q) || r.g2phone.toLowerCase().includes(q) ||
+             r.student.toLowerCase().includes(q) || r.family.toLowerCase().includes(q) ||
+             r.school.toLowerCase().includes(q) ||
              r.classList.some(c => c.toLowerCase().includes(q))
     })
     const val = (r) => {
