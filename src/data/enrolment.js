@@ -150,12 +150,14 @@ export function buildEnrolmentIndex(records, programs, locNameOf) {
       if (!entry.program) continue
       const sessions = byName.get(norm(entry.program))
       if (!sessions || !sessions.length) continue
-      let s = matchSession(entry, sessions, locNameOf)
+      let hits = matchSessions(entry, sessions, locNameOf)
       // A class that runs one session has nowhere else to put anyone.
-      if (!s && sessions.length === 1) s = sessions[0]
-      if (!s) continue
-      const key = sessionKey(entry.program, s.locationId, s.day, s.start)
-      counts.set(key, (counts.get(key) || 0) + 1)
+      if (!hits.length && sessions.length === 1) hits = [sessions[0]]
+      // Counted once per session attended — a DOUBLE fills a seat twice.
+      for (const s of hits) {
+        const key = sessionKey(entry.program, s.locationId, s.day, s.start)
+        counts.set(key, (counts.get(key) || 0) + 1)
+      }
     }
   }
   return counts
