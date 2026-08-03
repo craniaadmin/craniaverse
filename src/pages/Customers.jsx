@@ -40,6 +40,7 @@ const STATUS_STYLE = {
 const statusStyle = (s) => STATUS_STYLE[s] || STATUS_STYLE.Inactive
 
 const COLS = [
+  { k: 'family',  l: 'Family ID' },
   { k: 'g1',      l: 'Guardian 1' },
   { k: 'g2',      l: 'Guardian 2' },
   { k: 'student', l: 'Student' },   // never hideable — it names the row
@@ -47,6 +48,16 @@ const COLS = [
   { k: 'classes', l: 'Classes' },
 ]
 const LOCKED_COL = 'student'
+
+/* How a family gets a number. Nothing stores one, so it is derived from
+   the order families first appear — oldest record wins — which keeps a
+   given family on the same number between sessions. Deleting an older
+   family renumbers the ones after it, so this is a reference for reading
+   a list aloud, not an identifier to write on anything durable. */
+const familyRef = (n) => 'F' + String(n).padStart(4, '0')
+
+const SOURCES = ['Website', 'Walk-in', 'Phone', 'Email', 'Referral', 'Returning Family', 'Event', 'Other']
+const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
 
 /* Proportions rather than pixels, and they sum to 100 — a fixed layout
    hands leftover space to any pixel column, which starves the text ones
