@@ -1095,7 +1095,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
             <thead>
               {/* Filter row: each column offers the values actually present,
                   so narrowing to a grade or a class needs no typing. */}
-              <tr className="frow">
+              {/* Not `frow` — the detail view's field rows own that name and
+                  set display:grid, which pulled this row out of table layout
+                  and broke every column width. */}
+              <tr className="colfrow">
                 <th />
                 {orderedCols.map(c => (
                   <th key={c.k}>
