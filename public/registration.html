@@ -539,13 +539,20 @@ function flexCap(title){
   return Infinity;
 }
 
+/* Cost lives in `cost` with its own `costUnit`; `fees` was the old field
+   name and left every class showing a blank price. */
 function deriveCost(p){
-  if(p.fees == null || p.fees === '') return '';
-  var per = String(p.period || '').toLowerCase();
-  var suffix = '/mo';
-  if(per.indexOf('week') !== -1) suffix = '/wk';
-  else if(per.indexOf('lesson') !== -1) suffix = '/lesson';
-  return '$' + p.fees + ' ' + suffix;
+  if(!p) return '';
+  var amount = (p.cost == null || p.cost === '') ? p.fees : p.cost;
+  if(amount == null || amount === '') return '';
+  var unit = String(p.costUnit || '').trim();
+  if(!unit){
+    var per = String(p.period || '').toLowerCase();
+    unit = per.indexOf('week') !== -1 ? '/wk'
+      : per.indexOf('lesson') !== -1 ? '/lesson'
+      : '/mo';
+  }
+  return '$' + amount + (unit ? ' ' + unit : '');
 }
 
 var DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
