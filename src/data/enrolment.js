@@ -72,9 +72,30 @@ export function statedLocationId(entry, sessions, locNameOf) {
    sat first in the array. When a registration names a site with no session at
    the stated time, or names none at all where several sites run that slot,
    this returns null rather than guessing. */
-export function matchSession(entry, sessions, locNameOf) {
-  const s = String(entry?.schedule || '').toLowerCase()
-  if (!s || !sessions || sessions.length === 0) return null
+/* The slots one enrolment covers. A DOUBLE attends twice a week and an
+   UNLIMITED up to five times, and the registration form already collects
+   that — it joins the picks into `schedule` as "Thu 4:30 pm, Sat 9:30 am".
+   Newer records carry `sessions[]` instead, which is the shape to prefer.
+
+   Splitting matters for correctness, not just completeness: matched as one
+   string, "Thu 4:30 pm, Sat 9:30 am" contains both "sat" and "4:30 pm", so
+   it matched a Saturday 4:30 class the student had never enrolled in. */
+export function entrySlots(entry) {
+  const list = entry && Array.isArray(entry.sessions) ? entry.sessions : null
+  if (list && list.length) {
+    const out = list
+      .map((s) => [s && s.day, s && s.time].filter(Boolean).join(' ').trim())
+      .filter(Boolean)
+    if (out.length) return out
+  }
+  return String((entry && entry.schedule) || '')
+    .split(',').map((s) => s.trim()).filter(Boolean)
+}
+
+// Match one slot's text — "Mon 4:30 pm" — against the program's sessions.
+function matchOneSlot(text, entry, sessions, locNameOf) {
+  const s = String(text || '').toLowerCase()
+  if (!s) return null
   const dayTime = sessions.filter((sess) => {
     if (sess.day == null) return false
     const day = s.includes(DOW[sess.day].toLowerCase())
@@ -88,6 +109,24 @@ export function matchSession(entry, sessions, locNameOf) {
 
   const sites = new Set(dayTime.map((sess) => sess.locationId).filter(Boolean))
   return sites.size > 1 ? null : dayTime[0]
+}
+
+/* Every session this enrolment belongs to — a twice-weekly student turns up
+   on two registers, so they must appear on both. */
+export function matchSessions(entry, sessions, locNameOf) {
+  if (!sessions || sessions.length === 0) return []
+  const seen = new Set()
+  const out = []
+  for (const slot of entrySlots(entry)) {
+    const hit = matchOneSlot(slot, entry, sessions, locNameOf)
+    if (hit && !seen.has(hit.key)) { seen.add(hit.key); out.push(hit) }
+  }
+  return out
+}
+
+// First match only — for callers that need a single answer.
+export function matchSession(entry, sessions, locNameOf) {
+  return matchSessions(entry, sessions, locNameOf)[0] || null
 }
 
 export const sessionKey = (name, locationId, day, start) =>
