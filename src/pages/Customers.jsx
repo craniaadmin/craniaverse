@@ -364,12 +364,6 @@ const CSS = `
 .cu .sessx:hover{color:var(--danger)}
 .cu .sessadd{background:transparent;border:1px dashed var(--teal);color:var(--teal);border-radius:7px;
     padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:3px}
-.cu .feenote{font-size:11.5px;color:var(--muted);margin:10px 0 8px;line-height:1.4}
-.cu .feeinst{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:4px 14px;
-    border-top:1px solid var(--line);padding-top:10px}
-.cu .feeinst .irow{display:flex;justify-content:space-between;gap:10px;font-size:12px;
-    background:var(--pill);border-radius:6px;padding:4px 9px}
-.cu .feeinst .irow.iskip{background:transparent;color:var(--faint)}
 
 .cupop{position:fixed;z-index:220;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
     box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;
