@@ -746,8 +746,12 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           billing: [...new Set(progs.map(p => p.billing).filter(Boolean))].join(', '),
           rate: [...new Set(progs.map(p => p.rate).filter(Boolean))].join(', '),
           fees, paid, balance: Math.max(0, fees - paid), payment,
-          // Enrolled once but nothing running now — distinct from never enrolled.
-          inactive: progs.length > 0 && !progs.some(p => p.active),
+          /* Finished, not merely not-running. This used to be `!p.active`,
+             which swept up New and On Hold — so a family that had just
+             registered was hidden until you ticked "Show inactive", which
+             is the opposite of who needs attention. */
+          inactive: progs.length > 0 && progs.every(p =>
+            ['completed', 'cancelled', 'inactive'].includes(String(p.status || '').toLowerCase())),
           pending: progs.some(p => ['new', 'on hold'].includes(String(p.status || '').toLowerCase())),
         })
       }
