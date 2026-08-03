@@ -18,8 +18,22 @@ const norm = (s) => String(s || '').trim().toUpperCase()
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const DOW_ORD = { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 0: 6 }
+/* Fallback only. The real list lives in programs_state and the Programs
+   page lets it be renamed and added to, so `useLocName` below prefers
+   that and only falls back here. */
 const LOCATIONS = { loc_boardwalk: 'Boardwalk', loc_waterloo: 'Waterloo East' }
-const locName = (id) => LOCATIONS[id] || String(id || '').replace(/^loc_/, '').replace(/_/g, ' ')
+const titleCase = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase())
+const staticLocName = (id) =>
+  LOCATIONS[id] || titleCase(String(id || '').replace(/^loc_/, '').replace(/_/g, ' '))
+
+function useLocName() {
+  const { programsState } = useStore()
+  return useMemo(() => {
+    const byId = new Map()
+    for (const l of (programsState?.locations || [])) if (l?.id) byId.set(l.id, l.name || '')
+    return (id) => byId.get(id) || staticLocName(id)
+  }, [programsState])
+}
 
 /* Category running order, matching the Programs page. Anything new sorts
    alphabetically after these. */
