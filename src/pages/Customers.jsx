@@ -153,12 +153,27 @@ function useFamilyIds(records, assign) {
 const SOURCES = ['Website', 'Walk-in', 'Phone', 'Email', 'Referral', 'Returning Family', 'Event', 'Other']
 const CONSENTS = ['Photo', 'Walk Home', 'Media / Social', 'Terms & Conditions']
 
-/* Proportions rather than pixels, and they sum to 100 — a fixed layout
-   hands leftover space to any pixel column, which starves the text ones
-   on a wide screen. Sized so nothing is squeezed at the 820px min-width. */
-const SEL_W = '3%'
-const ACT_W = '7%'
-const COL_W = { family: '13%', g1: '15%', g2: '14%', student: '16%', grade: '10%', classes: '19%' }
+/* Pixels, not proportions. With up to 35 columns available there is no
+   percentage split that works for both 7 columns and 30, so the table sizes
+   to its content and scrolls (`width:max-content; min-width:100%`). When the
+   shown columns are narrower than the card, the table stretches and the
+   spare space is shared out in proportion to these widths — which is why
+   they must ALL be pixels. Mixing a percentage in makes Chrome hand that
+   column the entire remainder, which is what starved the text columns
+   before. */
+const SEL_W = '26px'
+const ACT_W = '78px'
+const COL_PX = {
+  family: 82, received: 104, source: 118,
+  g1: 150, g1rel: 128, g1phone: 132, g1email: 200, g1occ: 140,
+  g2: 150, g2rel: 128, g2phone: 132, g2email: 200, g2occ: 140,
+  address: 220, kids: 66,
+  student: 156, grade: 62, classes: 250, payment: 88, progstatus: 128,
+  year: 78, billing: 118, rate: 92, fees: 96, paid: 96, balance: 100,
+  school: 150, dob: 106, allergies: 190, notes: 190,
+  ec1: 160, ec1rel: 128, ec1phone: 132, ec1email: 200, consents: 170,
+}
+const colWidth = (k) => (COL_PX[k] || 130) + 'px'
 
 const CPREF_KEY = 'customers-cols'
 function loadColPrefs() {
