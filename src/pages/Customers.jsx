@@ -42,13 +42,6 @@ const STATUS_STYLE = {
 }
 const statusStyle = (s) => STATUS_STYLE[s] || STATUS_STYLE.Inactive
 
-// Payment is its own vocabulary — it answers "has the money arrived", not
-// "is the class running", so it does not share the status palette.
-const PAYMENT_STYLE = {
-  Paid:    { bg: '#def2de', fg: '#2b7a2e' },
-  Partial: { bg: '#fbf3ce', fg: '#7a6417' },
-  Unpaid:  { bg: '#fadbd8', fg: '#922b21' },
-}
 
 /* A row is a family. `scope` decides how a cell fills:
 
