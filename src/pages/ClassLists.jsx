@@ -156,27 +156,35 @@ function useClassLists() {
       const all = cls.allSessions
       const groups = new Map() // session key (or null) -> rows
       for (const row of cls.roster) {
-        let s = matchSession(row.entry, all, locNameOf)
-        if (!s) {
+        /* One enrolment can cover several sessions — a DOUBLE attends twice
+           a week — and the student has to appear on every register they
+           turn up to, not just the first. */
+        let hits = matchSessions(row.entry, all, locNameOf)
+        if (!hits.length) {
           /* Record why, so the bucket below can say "booked at the wrong
              site" rather than blaming the time when the time was fine. */
           const wantLoc = statedLocationId(row.entry, all, locNameOf)
-          const txt = String(row.entry.schedule || '').toLowerCase()
-          const slot = txt ? all.filter((sess) => sess.day != null &&
+          const slots = entrySlots(row.entry).map((t) => t.toLowerCase())
+          const slot = all.filter((sess) => sess.day != null && slots.some((txt) =>
             txt.includes(DOW[sess.day].toLowerCase()) &&
-            (sess.start ? txt.includes(fmtTime(sess.start).toLowerCase()) : true)) : []
+            (sess.start ? txt.includes(fmtTime(sess.start).toLowerCase()) : true)))
           row.why = slot.length === 0 ? 'schedule' : wantLoc ? 'location' : 'nosite'
           row.wantLocName = wantLoc ? locNameOf(wantLoc) : ''
           // Which sites do run that slot — the choice a human has to make.
           row.slotSites = [...new Set(slot.map((sess) => sess.locationId).filter(Boolean))]
             .map(locNameOf).sort()
+          // A class that runs one session has nowhere else to put anyone, so
+          // stale or missing schedule text should not strand them.
+          if (all.length === 1) hits = [all[0]]
         }
-        // A class that runs one session has nowhere else to put anyone, so
-        // stale or missing schedule text should not strand them.
-        if (!s && all.length === 1) s = all[0]
-        const key = s ? s.key : null
-        if (!groups.has(key)) groups.set(key, [])
-        groups.get(key).push(row)
+        /* A student booked for two slots who only matches one still belongs
+           on that register — say so on the row rather than hiding it. */
+        const expected = entrySlots(row.entry).length
+        row.partial = hits.length > 0 && expected > hits.length ? { got: hits.length, of: expected } : null
+        for (const key of (hits.length ? hits.map((s) => s.key) : [null])) {
+          if (!groups.has(key)) groups.set(key, [])
+          groups.get(key).push(row)
+        }
       }
       cls.sessions = all.map((s) => ({ session: s, rows: groups.get(s.key) || [] }))
       cls.unspecified = groups.get(null) || []
