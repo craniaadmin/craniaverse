@@ -1408,9 +1408,27 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
     }
   }
 
+  /* Copy an existing student — same family, same school and grade, name
+     marked so the duplicate is obvious until it is edited. Programs are
+     deliberately not copied: enrolments are per child and per session, and
+     silently double-booking a class is worse than retyping one. */
+  const handleDuplicate = async (record) => {
+    const s = record.student || {}
+    try {
+      const id = await handleAddSibling(record, {
+        studentFirstName: s.firstName || 'New',
+        studentLastName: `${s.lastName || 'Student'} (copy)`,
+        grade: s.grade || '', school: s.school || '',
+      })
+      if (id) setDetailId(id)
+    } catch (err) {
+      dialog.alert('Could not duplicate', String(err.message || err))
+    }
+  }
+
   // Adds another child under the same guardians and emergency contact, so
   // it groups as a sibling automatically.
-  const handleAddSibling = async (record) => {
+  const handleAddSibling = async (record, over = {}) => {
     try {
       const g1 = record.customer?.guardian1 || {}
       const g2 = record.customer?.guardian2 || {}
