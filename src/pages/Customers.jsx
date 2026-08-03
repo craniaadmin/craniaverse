@@ -223,6 +223,36 @@ const CSS = `
 .cu .pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:700;
     letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
 .cu .feelab{font-size:9px;color:#fff;font-weight:700;width:16px;display:inline-block;text-align:center}
+.cu .feebtn{background:#fff;border:1px solid var(--field);border-radius:7px;padding:3px 9px;
+    font-size:11.5px;font-weight:700;color:var(--dark-brown);cursor:pointer;font-family:inherit;white-space:nowrap}
+.cu .feebtn:hover{background:#f1f5f4}
+.cu .feepanel{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);
+    border-radius:10px;padding:14px 16px;margin:2px 4px 0;text-align:left}
+.cu .feehead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;
+    padding-bottom:7px;border-bottom:1px solid var(--line)}
+.cu .feehead .t{font-size:12.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px}
+.cu .pdfbtn{background:var(--pill);border:1px solid var(--field);border-radius:7px;padding:4px 10px;
+    font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--dark-brown)}
+.cu .pdfbtn:disabled{opacity:.5;cursor:default}
+.cu .feegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.cu .feegrid label{display:block;font-size:11.5px;font-weight:600;color:var(--muted)}
+.cu .feegrid input,.cu .feegrid select{width:100%;box-sizing:border-box;margin-top:4px;padding:6px 9px;
+    border:1px solid var(--field);border-radius:7px;font:inherit;font-size:12.5px;background:#fff;color:var(--dark-brown)}
+.cu .feegrid input:focus,.cu .feegrid select:focus{outline:none;border-color:var(--teal)}
+.cu .feegrid .discrow{display:flex;gap:5px}
+.cu .feegrid .discrow input{flex:1}
+.cu .feegrid .discrow select{width:56px;flex:none}
+.cu .feetotals{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:5px 18px;font-size:12.5px}
+.cu .feetotals div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.cu .feetotals span{color:var(--muted)}
+.cu .feetotals .paidline b{color:#2b7a2e}
+.cu .feetotals .owedline b{color:var(--danger)}
+.cu .feenote{font-size:11.5px;color:var(--muted);margin:10px 0 8px;line-height:1.4}
+.cu .feeinst{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:4px 14px;
+    border-top:1px solid var(--line);padding-top:10px}
+.cu .feeinst .irow{display:flex;justify-content:space-between;gap:10px;font-size:12px;
+    background:var(--pill);border-radius:6px;padding:4px 9px}
+.cu .feeinst .irow.iskip{background:transparent;color:var(--faint)}
 
 .cupop{position:fixed;z-index:220;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
     box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;
