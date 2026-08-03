@@ -69,40 +69,42 @@ const buildYearCfg = (yearKey) => ({
 const AVAILABLE_YEARS = ['22_23', '23_24', '24_25', '25_26', '26_27', '27_28', '28_29']
 
 // ---------- Fee math ----------
-function computeSchedule(cfg, monthly, firstLesson, regFee, matFee) {
-  const timeline = cfg.timeline
-  const weeksPerYear = cfg.weeksPerYear
-  const academicMonthCount = MONTH_ORDER.filter(m => ACADEMIC.has(m)).length // 10
-  const weeklyRate = monthly * academicMonthCount / weeksPerYear
-  const scheduledWeeks = Math.max(0, weeksPerYear - (firstLesson - 1))
+/* Billing comes from the shared engine so this page and the fee panel on
+   Customers quote the same figure. It bills ten uniform months of 3.5
+   lessons rather than the real break calendar below — the calendar strip
+   still shows when lessons actually fall, and is how you pick a starting
+   week, but a mid-year start is charged by the uniform month. The two
+   models only ever disagreed for a late start, and disagreeing about an
+   invoice is worse than either rule.
 
-  const perMonthWeeks = {}
-  const totalMonthWeeks = {}
-  MONTH_ORDER.forEach(m => { perMonthWeeks[m] = 0; totalMonthWeeks[m] = 0 })
-  for (const cell of timeline) {
-    if (cell.kind === 'lesson') {
-      totalMonthWeeks[cell.month] += 1
-      if (cell.n >= firstLesson) perMonthWeeks[cell.month] += 1
-    }
-  }
-
-  let tuition = 0
-  const installments = MONTH_ORDER.map(m => {
-    if (!ACADEMIC.has(m) || perMonthWeeks[m] === 0) {
-      return { month: m, kind: 'skip', amount: 0 }
-    }
-    const isPartial = perMonthWeeks[m] < totalMonthWeeks[m]
-    if (isPartial) {
-      const amount = weeklyRate * perMonthWeeks[m]
-      tuition += amount
-      return { month: m, kind: 'prorated', amount, weeks: perMonthWeeks[m] }
-    }
-    tuition += monthly
-    return { month: m, kind: 'full', amount: monthly }
+   The return shape is unchanged so InstallmentsCard needs no edits. */
+function computeSchedule(cfg, monthly, firstLesson, regFee, matFee, discount = 0, discountType = '%') {
+  const e = feeEngine({
+    schedule: 'Monthly',
+    months: {},
+    feeCalc: { firstLesson, monthlyFee: monthly, regFee, matFee, discount, discountType },
   })
 
-  const total = tuition + regFee + matFee
-  return { weeksPerYear, scheduledWeeks, weeklyRate, monthly, tuition, regFee, matFee, total, installments }
+  const installments = MONTH_ORDER.map(m => {
+    if (!ACADEMIC.has(m)) return { month: m, kind: 'skip', amount: 0 }
+    const k = MONTH_ORDER.indexOf(m) // sep = 0 … jun = 9
+    if (k < e.mIdx) return { month: m, kind: 'skip', amount: 0 }
+    const amount = e.monthFee(k) || 0
+    const prorated = k === e.mIdx && e.lessonsFirstMonth < TOTAL_LESSONS / BILLED_MONTHS
+    return { month: m, kind: prorated ? 'prorated' : 'full', amount }
+  })
+
+  return {
+    weeksPerYear: cfg.weeksPerYear,
+    scheduledWeeks: e.lessons,
+    weeklyRate: e.monthly / (TOTAL_LESSONS / BILLED_MONTHS),
+    monthly: e.monthly,
+    tuition: e.lessonFees,
+    regFee: e.regFee,
+    matFee: e.matFee,
+    total: e.total,
+    installments,
+  }
 }
 
 // ---------- Component ----------
