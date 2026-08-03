@@ -848,75 +848,125 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
 
   const arrow = k => sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null
 
-  // ---- body rows, with repeated guardians blanked ----
+  /* One rendered row per family, in the order the sort left the students.
+     Guardian details used to repeat down a sibling's row and get blanked
+     out again, which left the table looking half-empty; now they are stated
+     once and the children stack beside them. */
+  const familyRows = useMemo(() => {
+    const out = []
+    const byKey = new Map()
+    for (const r of visible) {
+      let fam = byKey.get(r.familyKey)
+      if (!fam) { fam = { key: r.familyKey, head: r, students: [] }; byKey.set(r.familyKey, fam); out.push(fam) }
+      fam.students.push(r)
+    }
+    return out
+  }, [visible])
+
   const bodyRows = []
-  let prevFam = null
-  visible.forEach((r) => {
-    const sameFam = prevFam !== null && prevFam === r.familyKey
-    if (prevFam !== null && prevFam !== r.familyKey) {
+  familyRows.forEach((fam, fi) => {
+    if (fi > 0) {
       bodyRows.push(
-        <tr className="grpsep" key={'sep-' + r.id}>
+        <tr className="grpsep" key={'sep-' + fam.key}>
           <td className="nosep" /><td colSpan={orderedCols.length + 1} />
         </tr>
       )
     }
-    prevFam = r.familyKey
+    const head = fam.head
+    const kids = fam.students
+    const allKidsSel = kids.every(s => selected.has(s.id))
+    const someKidsSel = kids.some(s => selected.has(s.id))
 
-    const isSel = selected.has(r.id)
+    /* One band per child. Every student-scoped column emits the same number
+       of bands in the same order, which is what keeps a child's name, grade
+       and programs on the same line across the row. */
+    const bands = (render) => kids.map(s => (
+      <div className="band" key={s.id}>{render(s)}</div>
+    ))
+
     const tds = orderedCols.map(c => {
       const k = c.k
-      // Family reference belongs to the family, not each sibling.
-      if ((k === 'g1' || k === 'g2' || k === 'family') && sameFam) {
-        return <td key={k} className={`col-${k} rep`} />
-      }
+      let content, title = ''
 
-      let content
-      if (k === 'family') {
-        content = r.family ? <span className="famref">{r.family}</span> : <span className="dash">—</span>
+      if (c.scope === 'family') {
+        const v = head[k]
+        if (k === 'family') {
+          content = v ? <span className="famref">{v}</span> : <span className="dash">—</span>
+        } else {
+          content = v === '' || v == null ? <span className="dash">—</span> : v
+        }
+        title = String(v ?? '')
       } else if (k === 'student') {
-        content = <span className="sname">{r.student || <span className="dash">—</span>}</span>
+        content = bands(s => (
+          <button className="stupill stuname" title={`Open ${s.student}`}
+            onClick={e => { e.stopPropagation(); onSelect(s.id) }}>
+            {s.student || '—'}
+          </button>
+        ))
+        title = kids.map(s => s.student).join(', ')
       } else if (k === 'classes') {
-        content = r.classList.length === 0 ? <span className="dash">—</span> : r.classList.map((c, i) => {
-          const prog = progByName.get(c.trim().toUpperCase())
-          return (
-            <React.Fragment key={c}>
-              {i > 0 && ', '}
-              {prog ? (
-                <button className="clink" title={`Open ${c} in Programs`}
-                  onClick={e => { e.stopPropagation(); onNavigate && onNavigate('Programs', prog.id) }}
-                >{c}</button>
-              ) : <span title="Not in the Programs list">{c}</span>}
-            </React.Fragment>
-          )
+        content = bands(s => s.progList.length === 0
+          ? <span className="dash">—</span>
+          : s.progList.map((p, i) => {
+            const name = p.program || ''
+            const prog = progByName.get(name.trim().toUpperCase())
+            const st = statusStyle(p.status)
+            return (
+              <button key={name + i} className="stupill"
+                style={{ background: st.bg, color: st.fg }}
+                title={`${name} — ${p.status || 'no status'}${prog ? ' · click to open in Programs' : ''}`}
+                onClick={e => { e.stopPropagation(); if (prog) onNavigate && onNavigate('Programs', prog.id) }}>
+                {name || '—'}
+              </button>
+            )
+          }))
+        title = kids.map(s => s.classList.join(', ')).filter(Boolean).join(' | ')
+      } else if (k === 'payment') {
+        content = bands(s => {
+          if (!s.payment) return <span className="dash">—</span>
+          const ps = PAYMENT_STYLE[s.payment]
+          return <span className="cp" style={{ background: ps.bg, color: ps.fg }}>{s.payment}</span>
         })
+        title = kids.map(s => s.payment).filter(Boolean).join(', ')
+      } else if (k === 'fees' || k === 'paid' || k === 'balance') {
+        content = bands(s => (s[k] > 0 ? money(s[k]) : <span className="dash">—</span>))
+        title = kids.map(s => (s[k] > 0 ? money(s[k]) : '')).filter(Boolean).join(', ')
       } else {
-        content = r[k] === '' || r[k] == null ? <span className="dash">—</span> : r[k]
+        content = bands(s => (s[k] === '' || s[k] == null ? <span className="dash">—</span> : s[k]))
+        title = kids.map(s => s[k]).filter(v => v !== '' && v != null).join(', ')
       }
 
-      const title = k === 'classes' ? r.classList.join(', ') : String(r[k] || '')
-      return <td key={k} className={`col-${k}`} title={title}>{content}</td>
+      return (
+        <td key={k} className={`col-${k}${c.cls ? ' ' + c.cls : ''}${c.scope === 'student' ? ' banded' : ''}`}
+          title={title}>{content}</td>
+      )
     })
 
     bodyRows.push(
-      <tr key={r.id} className={isSel ? 'sel' : ''}
-        title="Click to open this student; right-click for more"
-        onClick={() => onSelect(r.id)}
-        onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: r }) }}>
+      <tr key={fam.key} className={someKidsSel ? 'sel' : ''}
+        title="Click to open this family; right-click for more"
+        onClick={() => onSelect(head.id)}
+        onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: head }) }}>
         <td className="selcol" onClick={e => e.stopPropagation()}>
-          <input type="checkbox" checked={isSel} onChange={e => setSelected(s => {
-            const n = new Set(s)
-            if (e.target.checked) n.add(r.id); else n.delete(r.id)
-            return n
-          })} />
+          {/* Ticking a family ticks every child in it — the actions that
+              consume the selection all work on students. */}
+          <input type="checkbox" checked={allKidsSel}
+            ref={el => { if (el) el.indeterminate = someKidsSel && !allKidsSel }}
+            onChange={e => setSelected(s => {
+              const n = new Set(s)
+              for (const kid of kids) { if (e.target.checked) n.add(kid.id); else n.delete(kid.id) }
+              return n
+            })} />
         </td>
         {tds}
         <td className="actcell" onClick={e => e.stopPropagation()}>
           <button className="rowbtn rb-add" title="Add a sibling to this family"
-            onClick={() => onAddSibling(r.record)}><UserPlus size={12} /></button>
-          <button className="rowbtn rb-dup" title="Duplicate this student"
-            onClick={() => onDuplicate(r.record)}><Copy size={12} /></button>
-          <button className="rowbtn rb-del" title="Delete this student"
-            onClick={() => onDelete(r.record)}><Trash2 size={12} /></button>
+            onClick={() => onAddSibling(head.record)}><UserPlus size={12} /></button>
+          <button className="rowbtn rb-dup" title={`Duplicate ${head.student}`}
+            onClick={() => onDuplicate(head.record)}><Copy size={12} /></button>
+          <button className="rowbtn rb-del"
+            title={kids.length > 1 ? `Delete all ${kids.length} students in this family` : 'Delete this student'}
+            onClick={() => onDeleteFamily(kids.map(s => s.record))}><Trash2 size={12} /></button>
         </td>
       </tr>
     )
