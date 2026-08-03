@@ -1816,11 +1816,29 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
     }
   }
 
+  /* Deleting a family row removes every child in it. Named in full in the
+     prompt, because on a family row the count is not obvious from what is
+     under the cursor. */
+  const handleDeleteFamily = async (recordList) => {
+    const list = recordList.filter(Boolean)
+    if (!list.length) return
+    if (list.length === 1) return handleDelete(list[0])
+    const names = list.map(r => `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim() || 'a student')
+    const ok = await dialog.confirm(
+      `Delete all ${list.length} students in this family — ${names.join(', ')}? ` +
+      'This also removes their linked customer and guardian information, and cannot be undone.',
+      { title: 'Delete Family' })
+    if (!ok) return
+    for (const r of list) await handleDelete(r, { silent: true })
+    setDetailId(null)
+  }
+
   if (detailId) {
     return <CustomerDetail recordId={detailId} onBack={() => setDetailId(null)} onSelectRecord={setDetailId}
       onAddSibling={handleAddSibling} onDelete={handleDelete} onNavigate={onNavigate} />
   }
 
   return <CustomerList onSelect={handleSelect} onAdd={handleAdd} onAddSibling={handleAddSibling}
-    onDuplicate={handleDuplicate} onDelete={handleDelete} onNavigate={onNavigate} familyIds={familyIds} />
+    onDuplicate={handleDuplicate} onDelete={handleDelete} onDeleteFamily={handleDeleteFamily}
+    onNavigate={onNavigate} familyIds={familyIds} />
 }
