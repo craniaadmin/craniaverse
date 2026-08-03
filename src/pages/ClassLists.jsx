@@ -439,7 +439,7 @@ export default function ClassLists({ onNavigate }) {
                         <span style={{ ...pillStyle, background: '#eef1f4', color: '#6B6455', flexShrink: 0 }}>Inactive</span>
                       )}
                       <button
-                        onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate('Programs') }}
+                        onClick={(e) => { e.stopPropagation(); onNavigate && onNavigate('Programs', c.program.id) }}
                         title="View in Programs"
                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex', flexShrink: 0 }}
                       ><ExternalLink size={13} /></button>
@@ -578,7 +578,7 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
               </td>
               <td style={{ padding: '6px 4px', textAlign: 'center' }}>
                 <button
-                  onClick={() => onNavigate && onNavigate('Students')}
+                  onClick={() => onNavigate && onNavigate('Students', r.id)}
                   title="View in Students"
                   style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex' }}
                 ><ExternalLink size={13} /></button>
