@@ -123,8 +123,14 @@ function matchSession(entry, sessions, locNameOf) {
   if (dayTime.length === 0) return null
 
   const wantLoc = statedLocationId(entry, sessions, locNameOf)
-  if (!wantLoc) return dayTime[0]
-  return dayTime.find((sess) => sess.locationId === wantLoc) || null
+  if (wantLoc) return dayTime.find((sess) => sess.locationId === wantLoc) || null
+
+  /* No site on the registration. If this slot only runs at one site there
+     is nothing to get wrong; if it runs at several, picking one would be a
+     guess shown as fact — which is how a Waterloo East student ended up
+     listed under Boardwalk. Leave it unplaced and say so instead. */
+  const sites = new Set(dayTime.map((sess) => sess.locationId).filter(Boolean))
+  return sites.size > 1 ? null : dayTime[0]
 }
 
 /* A program can carry thirty sessions across two locations, and listing them
