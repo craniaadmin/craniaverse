@@ -777,14 +777,18 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
 
   const metrics = useMemo(() => {
     const fams = new Set(allRows.map(r => r.familyKey))
-    let enrolments = 0, noClasses = 0
+    let enrolments = 0, noClasses = 0, pending = 0
     for (const r of allRows) {
       enrolments += (r.record.programs || []).filter(p => p.active).length
       if (r.classList.length === 0) noClasses++
+      // Counted per program, not per student: two unstarted programs are
+      // two things to chase.
+      pending += (r.record.programs || [])
+        .filter(p => ['new', 'on hold'].includes(String(p.status || '').toLowerCase())).length
     }
     // Real money still to collect, from the same engine the fee panel uses.
     const owed = outstandingFor(allRows.map(r => r.record))
-    return { families: fams.size, students: allRows.length, enrolments, noClasses, owed }
+    return { families: fams.size, students: allRows.length, enrolments, noClasses, pending, owed }
   }, [allRows])
 
   /* Values actually present, so a filter never offers a dead end. */
