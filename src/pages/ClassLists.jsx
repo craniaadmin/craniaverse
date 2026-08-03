@@ -562,8 +562,12 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
               <td style={{ ...CELL, color: 'var(--ink-soft)' }} title={contactLine}>
                 {contactLine || '—'}
               </td>
-              <td style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }} title={entry.schedule || ''}>
+              {/* Shows the site too, so a booking at the wrong campus reads as
+                  a place mismatch rather than an unexplained time mismatch. */}
+              <td style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }}
+                title={[entry.schedule, row.wantLocName].filter(Boolean).join(' · ')}>
                 {entry.schedule || (showSchedule ? 'no schedule set' : '—')}
+                {row.wantLocName ? ` · ${row.wantLocName}` : ''}
               </td>
               <td style={CELL}>{entry.year || '—'}</td>
               <td style={{ ...CELL, textAlign: 'center' }}>
