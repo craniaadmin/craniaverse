@@ -1231,6 +1231,33 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
       </div>
 
       <div className="panels">
+        {/* Where the family came from and what they've agreed to. Both are
+            asked on the registration form and had nowhere to live here. */}
+        <div>
+          <div className="sec-h">Registration</div>
+          <div className="frow">
+            <label>Source:</label>
+            <select className="selin" value={meta.source || ''}
+              onChange={e => updateCustField('meta', 'source', e.target.value)}>
+              <option value="">—</option>
+              {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="frow">
+            <label>Joined:</label>
+            <div className="ro">{(selected.createdAt || '').slice(0, 10) || '—'}</div>
+          </div>
+          <div className="consents">
+            {CONSENTS.map(c => (
+              <label key={c} className="consent">
+                <input type="checkbox" checked={!!(meta.consents || {})[c]}
+                  onChange={e => updateCustField('meta', 'consents',
+                    { ...(meta.consents || {}), [c]: e.target.checked })} />
+                {c}
+              </label>
+            ))}
+          </div>
+        </div>
         {panel('Guardian 1', guardian1, { section: 'guardian1' })}
         {panel('Guardian 2', guardian2, { section: 'guardian2' })}
         {panel('Emergency Contact', emergency, { section: 'emergency', highlightEmail: false })}
