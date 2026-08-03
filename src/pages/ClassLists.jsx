@@ -604,13 +604,20 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
               <td style={{ ...CELL, color: 'var(--ink-soft)' }} title={contactLine}>
                 {contactLine || '—'}
               </td>
-              {/* Shows the site too, so a booking at the wrong campus reads as
-                  a place mismatch rather than an unexplained time mismatch. */}
-              <td style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }}
-                title={[entry.schedule, row.wantLocName].filter(Boolean).join(' · ')}>
-                {entry.schedule || (showSchedule ? 'no schedule set' : '—')}
-                {row.wantLocName ? ` · ${row.wantLocName}` : ''}
-              </td>
+              {/* Shows what the registration says about place as well as time.
+                  When no site could be read, show the raw platform text rather
+                  than nothing — that string is the reason the row is here. */}
+              {(() => {
+                const raw = String(entry.platform || entry.location || '').trim()
+                const place = row.wantLocName || (raw && `“${raw}”`) || ''
+                return (
+                  <td style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }}
+                    title={[entry.schedule, raw].filter(Boolean).join(' · ')}>
+                    {entry.schedule || (showSchedule ? 'no schedule set' : '—')}
+                    {place ? ` · ${place}` : ''}
+                  </td>
+                )
+              })()}
               <td style={CELL}>{entry.year || '—'}</td>
               <td style={{ ...CELL, textAlign: 'center' }}>
                 <span style={{
