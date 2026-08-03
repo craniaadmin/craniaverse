@@ -31,14 +31,24 @@ const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warni
 /* Shared with Contests and Class Lists. The page used to carry its own
    greens and yellows, which read as a different product. */
 const STATUS_STYLE = {
+  New:          { bg: '#fbf3ce', fg: '#7a6417' },
   Active:       { bg: '#dff5e0', fg: '#2b7a2e' },
   'Late Start': { bg: '#fff4d6', fg: '#8a6a00' },
+  'On Hold':    { bg: '#fbf3ce', fg: '#7a6417' },
   'On-Hold':    { bg: '#eef1f4', fg: '#6B6455' },
   Completed:    { bg: '#e4f2fb', fg: '#1c6ea4' },
   Cancelled:    { bg: '#fde0e0', fg: '#a12626' },
   Inactive:     { bg: '#eef1f4', fg: '#6B6455' },
 }
 const statusStyle = (s) => STATUS_STYLE[s] || STATUS_STYLE.Inactive
+
+// Payment is its own vocabulary — it answers "has the money arrived", not
+// "is the class running", so it does not share the status palette.
+const PAYMENT_STYLE = {
+  Paid:    { bg: '#def2de', fg: '#2b7a2e' },
+  Partial: { bg: '#fbf3ce', fg: '#7a6417' },
+  Unpaid:  { bg: '#fadbd8', fg: '#922b21' },
+}
 
 const COLS = [
   { k: 'family',  l: 'Family ID' },
