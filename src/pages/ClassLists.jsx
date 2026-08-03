@@ -226,6 +226,12 @@ function useClassLists() {
 
     // Sub-group each class's roster by matched session.
     for (const cls of classes) {
+      /* Merged records arrive in catalogue order, which interleaves sites and
+         days. Read them the way a timetable reads: day, then time, then site. */
+      cls.allSessions.sort((a, b) =>
+        (a.day == null ? 99 : DOW_ORD[a.day]) - (b.day == null ? 99 : DOW_ORD[b.day])
+        || String(a.start || '').localeCompare(String(b.start || ''))
+        || String(locNameOf(a.locationId) || '').localeCompare(String(locNameOf(b.locationId) || '')))
       const all = cls.allSessions
       const groups = new Map() // session key (or null) -> rows
       for (const row of cls.roster) {
