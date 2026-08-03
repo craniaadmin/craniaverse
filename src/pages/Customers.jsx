@@ -870,7 +870,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded,
 
 /* The calculator, matching the Customers template: ten billed months of
    3.5 lessons, first month pro-rated by the starting lesson. */
-function FeePanel({ prog, fc, engine, setCalc, onPdf, pdfBusy }) {
+function FeePanel({ prog, fc, engine, setCalc, onBilling, onPdf, pdfBusy }) {
   const e = engine || engineForEntry({ ...prog, feeCalc: fc })
   const num = (v) => (v === '' ? '' : Number(v))
   return (
