@@ -182,7 +182,11 @@ const CSS = `
 .ct thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
     user-select:none;border-radius:6px;position:relative}
-.ct thead th.colh .lbl{display:block;text-align:center;padding:0 30px}
+/* The sort arrow and eye sit absolutely at right:3px, so only the RIGHT
+   padding reserves anything — the matching 30px on the left bought nothing
+   and truncated short headers like "Grade". Right side unchanged; left cut. */
+.ct thead th.colh .lbl{display:block;text-align:center;padding:0 30px 0 4px;
+    overflow:hidden;text-overflow:ellipsis}
 .ct thead th.selcol,.ct thead th:empty,.ct thead th.blankhead,
 .ct tbody td.selcol,.ct tbody td.actcell{background:transparent}
 .ct thead th.selcol input,.ct tbody td.selcol input{width:12px;height:12px;margin:0;

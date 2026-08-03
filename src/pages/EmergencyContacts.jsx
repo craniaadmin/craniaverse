@@ -131,7 +131,11 @@ const CSS = `
 .ec thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
     user-select:none;border-radius:6px;position:relative}
-.ec thead th.colh .lbl{display:block;text-align:center;padding:0 30px}
+/* The sort arrow and eye sit absolutely at right:3px, so only the RIGHT
+   padding reserves anything — the matching 30px on the left bought nothing
+   and truncated short headers like "Grade". Right side unchanged; left cut. */
+.ec thead th.colh .lbl{display:block;text-align:center;padding:0 30px 0 4px;
+    overflow:hidden;text-overflow:ellipsis}
 .ec thead th .arw{opacity:.85;font-size:10px}
 .ec thead th.colh{cursor:grab}
 .ec thead th.colh .thicons{position:absolute;right:3px;top:50%;transform:translateY(-50%);

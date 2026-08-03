@@ -516,8 +516,12 @@ const CSS = `
 .pg thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
     user-select:none;border-radius:6px;position:relative}
-.pg thead th.colh .lbl{display:block;text-align:center;padding:0 30px}
-.pg thead th.colh.hasgear .lbl{padding:0 42px}
+/* The sort arrow and eye sit absolutely at right:3px, so only the RIGHT
+   padding reserves anything — the matching 30px on the left bought nothing
+   and truncated short headers like "Grade". Right side unchanged; left cut. */
+.pg thead th.colh .lbl{display:block;text-align:center;padding:0 30px 0 4px;
+    overflow:hidden;text-overflow:ellipsis}
+.pg thead th.colh.hasgear .lbl{padding:0 42px 0 4px}
 .pg thead th.colh .thicons{position:absolute;right:3px;top:50%;transform:translateY(-50%);
     display:inline-flex;align-items:center;gap:2px;line-height:1}
 /* Nothing empty draws a pill — including the placeholder cells the filter row
