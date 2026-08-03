@@ -307,8 +307,11 @@ const CSS = `
 .cu .feebtn{background:#fff;border:1px solid var(--field);border-radius:7px;padding:3px 9px;
     font-size:11.5px;font-weight:700;color:var(--dark-brown);cursor:pointer;font-family:inherit;white-space:nowrap}
 .cu .feebtn:hover{background:#f1f5f4}
+/* The panel is rendered inside a table cell, and .cu tbody td sets
+   white-space:nowrap — which the labels and the hint inherit, so they ran
+   past the edge of their column instead of wrapping. Reset it here. */
 .cu .feepanel{background:#fff;border:1px solid var(--line);border-left:3px solid var(--teal);
-    border-radius:10px;padding:14px 16px;margin:2px 4px 0;text-align:left}
+    border-radius:10px;padding:14px 16px;margin:2px 4px 0;text-align:left;white-space:normal}
 .cu .feehead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;
     padding-bottom:7px;border-bottom:1px solid var(--line)}
 .cu .feehead .t{font-size:12.5px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px}
