@@ -753,12 +753,14 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
              r.school.toLowerCase().includes(q) ||
              r.classList.some(c => c.toLowerCase().includes(q))
     })
+    const NUMERIC = ['kids', 'fees', 'paid', 'balance']
     const val = (r) => {
       if (sort.key === 'classes') return r.classList.join(', ').toLowerCase()
       if (sort.key === 'grade') {
         const n = parseFloat(String(r.grade).replace(/[^0-9.]/g, ''))
         return isFinite(n) ? n : 999
       }
+      if (NUMERIC.includes(sort.key)) return Number(r[sort.key]) || 0
       return String(r[sort.key] || '').toLowerCase()
     }
     /* Ties fall back to guardian then student, so siblings stay together
