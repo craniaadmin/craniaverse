@@ -110,6 +110,7 @@ const CSS = `
 .cu .metric.mstu{border-bottom-color:var(--yellow)}
 .cu .metric.menr{border-bottom-color:var(--light-blue)}
 .cu .metric.mnone{border-bottom-color:#c0392b}
+.cu .metric.mowed{border-bottom-color:#8a6a00}
 .cu .metric .label{font-size:12.5px;color:#6b6455;font-weight:600;margin-bottom:4px}
 .cu .metric .value{font-size:24px;font-weight:700;color:var(--dark-brown);font-variant-numeric:tabular-nums}
 .cu .metric .hint{font-size:11.5px;color:#9a948a;margin-top:3px}
@@ -1116,15 +1117,32 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
   const downloadPdf = async (prog, fc) => {
     setPdfBusy(true)
     try {
+      /* The generator draws a finished schedule — it takes computed totals
+         and installments, not the inputs — so run the engine here and hand
+         it the same numbers the panel is showing. */
+      const e = engineForEntry({ ...prog, feeCalc: fc })
+      const yearLabel = /^\d{2}_\d{2}$/.test(prog.year || '')
+        ? `20${prog.year.slice(0, 2)}–${prog.year.slice(3)}`
+        : (prog.year || '')
+      const yearStart = /^\d{2}_\d{2}$/.test(prog.year || '') ? 2000 + Number(prog.year.slice(0, 2)) : 2026
       const res = await fetch(`${API_BASE}/api/fee-schedule/pdf`, {
         method: 'POST', headers: HEADERS,
         body: JSON.stringify({
           studentName: `${selected.student?.firstName || ''} ${selected.student?.lastName || ''}`.trim(),
-          programName: prog.program || '', year: prog.year || '',
-          firstLesson: fc.firstLesson, monthly: fc.monthlyFee,
-          regFee: fc.regFee, matFee: fc.matFee,
-          discount: fc.discount, discountType: fc.discountType,
-          billing: prog.billing || 'Monthly',
+          programName: prog.program || '',
+          yearLabel, yearStart,
+          weeksPerYear: TOTAL_LESSONS,
+          firstLesson: fc.firstLesson || 1,
+          scheduledWeeks: e.lessons,
+          tuition: e.lessonFees, regFee: e.regFee, matFee: e.matFee, total: e.total,
+          installments: e.installments.map((i, k) => ({
+            month: String(i.month || '').toLowerCase(),
+            kind: (i.skipped || !i.amount)
+              ? 'skip'
+              : (k === e.mIdx && e.lessonsFirstMonth < TOTAL_LESSONS / 10 ? 'prorated' : 'full'),
+            amount: i.amount || 0,
+          })),
+          filename: `fee-schedule-${(prog.program || 'program').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`,
         }),
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
