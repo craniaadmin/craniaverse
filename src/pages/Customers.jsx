@@ -735,6 +735,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       <div className="filters">
         <input type="search" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search guardians, students or classes…" autoComplete="off" />
+        <label className="toggle" title="Students whose programs have all finished">
+          <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
+          Show inactive
+        </label>
         {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
         <button className="addbtn" onClick={onAdd}><UserPlus size={14} /> Add Family</button>
       </div>
