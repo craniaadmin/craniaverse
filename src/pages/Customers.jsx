@@ -661,8 +661,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     return m
   }, [programs])
 
-  /* One row per student. Guardian identity groups them into families so
-     the guardian cells can be blanked on repeats. */
+  /* One entry per student, carrying both its own values and its family's.
+     Rows are still built per student because filtering, searching, sorting,
+     selection and the metrics all reason about students; they are gathered
+     into family rows only at render time. */
   const allRows = useMemo(() => {
     const real = records.filter(r => r.id !== 'seed')
     const byFamily = new Map()
@@ -674,22 +676,58 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     const rows = []
     for (const [key, students] of byFamily) {
       const first = students[0]
-      const g1 = personName(first.customer?.guardian1)
-      const g2 = personName(first.customer?.guardian2)
-      const g1Email = first.customer?.guardian1?.['Email'] || ''
-      const family = familyIds.get(key) || ''
+      const c = first.customer || {}
+      const g1o = c.guardian1 || {}, g2o = c.guardian2 || {}, emo = c.emergency || {}
+      const meta = c.meta || {}
+      const phone = (g) => g['Phone (Mobile)'] || g['Phone (Home)'] || ''
+      const address = [g1o['Street Address'], g1o['Unit'], g1o['City'],
+        g1o['Province'], g1o['Postal Code']].filter(Boolean).join(', ')
+      const consents = Object.entries(meta.consents || {})
+        .filter(([, v]) => v).map(([k]) => k).join(', ')
+      const fam = {
+        family: familyIds.get(key) || '',
+        received: (first.createdAt || '').slice(0, 10),
+        source: meta.source || '',
+        g1: personName(g1o), g1rel: g1o['Relationship'] || '', g1phone: phone(g1o),
+        g1email: g1o['Email'] || '', g1occ: g1o['Occupation'] || '',
+        g2: personName(g2o), g2rel: g2o['Relationship'] || '', g2phone: phone(g2o),
+        g2email: g2o['Email'] || '', g2occ: g2o['Occupation'] || '',
+        address, kids: students.length,
+        ec1: personName(emo), ec1rel: emo['Relationship'] || '',
+        ec1phone: emo['Phone (Mobile)'] || '', ec1email: emo['Email'] || '',
+        consents,
+      }
       const sorted = [...students].sort((a, b) =>
         (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
       for (const s of sorted) {
         const progs = s.programs || []
+        const live = progs.filter(p => String(p.status || '').toLowerCase() !== 'cancelled')
+        let fees = 0, paid = 0
+        for (const p of live) {
+          if (!p.feeCalc) continue
+          const e = engineForEntry(p)
+          fees += e.total; paid += e.paid
+        }
+        const payment = fees <= 0 ? '' : (paid >= fees - 0.005 ? 'Paid' : (paid > 0 ? 'Partial' : 'Unpaid'))
+        const notes = s.student?.notes
         rows.push({
-          id: s.id, record: s, familyKey: key, family,
-          g1, g2, g1Email,
+          id: s.id, record: s, familyKey: key, ...fam,
           student: `${s.student?.firstName || ''} ${s.student?.lastName || ''}`.trim(),
           grade: s.student?.grade || '',
+          school: s.student?.school || '',
+          dob: s.student?.dob || '',
+          allergies: s.student?.medical || '',
+          notes: Array.isArray(notes) ? notes.filter(Boolean).join(' · ') : (notes || ''),
           classList: classesOf(s),
+          progList: progs,
+          progstatus: [...new Set(progs.map(p => p.status).filter(Boolean))].join(', '),
+          year: [...new Set(progs.map(p => p.year).filter(Boolean))].join(', '),
+          billing: [...new Set(progs.map(p => p.billing).filter(Boolean))].join(', '),
+          rate: [...new Set(progs.map(p => p.rate).filter(Boolean))].join(', '),
+          fees, paid, balance: Math.max(0, fees - paid), payment,
           // Enrolled once but nothing running now — distinct from never enrolled.
           inactive: progs.length > 0 && !progs.some(p => p.active),
+          pending: progs.some(p => ['new', 'on hold'].includes(String(p.status || '').toLowerCase())),
         })
       }
     }
