@@ -49,6 +49,12 @@ let STATE = [
   rec('2', 'F0001', 'Kofi', 'Okafor', '2', 'Elmwood PS', OKA1, OKA2, [
     prog('FLEX MATH - SINGLE', 'New', '249'),
   ]),
+  // Sorts between Kofi and Zara and carries two programs, so the tall cell
+  // sits in the MIDDLE of the family — the case that misaligns naive stacking.
+  rec('6', 'F0001', 'Mina', 'Okafor', '6', 'Elmwood PS', OKA1, OKA2, [
+    prog('MATH ENRICHMENT - LEVEL 2', 'Active', '289'),
+    prog('TEKNOKIDS CODING: JAVASCRIPT/AI', 'Active', '319'),
+  ]),
   rec('3', 'F0002', 'Aditi', 'Sharma', '7', 'Centennial PS', SHA1, SHA2, [
     prog('TEKNOKIDS CODING: JAVASCRIPT/AI', 'Active', '319', ALL_PAID),
   ]),
