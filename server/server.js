@@ -658,6 +658,16 @@ app.put('/api/programs/decrement-spots', wrap(async (req, res) => {
   res.json({ ok: true, decremented: count })
 }))
 
+/* Public: just the site ids and names. The registration form needs them to
+   label a class's locations ("Boardwalk (In-Person)"), and programs_state
+   as a whole carries admin view state — column order, palettes — that the
+   form has no business seeing. */
+app.get('/api/locations', wrap(async (_req, res) => {
+  const state = await getProgramsState()
+  const list = Array.isArray(state?.locations) ? state.locations : []
+  res.json(list.map(l => ({ id: l.id, name: l.name || '' })).filter(l => l.id))
+}))
+
 // ---- programs backups --------
 app.get('/api/programs-state', wrap(async (_req, res) => {
   const state = await getProgramsState()
