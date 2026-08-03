@@ -235,9 +235,9 @@ const CSS = `
 .cu .filters .toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
     color:var(--muted);cursor:pointer}
 .cu .filters .toggle input{accent-color:var(--teal);cursor:pointer;margin:0}
-.cu .frow .selin{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--field);
+.cu .colfrow .selin{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--field);
     border-radius:8px;font:inherit;font-size:13px;background:#fff;color:var(--dark-brown)}
-.cu .frow .selin:focus{outline:none;border-color:var(--teal)}
+.cu .colfrow .selin:focus{outline:none;border-color:var(--teal)}
 .cu .consents{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;
     border-top:1px solid var(--line)}
 .cu .consent{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dark-brown);cursor:pointer}
@@ -338,8 +338,8 @@ const CSS = `
 .cu .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;margin:0;line-height:1;
     cursor:pointer;transition:color .15s;display:inline-flex;vertical-align:middle}
 .cu .rowbtn.rb-add:hover,.cu .rowbtn.rb-dup:hover{color:var(--teal)}
-.cu thead tr.frow th{background:#eaf3f2;padding:5px 6px;border-radius:0}
-.cu thead tr.frow th:empty{background:transparent}
+.cu thead tr.colfrow th{background:#eaf3f2;padding:5px 6px;border-radius:0}
+.cu thead tr.colfrow th:empty{background:transparent}
 .cu .colf{width:100%;background:#fff;border:1px solid var(--field);border-radius:7px;padding:4px 6px;
     font-size:11.5px;color:var(--dark-brown);font-weight:600;cursor:pointer;font-family:inherit}
 .cu .colf.on{background:var(--light-blue);border-color:var(--light-blue)}
