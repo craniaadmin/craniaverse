@@ -175,15 +175,21 @@ const COL_PX = {
 }
 const colWidth = (k) => (COL_PX[k] || 130) + 'px'
 
-const CPREF_KEY = 'customers-cols'
+/* Bumped from `customers-cols`: under the old six-column set an empty
+   hiddenCols meant "show everything", which would now open all 35 at once. */
+const CPREF_KEY = 'customers-cols-v2'
+const defaultHidden = () =>
+  Object.fromEntries(COLS.filter(c => !DEFAULT_SHOWN.includes(c.k)).map(c => [c.k, true]))
+
 function loadColPrefs() {
   try {
-    const v = JSON.parse(localStorage.getItem(CPREF_KEY) || '{}')
+    const v = JSON.parse(localStorage.getItem(CPREF_KEY) || 'null')
+    if (!v) return { hiddenCols: defaultHidden(), colOrder: [] }
     return {
-      hiddenCols: v.hiddenCols && typeof v.hiddenCols === 'object' ? v.hiddenCols : {},
+      hiddenCols: v.hiddenCols && typeof v.hiddenCols === 'object' ? v.hiddenCols : defaultHidden(),
       colOrder: Array.isArray(v.colOrder) ? v.colOrder : [],
     }
-  } catch { return { hiddenCols: {}, colOrder: [] } }
+  } catch { return { hiddenCols: defaultHidden(), colOrder: [] } }
 }
 function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ } }
 
