@@ -90,10 +90,14 @@ function statedLocationId(entry, sessions, locNameOf) {
   const hint = `${entry?.location || ''} ${entry?.platform || ''}`.trim().toLowerCase()
   if (!hint) return null
   const ids = [...new Set(sessions.map((s) => s.locationId).filter(Boolean))]
-  for (const id of ids) {
-    const name = String(locNameOf(id) || '').toLowerCase()
-    if (name && hint.includes(name)) return id
-  }
+  /* Longest name first. Sites whose names nest — "Waterloo" alongside
+     "Waterloo East" — would otherwise resolve to whichever came first in
+     the array rather than the one actually named. */
+  const named = ids
+    .map((id) => ({ id, name: String(locNameOf(id) || '').toLowerCase() }))
+    .filter((x) => x.name)
+    .sort((a, b) => b.name.length - a.name.length)
+  for (const { id, name } of named) if (hint.includes(name)) return id
   return null
 }
 
