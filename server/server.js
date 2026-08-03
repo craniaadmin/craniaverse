@@ -243,9 +243,9 @@ async function commitSurveys(surveys) {
 }
 
 // ---- registrations: one-time migration of legacy records ---
-// Earlier records may be missing the programs / cashLog
-// fields. Pull all records, patch in-memory, and write back
-// only if something changed.
+// Earlier records may be missing the programs / cashLog /
+// student.notes fields. Pull all records, patch in-memory, and
+// write back only if something changed.
 async function migrateRegistrations() {
   const records = await getRegistrations()
   let changed = false
@@ -258,6 +258,15 @@ async function migrateRegistrations() {
     }
     if (!Array.isArray(r.cashLog)) {
       r.cashLog = []
+      changed = true
+    }
+    // The Students page reads student.notes as an array. A record saved
+    // before the field existed has none, which used to take the whole
+    // detail view down rather than showing an empty notes box.
+    if (r.student && !Array.isArray(r.student.notes)) {
+      r.student.notes = typeof r.student.notes === 'string' && r.student.notes
+        ? r.student.notes.split('\n')
+        : []
       changed = true
     }
   })
