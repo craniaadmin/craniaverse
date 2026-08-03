@@ -280,7 +280,10 @@ const CSS = `
 .cu .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
     border-bottom:3px solid var(--teal);overflow-x:auto}
-.cu table{width:100%;min-width:820px;table-layout:fixed;border-collapse:separate;
+/* Sizes to the sum of its columns and scrolls when that exceeds the card;
+   stretches to fill when it does not. Every colgroup width is a pixel value
+   so the stretch is shared out proportionally. */
+.cu table{width:max-content;min-width:100%;table-layout:fixed;border-collapse:separate;
     border-spacing:5px 5px;background:#fff}
 .cu thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
