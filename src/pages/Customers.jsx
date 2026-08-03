@@ -315,25 +315,42 @@ const CSS = `
 .cu .pdfbtn{background:var(--pill);border:1px solid var(--field);border-radius:7px;padding:4px 10px;
     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--dark-brown)}
 .cu .pdfbtn:disabled{opacity:.5;cursor:default}
-/* minmax(0,…) not (140px,…): a 1fr track keeps an automatic minimum of its
-   content, and a <select> measures to its longest option ("Every 3 Months"),
-   so the tracks refused to shrink and overflowed the panel. */
-.cu .feegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:10px 12px;margin-bottom:14px}
-.cu .feegrid > label{min-width:0}
-.cu .feegrid label{display:block;font-size:11.5px;font-weight:600;color:var(--muted)}
-.cu .feegrid input,.cu .feegrid select{width:100%;min-width:0;box-sizing:border-box;margin-top:4px;padding:6px 9px;
-    border:1px solid var(--field);border-radius:7px;font:inherit;font-size:12.5px;background:#fff;color:var(--dark-brown)}
-.cu .feegrid input:focus,.cu .feegrid select:focus{outline:none;border-color:var(--teal)}
-.cu .feegrid .discrow{display:flex;gap:5px;min-width:0}
-.cu .feegrid .discrow input{flex:1;min-width:0}
-.cu .feegrid .discrow select{width:56px;flex:none}
-.cu .feetotals{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:5px 22px;font-size:12.5px}
-.cu .feetotals div{min-width:0}
-.cu .feetotals div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
-.cu .feetotals span{color:var(--muted)}
-.cu .feetotals .paidline b{color:#2b7a2e}
-.cu .feetotals .owedline b{color:var(--danger)}
+/* Three flex columns, each a stack of "label … control" rows — the
+   template's layout. The label takes the slack and the control is a fixed
+   96px, so nothing can be pushed out of the panel however long a label or a
+   <select> option runs. The auto-fit grid this replaced could not shrink
+   below its widest option ("Every 3 Months") and overflowed by 60px. */
+.cu .fspgrid{display:flex;gap:24px;align-items:flex-start;margin-bottom:2px}
+.cu .fspcol{flex:1;min-width:0}
+.cu .fsprow{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cu .fsprow label{flex:1;min-width:0;font-size:11.5px;font-weight:600;color:var(--muted)}
+.cu .fsprow input,.cu .fsprow select{flex:0 0 96px;min-width:0;box-sizing:border-box;background:#fff;
+    border:1px solid var(--field);border-radius:6px;height:24px;padding:0 7px;
+    font:inherit;font-size:11.5px;color:var(--dark-brown)}
+.cu .fsprow input:focus,.cu .fsprow select:focus{outline:none;border-color:var(--teal)}
+.cu .fsprow.calc b{font-size:12px;color:var(--dark-brown);font-variant-numeric:tabular-nums}
+.cu .fsprow.calc.total b{font-size:14px}
+.cu .fsprow.calc.paidline b{color:#2b7a2e}
+.cu .fsprow.calc.owedline b{color:var(--danger)}
+.cu .fsprow.fee input{flex:0 0 72px;text-align:right}
+.cu .fsprow.fee label,.cu .fsprow.fee input{color:var(--danger)}
+.cu .fsprow.paidfee label{color:#2b7a2e}
+.cu .fsprow.paidfee input{color:#2b7a2e;background:#DEF2DE;border-color:#8CC79A;font-weight:700}
+.cu .fsprow.mo label{color:var(--danger)}
+.cu .fsprow.mo b{font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--danger)}
+.cu .fsprow.mo.off label,.cu .fsprow.mo.off b{color:var(--faint)}
+.cu .fsprow.mo.paidmo label{color:#2b7a2e}
+.cu .fsprow.mo.paidmo b{color:#2b7a2e;font-weight:800}
+.cu .fsphr{height:1px;background:var(--line);margin:8px 0}
+.cu .fsphint{font-size:10.5px;color:var(--faint);margin:8px 0 0;line-height:1.4}
+.cu .fspmh{font-size:11.5px;font-weight:700;color:var(--teal);margin-bottom:6px;
+    padding-bottom:4px;border-bottom:1px solid var(--light-blue)}
+.cu .fspcol.months{padding:0 6px;align-self:flex-start}
+.cu .discwrap{flex:0 0 96px;display:flex;gap:3px;min-width:0}
+.cu .discwrap input{flex:1;min-width:0}
+.cu .discwrap select.discunit{flex:0 0 38px;padding:0 2px}
+/* One column is unreadably narrow on a laptop; stack them instead. */
+@media (max-width:1080px){ .cu .fspgrid{flex-wrap:wrap} .cu .fspcol{flex:1 1 260px} }
 .cu .sessrows{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
 .cu .sesshead{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;
     letter-spacing:.4px;margin-bottom:7px}
