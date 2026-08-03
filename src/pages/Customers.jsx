@@ -1050,7 +1050,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           <table>
             <colgroup>
               <col style={{ width: SEL_W }} />
-              {orderedCols.map(c => <col key={c.k} style={{ width: COL_W[c.k] }} />)}
+              {orderedCols.map(c => <col key={c.k} style={{ width: colWidth(c.k) }} />)}
               <col style={{ width: ACT_W }} />
             </colgroup>
             <thead>
