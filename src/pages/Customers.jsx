@@ -519,12 +519,15 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       const sorted = [...students].sort((a, b) =>
         (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
       for (const s of sorted) {
+        const progs = s.programs || []
         rows.push({
-          id: s.id, record: s, familyKey: key,
+          id: s.id, record: s, familyKey: key, family,
           g1, g2, g1Email,
           student: `${s.student?.firstName || ''} ${s.student?.lastName || ''}`.trim(),
           grade: s.student?.grade || '',
           classList: classesOf(s),
+          // Enrolled once but nothing running now — distinct from never enrolled.
+          inactive: progs.length > 0 && !progs.some(p => p.active),
         })
       }
     }
