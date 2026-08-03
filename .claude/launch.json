@@ -18,20 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "cupreview",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "vite",
-        "--config",
-        "vite.cupreview.config.js",
-        "--host",
-        "127.0.0.1",
-        "--port",
-        "5220"
-      ],
-      "port": 5220
     }
   ]
 }
