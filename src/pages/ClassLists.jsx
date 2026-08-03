@@ -7,8 +7,9 @@
 // out under their category heading.
 //
 // Note: an enrolment naming a program that is not in the Programs list
-// does not appear anywhere on this page. The block that used to list
-// those was removed by request.
+// belongs to no class, so it appears on no roster. The block that used to
+// list those was removed by request; a single collapsed line above the
+// cards keeps them from being invisible.
 
 import { useMemo, useState } from 'react'
 import { Search, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
@@ -202,7 +203,7 @@ const cardShadow = { boxShadow: 'var(--brand-shadow)' }
 export default function ClassLists({ onNavigate }) {
   const { status: fetchStatus } = useStore()
   const locNameOf = useLocName()
-  const { classes } = useClassLists()
+  const { classes, unlisted } = useClassLists()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const [hideEmpty, setHideEmpty] = useState(true)
@@ -338,6 +339,28 @@ export default function ClassLists({ onNavigate }) {
           <button onClick={collapseAll} style={toolbarBtn}>Collapse all</button>
         </div>
       </div>
+
+      {/* Enrolments naming a program the catalogue does not have appear on no
+          roster at all. One quiet line so they are visible without a second
+          block — the register itself stays about who is in the room. */}
+      {unlisted.length > 0 && (
+        <details style={{ margin: '0 0 14px', fontSize: 12.5, color: '#8a6a00' }}>
+          <summary style={{ cursor: 'pointer', fontWeight: 600 }}>
+            {unlisted.reduce((n, u) => n + u.roster.length, 0)} enrolment
+            {unlisted.reduce((n, u) => n + u.roster.length, 0) === 1 ? '' : 's'} name a program that
+            {' '}isn’t in the Programs list — not shown on any roster
+          </summary>
+          <div style={{ padding: '8px 0 0 16px', color: 'var(--ink-soft)' }}>
+            {unlisted.map((u) => (
+              <div key={u.title} style={{ padding: '2px 0' }}>
+                <b>{u.title}</b>{' — '}
+                {u.roster.map((row) => `${row.record.student?.firstName || ''} ${row.record.student?.lastName || ''}`.trim())
+                  .filter(Boolean).join(', ')}
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
 
       {/* Class cards */}
       {visible.length === 0 ? (
