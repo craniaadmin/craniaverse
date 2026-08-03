@@ -691,6 +691,11 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
           <div className="label">No Classes</div><div className="value">{metrics.noClasses}</div>
           <div className="hint">not enrolled in anything</div>
         </div>
+        <div className="metric mowed">
+          <div className="label">Outstanding Fees</div>
+          <div className="value" style={{ fontSize: metrics.owed >= 100000 ? 19 : 22 }}>{money(metrics.owed)}</div>
+          <div className="hint">still to collect</div>
+        </div>
       </div>
 
       <div className="filters">
