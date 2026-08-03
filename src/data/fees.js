@@ -131,3 +131,39 @@ export function syncProgramMoney(program) {
 
 export const money = (n) =>
   '$' + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+/* Run the engine over a registration's program entry.
+
+   Two shape differences from the template. Our payment squares are keyed
+   lowercase and hold four states — paid / pending / overdue / empty —
+   rather than a boolean, and only `paid` is money actually received.
+   And `schedule` on our entries is already the class time ("Mon 4:30 pm"),
+   so the billing cadence lives on `billing`. */
+export function engineForEntry(entry) {
+  const fees = (entry && entry.fees) || {}
+  const months = {}
+  for (const k of MONTH_KEYS) {
+    if (String(fees[k.toLowerCase()] || '').toLowerCase() === 'paid') months[k] = true
+  }
+  return feeEngine({
+    schedule: (entry && entry.billing) || 'Monthly',
+    months,
+    feeCalc: entry && entry.feeCalc,
+  })
+}
+
+/* Total still owed across a set of registrations. Cancelled enrolments are
+   not money anyone expects to collect, so they are left out. */
+export function outstandingFor(records) {
+  let owed = 0
+  for (const r of (records || [])) {
+    if (r.id === 'seed') continue
+    for (const entry of (r.programs || [])) {
+      if (String(entry.status || '').toLowerCase() === 'cancelled') continue
+      if (!entry.feeCalc) continue
+      const e = engineForEntry(entry)
+      owed += Math.max(0, e.total - e.paid)
+    }
+  }
+  return owed
+}
