@@ -1299,8 +1299,21 @@ function init(){
   loadPrograms();
 }
 
+/* Site names first, so a class's locations read "Boardwalk" rather than
+   the raw id. Failing that we de-prefix the id, so the form still works
+   if the endpoint is unavailable. */
 function loadPrograms(){
-  fetch('/api/programs', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+  var HDRS = { headers: { 'ngrok-skip-browser-warning': 'true' } };
+  fetch('/api/locations', HDRS)
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .catch(function(){ return []; })
+    .then(function(locs){
+      LOCATIONS_BY_ID = {};
+      (Array.isArray(locs) ? locs : []).forEach(function(l){
+        if(l && l.id) LOCATIONS_BY_ID[l.id] = l.name || '';
+      });
+      return fetch('/api/programs', HDRS);
+    })
     .then(function(r){ return r.ok ? r.json() : []; })
     .then(function(data){
       PROGRAMS_DATA = Array.isArray(data) ? data : [];
