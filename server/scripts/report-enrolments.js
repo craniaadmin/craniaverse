@@ -119,6 +119,52 @@ async function main() {
 
   if (!orphans.size) { console.log('Nothing to repair.'); return }
 
+  if (DELETE) {
+    /* Removing the enrolment, not the student. Anyone left with none is
+       still on the roll — they are simply booked into nothing, which is
+       the truth once a booking against a non-existent class is gone. */
+    let removing = 0
+    const emptied = []
+    const touched = new Map()
+    for (const [name, list] of [...orphans.entries()].sort((a, b) => b[1].length - a[1].length)) {
+      console.log(`  ${String(list.length).padStart(2)}x  "${name}"`)
+      console.log(`        ${list.map(x => x.who).slice(0, 6).join(', ')}${list.length > 6 ? ' …' : ''}`)
+      removing += list.length
+      for (const x of list) touched.set(x.row.id, x)
+    }
+    // What each student is left holding.
+    for (const [, x] of touched) {
+      const keep = (x.payload.programs || []).filter(e => !e.program || known.has(norm(e.program)))
+      if (keep.length === 0) emptied.push(x.who)
+    }
+
+    console.log(`\nWould delete ${removing} enrolment(s) from ${touched.size} registration(s).`)
+    if (emptied.length) {
+      console.log(`${emptied.length} student(s) would be left with no classes at all — they stay on the roll:`)
+      console.log('  ' + [...new Set(emptied)].join(', '))
+    }
+
+    if (!APPLY) {
+      console.log('\nRead-only — nothing was deleted.')
+      console.log('Add --apply to back up and delete them.')
+      return
+    }
+
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const dumpPath = path.join(SERVER_DIR, `backup-registrations-${stamp}.json`)
+    fs.writeFileSync(dumpPath, JSON.stringify(regRows, null, 2))
+    console.log(`\n  ✓ backup written to ${path.relative(path.join(SERVER_DIR, '..'), dumpPath)}`)
+
+    for (const [id, x] of touched) {
+      x.payload.programs = (x.payload.programs || []).filter(e => !e.program || known.has(norm(e.program)))
+      await pb.collection('registrations').update(id, { payload: x.payload })
+    }
+    console.log(`  ✓ deleted ${removing} enrolment(s) across ${touched.size} registration(s)`)
+    console.log('\n✓ Done. Restart the API so it drops its cached registrations:')
+    console.log('    pm2 restart craniaverse-api')
+    return
+  }
+
   const plan = []
   for (const [name, list] of [...orphans.entries()].sort((a, b) => b[1].length - a[1].length)) {
     const forced = MAP.get(norm(name))
