@@ -235,6 +235,7 @@ const CSS = `
 .cu .metric.on{outline:2px solid var(--teal);outline-offset:1px}
 .cu .metric.mstu{border-bottom-color:var(--yellow)}
 .cu .metric.menr{border-bottom-color:var(--light-blue)}
+.cu .metric.mpend{border-bottom-color:#7a6417}
 .cu .metric.mnone{border-bottom-color:#c0392b}
 .cu .metric.mowed{border-bottom-color:#8a6a00}
 .cu .famref{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);font-weight:600}
