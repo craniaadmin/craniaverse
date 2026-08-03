@@ -482,7 +482,7 @@ function CtxMenu({ x, y, items, onClose }) {
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
-function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
+function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onNavigate, familyIds }) {
   const { records, programs } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
@@ -561,7 +561,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       const g1 = personName(first.customer?.guardian1)
       const g2 = personName(first.customer?.guardian2)
       const g1Email = first.customer?.guardian1?.['Email'] || ''
-      const family = famOrder.get(key) || ''
+      const family = familyIds.get(key) || ''
       const sorted = [...students].sort((a, b) =>
         (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
       for (const s of sorted) {
@@ -578,7 +578,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDelete, onNavigate }) {
       }
     }
     return rows
-  }, [records])
+  }, [records, familyIds])
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -1372,11 +1372,24 @@ export default function Customers(props) {
 }
 
 function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) {
-  const { records, select, addRegistration, deleteRegistration } = useStore()
+  const { records, select, addRegistration, deleteRegistration, updateCustomerField } = useStore()
   const dialog = useDialog()
   const [detailId, setDetailId] = useState(null)
 
   const handleSelect = (id) => { select(id); setDetailId(id) }
+
+  /* Stamp the family reference onto any record missing one, then leave it
+     alone forever — it is the identifier, not a position in a list. */
+  const assignFamilyId = useCallback((recordId, ref) => {
+    const rec = records.find(r => r.id === recordId)
+    const meta = { ...(rec?.customer?.meta || {}), familyId: ref }
+    updateCustomerField(recordId, 'meta', 'familyId', ref)
+    fetch(`${API_BASE}/api/registrations/${recordId}/customer`, {
+      method: 'PUT', headers: HEADERS, body: JSON.stringify({ meta }),
+    }).catch(() => {})
+  }, [records, updateCustomerField])
+
+  const familyIds = useFamilyIds(records, assignFamilyId)
 
   // Opened via onNavigate('Customers', recordId) from another page.
   useEffect(() => {
