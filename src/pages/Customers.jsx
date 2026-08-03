@@ -973,6 +973,49 @@ const PAYMENT_STYLE = {
 
 const DEFAULT_FEE_CALC = { firstLesson: 1, monthlyFee: 0, regFee: 79, matFee: 59, discount: 0, discountType: '%' }
 
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+/* When a class runs more than once a week. A DOUBLE attends twice and an
+   UNLIMITED up to five times, and each slot is its own register — so each
+   needs recording separately rather than being crammed into one line.
+   `schedule` is kept in step because the roster pages match on it. */
+function SessionRows({ prog, onChange }) {
+  const rows = entrySlots(prog).map((text) => {
+    const m = /^\s*(\S+)\s+(.*)$/.exec(text) || []
+    return { day: m[1] || '', time: (m[2] || '').trim() }
+  })
+  const list = rows.length ? rows : [{ day: '', time: '' }]
+
+  const commit = (next) => {
+    const clean = next.filter(s => s.day || s.time)
+    onChange(
+      clean.map(s => ({ day: s.day, time: s.time, duration: '' })),
+      clean.map(s => [s.day, s.time].filter(Boolean).join(' ')).join(', '),
+    )
+  }
+  const setAt = (i, patch) => commit(list.map((s, k) => k === i ? { ...s, ...patch } : s))
+
+  return (
+    <div className="sessrows">
+      <div className="sesshead">Sessions — one register each</div>
+      {list.map((s, i) => (
+        <div className="sessrow" key={i}>
+          <select value={s.day} onChange={e => setAt(i, { day: e.target.value })}>
+            <option value="">Day</option>
+            {DAY_NAMES.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <input placeholder="4:30 pm" value={s.time} onChange={e => setAt(i, { time: e.target.value })} />
+          <button className="sessx" title="Remove this session"
+            onClick={() => commit(list.filter((_, k) => k !== i))}>×</button>
+        </div>
+      ))}
+      <button className="sessadd" onClick={() => commit([...list, { day: '', time: '' }])}>
+        + Add session
+      </button>
+    </div>
+  )
+}
+
 function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded, onToggleExpand, onPdf, pdfBusy }) {
   const status = prog.active ? 'Active' : 'Inactive'
   const ss = statusStyle(status)
