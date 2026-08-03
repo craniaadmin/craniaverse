@@ -12,7 +12,8 @@
     "reset-calendar": "node scripts/reset-calendar.js",
     "reset-registrations": "node scripts/reset-registrations.js",
     "tidy-class-lists": "node scripts/tidy-class-lists.js",
-    "prune-blank-programs": "node scripts/prune-blank-programs.js"
+    "prune-blank-programs": "node scripts/prune-blank-programs.js",
+    "import-programs": "node scripts/import-programs.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.6",
