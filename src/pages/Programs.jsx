@@ -2093,6 +2093,7 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
 
       {bulkOpen && (
         <BulkModal count={selected.size} locations={locations} categories={categoryOrder}
+          teacherOptions={teacherOptions}
           onClose={() => setBulkOpen(false)} onApply={applyBulk} />
       )}
 
@@ -2207,6 +2208,13 @@ function CellEditor({ row, col, locations, programs, categories, teacherOptions,
     if (col === 'days') return DOW.map(d => ({ v: String(d.n), l: d.l }))
     if (col === 'platform') return PLATFORMS.map(p => ({ v: p, l: p }))
     if (col === 'category') return categories.map(c => ({ v: c, l: c }))
+    /* Instructor comes from Staff. A name already stored for someone who has
+       since left stays in the list so editing another cell doesn't wipe it. */
+    if (col === 'instructor') {
+      const opts = teacherOptions.map(t => ({ v: t, l: t }))
+      if (initial && !teacherOptions.includes(initial)) opts.push({ v: initial, l: `${initial} (not on staff)` })
+      return opts
+    }
     return null
   })()
 
@@ -2230,10 +2238,8 @@ function CellEditor({ row, col, locations, programs, categories, teacherOptions,
     return <input className="cellin" ref={ref} type="time" value={val} onKeyDown={onKey}
       onChange={e => setVal(e.target.value)} onBlur={done} />
   }
-  if (col === 'subject' || col === 'instructor') {
-    const opts = col === 'subject'
-      ? [...new Set(programs.map(p => p.subject).filter(Boolean))].sort()
-      : teacherOptions
+  if (col === 'subject') {
+    const opts = [...new Set(programs.map(p => p.subject).filter(Boolean))].sort()
     const lid = 'ce-' + col
     return <>
       <input className="cellin" ref={ref} list={lid} value={val} onKeyDown={onKey}
@@ -2427,9 +2433,16 @@ function EntryModal({
               onChange={e => set({ enrolled: e.target.value })} /></div>
         </div>
         <div className="field"><label>Instructor</label>
-          <input list="emTeachers" value={form.instructor}
-            onChange={e => set({ instructor: e.target.value })} />
-          <datalist id="emTeachers">{teacherOptions.map(t => <option key={t} value={t} />)}</datalist></div>
+          {/* Bound to Staff rather than free text, so a name is either
+              somebody on the team or deliberately blank. A value already
+              stored for someone who has since left stays selectable. */}
+          <select value={form.instructor} onChange={e => set({ instructor: e.target.value })}>
+            <option value="">— none —</option>
+            {teacherOptions.map(t => <option key={t} value={t}>{t}</option>)}
+            {form.instructor && !teacherOptions.includes(form.instructor) && (
+              <option value={form.instructor}>{form.instructor} (not on staff)</option>
+            )}
+          </select></div>
         <div className="field"><label>Comments / Notes</label>
           <textarea rows={3} value={form.description}
             onChange={e => set({ description: e.target.value })} /></div>
@@ -2486,7 +2499,7 @@ function EntryModal({
 }
 
 
-function BulkModal({ count, locations, categories, onClose, onApply }) {
+function BulkModal({ count, locations, categories, teacherOptions, onClose, onApply }) {
   const [f, setF] = useState({
     category: '', subject: '', year: '', ageRange: '', platform: '__', locationId: '',
     instructor: '', start: '', end: '', duration: '', sessions: '', period: '__',
@@ -2548,7 +2561,10 @@ function BulkModal({ count, locations, categories, onClose, onApply }) {
               {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
             </select></div>
           <div className="field"><label>Instructor</label>
-            <input placeholder="— unchanged —" value={f.instructor} onChange={e => set({ instructor: e.target.value })} /></div>
+            <select value={f.instructor} onChange={e => set({ instructor: e.target.value })}>
+              <option value="">— unchanged —</option>
+              {teacherOptions.map(t => <option key={t} value={t}>{t}</option>)}
+            </select></div>
         </div>
         <div className="frow">
           <div className="field"><label>Start Time</label>
