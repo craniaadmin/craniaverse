@@ -539,37 +539,124 @@ function flexCap(title){
   return Infinity;
 }
 
+/* Cost lives in `cost` with its own `costUnit`; `fees` was the old field
+   name and left every class showing a blank price. */
 function deriveCost(p){
-  if(p.fees == null || p.fees === '') return '';
-  var per = String(p.period || '').toLowerCase();
-  var suffix = '/mo';
-  if(per.indexOf('week') !== -1) suffix = '/wk';
-  else if(per.indexOf('lesson') !== -1) suffix = '/lesson';
-  return '$' + p.fees + ' ' + suffix;
+  if(!p) return '';
+  var amount = (p.cost == null || p.cost === '') ? p.fees : p.cost;
+  if(amount == null || amount === '') return '';
+  var unit = String(p.costUnit || '').trim();
+  if(!unit){
+    var per = String(p.period || '').toLowerCase();
+    unit = per.indexOf('week') !== -1 ? '/wk'
+      : per.indexOf('lesson') !== -1 ? '/lesson'
+      : '/mo';
+  }
+  return '$' + amount + (unit ? ' ' + unit : '');
 }
 
+var DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var DOW_RANK  = { 1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6 };
+var LOCATIONS_BY_ID = {}; // filled by loadLocations()
+
+function locationName(id){
+  if(!id) return '';
+  if(LOCATIONS_BY_ID[id]) return LOCATIONS_BY_ID[id];
+  return String(id).replace(/^loc_/, '').replace(/_/g,' ')
+    .replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+}
+
+/* Build the dropdowns from the live catalogue.
+   -------------------------------------------------------------------
+   A program carries its name in `name`, its delivery in `platform`, and
+   its schedule in `offerings[]`, where each offering is a site plus a
+   list of days and a list of times — so one offering describes several
+   sessions. This used to read `title`, `location`,
+   `offerings[].platform` and `offerings[].active`, none of which exist:
+   every class collapsed into a single unnamed group and the `active`
+   filter dropped every time slot, because offerings have no such flag.
+
+   Variants are per site, pooled across every program record sharing a
+   name — the catalogue holds several records for some classes — so the
+   student picks a site and then a real day and time. The label is
+   "Boardwalk (In-Person)", which is the shape the roster pages parse
+   back out. */
 function buildMergedPrograms(){
-  // Always include ALL programs (active or not) so indices never shift.
-  // active=false programs are hidden from the dropdown but stay in the array.
   var groups = {};
   var order = [];
+
   PROGRAMS_DATA.forEach(function(p, idx){
-    var key = p.title || '';
-    if(!groups[key]){
-      groups[key] = { title: p.title, variants: [] };
-      order.push(key);
+    var title = p.name || p.title || '';
+    if(!title) return;
+    if(!groups[title]){
+      groups[title] = { title: title, byLoc: {}, locOrder: [] };
+      order.push(title);
     }
-    groups[key].variants.push({
-      programIdx: idx,
-      location: p.location || '',
-      platform: (p.offerings && p.offerings[0] && p.offerings[0].platform) || '',
-      fees: p.fees, period: p.period,
-      active: !!p.active,
-      // only keep active offerings
-      offerings: (p.offerings || []).map(function(o, oIdx){ return Object.assign({ offeringIdx: oIdx }, o); }).filter(function(o){ return o.active; }),
+    var g = groups[title];
+
+    (p.offerings || []).forEach(function(o){
+      var locId = o.locationId || '';
+      if(!g.byLoc[locId]){
+        g.byLoc[locId] = {
+          programIdx: idx,
+          locationId: locId,
+          location: locationName(locId),
+          platform: p.platform || '',
+          active: p.active !== false,
+          sessions: [],
+          seen: {},
+        };
+        g.locOrder.push(locId);
+      }
+      var variant = g.byLoc[locId];
+      // A record that is active anywhere makes the site bookable.
+      if(p.active !== false) variant.active = true;
+
+      var days  = (o.days  || []).length ? o.days  : [null];
+      var times = (o.times || []).length ? o.times : [null];
+      days.forEach(function(d){
+        times.forEach(function(t){
+          var start = (t && t.start) || '';
+          var sig = d + '|' + start;
+          if(variant.seen[sig]) return;   // same slot from a duplicate record
+          variant.seen[sig] = true;
+          variant.sessions.push({
+            day: d == null ? '' : (DOW_NAMES[d] || ''),
+            dayNum: d,
+            start: start,
+            end: (t && t.end) || '',
+            teacher: o.instructor || '',
+            spots: (o.capacity === '' || o.capacity == null) ? null : Number(o.capacity),
+          });
+        });
+      });
     });
   });
-  MERGED_PROGRAMS = order.map(function(k){ return groups[k]; });
+
+  MERGED_PROGRAMS = order.map(function(k){
+    var g = groups[k];
+    return {
+      title: g.title,
+      variants: g.locOrder.map(function(locId){
+        var v = g.byLoc[locId];
+        v.sessions.sort(function(a, b){
+          var ra = a.dayNum == null ? 99 : DOW_RANK[a.dayNum];
+          var rb = b.dayNum == null ? 99 : DOW_RANK[b.dayNum];
+          return ra - rb || String(a.start).localeCompare(String(b.start));
+        });
+        // Index after sorting — toggleCardOffering looks slots up by this.
+        v.sessions.forEach(function(s, i){ s.offeringIdx = i; });
+        return {
+          programIdx: v.programIdx,
+          locationId: v.locationId,
+          location: v.location,
+          platform: v.platform,
+          active: v.active,
+          offerings: v.sessions,
+        };
+      }),
+    };
+  });
 }
 
 function variantLabel(v){
@@ -1212,8 +1299,21 @@ function init(){
   loadPrograms();
 }
 
+/* Site names first, so a class's locations read "Boardwalk" rather than
+   the raw id. Failing that we de-prefix the id, so the form still works
+   if the endpoint is unavailable. */
 function loadPrograms(){
-  fetch('/api/programs', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+  var HDRS = { headers: { 'ngrok-skip-browser-warning': 'true' } };
+  fetch('/api/locations', HDRS)
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .catch(function(){ return []; })
+    .then(function(locs){
+      LOCATIONS_BY_ID = {};
+      (Array.isArray(locs) ? locs : []).forEach(function(l){
+        if(l && l.id) LOCATIONS_BY_ID[l.id] = l.name || '';
+      });
+      return fetch('/api/programs', HDRS);
+    })
     .then(function(r){ return r.ok ? r.json() : []; })
     .then(function(data){
       PROGRAMS_DATA = Array.isArray(data) ? data : [];
