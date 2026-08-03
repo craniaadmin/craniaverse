@@ -800,34 +800,130 @@ const PAYMENT_STYLE = {
   Overdue: { bg: '#fde0e0', fg: '#a12626' },
 }
 
-function ProgramRow({ prog, onToggleActive, onFeeChange }) {
+const DEFAULT_FEE_CALC = { firstLesson: 1, monthlyFee: 0, regFee: 79, matFee: 59, discount: 0, discountType: '%' }
+
+function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded, onToggleExpand, onPdf, pdfBusy }) {
   const status = prog.active ? 'Active' : 'Inactive'
   const ss = statusStyle(status)
-  const payment = derivedPayment(prog.fees)
-  const ps = PAYMENT_STYLE[payment]
+  /* Payment now follows the money, not just the square colours: a program
+     is Paid when the ticked squares cover the total the engine computes. */
+  const e = prog.feeCalc ? engineForEntry(prog) : null
+  const payment = e
+    ? (e.total > 0 && e.paid >= e.total - 0.005 ? 'Paid' : e.paid > 0 ? 'Partial' : 'Unpaid')
+    : derivedPayment(prog.fees)
+  const ps = PAYMENT_STYLE[payment] || { bg: '#eef1f4', fg: '#6B6455' }
+  const fc = prog.feeCalc || DEFAULT_FEE_CALC
+  const setCalc = (patch) => onCalcChange(prog, { ...fc, ...patch })
+
   return (
-    <tr>
-      <td>
-        <input type="checkbox" checked={prog.active || false} onChange={() => onToggleActive(prog)}
-          style={{ width: 14, height: 14, cursor: 'pointer', accentColor: '#5FA09E', margin: 0 }} />
-      </td>
-      <td><span className="pill" style={{ background: ss.bg, color: ss.fg }}>{status}</span></td>
-      <td>{prog.year || '—'}</td>
-      <td className="pname">{prog.program || '—'}</td>
-      <td>
-        {prog.rate
-          ? <><b>{prog.rate}</b>{prog.rateUnit && <span style={{ color: '#9A948A' }}> {prog.rateUnit}</span>}</>
-          : <span style={{ color: '#9A948A' }}>—</span>}
-      </td>
-      <td>
-        <div style={{ display: 'flex', gap: 3, alignItems: 'center', justifyContent: 'center' }}>
-          {FEE_KEYS.map(k => (
-            <FeeSquare key={k} state={prog.fees?.[k] || 'empty'} onChange={s => onFeeChange(prog, k, s)} />
-          ))}
-        </div>
-      </td>
-      <td>{payment && <span className="pill" style={{ background: ps.bg, color: ps.fg }}>{payment}</span>}</td>
-    </tr>
+    <>
+      <tr>
+        <td>
+          <input type="checkbox" checked={prog.active || false} onChange={() => onToggleActive(prog)}
+            style={{ width: 14, height: 14, cursor: 'pointer', accentColor: '#5FA09E', margin: 0 }} />
+        </td>
+        <td><span className="pill" style={{ background: ss.bg, color: ss.fg }}>{status}</span></td>
+        <td>{prog.year || '—'}</td>
+        <td className="pname">{prog.program || '—'}</td>
+        <td>
+          {prog.rate
+            ? <><b>{prog.rate}</b>{prog.rateUnit && <span style={{ color: '#9A948A' }}> {prog.rateUnit}</span>}</>
+            : <span style={{ color: '#9A948A' }}>—</span>}
+        </td>
+        <td>
+          {/* Each square is worth what that installment bills, so hovering
+              one answers "how much is this?" without opening the panel. */}
+          <div style={{ display: 'flex', gap: 3, alignItems: 'center', justifyContent: 'center' }}>
+            {FEE_KEYS.map((k, i) => (
+              <FeeSquare key={k} state={prog.fees?.[k] || 'empty'}
+                amount={e ? e.amountFor(MONTH_KEYS[i]) : null}
+                label={FEE_LABELS[i]}
+                onChange={s => onFeeChange(prog, k, s)} />
+            ))}
+          </div>
+        </td>
+        <td>{payment && <span className="pill" style={{ background: ps.bg, color: ps.fg }}>{payment}</span>}</td>
+        <td>
+          <button className="feebtn" onClick={onToggleExpand}>
+            {e ? money(e.total) : 'Fees'} {expanded ? '▴' : '▾'}
+          </button>
+        </td>
+      </tr>
+      {expanded && (
+        <tr>
+          <td colSpan={8} style={{ background: 'transparent', padding: '0 0 10px' }}>
+            <FeePanel prog={prog} fc={fc} engine={e} setCalc={setCalc} onPdf={onPdf} pdfBusy={pdfBusy} />
+          </td>
+        </tr>
+      )}
+    </>
+  )
+}
+
+/* The calculator, matching the Customers template: ten billed months of
+   3.5 lessons, first month pro-rated by the starting lesson. */
+function FeePanel({ prog, fc, engine, setCalc, onPdf, pdfBusy }) {
+  const e = engine || engineForEntry({ ...prog, feeCalc: fc })
+  const num = (v) => (v === '' ? '' : Number(v))
+  return (
+    <div className="feepanel">
+      <div className="feehead">
+        <span className="t">Fee Schedule — {prog.program || 'Program'}</span>
+        <button className="pdfbtn" disabled={pdfBusy} onClick={() => onPdf(prog, fc)}>
+          {pdfBusy ? 'Preparing…' : '📄 PDF'}
+        </button>
+      </div>
+      <div className="feegrid">
+        <label>Billing
+          <select value={prog.billing || 'Monthly'} onChange={ev => setCalc({ __billing: ev.target.value })}>
+            {SCHEDULE_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
+          </select>
+        </label>
+        <label>First Lesson #
+          <input type="number" min="1" max="35" value={fc.firstLesson ?? 1}
+            onChange={ev => setCalc({ firstLesson: num(ev.target.value) })} />
+        </label>
+        <label>Monthly Fee ($)
+          <input type="number" min="0" value={fc.monthlyFee ?? ''}
+            onChange={ev => setCalc({ monthlyFee: num(ev.target.value) })} />
+        </label>
+        <label>Discount
+          <span className="discrow">
+            <input type="number" min="0" value={fc.discount ?? 0}
+              onChange={ev => setCalc({ discount: num(ev.target.value) })} />
+            <select value={fc.discountType || '%'} onChange={ev => setCalc({ discountType: ev.target.value })}>
+              <option value="%">%</option><option value="$">$</option>
+            </select>
+          </span>
+        </label>
+        <label>Registration ($)
+          <input type="number" min="0" value={fc.regFee ?? 0}
+            onChange={ev => setCalc({ regFee: num(ev.target.value) })} />
+        </label>
+        <label>Material ($)
+          <input type="number" min="0" value={fc.matFee ?? 0}
+            onChange={ev => setCalc({ matFee: num(ev.target.value) })} />
+        </label>
+      </div>
+      <div className="feetotals">
+        <div><span>Lessons remaining</span><b>{e.lessons} of {TOTAL_LESSONS}</b></div>
+        <div><span>Total lesson fees</span><b>{money(e.lessonFees)}</b></div>
+        <div><span>Total incl. registration &amp; material</span><b>{money(e.total)}</b></div>
+        <div><span>Last month + registration &amp; material</span><b>{money(e.upfront)}</b></div>
+        <div className="paidline"><span>Paid so far</span><b>{money(e.paid)}</b></div>
+        <div className="owedline"><span>Outstanding</span><b>{money(Math.max(0, e.total - e.paid))}</b></div>
+      </div>
+      <div className="feenote">
+        The first month is pro-rated by lessons remaining; following months are the full monthly fee.
+      </div>
+      <div className="feeinst">
+        {e.installments.map(i => (
+          <div key={i.label} className={'irow' + (i.skipped || !i.amount ? ' iskip' : '')}>
+            <span>{i.label}</span><b>{i.skipped || !i.amount ? '—' : money(i.amount)}</b>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
