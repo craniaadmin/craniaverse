@@ -293,8 +293,7 @@ const CSS = `
 .cu tbody td.actcell{white-space:nowrap;text-align:center}
 /* A student in two classes must show both names, not the first and an
    ellipsis — which class the second one is, is the whole point of the
-   column. Only this column wraps; the row grows to fit. */
-.cu tbody td.col-classes{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px}
+   column. Styled below, next to the rowSpan rules. */
 .cu .selcol{text-align:center}
 .cu thead th .arw{opacity:.85;font-size:10px}
 .cu thead th.colh{cursor:grab}
