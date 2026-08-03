@@ -14,7 +14,8 @@ import { useMemo, useState } from 'react'
 import { Search, ChevronDown, ChevronRight, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
 import {
-  DOW, DOW_ORD, norm, fmtTime, sessionsOf, statedLocationId, matchSession,
+  DOW, DOW_ORD, norm, fmtTime, sessionsOf, statedLocationId,
+  matchSessions, entrySlots,
 } from '../data/enrolment'
 
 /* Fallback only. The real list lives in programs_state and the Programs
@@ -523,7 +524,17 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
           const contactLine = [contact.name, contact.phone, contact.email].filter(Boolean).join(' · ')
           return (
             <tr key={r.id + i} style={{ borderTop: '1px solid #f0ede3', background: i % 2 ? '#fafaf7' : '#fff', height: 34 }}>
-              <td style={{ ...CELL, fontWeight: 600 }} title={name}>{name || '—'}</td>
+              <td style={{ ...CELL, fontWeight: 600 }} title={name}>
+                {name || '—'}
+                {/* Booked for more slots than we could place them in — they
+                    belong here, but a second register is missing them. */}
+                {row.partial && (
+                  <span title={`Booked for ${row.partial.of} sessions; only ${row.partial.got} could be matched to this class's timetable`}
+                    style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#8a6a00' }}>
+                    {row.partial.got}/{row.partial.of}
+                  </span>
+                )}
+              </td>
               <td style={CELL}>{r.student?.grade || '—'}</td>
               <td style={CELL} title={r.student?.school || ''}>{r.student?.school || '—'}</td>
               <td style={{ ...CELL, color: 'var(--ink-soft)' }} title={contactLine}>
