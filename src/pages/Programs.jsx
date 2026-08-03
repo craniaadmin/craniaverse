@@ -4,6 +4,7 @@ import { useStore } from '../data/store'
    order, category colours and the two real locations. Programs themselves come from
    the store; only these view defaults are read from it. */
 import SEED from '../data/programsData.json'
+import { buildEnrolmentIndex, sessionKey } from '../data/enrolment'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
@@ -955,6 +956,16 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
     () => staff.map(s => `${s.firstName} ${s.lastName}`.trim()).filter(Boolean).sort(),
     [staff])
 
+  /* Live enrolment per session, counted from the register with the same
+     matcher Class Lists uses. Feeds the Enrolment column wherever an
+     offering has no manually entered figure. */
+  const locNameOf = useCallback(
+    (id) => (viewState.locations.find(l => l.id === id) || {}).name || '',
+    [viewState.locations])
+  const enrolIndex = useMemo(
+    () => buildEnrolmentIndex(registrations, programs, locNameOf),
+    [registrations, programs, locNameOf])
+
   const colOrder = viewState.colOrder
   const hiddenCols = viewState.hiddenCols
   const setColOrder = useCallback(u => updateView('colOrder', u), [updateView])
@@ -1398,7 +1409,7 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
       spots,
       instructor: r.instructor || dash,
     }
-  }, [locColor])
+  }, [locColor, enrolIndex])
 
   /* A stable string per cell, used both for repeat suppression and identical-row collapse. */
   const cellSig = useCallback((r, k) => {
