@@ -772,16 +772,20 @@ function Field({ label, value, readOnly, onChange, highlightEmail = true }) {
   )
 }
 
-function FeeSquare({ state, onChange }) {
+function FeeSquare({ state, onChange, amount, label }) {
   const colors = { paid: '#cfe6b4', pending: '#f6e3a1', overdue: '#e8503f', empty: '#e8ecef' }
   const next = { paid: 'pending', pending: 'overdue', overdue: 'empty', empty: 'paid' }
+  // Carries the money, so hovering a square answers "how much is this one?"
+  const title = amount != null && amount > 0
+    ? [label, money(amount), state].filter(Boolean).join(' · ')
+    : state
   return (
     <button type="button" onClick={() => onChange(next[state] || 'paid')}
       style={{
         width: 16, height: 16, borderRadius: 3, border: 'none',
         background: colors[state] || colors.empty, cursor: 'pointer', padding: 0, flexShrink: 0,
       }}
-      title={state} />
+      title={title} />
   )
 }
 
