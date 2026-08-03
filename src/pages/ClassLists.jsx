@@ -66,18 +66,47 @@ function sessionLabel(s) {
   return [day, fmtTime(s.start)].filter(Boolean).join(' ') || 'Unscheduled'
 }
 
-// Best-effort match of a student's free-text schedule ("Mon 4:30 pm")
-// to one of the program's sessions, so rosters split by actual class
-// session rather than lumping every enrollee together.
-function matchSession(scheduleText, sessions) {
-  const s = String(scheduleText || '').toLowerCase()
+/* The site a registration names. The public form writes it into
+   `platform` as "Boardwalk (In-Person)" / "Waterloo East (Online)" —
+   `location` exists in the record shape but comes through empty — so
+   read both. A bare "Online" names no site and must not be read as one,
+   which is why this matches against the locations actually on offer
+   rather than looking for a bracket. */
+function statedLocationId(entry, sessions, locNameOf) {
+  const hint = `${entry?.location || ''} ${entry?.platform || ''}`.trim().toLowerCase()
+  if (!hint) return null
+  const ids = [...new Set(sessions.map((s) => s.locationId).filter(Boolean))]
+  for (const id of ids) {
+    const name = String(locNameOf(id) || '').toLowerCase()
+    if (name && hint.includes(name)) return id
+  }
+  return null
+}
+
+/* Match a student's free-text schedule ("Mon 4:30 pm") to one of the
+   program's sessions so rosters split by real session.
+
+   Location is part of the match, not decoration. FLEX MATH runs the same
+   day and time at both sites, so matching on day and time alone returned
+   whichever offering happened to sit first in the array and quietly filed
+   students at the wrong campus. When a registration names a site and that
+   site has no session at the stated time, this returns null rather than
+   guessing — the row then lands in the "doesn't match" bucket where the
+   conflict is visible and fixable. */
+function matchSession(entry, sessions, locNameOf) {
+  const s = String(entry?.schedule || '').toLowerCase()
   if (!s || !sessions || sessions.length === 0) return null
-  return sessions.find((sess) => {
+  const dayTime = sessions.filter((sess) => {
     if (sess.day == null) return false
     const day = s.includes(DOW[sess.day].toLowerCase())
     const time = sess.start ? s.includes(fmtTime(sess.start).toLowerCase()) : true
     return day && time
-  }) || null
+  })
+  if (dayTime.length === 0) return null
+
+  const wantLoc = statedLocationId(entry, sessions, locNameOf)
+  if (!wantLoc) return dayTime[0]
+  return dayTime.find((sess) => sess.locationId === wantLoc) || null
 }
 
 /* A program can carry thirty sessions across two locations, and listing them
