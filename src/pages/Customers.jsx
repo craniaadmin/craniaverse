@@ -820,6 +820,22 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
               <col style={{ width: ACT_W }} />
             </colgroup>
             <thead>
+              {/* Filter row: each column offers the values actually present,
+                  so narrowing to a grade or a class needs no typing. */}
+              <tr className="frow">
+                <th />
+                {orderedCols.map(c => (
+                  <th key={c.k}>
+                    <select className={'colf' + (colFilters[c.k] ? ' on' : '')}
+                      value={colFilters[c.k] || ''}
+                      onChange={e => setColFilters(f => ({ ...f, [c.k]: e.target.value }))}>
+                      <option value="">All</option>
+                      {(filterOptions[c.k] || []).map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </th>
+                ))}
+                <th />
+              </tr>
               <tr>
                 <th className="selcol">
                   <input type="checkbox" checked={allSel} onChange={e =>
