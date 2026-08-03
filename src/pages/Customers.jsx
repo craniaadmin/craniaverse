@@ -23,6 +23,7 @@ import { useStore } from '../data/store'
 import {
   engineForEntry, outstandingFor, money, MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
 } from '../data/fees'
+import { entrySlots } from '../data/enrolment'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
@@ -320,6 +321,19 @@ const CSS = `
 .cu .feetotals span{color:var(--muted)}
 .cu .feetotals .paidline b{color:#2b7a2e}
 .cu .feetotals .owedline b{color:var(--danger)}
+.cu .sessrows{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.cu .sesshead{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.4px;margin-bottom:7px}
+.cu .sessrow{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.cu .sessrow select{width:80px;flex:none}
+.cu .sessrow input{flex:1;min-width:0}
+.cu .sessrow select,.cu .sessrow input{padding:5px 8px;border:1px solid var(--field);border-radius:7px;
+    font:inherit;font-size:12.5px;background:#fff;color:var(--dark-brown);box-sizing:border-box}
+.cu .sessrow select:focus,.cu .sessrow input:focus{outline:none;border-color:var(--teal)}
+.cu .sessx{background:none;border:none;color:#c9c3b5;font-size:16px;cursor:pointer;padding:0 5px;line-height:1}
+.cu .sessx:hover{color:var(--danger)}
+.cu .sessadd{background:transparent;border:1px dashed var(--teal);color:var(--teal);border-radius:7px;
+    padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:3px}
 .cu .feenote{font-size:11.5px;color:var(--muted);margin:10px 0 8px;line-height:1.4}
 .cu .feeinst{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:4px 14px;
     border-top:1px solid var(--line);padding-top:10px}
@@ -1016,7 +1030,7 @@ function SessionRows({ prog, onChange }) {
   )
 }
 
-function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded, onToggleExpand, onPdf, pdfBusy }) {
+function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSessionsChange, expanded, onToggleExpand, onPdf, pdfBusy }) {
   const status = prog.active ? 'Active' : 'Inactive'
   const ss = statusStyle(status)
   /* Payment now follows the money, not just the square colours: a program
@@ -1067,7 +1081,9 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded,
         <tr>
           <td colSpan={8} style={{ background: 'transparent', padding: '0 0 10px' }}>
             <FeePanel prog={prog} fc={fc} engine={e} setCalc={setCalc}
-              onBilling={v => onCalcChange(prog, fc, v)} onPdf={onPdf} pdfBusy={pdfBusy} />
+              onBilling={v => onCalcChange(prog, fc, v)}
+              onSessions={(sessions, schedule) => onSessionsChange(prog, sessions, schedule)}
+              onPdf={onPdf} pdfBusy={pdfBusy} />
           </td>
         </tr>
       )}
@@ -1077,7 +1093,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, expanded,
 
 /* The calculator, matching the Customers template: ten billed months of
    3.5 lessons, first month pro-rated by the starting lesson. */
-function FeePanel({ prog, fc, engine, setCalc, onBilling, onPdf, pdfBusy }) {
+function FeePanel({ prog, fc, engine, setCalc, onBilling, onSessions, onPdf, pdfBusy }) {
   const e = engine || engineForEntry({ ...prog, feeCalc: fc })
   const num = (v) => (v === '' ? '' : Number(v))
   return (
@@ -1276,6 +1292,13 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
     setProgs(updated); persistPrograms(updated)
   }
 
+  /* Sessions and the schedule text move together: the roster pages match
+     on , so leaving it stale would strand the student. */
+  const updateSessions = (prog, sessions, schedule) => {
+    const updated = progs.map(p => p === prog ? { ...p, sessions, schedule } : p)
+    setProgs(updated); persistPrograms(updated)
+  }
+
   const [openFees, setOpenFees] = useState(() => new Set())
   const toggleFees = (i) => setOpenFees(s => {
     const n = new Set(s)
@@ -1443,7 +1466,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
               </td></tr>
             ) : displayed.map((p, i) => (
               <ProgramRow key={i} prog={p} onToggleActive={toggleActive} onFeeChange={updateFee}
-                onCalcChange={updateCalc} expanded={openFees.has(i)} onToggleExpand={() => toggleFees(i)}
+                onCalcChange={updateCalc} onSessionsChange={updateSessions} expanded={openFees.has(i)} onToggleExpand={() => toggleFees(i)}
                 onPdf={downloadPdf} pdfBusy={pdfBusy} />
             ))}
           </tbody>
