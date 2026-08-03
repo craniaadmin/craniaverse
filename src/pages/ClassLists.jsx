@@ -126,7 +126,7 @@ function matchSession(entry, sessions, locNameOf) {
 /* A program can carry thirty sessions across two locations, and listing them
    all turns the summary line into a wall of times. Name the days it runs and
    the span of start times instead, with locations if it has more than one. */
-function summarise(sessions) {
+function summarise(sessions, locNameOf = staticLocName) {
   if (!sessions || sessions.length === 0) return 'No offerings scheduled'
   const days = [...new Set(sessions.map((s) => s.session.day).filter((d) => d != null))]
     .sort((a, b) => DOW_ORD[a] - DOW_ORD[b]).map((d) => DOW[d])
@@ -137,7 +137,7 @@ function summarise(sessions) {
   if (starts.length === 1) parts.push(fmtTime(starts[0]))
   else if (starts.length > 1) parts.push(`${fmtTime(starts[0])}–${fmtTime(starts[starts.length - 1])}`)
   if (locs.length > 1) parts.push(`${locs.length} locations`)
-  else if (locs.length === 1) parts.push(locName(locs[0]))
+  else if (locs.length === 1) parts.push(locNameOf(locs[0]))
   const label = parts.join('  ·  ')
   return label ? `${label}  ·  ${sessions.length} session${sessions.length === 1 ? '' : 's'}` : 'Unscheduled'
 }
@@ -171,6 +171,7 @@ function statusStyle(s) { return STATUS_STYLE[s] || { bg: '#eef1f4', fg: '#6B645
 // ---- build class groups from store data ----
 function useClassLists() {
   const { records, programs } = useStore()
+  const locNameOf = useLocName()
 
   return useMemo(() => {
     const realRecords = records.filter((r) => r.id !== 'seed')
@@ -197,7 +198,7 @@ function useClassLists() {
         if (candidates && candidates.length > 0) {
           let cls = candidates[0]
           if (candidates.length > 1) {
-            const matched = candidates.find((c) => matchSession(entry.schedule, c.allSessions))
+            const matched = candidates.find((c) => matchSession(entry, c.allSessions, locNameOf))
             if (matched) cls = matched
           }
           cls.roster.push(row)
@@ -214,7 +215,18 @@ function useClassLists() {
       const all = cls.allSessions
       const groups = new Map() // session key (or null) -> rows
       for (const row of cls.roster) {
-        let s = matchSession(row.entry.schedule, all)
+        let s = matchSession(row.entry, all, locNameOf)
+        if (!s) {
+          /* Record why, so the bucket below can say "booked at the wrong
+             site" rather than blaming the time when the time was fine. */
+          const wantLoc = statedLocationId(row.entry, all, locNameOf)
+          const txt = String(row.entry.schedule || '').toLowerCase()
+          const dayTimeExists = txt && all.some((sess) => sess.day != null &&
+            txt.includes(DOW[sess.day].toLowerCase()) &&
+            (sess.start ? txt.includes(fmtTime(sess.start).toLowerCase()) : true))
+          row.why = wantLoc && dayTimeExists ? 'location' : 'schedule'
+          row.wantLocName = wantLoc ? locNameOf(wantLoc) : ''
+        }
         // A class that runs one session has nowhere else to put anyone, so
         // stale or missing schedule text should not strand them.
         if (!s && all.length === 1) s = all[0]
@@ -229,13 +241,14 @@ function useClassLists() {
     const unlisted = Array.from(unlistedByTitle.entries()).map(([title, roster]) => ({ title, roster }))
 
     return { classes, unlisted, realRecords }
-  }, [records, programs])
+  }, [records, programs, locNameOf])
 }
 
 const cardShadow = { boxShadow: 'var(--brand-shadow)' }
 
 export default function ClassLists({ onNavigate }) {
   const { status: fetchStatus } = useStore()
+  const locNameOf = useLocName()
   const { classes } = useClassLists()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
@@ -432,7 +445,7 @@ export default function ClassLists({ onNavigate }) {
                       ><ExternalLink size={13} /></button>
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {summarise(c.sessions)}
+                      {summarise(c.sessions, locNameOf)}
                     </div>
                   </div>
                   {/* Fixed width so the counts line up down the column instead of
@@ -462,7 +475,7 @@ export default function ClassLists({ onNavigate }) {
                               letterSpacing: '.4px', color: 'var(--ink-soft)', background: '#fafaf7',
                             }}>
                               {sessionLabel(s.session)}{s.session.instructor ? ` — ${s.session.instructor}` : ''}
-                              {s.session.locationId ? ` · ${locName(s.session.locationId)}` : ''}
+                              {s.session.locationId ? ` · ${locNameOf(s.session.locationId)}` : ''}
                               {s.session.capacity != null && ` (${s.rows.length}/${s.session.capacity})`}
                             </div>
                             <Roster rows={s.rows} onNavigate={onNavigate} />
