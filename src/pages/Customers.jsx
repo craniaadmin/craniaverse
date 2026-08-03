@@ -1189,7 +1189,9 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
                 {showOnlyActive ? 'No active programs.' : 'No programs registered.'}
               </td></tr>
             ) : displayed.map((p, i) => (
-              <ProgramRow key={i} prog={p} onToggleActive={toggleActive} onFeeChange={updateFee} />
+              <ProgramRow key={i} prog={p} onToggleActive={toggleActive} onFeeChange={updateFee}
+                onCalcChange={updateCalc} expanded={openFees.has(i)} onToggleExpand={() => toggleFees(i)}
+                onPdf={downloadPdf} pdfBusy={pdfBusy} />
             ))}
           </tbody>
         </table>
