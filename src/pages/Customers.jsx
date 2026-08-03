@@ -730,6 +730,8 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         <td className="actcell" onClick={e => e.stopPropagation()}>
           <button className="rowbtn rb-add" title="Add a sibling to this family"
             onClick={() => onAddSibling(r.record)}><UserPlus size={12} /></button>
+          <button className="rowbtn rb-dup" title="Duplicate this student"
+            onClick={() => onDuplicate(r.record)}><Copy size={12} /></button>
           <button className="rowbtn rb-del" title="Delete this student"
             onClick={() => onDelete(r.record)}><Trash2 size={12} /></button>
         </td>
@@ -1434,7 +1436,9 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
       const g2 = record.customer?.guardian2 || {}
       const em = record.customer?.emergency || {}
       const id = await addRegistration({
-        studentFirstName: 'New', studentLastName: 'Student', forceNew: true,
+        studentFirstName: over.studentFirstName || 'New',
+        studentLastName: over.studentLastName || 'Student',
+        grade: over.grade, school: over.school, forceNew: true,
         g1FirstName: g1['First Name'], g1LastName: g1['Last Name'], g1Relationship: g1['Relationship'],
         g1PhoneHome: g1['Phone (Home)'], g1PhoneMobile: g1['Phone (Mobile)'], g1Email: g1['Email'],
         g1Address1: g1['Street Address'], g1Address2: g1['Unit'], g1City: g1['City'],
@@ -1446,7 +1450,8 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
         emFirstName: em['First Name'], emLastName: em['Last Name'], emRelationship: em['Relationship'],
         emPhone: em['Phone (Mobile)'], emEmail: em['Email'],
       })
-      if (id) setDetailId(id)
+      if (id && !over.studentLastName) setDetailId(id)
+      return id
     } catch (err) {
       dialog.alert('Could not add sibling', String(err.message || err))
     }
@@ -1480,5 +1485,5 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
   }
 
   return <CustomerList onSelect={handleSelect} onAdd={handleAdd} onAddSibling={handleAddSibling}
-    onDelete={handleDelete} onNavigate={onNavigate} />
+    onDuplicate={handleDuplicate} onDelete={handleDelete} onNavigate={onNavigate} familyIds={familyIds} />
 }
