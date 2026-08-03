@@ -893,6 +893,15 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     return out
   }, [visible])
 
+  /* A family occupies one <tr> per child, with the family-scoped cells given
+     a rowSpan so they are stated once beside the group.
+
+     The obvious alternative — one <tr> per family, children stacked as
+     equal-height blocks inside each cell — only lines up while every block
+     is one line tall. A child enrolled in two programs makes that cell 43px
+     against 20px elsewhere, and every child below it slides out of step with
+     its own grade and fees. rowSpan hands the alignment to the table, where
+     it holds whatever the cells contain. */
   const bodyRows = []
   familyRows.forEach((fam, fi) => {
     if (fi > 0) {
@@ -904,102 +913,100 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     }
     const head = fam.head
     const kids = fam.students
+    const span = kids.length
     const allKidsSel = kids.every(s => selected.has(s.id))
     const someKidsSel = kids.some(s => selected.has(s.id))
 
-    /* One band per child. Every student-scoped column emits the same number
-       of bands in the same order, which is what keeps a child's name, grade
-       and programs on the same line across the row. */
-    const bands = (render) => kids.map(s => (
-      <div className="band" key={s.id}>{render(s)}</div>
-    ))
+    kids.forEach((s, si) => {
+      const first = si === 0
+      const tds = []
 
-    const tds = orderedCols.map(c => {
-      const k = c.k
-      let content, title = ''
+      if (first) {
+        tds.push(
+          <td key="__sel" className="selcol" rowSpan={span} onClick={e => e.stopPropagation()}>
+            {/* Ticking a family ticks every child in it — everything that
+                consumes the selection works on students. */}
+            <input type="checkbox" checked={allKidsSel}
+              ref={el => { if (el) el.indeterminate = someKidsSel && !allKidsSel }}
+              onChange={e => setSelected(sel => {
+                const n = new Set(sel)
+                for (const kid of kids) { if (e.target.checked) n.add(kid.id); else n.delete(kid.id) }
+                return n
+              })} />
+          </td>
+        )
+      }
 
-      if (c.scope === 'family') {
-        const v = head[k]
-        if (k === 'family') {
-          content = v ? <span className="famref">{v}</span> : <span className="dash">—</span>
-        } else {
-          content = v === '' || v == null ? <span className="dash">—</span> : v
+      for (const c of orderedCols) {
+        const k = c.k
+        const cls = `col-${k}${c.cls ? ' ' + c.cls : ''}`
+
+        if (c.scope === 'family') {
+          if (!first) continue
+          const v = head[k]
+          const content = k === 'family'
+            ? (v ? <span className="famref">{v}</span> : <span className="dash">—</span>)
+            : (v === '' || v == null ? <span className="dash">—</span> : v)
+          tds.push(<td key={k} className={cls + ' famcell'} rowSpan={span} title={String(v ?? '')}>{content}</td>)
+          continue
         }
-        title = String(v ?? '')
-      } else if (k === 'student') {
-        content = bands(s => (
-          <button className="stupill stuname" title={`Open ${s.student}`}
-            onClick={e => { e.stopPropagation(); onSelect(s.id) }}>
-            {s.student || '—'}
-          </button>
-        ))
-        title = kids.map(s => s.student).join(', ')
-      } else if (k === 'classes') {
-        content = bands(s => s.progList.length === 0
-          ? <span className="dash">—</span>
-          : s.progList.map((p, i) => {
+
+        let content, title = String(s[k] ?? '')
+        if (k === 'student') {
+          content = (
+            <button className="stupill stuname" title={`Open ${s.student}`}
+              onClick={e => { e.stopPropagation(); onSelect(s.id) }}>{s.student || '—'}</button>
+          )
+        } else if (k === 'classes') {
+          title = s.classList.join(', ')
+          content = s.progList.length === 0 ? <span className="dash">—</span> : s.progList.map((p, i) => {
             const name = p.program || ''
             const prog = progByName.get(name.trim().toUpperCase())
             const st = statusStyle(p.status)
             return (
-              <button key={name + i} className="stupill"
-                style={{ background: st.bg, color: st.fg }}
+              <button key={name + i} className="stupill" style={{ background: st.bg, color: st.fg }}
                 title={`${name} — ${p.status || 'no status'}${prog ? ' · click to open in Programs' : ''}`}
                 onClick={e => { e.stopPropagation(); if (prog) onNavigate && onNavigate('Programs', prog.id) }}>
                 {name || '—'}
               </button>
             )
-          }))
-        title = kids.map(s => s.classList.join(', ')).filter(Boolean).join(' | ')
-      } else if (k === 'payment') {
-        content = bands(s => {
-          if (!s.payment) return <span className="dash">—</span>
+          })
+        } else if (k === 'payment') {
           const ps = PAYMENT_STYLE[s.payment]
-          return <span className="cp" style={{ background: ps.bg, color: ps.fg }}>{s.payment}</span>
-        })
-        title = kids.map(s => s.payment).filter(Boolean).join(', ')
-      } else if (k === 'fees' || k === 'paid' || k === 'balance') {
-        content = bands(s => (s[k] > 0 ? money(s[k]) : <span className="dash">—</span>))
-        title = kids.map(s => (s[k] > 0 ? money(s[k]) : '')).filter(Boolean).join(', ')
-      } else {
-        content = bands(s => (s[k] === '' || s[k] == null ? <span className="dash">—</span> : s[k]))
-        title = kids.map(s => s[k]).filter(v => v !== '' && v != null).join(', ')
+          content = !s.payment ? <span className="dash">—</span>
+            : <span className="cp" style={{ background: ps.bg, color: ps.fg }}>{s.payment}</span>
+        } else if (k === 'fees' || k === 'paid' || k === 'balance') {
+          content = s[k] > 0 ? money(s[k]) : <span className="dash">—</span>
+          title = s[k] > 0 ? money(s[k]) : ''
+        } else {
+          content = s[k] === '' || s[k] == null ? <span className="dash">—</span> : s[k]
+        }
+        tds.push(<td key={k} className={cls} title={title}>{content}</td>)
       }
 
-      return (
-        <td key={k} className={`col-${k}${c.cls ? ' ' + c.cls : ''}${c.scope === 'student' ? ' banded' : ''}`}
-          title={title}>{content}</td>
+      if (first) {
+        tds.push(
+          <td key="__act" className="actcell" rowSpan={span} onClick={e => e.stopPropagation()}>
+            <button className="rowbtn rb-add" title="Add a sibling to this family"
+              onClick={() => onAddSibling(head.record)}><UserPlus size={12} /></button>
+            <button className="rowbtn rb-dup" title={`Duplicate ${head.student}`}
+              onClick={() => onDuplicate(head.record)}><Copy size={12} /></button>
+            <button className="rowbtn rb-del"
+              title={span > 1 ? `Delete all ${span} students in this family` : 'Delete this student'}
+              onClick={() => onDeleteFamily(kids.map(kid => kid.record))}><Trash2 size={12} /></button>
+          </td>
+        )
+      }
+
+      bodyRows.push(
+        <tr key={s.id} className={(selected.has(s.id) ? 'sel ' : '') + (first ? 'famtop' : 'famcont')}
+          title="Click to open this student; right-click for more"
+          onClick={() => onSelect(s.id)}
+          onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: s }) }}>
+          {tds}
+        </tr>
       )
     })
-
-    bodyRows.push(
-      <tr key={fam.key} className={someKidsSel ? 'sel' : ''}
-        title="Click to open this family; right-click for more"
-        onClick={() => onSelect(head.id)}
-        onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: head }) }}>
-        <td className="selcol" onClick={e => e.stopPropagation()}>
-          {/* Ticking a family ticks every child in it — the actions that
-              consume the selection all work on students. */}
-          <input type="checkbox" checked={allKidsSel}
-            ref={el => { if (el) el.indeterminate = someKidsSel && !allKidsSel }}
-            onChange={e => setSelected(s => {
-              const n = new Set(s)
-              for (const kid of kids) { if (e.target.checked) n.add(kid.id); else n.delete(kid.id) }
-              return n
-            })} />
-        </td>
-        {tds}
-        <td className="actcell" onClick={e => e.stopPropagation()}>
-          <button className="rowbtn rb-add" title="Add a sibling to this family"
-            onClick={() => onAddSibling(head.record)}><UserPlus size={12} /></button>
-          <button className="rowbtn rb-dup" title={`Duplicate ${head.student}`}
-            onClick={() => onDuplicate(head.record)}><Copy size={12} /></button>
-          <button className="rowbtn rb-del"
-            title={kids.length > 1 ? `Delete all ${kids.length} students in this family` : 'Delete this student'}
-            onClick={() => onDeleteFamily(kids.map(s => s.record))}><Trash2 size={12} /></button>
-        </td>
-      </tr>
-    )
   })
 
   return (
