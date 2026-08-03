@@ -488,6 +488,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
   const [search, setSearch] = useState('')
   const [noClassesOnly, setNoClassesOnly] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
+  const [colFilters, setColFilters] = useState({})
   const [sort, setSort] = useState({ key: 'g1', dir: 1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
