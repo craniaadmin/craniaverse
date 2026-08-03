@@ -17,6 +17,14 @@
 //   node server/scripts/report-enrolments.js
 //   node server/scripts/report-enrolments.js --map "Old Name=REAL NAME" --apply
 //
+// --delete throws them away instead of repointing. It removes the
+// enrolment from the student, never the student: someone whose only
+// enrolment was an orphan stays on the roll with no classes, which is
+// what they in fact are.
+//
+//   node server/scripts/report-enrolments.js --delete
+//   node server/scripts/report-enrolments.js --delete --apply
+//
 // Requires server/.env: PB_URL, PB_ADMIN_EMAIL, PB_ADMIN_PASSWORD
 // ============================================================
 import fs from 'fs'
