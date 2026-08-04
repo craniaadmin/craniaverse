@@ -64,45 +64,30 @@ export function buildFamilyIndex(records) {
   const ds = makeDisjointSet()
   for (const r of list) ds.find(r.id)
 
-  // 1 — an explicit family reference wins over anything derived.
-  const byRef = new Map()
-  for (const r of list) {
-    const ref = norm(r.customer?.meta?.familyId)
-    if (!ref) continue
-    if (byRef.has(ref)) ds.union(byRef.get(ref), r.id)
-    else byRef.set(ref, r.id)
-  }
-
-  // 2 — a shared email address, from either guardian slot.
+  // 1 — the same guardian 1 email address.
   const byEmail = new Map()
   for (const r of list) {
-    for (const g of guardians(r)) {
-      const e = emailOf(g)
-      if (!e) continue
-      if (byEmail.has(e)) ds.union(byEmail.get(e), r.id)
-      else byEmail.set(e, r.id)
-    }
+    const e = emailOf(guardianOne(r))
+    if (!e) continue
+    if (byEmail.has(e)) ds.union(byEmail.get(e), r.id)
+    else byEmail.set(e, r.id)
   }
 
-  /* 3 — the same guardian name, where the addresses do not disagree. Each
-     slot is bucketed separately, so a parent recorded as guardian 2 on one
-     registration and guardian 1 on another still finds their match. */
-  for (const slot of [0, 1]) {
-    const buckets = new Map()
-    for (const r of list) {
-      const g = guardians(r)[slot]
-      const name = fullName(g)
-      if (!name) continue
-      if (!buckets.has(name)) buckets.set(name, [])
-      buckets.get(name).push({ id: r.id, email: emailOf(g) })
-    }
-    for (const members of buckets.values()) {
-      const distinct = new Set(members.map(m => m.email).filter(Boolean))
-      // More than one address under one name means more than one person.
-      // Leave them to whatever the email pass already decided.
-      if (distinct.size > 1) continue
-      for (let i = 1; i < members.length; i++) ds.union(members[0].id, members[i].id)
-    }
+  // 2 — the same guardian 1 name, where the addresses do not disagree.
+  const buckets = new Map()
+  for (const r of list) {
+    const g = guardianOne(r)
+    const name = fullName(g)
+    if (!name) continue
+    if (!buckets.has(name)) buckets.set(name, [])
+    buckets.get(name).push({ id: r.id, email: emailOf(g) })
+  }
+  for (const members of buckets.values()) {
+    const distinct = new Set(members.map(m => m.email).filter(Boolean))
+    // More than one address under one name means more than one person.
+    // Leave those to what the email pass already decided.
+    if (distinct.size > 1) continue
+    for (let i = 1; i < members.length; i++) ds.union(members[0].id, members[i].id)
   }
 
   const out = new Map()
