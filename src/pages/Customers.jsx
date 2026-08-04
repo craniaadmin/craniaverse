@@ -871,7 +871,7 @@ function CustomersSettings({ onClose, categories, catColors, onCatColor }) {
    edits someone else made in the meantime. Field edits have their own stack
    in the detail view, where they happen. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
-  onNavigate, familyIds, onUndo, onRedo, histBusy, histNote, undoLabel, redoLabel }) {
+  onNavigate, familyIds, familyIndex, onUndo, onRedo, histBusy, histNote, undoLabel, redoLabel }) {
   const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
@@ -2235,7 +2235,9 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
     }).catch(() => {})
   }, [records, updateCustomerField])
 
-  const familyIds = useFamilyIds(records, assignFamilyId)
+  // One grouping, shared by the list, the detail view and the delete path.
+  const familyIndex = useMemo(() => buildFamilyIndex(records), [records])
+  const familyIds = useFamilyIds(records, familyIndex, assignFamilyId)
 
   // Opened via onNavigate('Customers', recordId) from another page.
   useEffect(() => {
@@ -2361,7 +2363,7 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
 
   return <CustomerList onSelect={handleSelect} onAdd={handleAdd} onAddSibling={handleAddSibling}
     onDuplicate={handleDuplicate} onDelete={handleDelete} onDeleteFamily={handleDeleteFamily}
-    onNavigate={onNavigate} familyIds={familyIds}
+    onNavigate={onNavigate} familyIds={familyIds} familyIndex={familyIndex}
     onUndo={doUndo} onRedo={doRedo} histBusy={histBusy} histNote={histNote}
     undoLabel={undoStack.length ? undoStack[undoStack.length - 1].label : ''}
     redoLabel={redoStack.length ? redoStack[redoStack.length - 1].label : ''} />

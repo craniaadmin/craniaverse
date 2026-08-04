@@ -51,13 +51,6 @@ function loadColPrefs() {
 }
 function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ } }
 
-// A family's identity = normalized guardian1 name + email. A record with
-// no guardian identity (e.g. a just-added blank student) stands on its
-// own, keyed by its id — mirrors the Customers page grouping.
-function guardianIdentity(r) {
-  const g1 = r.customer?.guardian1 || {}
-  return `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
-}
 function guardianName(r) {
   const g1 = r.customer?.guardian1 || {}
   return `${g1['First Name'] || ''} ${g1['Last Name'] || ''}`.trim()
