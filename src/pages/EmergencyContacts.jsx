@@ -614,12 +614,34 @@ export default function EmergencyContacts({ onNavigate }) {
         ) : (
           <table>
             <colgroup>
+              <col style={{ width: SEL_W }} />
               {orderedCols.map(c => <col key={c.k} style={{ width: COL_W[c.k] }} />)}
             </colgroup>
             <thead>
-              <tr>
+              {/* Not `frow` — that name belongs to the field rows elsewhere
+                  and sets display:grid, which takes the row out of table
+                  layout and wrecks every column width. */}
+              <tr className="colfrow">
+                <th />
                 {orderedCols.map(c => (
-                  <th key={c.k} className="colh" draggable data-col={c.k}
+                  <th key={c.k}>
+                    <select className={'colf' + (colFilters[c.k] ? ' on' : '')}
+                      value={colFilters[c.k] || ''}
+                      onChange={e => setColFilters(f => ({ ...f, [c.k]: e.target.value }))}>
+                      <option value="">All</option>
+                      {(filterOptions[c.k] || []).map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </th>
+                ))}
+              </tr>
+              <tr>
+                <th className="selcol">
+                  <input type="checkbox" checked={allSel} title="Select all shown"
+                    onChange={e =>
+                      setSelected(e.target.checked ? new Set(visible.map(r => r.id)) : new Set())} />
+                </th>
+                {orderedCols.map(c => (
+                  <th key={c.k} className={'colh' + (sort.key === c.k ? ' sorted' : '')} draggable data-col={c.k}
                     onDragStart={() => { dragCol.current = c.k }}
                     onDragOver={e => e.preventDefault()}
                     onDrop={() => onDrop(c.k)}>
