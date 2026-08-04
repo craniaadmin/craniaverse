@@ -973,6 +973,9 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
   }, [setProgramsState])
 
   const [settingsOpen, setSettingsOpen] = useState(false)
+  // { fam, kid } — kid null means the pointer is over something the whole
+  // family shares, so the whole block lights up.
+  const [hover, setHover] = useState({ fam: null, kid: null })
 
   /* Only the categories families are actually enrolled in — a colour picker
      listing every category in the catalogue would mostly be noise here. */
