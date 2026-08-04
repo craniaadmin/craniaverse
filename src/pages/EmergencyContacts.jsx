@@ -542,9 +542,17 @@ export default function EmergencyContacts({ onNavigate }) {
       return <td key={k} className={`col-${k}`} title={title}>{content}</td>
     })
 
+    const isSel = selected.has(r.id)
     bodyRows.push(
-      <tr key={r.linkId} className={r.missing ? 'rmiss' : ''}
+      <tr key={r.linkId} className={(r.missing ? 'rmiss' : '') + (isSel ? ' sel' : '')}
         onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: r }) }}>
+        <td className="selcol" onClick={e => e.stopPropagation()}>
+          <input type="checkbox" checked={isSel} onChange={e => setSelected(s => {
+            const n = new Set(s)
+            if (e.target.checked) n.add(r.id); else n.delete(r.id)
+            return n
+          })} />
+        </td>
         {tds}
       </tr>
     )
