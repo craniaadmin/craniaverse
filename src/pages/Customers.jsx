@@ -149,7 +149,14 @@ function useFamilyIds(records, familyIndex, assign) {
     for (const r of (records || [])) highest = Math.max(highest, refNumber(r.customer?.meta?.familyId))
     const out = new Map()
     for (const [key, members] of byFamily) {
-      const existing = members.map(m => m.customer?.meta?.familyId).find(v => refNumber(v) > 0)
+      /* Where two records that were kept apart are now recognised as one
+         family, they arrive carrying a reference each. Keep the lower —
+         it is the one the family has had longest — and the other number is
+         simply retired, never reissued. */
+      const existing = members
+        .map(m => m.customer?.meta?.familyId)
+        .filter(v => refNumber(v) > 0)
+        .sort((a, b) => refNumber(a) - refNumber(b))[0]
       out.set(key, existing || familyRef(++highest))
     }
     return out
@@ -161,8 +168,11 @@ function useFamilyIds(records, familyIndex, assign) {
       const ref = refs.get(key)
       for (const m of members) {
         if (m.customer?.meta?.familyId === ref) continue
-        if (done.current.has(m.id)) continue
-        done.current.add(m.id)
+        // Keyed by the reference too, so a record whose family merges after
+        // it was already stamped still gets the corrected number.
+        const stamp = `${m.id}:${ref}`
+        if (done.current.has(stamp)) continue
+        done.current.add(stamp)
         assign(m.id, ref)
       }
     }
