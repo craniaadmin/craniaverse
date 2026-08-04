@@ -982,13 +982,16 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       for (const s of sorted) {
         const progs = s.programs || []
         const live = progs.filter(p => String(p.status || '').toLowerCase() !== 'cancelled')
+        /* Every live enrolment counts, priced from its rate when nobody has
+           opened the calculator on it. Skipping those left the Payment
+           column showing a dash for almost every family. */
         let fees = 0, paid = 0
         for (const p of live) {
-          if (!p.feeCalc) continue
           const e = engineForEntry(p)
           fees += e.total; paid += e.paid
         }
-        const payment = fees <= 0 ? '' : (paid >= fees - 0.005 ? 'Paid' : (paid > 0 ? 'Partial' : 'Unpaid'))
+        const payment = live.length === 0 ? ''
+          : (fees > 0 && paid >= fees - 0.005 ? 'Paid' : (paid > 0 ? 'Partial' : 'Unpaid'))
         const notes = s.student?.notes
         rows.push({
           id: s.id, record: s, familyKey: key, ...fam,
