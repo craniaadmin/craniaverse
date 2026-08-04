@@ -939,6 +939,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
      are named after the programs ("FLEX", "SUMMER CAMP", "TEKNOKIDS
      CODING"), so the longest one the name starts with is the right one. */
   const squash = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+  const words = (s) => String(s || '').toUpperCase().split(/[^A-Z0-9]+/).filter(t => t.length > 2)
 
   const progBySquashed = useMemo(() => {
     const m = new Map()
