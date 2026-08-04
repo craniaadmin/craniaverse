@@ -257,7 +257,6 @@ const CSS = `
 .cu .metric.clickable:hover{outline:2px solid var(--light-blue);outline-offset:1px}
 .cu .metric.on{outline:2px solid var(--teal);outline-offset:1px}
 .cu .metric.mstu{border-bottom-color:var(--yellow)}
-.cu .metric.menr{border-bottom-color:var(--light-blue)}
 .cu .actions .hbtn:disabled{opacity:.4;cursor:default}
 .cu .histnote{margin:0 0 10px;padding:7px 12px;border-radius:8px;background:#FBF3CE;
     border:1px solid #E8DCA0;color:#7a6417;font-size:12px;font-weight:600}
@@ -292,7 +291,6 @@ const CSS = `
 .cupop-sw .sw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid #fff;
     box-shadow:0 0 0 1px #d8d3c6}
 .cu .metric.mpend{border-bottom-color:#7a6417}
-.cu .metric.mnone{border-bottom-color:#c0392b}
 .cu .metric.mowed{border-bottom-color:#8a6a00}
 .cu .famref{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);font-weight:600}
 .cu .filters .toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
@@ -866,7 +864,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
   const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
-  const [noClassesOnly, setNoClassesOnly] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
   const [colFilters, setColFilters] = useState({})
   const [sort, setSort] = useState({ key: 'g1', dir: 1 })
@@ -1096,7 +1093,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase()
     const out = allRows.filter(r => {
-      if (noClassesOnly && r.classList.length > 0) return false
       if (!showInactive && r.inactive) return false
       for (const [k, want] of Object.entries(colFilters)) {
         if (!want) continue
@@ -1132,14 +1128,12 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       if (g) return g
       return a.student.localeCompare(b.student, undefined, { sensitivity: 'base' })
     })
-  }, [allRows, search, noClassesOnly, showInactive, colFilters, sort])
+  }, [allRows, search, showInactive, colFilters, sort])
 
   const metrics = useMemo(() => {
     const fams = new Set(allRows.map(r => r.familyKey))
-    let enrolments = 0, noClasses = 0, pending = 0
+    let pending = 0
     for (const r of allRows) {
-      enrolments += (r.record.programs || []).filter(p => p.active).length
-      if (r.classList.length === 0) noClasses++
       // Counted per program, not per student: two unstarted programs are
       // two things to chase.
       pending += (r.record.programs || [])
@@ -1147,7 +1141,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     }
     // Real money still to collect, from the same engine the fee panel uses.
     const owed = outstandingFor(allRows.map(r => r.record))
-    return { families: fams.size, students: allRows.length, enrolments, noClasses, pending, owed }
+    return { families: fams.size, students: allRows.length, pending, owed }
   }, [allRows])
 
   /* Values actually present, so a filter never offers a dead end. */
@@ -1164,8 +1158,8 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     return out
   }, [allRows])
 
-  const anyFilterActive = !!search || noClassesOnly || showInactive || Object.values(colFilters).some(Boolean)
-  const clearAllFilters = () => { setSearch(''); setNoClassesOnly(false); setShowInactive(false); setColFilters({}) }
+  const anyFilterActive = !!search || showInactive || Object.values(colFilters).some(Boolean)
+  const clearAllFilters = () => { setSearch(''); setShowInactive(false); setColFilters({}) }
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
