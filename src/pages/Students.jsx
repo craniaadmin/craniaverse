@@ -31,6 +31,7 @@ const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
 
 const COLS = [
+  { k: 'studentId', l: 'Student ID' },
   { k: 'name',    l: 'Name' },   // never hideable — it names the row
   { k: 'login',   l: 'Login' },
   { k: 'grade',   l: 'Grade' },
@@ -39,6 +40,50 @@ const COLS = [
   { k: 'classes', l: 'Classes' },
 ]
 const LOCKED_COL = 'name'
+
+/* The student's number. Issued once, written to the record, and never
+   recomputed or reused — including after a deletion, so a number always
+   refers to the same child for as long as the school has records.
+   Deriving it from position in a list would renumber everyone the moment
+   somebody was removed, which is the one thing an identifier must not do. */
+const studentRef = (n) => 'S' + String(n).padStart(4, '0')
+const refNumber = (ref) => {
+  const m = /^S(\d+)$/.exec(String(ref || '').trim())
+  return m ? Number(m[1]) : 0
+}
+
+/* Stamp a number on any student that has none, always above the highest
+   ever issued. A record that already has one is left completely alone —
+   that is what makes it safe to print on a form or quote on the phone. */
+function useStudentIds(records, assign) {
+  const done = useRef(new Set())
+
+  const ids = useMemo(() => {
+    let highest = 0
+    for (const r of (records || [])) highest = Math.max(highest, refNumber(r.customer?.meta?.studentId))
+    const out = new Map()
+    for (const r of (records || [])) {
+      if (r.id === 'seed') continue
+      const existing = r.customer?.meta?.studentId
+      out.set(r.id, refNumber(existing) > 0 ? existing : studentRef(++highest))
+    }
+    return out
+  }, [records])
+
+  useEffect(() => {
+    if (!assign) return
+    for (const r of (records || [])) {
+      if (r.id === 'seed') continue
+      const ref = ids.get(r.id)
+      if (!ref || r.customer?.meta?.studentId === ref) continue
+      if (done.current.has(r.id)) continue
+      done.current.add(r.id)
+      assign(r.id, ref)
+    }
+  }, [records, ids, assign])
+
+  return ids
+}
 
 /* Proportions rather than pixels, summing to 100 — a fixed layout gives
    the leftover space to any pixel column, starving the text ones on a

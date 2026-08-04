@@ -27,6 +27,8 @@ import {
 import { entrySlots } from '../data/enrolment'
 import { buildFamilyIndex, familyOf } from '../data/family'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
+import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
+import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
@@ -54,50 +56,6 @@ const inEditableField = (el) => {
   const tag = el.tagName
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable === true
 }
-
-/* Programme-type colours. The same palette and default the Programs page
-   uses, because both read and write programsState.catColors. */
-const LPAL = ['#F1F3F4', '#A6E2F9', '#5FA09E', '#E0DE85', '#2E2516', '#FBDDE4', '#FCE6D2',
-  '#FBF3CE', '#E8F3C2', '#DEF2DE', '#BEEBE8', '#D8ECF8', '#CAD6F2', '#E7DEF5', '#E2CDA0', '#FFFFFF']
-const DEFAULT_CAT_COLOR = '#F1F3F4'
-
-/* Every category ships with the same grey, so out of the box a Flex pill
-   and an Enrichment pill are identical and the colour tells you nothing.
-   Where a category has no colour of its own — or still has that grey — it
-   gets a stable one picked from the palette by name, so the types are
-   telling apart immediately. Choosing a colour in settings overrides it. */
-const TINTS = ['#A6E2F9', '#DEF2DE', '#FBF3CE', '#FBDDE4', '#E7DEF5',
-  '#BEEBE8', '#FCE6D2', '#E8F3C2', '#CAD6F2', '#E2CDA0']
-
-/* Assigned by position in a sorted list, not by hashing the name: hashing
-   put two pairs of categories on the same colour while three palette
-   entries went unused, which is the whole problem again for those pairs.
-   Sorting keeps a category's colour stable as others are added. */
-function autoTints(categories) {
-  const names = [...new Set((categories || []).filter(Boolean))].sort()
-  const m = new Map()
-  names.forEach((c, i) => m.set(c, TINTS[i % TINTS.length]))
-  return m
-}
-
-const makeTintFor = (catColors, auto) => (cat) => {
-  if (!cat) return DEFAULT_CAT_COLOR
-  const set = catColors && catColors[cat]
-  if (set && set.toUpperCase() !== DEFAULT_CAT_COLOR) return set
-  return auto.get(cat) || DEFAULT_CAT_COLOR
-}
-
-/* Readable text for a chosen background. The palette runs from white to
-   #2E2516, so a fixed ink colour would vanish at one end or the other. */
-function inkOn(bg) {
-  const m = /^#?([0-9a-f]{6})$/i.exec(String(bg || '').trim())
-  if (!m) return '#2E2516'
-  const n = parseInt(m[1], 16)
-  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-  // Rec. 601 luma — good enough to choose between two inks.
-  return (0.299 * r + 0.587 * g + 0.114 * b) > 145 ? '#2E2516' : '#FFFFFF'
-}
-
 
 /* A row is a family. `scope` decides how a cell fills:
 
@@ -271,7 +229,7 @@ function classesOf(record) {
   return out
 }
 
-const CSS = BACKUP_CSS + `
+const CSS = BACKUP_CSS + CATCOLORS_CSS + `
 /* position:relative anchors the settings panel, which hangs off the gear
    button in the actions row. */
 .cu{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
@@ -300,15 +258,6 @@ const CSS = BACKUP_CSS + `
 .cusettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
     margin-top:4px}
 
-.cusettings .sp-catrow{display:flex;align-items:center;gap:9px;padding:4px 0}
-.cusettings .sp-catname{flex:1;min-width:0;font-size:12px;font-weight:600;color:var(--dark-brown);
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cusettings .cdot{width:22px;height:22px;border-radius:50%;flex:none;border:2px solid #fff;
-    box-shadow:0 0 0 1px #d8d3c6;cursor:pointer;padding:0}
-.cupop-sw{position:fixed;z-index:301;background:#fff;border:1px solid var(--line);border-radius:12px;
-    box-shadow:0 8px 24px rgba(46,37,22,.22);padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:172px}
-.cupop-sw .sw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid #fff;
-    box-shadow:0 0 0 1px #d8d3c6}
 .cu .metric.mpend{border-bottom-color:#7a6417}
 .cu .metric.mowed{border-bottom-color:#8a6a00}
 .cu .famref{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);font-weight:600}
@@ -722,39 +671,6 @@ function CtxMenu({ x, y, items, onClose }) {
 
 /* Colour swatch picker, matching the one on the Programs page so the two
    read as the same control. */
-function SwatchPop({ x, y, current, onPick, onClose }) {
-  return (
-    <>
-      <div style={{ position: 'fixed', inset: 0, zIndex: 300 }} onClick={onClose} />
-      <div className="cupop-sw" style={{ left: Math.min(x, window.innerWidth - 190), top: y }}>
-        {LPAL.map(c => (
-          <div key={c} className="sw" style={{
-            background: c,
-            outline: String(current || '').toLowerCase() === c.toLowerCase() ? '2px solid #2E2516' : undefined,
-          }} title={c} onClick={e => { e.stopPropagation(); onPick(c) }} />
-        ))}
-      </div>
-    </>
-  )
-}
-
-function ColorDot({ color, onPick }) {
-  const [pos, setPos] = useState(null)
-  return (
-    <>
-      <button type="button" className="cdot" title="Click to change colour"
-        style={{ background: color || DEFAULT_CAT_COLOR }}
-        onClick={e => {
-          e.stopPropagation()
-          const r = e.currentTarget.getBoundingClientRect()
-          setPos({ x: r.left, y: r.bottom + 6 })
-        }} />
-      {pos && <SwatchPop x={pos.x} y={pos.y} current={color}
-        onPick={c => { onPick(c); setPos(null) }} onClose={() => setPos(null)} />}
-    </>
-  )
-}
-
 /* Settings for this page: snapshots of the registrations table, and the
    colours the programme pills are tinted with.
 
@@ -779,22 +695,7 @@ function CustomersSettings({ onClose, categories, tintFor, onCatColor }) {
         hint="Snapshots of every registration, saved to the database (last 14 kept). Back up before an import or a bulk delete."
         onRestored={async () => { await refresh(); onClose() }} />
 
-      <div className="bkp-card">
-        <div className="bkp-title">Programme Colours</div>
-        <div className="bkp-hint">
-          Programme pills are tinted by type. These are the same colours the
-          Programs page uses, so a change here shows up there too.
-        </div>
-        {categories.length === 0 ? (
-          <div className="bkp-meta">No programme types in use yet.</div>
-        ) : categories.map(({ cat, n }) => (
-          <div key={cat} className="sp-catrow">
-            <ColorDot color={tintFor(cat)} onPick={c => onCatColor(cat, c)} />
-            <span className="sp-catname">{cat}</span>
-            <span className="bkp-count">{n}</span>
-          </div>
-        ))}
-      </div>
+      <CategoryColors categories={categories} tintFor={tintFor} onCatColor={onCatColor} />
     </div>
   )
 }
@@ -875,91 +776,13 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
      Programs page already keeps in programsState.catColors, so recolouring
      in either place shows up in both rather than the two drifting apart.
      Status is still carried, in the tooltip. */
-  const catColors = useMemo(() => programsState?.catColors || {}, [programsState])
+  /* One lookup for the catalogue: which programme a free-text name means,
+     what kind of programme it is, and what colour that kind is. Shared with
+     the Students page so a class looks the same on both. */
+  const { progFor, categoryOf, tintFor, catColors } =
+    useMemo(() => buildCategoryLookup(programs, programsState), [programs, programsState])
 
-  /* Registrations name their program as free text, and it rarely matches the
-     catalogue character for character — "Private Piano — 30 min" against
-     "PRIVATE PIANO LESSONS - 30 MIN", em-dash against hyphen, title case
-     against caps. Exact matching left almost everything uncategorised and so
-     untinted, which is why the column looked colourless.
-
-     So: compare on letters and digits alone, and if the catalogue still has
-     nothing, read the category off the front of the name — the categories
-     are named after the programs ("FLEX", "SUMMER CAMP", "TEKNOKIDS
-     CODING"), so the longest one the name starts with is the right one. */
-  const squash = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
-  const words = (s) => String(s || '').toUpperCase().split(/[^A-Z0-9]+/).filter(t => t.length > 2)
-
-  const progBySquashed = useMemo(() => {
-    const m = new Map()
-    for (const p of (programs || [])) if (p.name) m.set(squash(p.name), p)
-    return m
-  }, [programs])
-
-  const knownCategories = useMemo(() => {
-    const names = new Set([
-      ...Object.keys(catColors),
-      ...(programsState?.categoryOrder || []),
-      ...(programs || []).map(p => p.category).filter(Boolean),
-    ])
-    // Longest first so "TEKNOKIDS CODING" wins over a shorter overlap.
-    return [...names].map(c => ({ cat: c, key: squash(c), words: words(c) }))
-      .filter(x => x.key).sort((a, b) => b.key.length - a.key.length)
-  }, [catColors, programsState, programs])
-
-  const categoryOf = useCallback((name) => {
-    const k = squash(name)
-    if (!k) return ''
-    const hit = progBySquashed.get(k)
-    if (hit?.category) return hit.category
-    for (const { cat, key } of knownCategories) if (k.startsWith(key)) return cat
-    for (const { cat, key } of knownCategories) if (k.includes(key)) return cat
-    /* Last resort, on shared words: "Private Piano — 30 min" belongs to
-       "PRIVATE PIANO LESSONS", but the name never says "lessons" so neither
-       string contains the other. Two words in common is enough to be sure;
-       a one-word category has to match that word outright, which the
-       containment passes above would already have caught. */
-    const w = words(name)
-    let best = null
-    for (const c of knownCategories) {
-      const shared = c.words.filter(x => w.includes(x)).length
-      if (shared >= 2 && shared > (best?.shared || 0)) best = { cat: c.cat, shared }
-    }
-    return best ? best.cat : ''
-  }, [progBySquashed, knownCategories])
-
-  const progFor = useCallback((name) =>
-    progByName.get(String(name || '').trim().toUpperCase()) || progBySquashed.get(squash(name)) || null,
-  [progByName, progBySquashed])
-
-  const setCatColor = useCallback((cat, color) => {
-    setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
-  }, [setProgramsState])
-
-  const tintFor = useMemo(
-    () => makeTintFor(catColors, autoTints(knownCategories.map(c => c.cat))),
-    [catColors, knownCategories])
-
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  // { fam, kid } — kid null means the pointer is over something the whole
-  // family shares, so the whole block lights up.
-  const [hover, setHover] = useState({ fam: null, kid: null })
-
-  /* Only the categories families are actually enrolled in — a colour picker
-     listing every category in the catalogue would mostly be noise here. */
-  const usedCategories = useMemo(() => {
-    const counts = new Map()
-    for (const r of records) {
-      if (r.id === 'seed') continue
-      for (const p of (r.programs || [])) {
-        const cat = categoryOf(p.program)
-        if (!cat) continue
-        counts.set(cat, (counts.get(cat) || 0) + 1)
-      }
-    }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .map(([cat, n]) => ({ cat, n }))
-  }, [records, categoryOf])
+  const usedCategories = useMemo(() => categoriesInUse(records, categoryOf), [records, categoryOf])
 
   /* One entry per student, carrying both its own values and its family's.
      Rows are still built per student because filtering, searching, sorting,
