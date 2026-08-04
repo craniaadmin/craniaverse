@@ -1237,7 +1237,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
 
       if (first) {
         tds.push(
-          <td key="__sel" className="selcol" rowSpan={span} onClick={e => e.stopPropagation()}>
+          <td key="__sel" className="selcol" rowSpan={span} onMouseEnter={() => setHover({ fam: fam.key, kid: null })} onClick={e => e.stopPropagation()}>
             {/* Ticking a family ticks every child in it — everything that
                 consumes the selection works on students. */}
             <input type="checkbox" checked={allKidsSel}
@@ -1261,7 +1261,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           const content = k === 'family'
             ? (v ? <span className="famref">{v}</span> : <span className="dash">—</span>)
             : (v === '' || v == null ? <span className="dash">—</span> : v)
-          tds.push(<td key={k} className={cls + ' famcell'} rowSpan={span} title={String(v ?? '')}>{content}</td>)
+          tds.push(<td key={k} className={cls + ' famcell'} rowSpan={span} onMouseEnter={() => setHover({ fam: fam.key, kid: null })} title={String(v ?? '')}>{content}</td>)
           continue
         }
 
@@ -1298,12 +1298,12 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         } else {
           content = s[k] === '' || s[k] == null ? <span className="dash">—</span> : s[k]
         }
-        tds.push(<td key={k} className={cls} title={title}>{content}</td>)
+        tds.push(<td key={k} className={cls} onMouseEnter={() => setHover({ fam: fam.key, kid: s.id })} title={title}>{content}</td>)
       }
 
       if (first) {
         tds.push(
-          <td key="__act" className="actcell" rowSpan={span} onClick={e => e.stopPropagation()}>
+          <td key="__act" className="actcell" rowSpan={span} onMouseEnter={() => setHover({ fam: fam.key, kid: null })} onClick={e => e.stopPropagation()}>
             <button className="rowbtn rb-add" title="Add a sibling to this family"
               onClick={() => onAddSibling(head.record)}><UserPlus size={12} /></button>
             <button className="rowbtn rb-dup" title={`Duplicate ${head.student}`}
@@ -1533,19 +1533,28 @@ function Field({ label, value, readOnly, onChange, highlightEmail = true }) {
   )
 }
 
+/* An unticked square used to be #e8ecef against a row that turns #E4EFF3 on
+   hover — all but identical, so the boxes faded out at the moment you moved
+   the pointer over to click them. Empty is now white, and every state
+   carries a border of its own darker shade, so a square reads as a square on
+   any row background. */
+const FEE_SQUARE = {
+  paid:    { bg: '#cfe6b4', bd: '#7fa35c' },
+  pending: { bg: '#f6e3a1', bd: '#c4a544' },
+  overdue: { bg: '#e8503f', bd: '#b33526' },
+  empty:   { bg: '#ffffff', bd: '#b9c3c9' },
+}
+
 function FeeSquare({ state, onChange, amount, label }) {
-  const colors = { paid: '#cfe6b4', pending: '#f6e3a1', overdue: '#e8503f', empty: '#e8ecef' }
   const next = { paid: 'pending', pending: 'overdue', overdue: 'empty', empty: 'paid' }
+  const c = FEE_SQUARE[state] || FEE_SQUARE.empty
   // Carries the money, so hovering a square answers "how much is this one?"
   const title = amount != null && amount > 0
     ? [label, money(amount), state].filter(Boolean).join(' · ')
     : state
   return (
-    <button type="button" onClick={() => onChange(next[state] || 'paid')}
-      style={{
-        width: 16, height: 16, borderRadius: 3, border: 'none',
-        background: colors[state] || colors.empty, cursor: 'pointer', padding: 0, flexShrink: 0,
-      }}
+    <button type="button" className="feesq" onClick={() => onChange(next[state] || 'paid')}
+      style={{ background: c.bg, borderColor: c.bd }}
       title={title} />
   )
 }
