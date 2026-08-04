@@ -1812,8 +1812,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
 
   useEffect(() => {
     const onKey = e => {
-      const t = e.target
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return
+      if (e.repeat || inEditableField(e.target)) return
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
         e.preventDefault()
         if (e.shiftKey) doRedo(); else doUndo()
