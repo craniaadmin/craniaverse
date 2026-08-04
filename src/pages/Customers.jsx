@@ -225,14 +225,6 @@ function loadColPrefs() {
 }
 function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ } }
 
-/* A record with no guardian name and no email has no family identity yet
-   (a just-added blank student), so it stands on its own keyed by its id
-   rather than collapsing with every other guardian-less record into one
-   fake family. */
-function guardianIdentity(r) {
-  const g1 = r.customer?.guardian1 || {}
-  return `${g1['First Name'] || ''} ${g1['Last Name'] || ''} ${g1['Email'] || ''}`.trim().toLowerCase()
-}
 const personName = (p) => p ? `${p['First Name'] || ''} ${p['Last Name'] || ''}`.trim() : ''
 
 function classesOf(record) {
