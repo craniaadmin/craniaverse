@@ -465,12 +465,15 @@ const CSS = `
 .cu .ptable .pname{font-weight:600;text-transform:uppercase;text-align:left}
 .cu .pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:700;
     letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
-/* One label per square, same width and gap, so the letters sit over the
-   boxes they name. REG and MAT are three characters in a 16px box, so they
-   are set tighter than the single letters rather than colliding. */
-.cu .feelabs{display:flex;gap:3px;justify-content:center}
-.cu .feelab{font-size:8px;letter-spacing:-.5px;color:#fff;font-weight:700;width:16px;
-    display:inline-block;text-align:center;overflow:visible}
+/* The template's geometry: 12px squares at a 1px gap, with REG and MAT
+   given 18px because they are three characters where the rest are one.
+   That is what stops the labels colliding, and it keeps the whole strip to
+   193px instead of 267px. Labels share the widths so each sits over its own
+   box. */
+.cu .feelabs,.cu .feesqs{display:flex;gap:1px;align-items:center;justify-content:center;flex-wrap:nowrap}
+.cu .feelab{font-size:7px;letter-spacing:0;color:#fff;font-weight:700;width:12px;flex:none;
+    display:inline-block;text-align:center}
+.cu .feelab:nth-child(1),.cu .feelab:nth-child(2){width:18px}
 .cu .feebtn{background:#fff;border:1px solid var(--field);border-radius:7px;padding:3px 9px;
     font-size:11.5px;font-weight:700;color:var(--dark-brown);cursor:pointer;font-family:inherit;white-space:nowrap}
 .cu .feebtn:hover{background:#f1f5f4}
