@@ -18,6 +18,7 @@
 // clicking a customer or student name jumps to their detail view.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { buildFamilyIndex } from '../data/family'
 import { Phone, Mail, Eye, Download } from 'lucide-react'
 import { useStore } from '../data/store'
 
