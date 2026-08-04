@@ -1572,11 +1572,11 @@ function FeeSquare({ state, onChange, amount, label }) {
    because a square can say so, but they are a state of an installment, not
    of the program's balance. */
 const PAYMENT_STYLE = {
-  Paid:    { bg: '#dff5e0', fg: '#2b7a2e' },
-  Pending: { bg: '#fff4d6', fg: '#8a6a00' },
-  Partial: { bg: '#fbf3ce', fg: '#7a6417' },
-  Overdue: { bg: '#fde0e0', fg: '#a12626' },
-  Unpaid:  { bg: '#fadbd8', fg: '#922b21' },
+  Paid:    { bg: '#DEF2DE', fg: '#2C6B2E', bd: '#8CC79A' },
+  Partial: { bg: '#F5E27A', fg: '#4A3E06', bd: '#C9B93E' },
+  Unpaid:  { bg: '#FADBD8', fg: '#922B21', bd: '#EEB4AE' },
+  Pending: { bg: '#fff4d6', fg: '#8a6a00', bd: '#E2CDA0' },
+  Overdue: { bg: '#FADBD8', fg: '#922B21', bd: '#D9695C' },
 }
 
 // Stable across filtering, unlike a position in the visible array.
