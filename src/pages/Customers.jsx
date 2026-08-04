@@ -625,6 +625,165 @@ function CtxMenu({ x, y, items, onClose }) {
   )
 }
 
+/* Colour swatch picker, matching the one on the Programs page so the two
+   read as the same control. */
+function SwatchPop({ x, y, current, onPick, onClose }) {
+  return (
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 300 }} onClick={onClose} />
+      <div className="cupop-sw" style={{ left: Math.min(x, window.innerWidth - 190), top: y }}>
+        {LPAL.map(c => (
+          <div key={c} className="sw" style={{
+            background: c,
+            outline: String(current || '').toLowerCase() === c.toLowerCase() ? '2px solid #2E2516' : undefined,
+          }} title={c} onClick={e => { e.stopPropagation(); onPick(c) }} />
+        ))}
+      </div>
+    </>
+  )
+}
+
+function ColorDot({ color, onPick }) {
+  const [pos, setPos] = useState(null)
+  return (
+    <>
+      <button type="button" className="cdot" title="Click to change colour"
+        style={{ background: color || DEFAULT_CAT_COLOR }}
+        onClick={e => {
+          e.stopPropagation()
+          const r = e.currentTarget.getBoundingClientRect()
+          setPos({ x: r.left, y: r.bottom + 6 })
+        }} />
+      {pos && <SwatchPop x={pos.x} y={pos.y} current={color}
+        onPick={c => { onPick(c); setPos(null) }} onClose={() => setPos(null)} />}
+    </>
+  )
+}
+
+/* Settings for this page: snapshots of the registrations table, and the
+   colours the programme pills are tinted with.
+
+   The backup half follows the pattern already used by To Do, Checklists,
+   Calendar, Projects and Programs — list, back up now, restore — against
+   /api/customers/*. Restoring writes a "Before restore" snapshot first, so
+   picking the wrong one is recoverable. */
+function CustomersSettings({ onClose, categories, catColors, onCatColor }) {
+  const ref = useRef(null)
+  const [backups, setBackups] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [restoreOpen, setRestoreOpen] = useState(false)
+  const [err, setErr] = useState('')
+  const dialog = useDialog()
+  const { refresh } = useStore()
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
+  }, [onClose])
+
+  const loadBackups = () => fetch(`${API_BASE}/api/customers/backups`, { headers: HEADERS })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
+    .then(setBackups)
+    .catch(() => setBackups([]))
+
+  useEffect(() => { loadBackups() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const backupNow = async () => {
+    setBusy(true); setErr('')
+    try {
+      const res = await fetch(`${API_BASE}/api/customers/backup`, {
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({ label: new Date().toLocaleString() }),
+      })
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
+      await loadBackups()
+    } catch (e) {
+      setErr('Backup failed — the customers_backups collection may be missing (run pb-setup.js).')
+    }
+    setBusy(false)
+  }
+
+  const doRestore = async (b) => {
+    const ok = await dialog.confirm(
+      `Replace every registration with the snapshot from ${b.label || new Date(b.created).toLocaleString()}`
+      + ` (${b.count} record${b.count === 1 ? '' : 's'})? A snapshot of the current data is saved first.`,
+      { title: 'Restore Backup' })
+    if (!ok) return
+    setBusy(true); setErr('')
+    try {
+      const res = await fetch(`${API_BASE}/api/customers/restore/${b.id}`, { method: 'POST', headers: HEADERS })
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
+      await refresh()
+      setRestoreOpen(false)
+      onClose()
+    } catch (e) {
+      setErr('Restore failed — nothing was changed.')
+    }
+    setBusy(false)
+  }
+
+  const last = backups?.[0]
+  const lastLine = last
+    ? `Last backup: ${last.label || new Date(last.created).toLocaleString()} (${last.count} records)`
+    : backups === null ? 'Loading…' : 'No backups yet'
+
+  return (
+    <div className="cusettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
+      <div className="sp-card">
+        <div className="sp-card-title">Backups</div>
+        <div className="sp-hint">
+          Snapshots of every registration, saved to the database (last 14 kept).
+          Back up before an import or a bulk delete.
+        </div>
+        <div className="sp-meta">{lastLine}</div>
+        <div className="sp-btnrow">
+          <button type="button" className="sp-btn" disabled={busy} onClick={backupNow}>
+            {busy ? 'Working…' : 'Back Up Now'}
+          </button>
+          <button type="button" className="sp-btn" disabled={busy || !backups?.length}
+            onClick={() => setRestoreOpen(v => !v)}>
+            Restore{restoreOpen ? ' ▾' : '…'}
+          </button>
+        </div>
+        {err && <div className="sp-err">{err}</div>}
+        {restoreOpen && backups && (
+          <div className="sp-restore-list">
+            {backups.map(b => (
+              <div key={b.id} className="sp-restore-row">
+                <span className="sp-rlabel">
+                  {b.label || new Date(b.created).toLocaleString()}
+                  <span className="sp-rcount">{b.count} records</span>
+                </span>
+                <button type="button" className="sp-btn" disabled={busy} onClick={() => doRestore(b)}>
+                  Restore
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="sp-card">
+        <div className="sp-card-title">Programme Colours</div>
+        <div className="sp-hint">
+          Programme pills are tinted by type. These are the same colours the
+          Programs page uses, so a change here shows up there too.
+        </div>
+        {categories.length === 0 ? (
+          <div className="sp-meta">No programme types in use yet.</div>
+        ) : categories.map(({ cat, n }) => (
+          <div key={cat} className="sp-catrow">
+            <ColorDot color={catColors[cat] || DEFAULT_CAT_COLOR} onPick={c => onCatColor(cat, c)} />
+            <span className="sp-catname">{cat}</span>
+            <span className="sp-rcount">{n}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ─── Customer list view ────────────────────────────────────────────────────
 
 /* Undo/redo here covers whole registrations — add, duplicate, delete —
