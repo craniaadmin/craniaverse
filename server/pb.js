@@ -569,6 +569,48 @@ export async function restoreProgramsBackup(backupId) {
   return row.payload
 }
 
+// ---- customers (registrations) backups --------------------
+const MAX_CUSTOMERS_BACKUPS = 14
+
+export async function listCustomersBackups() {
+  await ensureAuth()
+  const rows = await pb().collection('customers_backups').getFullList()
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  return rows.map(r => ({
+    id: r.id, label: r.label || '', created: r.created,
+    // Shown in the restore list, so you can tell a full snapshot from one
+    // taken when the table was half-imported.
+    count: Array.isArray(r.payload) ? r.payload.length : 0,
+  }))
+}
+
+export async function createCustomersBackup(label) {
+  await ensureAuth()
+  const records = await loadRegistrations()
+  await pb().collection('customers_backups').create({ label: label || '', payload: records })
+  const all = await pb().collection('customers_backups').getFullList()
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  for (const old of all.slice(MAX_CUSTOMERS_BACKUPS)) {
+    await pb().collection('customers_backups').delete(old.id)
+  }
+  return { count: records.length }
+}
+
+export async function restoreCustomersBackup(backupId) {
+  await ensureAuth()
+  const row = await pb().collection('customers_backups').getOne(backupId)
+  if (!row?.payload || !Array.isArray(row.payload)) throw new Error('Backup not found or empty')
+  /* A restore that runs halfway is worse than one that does not run, so
+     take a snapshot of what is there now first — that is the only way back
+     if this turns out to be the wrong backup. */
+  const current = await loadRegistrations()
+  await pb().collection('customers_backups').create({
+    label: `Before restore — ${new Date().toLocaleString()}`, payload: current,
+  })
+  await saveRegistrations(row.payload)
+  return row.payload
+}
+
 // ---- projects (kanban board — singleton payload) --------
 // Schema mirrors the "crania-projects.json" file the client's
 // v20 kanban mockup writes to disk, so exports/imports round-trip.
