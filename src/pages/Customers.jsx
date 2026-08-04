@@ -1395,19 +1395,9 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           <div className="label">Students</div><div className="value">{metrics.students}</div>
           <div className="hint">across all families</div>
         </div>
-        <div className="metric menr">
-          <div className="label">Active Enrolments</div><div className="value">{metrics.enrolments}</div>
-          <div className="hint">programs marked active</div>
-        </div>
         <div className="metric mpend">
           <div className="label">New / On Hold</div><div className="value">{metrics.pending}</div>
           <div className="hint">programs not yet active</div>
-        </div>
-        <div className={'metric mnone clickable' + (noClassesOnly ? ' on' : '')}
-          title="Click to show only students with no classes"
-          onClick={() => setNoClassesOnly(v => !v)}>
-          <div className="label">No Classes</div><div className="value">{metrics.noClasses}</div>
-          <div className="hint">not enrolled in anything</div>
         </div>
         <div className="metric mowed">
           <div className="label">Outstanding Fees</div>
@@ -1679,7 +1669,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
         <td>{payment && <span className="pill" style={{ background: ps.bg, color: ps.fg }}>{payment}</span>}</td>
         <td>
           <button className="feebtn" onClick={onToggleExpand}>
-            {money(engine.total)} {expanded ? '▴' : '▾'}
+            Fees {expanded ? '▴' : '▾'}
           </button>
         </td>
       </tr>
@@ -2116,7 +2106,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
           </thead>
           <tbody>
             {displayed.length === 0 ? (
-              <tr><td colSpan={7} style={{ background: 'transparent', padding: '26px', color: 'var(--muted)' }}>
+              <tr><td colSpan={8} style={{ background: 'transparent', padding: '26px', color: 'var(--muted)' }}>
                 {showOnlyActive ? 'No active programs.' : 'No programs registered.'}
               </td></tr>
             ) : displayed.map((p, i) => (
