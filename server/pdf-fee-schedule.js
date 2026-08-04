@@ -156,50 +156,73 @@ export function generateFeeSchedulePdf(data) {
         }
       })
       y += 22
-
-      // ── Monthly Installments header bar ──────────────────
-      const barHeight = 32
-      doc.roundedRect(left, y, contentWidth, barHeight, 6).fill(TEAL)
-      doc.fillColor('#fff').font('Helvetica-Bold').fontSize(14)
-        .text('Monthly Installments', left + 16, y + 10)
-      y += barHeight + 6
-
-      // Row helper — one rounded pill per installment / fee.
-      const rowHeight = 28
-      const drawRow = (label, amount, opts = {}) => {
-        const {
-          bg = BLUE, tx = INK, labelFont = 'Helvetica-Bold', amtFont = 'Helvetica-Bold',
-          italic = false,
-        } = opts
-        // Guard: soft page break
-        if (y + rowHeight > doc.page.height - doc.page.margins.bottom - 60) {
-          doc.addPage()
-          y = doc.page.margins.top
-        }
-        doc.roundedRect(left, y, contentWidth, rowHeight, 6).fill(bg)
-        doc.fillColor(tx).font(labelFont).fontSize(11)
-          .text(label, left + 16, y + 9, { width: contentWidth * 0.7 })
-        doc.font(amtFont).fillColor(tx)
-          .text(amount, left, y + 9, { align: 'right', width: contentWidth - 16 })
-        y += rowHeight + 5
       }
 
-      // Installment rows
+      /* Two columns, the way the fee panel on screen reads: the summary on
+         the left, the month-by-month on the right. As one full-width stack
+         this ran to thirteen tall rows, which pushed Material Fee and Total
+         onto a second page on their own. */
+      const colGap = 22
+      const colW = (contentWidth - colGap) / 2
+      const rightX = left + colW + colGap
+      const bodyTop = y
+
+      const barHeight = 26
+      const drawBar = (x, label) => {
+        doc.roundedRect(x, y, colW, barHeight, 6).fill(TEAL)
+        doc.fillColor('#fff').font('Helvetica-Bold').fontSize(11.5)
+          .text(label, x + 12, y + 8, { width: colW - 24 })
+        return y + barHeight + 5
+      }
+
+      // One rounded pill: label left, amount right, inside a single column.
+      const rowHeight = 22
+      const drawPill = (x, yy, label, amount, opts = {}) => {
+        const {
+          bg = BLUE, tx = INK, labelFont = 'Helvetica-Bold', amtFont = 'Helvetica-Bold', size = 10,
+        } = opts
+        doc.roundedRect(x, yy, colW, rowHeight, 5).fill(bg)
+        doc.fillColor(tx).font(labelFont).fontSize(size)
+          .text(label, x + 11, yy + 6.5, { width: colW * 0.62, lineBreak: false })
+        doc.font(amtFont).fillColor(tx).fontSize(size)
+          .text(amount, x, yy + 6.5, { align: 'right', width: colW - 11 })
+        return yy + rowHeight + 4
+      }
+
+      // ── Left column: what the year costs ─────────────────
+      let ly = drawBar(left, 'Summary')
+      ly = drawPill(left, ly, `${weeksPerYear}-Week Year`, `${scheduledWeeks} weeks`,
+        { bg: SKIP_BG, tx: INK, labelFont: 'Helvetica', amtFont: 'Helvetica' })
+      ly = drawPill(left, ly, 'Tuition', money(tuition))
+      ly = drawPill(left, ly, 'Registration Fee', money(regFee), { bg: GOLD })
+      ly = drawPill(left, ly, 'Material Fee', money(matFee), { bg: GOLD })
+      ly = drawPill(left, ly, 'Total', money(total), { bg: TEAL, tx: '#fff' })
+
+      /* What is due before the first lesson: the last month's fee held as a
+         deposit, plus registration and material. */
+      const lastPaid = [...installments].reverse().find(i => i.kind !== 'skip' && i.amount > 0)
+      const upfront = (lastPaid ? lastPaid.amount : 0) + regFee + matFee
+      ly += 4
+      doc.font('Helvetica').fontSize(9).fillColor('#5a6470')
+        .text('Due before the first lesson', left + 2, ly, { width: colW - 4 })
+      ly += 12
+      doc.font('Helvetica-Bold').fontSize(12).fillColor(INK)
+        .text(money(upfront), left + 2, ly, { width: colW - 4 })
+      ly += 18
+
+      // ── Right column: month by month ─────────────────────
+      let ry = drawBar(rightX, 'Monthly Installments')
       installments.forEach(i => {
-        const label = `${MONTH_LONG[i.month]} ${yr(i.month)}${i.kind === 'prorated' ? '   ·   Prorated' : ''}`
+        const label = `${MONTH_LONG[i.month]} ${yr(i.month)}`
         if (i.kind === 'skip') {
-          drawRow(label, '-', { bg: SKIP_BG, tx: SKIP_TX, labelFont: 'Helvetica', amtFont: 'Helvetica' })
+          ry = drawPill(rightX, ry, label, '—',
+            { bg: SKIP_BG, tx: SKIP_TX, labelFont: 'Helvetica', amtFont: 'Helvetica' })
         } else {
-          drawRow(label, money(i.amount))
+          ry = drawPill(rightX, ry, label + (i.kind === 'prorated' ? '  · pro-rated' : ''), money(i.amount))
         }
       })
 
-      // Fees + total
-      drawRow('Registration Fee', money(regFee), { bg: GOLD })
-      drawRow('Material Fee',     money(matFee), { bg: GOLD })
-      drawRow('Total',            money(total),  { bg: TEAL, tx: '#fff' })
-
-      y += 12
+      y = Math.max(ly, ry, bodyTop) + 14
 
       // Closing paragraph
       doc.font('Helvetica').fontSize(10).fillColor(INK)
