@@ -2090,19 +2090,29 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
     setRedoStack([])
   }, [])
 
+  /* A ref, not the state flag: two keypresses in the same tick would both
+     read the old state and both run, stepping twice through the stack. */
+  const histRunning = useRef(false)
+
   const runHistory = useCallback(async (from, setFrom, setTo, dir) => {
     const entry = from[from.length - 1]
-    if (!entry || histBusy) return
+    if (!entry || histRunning.current) return
+    histRunning.current = true
     setHistBusy(true)
     try {
       await (dir === 'undo' ? entry.undo() : entry.redo())
       setFrom(s => s.slice(0, -1))
       setTo(s => [...s.slice(-19), entry])
+      /* Say what happened. Undoing a delete puts people back on the roll,
+         and that has to be visible — the first sign of it should not be
+         noticing later that someone you removed is listed again. */
+      setHistNote(`${dir === 'undo' ? 'Undid' : 'Redid'}: ${entry.label}`)
     } catch (err) {
       dialog.alert(dir === 'undo' ? 'Could not undo' : 'Could not redo', String(err.message || err))
     }
+    histRunning.current = false
     setHistBusy(false)
-  }, [histBusy, dialog])
+  }, [dialog])
 
   const doUndo = useCallback(() => runHistory(undoStack, setUndoStack, setRedoStack, 'undo'), [runHistory, undoStack])
   const doRedo = useCallback(() => runHistory(redoStack, setRedoStack, setUndoStack, 'redo'), [runHistory, redoStack])
