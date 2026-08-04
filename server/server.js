@@ -516,6 +516,29 @@ app.delete('/api/registrations/:id', wrap(async (req, res) => {
   res.json({ deleted: records.length - next.length })
 }))
 
+/* Put a deleted registration back exactly as it was, keeping its id.
+   This is what makes Undo on the Customers list honest: the POST route
+   builds a record from a flat form and mints a new id, so undoing a delete
+   through it would return the family without their enrolments or fee
+   history. Here the client hands back the whole record it was holding, and
+   commitRegistrations writes it under its original id.
+
+   Refuses if the id is already present, so a double-undo cannot duplicate
+   a family. */
+app.post('/api/registrations/restore', wrap(async (req, res) => {
+  const record = req.body
+  if (!record || typeof record !== 'object' || !record.id) {
+    return res.status(400).json({ error: 'body must be a registration record with an id' })
+  }
+  const records = await getRegistrations()
+  if (records.some((r) => r.id === record.id)) {
+    return res.status(409).json({ error: 'a registration with that id already exists' })
+  }
+  records.push(record)
+  await commitRegistrations(records)
+  res.status(201).json(record)
+}))
+
 app.put('/api/registrations/:id/student', wrap(async (req, res) => {
   const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
