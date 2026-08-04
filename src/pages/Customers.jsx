@@ -299,10 +299,16 @@ const CSS = `
 .cu thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
     user-select:none;border-radius:6px;position:relative}
-/* Icons are pinned to the right only, so padding belongs on that side.
-   Reserving 30px each way left "Family ID" about 30px and it read "FAMIL". */
-.cu thead th.colh .lbl{display:block;text-align:center;padding:0 30px 0 4px;
+/* The heading sits centred in the whole cell. It used to be padded 30px on
+   the right to clear the sort arrow and eye, which pushed "Students" and
+   "Payment" visibly left of the column they name. The icons are absolutely
+   positioned and carry the header's own background, so they can sit over
+   the end of the text on the rare narrow column instead of every heading
+   paying for them; only a sorted column reserves room, because its arrow is
+   always showing. */
+.cu thead th.colh .lbl{display:block;text-align:center;padding:0 6px;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cu thead th.colh.sorted .lbl{padding-right:20px}
 .cu thead th.selcol,.cu thead th:empty,.cu thead th.blankhead,
 .cu tbody td.selcol,.cu tbody td.actcell{background:transparent}
 .cu thead th.selcol input,.cu tbody td.selcol input{width:12px;height:12px;margin:0;
