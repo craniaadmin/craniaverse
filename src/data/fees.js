@@ -190,12 +190,7 @@ export function syncEntryMoney(entry) {
   const e = engineForEntry(entry)
   const fee = Math.round(e.total * 100) / 100
   const paid = Math.round(e.paid * 100) / 100
-  return {
-    ...entry,
-    fee,
-    paid,
-    payment: fee > 0 && paid >= fee - 0.005 ? 'Paid' : (paid > 0 ? 'Partial' : 'Unpaid'),
-  }
+  return { ...entry, fee, paid, payment: paymentStateOf(entry) }
 }
 
 /* Total still owed across a set of registrations. Cancelled enrolments are
