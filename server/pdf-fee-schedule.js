@@ -10,10 +10,12 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-// Prefer the black-on-transparent logo so it sits well on a white PDF.
+/* The PNG first, and it matters: the .jpg is the same mark but JPEG has no
+   alpha channel, so the transparent surround was baked to black and the logo
+   sat in a black box on a white page. crania-logo.png is RGBA. */
 const LOGO_CANDIDATES = [
-  path.join(__dirname, '..', 'src', 'assets', 'crania-logo-black.jpg'),
   path.join(__dirname, '..', 'src', 'assets', 'crania-logo.png'),
+  path.join(__dirname, '..', 'src', 'assets', 'crania-logo-black.jpg'),
 ]
 const LOGO_PATH = LOGO_CANDIDATES.find(p => fs.existsSync(p)) || null
 
