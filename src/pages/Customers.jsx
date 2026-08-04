@@ -320,8 +320,11 @@ const CSS = `
 .cu .selcol{text-align:center}
 .cu thead th .arw{opacity:.85;font-size:10px}
 .cu thead th.colh{cursor:grab}
+/* Carries the header background so it reads cleanly where it overlaps a
+   long heading, now that the label is centred across the full cell. */
 .cu thead th.colh .thicons{position:absolute;right:3px;top:50%;transform:translateY(-50%);
-    display:inline-flex;align-items:center;gap:2px;line-height:1}
+    display:inline-flex;align-items:center;gap:2px;line-height:1;
+    background:var(--teal);padding-left:4px;border-radius:3px}
 .cu thead th.colh .eye{cursor:pointer;opacity:0;font-size:11px;transition:opacity .12s}
 .cu thead th.colh:hover .eye{opacity:1}
 .cu thead th .sortable{cursor:pointer}
