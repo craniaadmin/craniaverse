@@ -620,13 +620,20 @@ function buildMergedPrograms(){
           var sig = d + '|' + start;
           if(variant.seen[sig]) return;   // same slot from a duplicate record
           variant.seen[sig] = true;
+          /* Places LEFT, not the size of the room. This used to show the
+             raw capacity, so a full class still advertised "7 spots". */
+          var seat = SPOTS_BY_SESSION[spotKey(p.name, o.locationId, d, start)];
+          var cap = (o.capacity === '' || o.capacity == null) ? null : Number(o.capacity);
+          var left = seat && seat.remaining != null ? seat.remaining
+            : (cap == null ? null : cap);
           variant.sessions.push({
             day: d == null ? '' : (DOW_NAMES[d] || ''),
             dayNum: d,
             start: start,
             end: (t && t.end) || '',
             teacher: o.instructor || '',
-            spots: (o.capacity === '' || o.capacity == null) ? null : Number(o.capacity),
+            spots: left,
+            full: left != null && left <= 0,
           });
         });
       });
