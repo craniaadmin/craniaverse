@@ -190,9 +190,9 @@ export function generateFeeSchedulePdf(data) {
       }
 
       // ── Left column: what the year costs ─────────────────
+      // The week count is already stated twice in the header, so it is not
+      // repeated here.
       let ly = drawBar(left, 'Summary')
-      ly = drawPill(left, ly, `${weeksPerYear}-Week Year`, `${scheduledWeeks} weeks`,
-        { bg: SKIP_BG, tx: INK, labelFont: 'Helvetica', amtFont: 'Helvetica' })
       ly = drawPill(left, ly, 'Tuition', money(tuition))
       ly = drawPill(left, ly, 'Registration Fee', money(regFee), { bg: GOLD })
       ly = drawPill(left, ly, 'Material Fee', money(matFee), { bg: GOLD })
