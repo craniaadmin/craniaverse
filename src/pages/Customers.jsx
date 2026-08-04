@@ -390,6 +390,9 @@ const CSS = `
 .cu .stupill{display:inline-block;max-width:100%;background:#E4EFF3;color:var(--dark-brown);
     border:none;border-radius:5px;padding:1px 7px;font:inherit;font-size:11.5px;font-weight:600;
     line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+/* An outline, so a programme still reads as a chip when its type colour is
+   the default — which is the same grey as the cell it sits on. */
+.cu .stupill.tinted{border:1px solid rgba(46,37,22,.16)}
 .cu .stupill.stuname{background:transparent;color:#3d7f7d;font-weight:700;padding-left:0;cursor:pointer}
 .cu .stupill.stuname:hover{text-decoration:underline}
 .cu button.stupill{cursor:pointer;font-family:inherit}
