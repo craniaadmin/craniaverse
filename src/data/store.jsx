@@ -166,6 +166,14 @@ export function StoreProvider({ children }) {
       : r))
   }, [])
 
+  /* The detail view PUTs a record's programs straight to the API. Without
+     this the store's copy stayed stale until the next full refresh, so
+     ticking a fee square left the Customers list still showing the old
+     Payment. Callers update here as well as on the server. */
+  const updatePrograms = useCallback((recordId, programs) => {
+    setRecords(prev => prev.map(r => r.id === recordId ? { ...r, programs } : r))
+  }, [])
+
   const addCashEntry = useCallback(async (recordId, { delta, reason }) => {
     // Optimistic local update
     setRecords(prev => prev.map(r => {
