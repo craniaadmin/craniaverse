@@ -531,10 +531,15 @@ export default function EmergencyContacts({ onNavigate }) {
         <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
         ><Eye size={13} /> Columns</button>
-        <button title="Download the contact list as a CSV file" onClick={exportCsv}>
+        <button title="Download the contact list as a CSV file" onClick={() => exportCsv()}>
           <Download size={13} /> Export CSV
         </button>
+        <button className="gearbtn" title="Backups" onClick={() => setSettingsOpen(true)}>⚙</button>
       </div>
+
+      {settingsOpen && (
+        <EmergencySettings onClose={() => setSettingsOpen(false)} />
+      )}
 
       {fetchStatus === 'offline' && (
         <div className="offline">Working offline — showing cached data.</div>
