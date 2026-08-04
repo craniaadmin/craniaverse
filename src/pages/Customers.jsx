@@ -2082,16 +2082,31 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
       </div>
       <div className="card">
         <table className="ptable">
+          {/* Fourteen squares and their labels need a fixed 263px. Without
+              this the auto layout handed the slack to Year, Status and Rate
+              — none of which need it — and squeezed the fee schedule until
+              its month letters ran together. Program takes what is left. */}
+          <colgroup>
+            <col style={{ width: '52px' }} />
+            <col style={{ width: '104px' }} />
+            <col style={{ width: '66px' }} />
+            <col />
+            <col style={{ width: '86px' }} />
+            <col style={{ width: '283px' }} />
+            <col style={{ width: '88px' }} />
+            <col style={{ width: '74px' }} />
+          </colgroup>
           <thead>
             <tr>
               <th>Active</th><th>Status</th><th>Year</th><th>Program</th><th>Rate</th>
               <th>
                 <div style={{ marginBottom: 3, letterSpacing: 1 }}>Fee Schedule</div>
-                <div style={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+                <div className="feelabs">
                   {FEE_LABELS.map((m, i) => <span key={i} className="feelab">{m}</span>)}
                 </div>
               </th>
               <th>Payment</th>
+              <th />
             </tr>
           </thead>
           <tbody>
