@@ -778,7 +778,7 @@ function ColorDot({ color, onPick }) {
    Calendar, Projects and Programs — list, back up now, restore — against
    /api/customers/*. Restoring writes a "Before restore" snapshot first, so
    picking the wrong one is recoverable. */
-function CustomersSettings({ onClose, categories, catColors, onCatColor }) {
+function CustomersSettings({ onClose, categories, tintFor, onCatColor }) {
   const ref = useRef(null)
   const [backups, setBackups] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -885,7 +885,7 @@ function CustomersSettings({ onClose, categories, catColors, onCatColor }) {
           <div className="sp-meta">No programme types in use yet.</div>
         ) : categories.map(({ cat, n }) => (
           <div key={cat} className="sp-catrow">
-            <ColorDot color={tintFor(cat, catColors)} onPick={c => onCatColor(cat, c)} />
+            <ColorDot color={tintFor(cat)} onPick={c => onCatColor(cat, c)} />
             <span className="sp-catname">{cat}</span>
             <span className="sp-rcount">{n}</span>
           </div>
@@ -1031,6 +1031,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
   const setCatColor = useCallback((cat, color) => {
     setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
   }, [setProgramsState])
+
+  const tintFor = useMemo(
+    () => makeTintFor(catColors, autoTints(knownCategories.map(c => c.cat))),
+    [catColors, knownCategories])
 
   const [settingsOpen, setSettingsOpen] = useState(false)
   // { fam, kid } — kid null means the pointer is over something the whole
@@ -1334,7 +1338,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
             const name = p.program || ''
             const prog = progFor(name)
             const cat = categoryOf(name)
-            const bg = tintFor(cat, catColors)
+            const bg = tintFor(cat)
             return (
               <button key={name + i} className="stupill tinted"
                 style={{ background: bg, color: inkOn(bg) }}
@@ -1420,7 +1424,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
 
       {settingsOpen && (
         <CustomersSettings onClose={() => setSettingsOpen(false)}
-          categories={usedCategories} catColors={catColors} onCatColor={setCatColor} />
+          categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
       )}
 
       <div className="metrics">
