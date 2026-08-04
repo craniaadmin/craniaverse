@@ -246,10 +246,13 @@ function useEmergencyRows() {
   return useMemo(() => {
     const realRecords = records.filter(r => r.id !== 'seed')
 
-    // Group records into families.
+    // Group records into families, by the same rule the Customers page
+    // uses — siblings whose records differ slightly must not come out as
+    // two families with two emergency contacts.
+    const familyIndex = buildFamilyIndex(realRecords)
     const families = new Map()
     for (const r of realRecords) {
-      const key = guardianIdentity(r) || `unknown-${r.id}`
+      const key = familyIndex.get(r.id) || `unknown-${r.id}`
       if (!families.has(key)) families.set(key, { customerName: guardianName(r) || '—', records: [] })
       families.get(key).records.push(r)
     }
