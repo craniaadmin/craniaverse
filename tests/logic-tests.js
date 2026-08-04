@@ -291,22 +291,18 @@ export async function runLogicTests() {
       const check = (label, records, expected) =>
         assertEq(shape(records), expected, label)
 
+      check('same guardian 1 groups the siblings',
+        [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', G('Ada', 'Test', 'ada@x.com'))], 'a+b')
+
       check('one sibling has the guardian email, the other does not',
         [rec('one', G('Ada', 'Test', 'ada@x.com')), rec('two', G('Ada', 'Test'))], 'one+two')
 
       check('case and spacing differences do not split a family',
         [rec('a', G('Ada', 'Test', 'Ada@X.com')), rec('b', G(' ada ', '  test ', 'ada@x.com'))], 'a+b')
 
-      check('a parent recorded in the second guardian slot still matches',
-        [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', {}, G('Ada', 'Test', 'ada@x.com'))], 'a+b')
-
       check('matching is transitive across email and name',
         [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', G('Ada', 'Test', 'ada@x.com')),
           rec('c', G('Ada', 'Test'))], 'a+b+c')
-
-      check('a shared family reference forces a join',
-        [rec('a', G('Ada', 'Test', 'ada@x.com'), {}, 'F0001'),
-          rec('b', G('Zed', 'Other', 'z@x.com'), {}, 'F0001')], 'a+b')
 
       // The other direction matters just as much: do not merge households.
       check('same guardian name but different emails stays two families',
@@ -315,8 +311,27 @@ export async function runLogicTests() {
       check('unrelated families stay apart',
         [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', G('Bob', 'Other', 'bob@x.com'))], 'a | b')
 
+      check('different guardian surnames are different families',
+        [rec('a', G('Pat', 'Studentone', 'pat1@x.com')), rec('b', G('Pat', 'Studenttwo', 'pat2@x.com'))], 'a | b')
+
       check('blank records do not collapse into one fake family',
         [rec('a', {}), rec('b', {})], 'a | b')
+
+      /* Guardian 2 is not consulted. Pooling both slots merged two unrelated
+         children whose records shared one address between different fields. */
+      check('a match in the guardian 2 slot does not join two families',
+        [rec('a', G('Tas', 'Karim', 'tas@x.com')),
+          rec('b', G('Other', 'Parent', 'other@x.com'), G('Tas', 'Karim', 'tas@x.com'))], 'a | b')
+
+      check('one guardian-less record does not join a named family',
+        [rec('a', G('Tas', 'Karim', 'tas@x.com')), rec('b', {})], 'a | b')
+
+      /* The stored reference is an output of this grouping, never an input —
+         otherwise a wrong merge stamps one reference on both records and
+         that reference becomes the evidence keeping them merged. */
+      check('a shared stored reference does not force unrelated records together',
+        [rec('a', G('Tas', 'Karim', 'tas@x.com'), {}, 'F0003'),
+          rec('b', G('Different', 'Parent', 'diff@x.com'), {}, 'F0003')], 'a | b')
     }),
   ]
 }
