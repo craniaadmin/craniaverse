@@ -1487,35 +1487,16 @@ function FeeSquare({ state, onChange, amount, label }) {
   )
 }
 
-function derivedPayment(fees) {
-  const states = Object.values(fees || {}).filter(s => s && s !== 'empty')
-  if (!states.length) return ''
-  if (states.includes('overdue')) return 'Overdue'
-  if (states.includes('pending')) return 'Pending'
-  if (states.every(s => s === 'paid')) return 'Paid'
-  return ''
-}
-
-/* Two vocabularies share this palette. Pending/Overdue come from the month
-   squares — what a marked installment says. Partial/Unpaid come from the
-   money itself, comparing what the fee engine totals against what has been
-   received; that is what the list column shows. Paid means the same in
-   both. */
+/* Payment is one vocabulary now, decided by the money: what the ticked
+   squares add up to against what the year costs. Pending and Overdue remain
+   because a square can say so, but they are a state of an installment, not
+   of the program's balance. */
 const PAYMENT_STYLE = {
   Paid:    { bg: '#dff5e0', fg: '#2b7a2e' },
   Pending: { bg: '#fff4d6', fg: '#8a6a00' },
   Partial: { bg: '#fbf3ce', fg: '#7a6417' },
   Overdue: { bg: '#fde0e0', fg: '#a12626' },
   Unpaid:  { bg: '#fadbd8', fg: '#922b21' },
-}
-
-/* Opening the panel on a program that has never been costed should show the
-   price it is sold at, not zero — a total of $138 beside a row reading
-   "$289 /wk" looks like the calculator is broken when it is only unfilled. */
-const feeCalcFor = (prog) => {
-  if (prog && prog.feeCalc) return prog.feeCalc
-  const n = Number(String((prog && prog.rate) || '').replace(/[^\d.]/g, ''))
-  return { firstLesson: 1, monthlyFee: Number.isFinite(n) ? n : 0, regFee: 79, matFee: 59, discount: 0, discountType: '%' }
 }
 
 // Stable across filtering, unlike a position in the visible array.
