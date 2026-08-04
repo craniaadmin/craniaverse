@@ -1674,14 +1674,14 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
         <td>{payment && <span className="pill" style={{ background: ps.bg, color: ps.fg }}>{payment}</span>}</td>
         <td>
           <button className="feebtn" onClick={onToggleExpand}>
-            {e ? money(e.total) : 'Fees'} {expanded ? '▴' : '▾'}
+            {money(engine.total)} {expanded ? '▴' : '▾'}
           </button>
         </td>
       </tr>
       {expanded && (
         <tr>
           <td colSpan={8} style={{ background: 'transparent', padding: '0 0 10px' }}>
-            <FeePanel prog={prog} fc={fc} engine={e} setCalc={setCalc}
+            <FeePanel prog={prog} fc={fc} engine={engine} setCalc={setCalc}
               onBilling={v => onCalcChange(prog, fc, v)}
               onSessions={(sessions, schedule) => onSessionsChange(prog, sessions, schedule)}
               onPdf={onPdf} pdfBusy={pdfBusy} />
