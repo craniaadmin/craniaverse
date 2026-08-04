@@ -953,7 +953,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       ...(programs || []).map(p => p.category).filter(Boolean),
     ])
     // Longest first so "TEKNOKIDS CODING" wins over a shorter overlap.
-    return [...names].map(c => ({ cat: c, key: squash(c) }))
+    return [...names].map(c => ({ cat: c, key: squash(c), words: words(c) }))
       .filter(x => x.key).sort((a, b) => b.key.length - a.key.length)
   }, [catColors, programsState, programs])
 
@@ -964,7 +964,18 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     if (hit?.category) return hit.category
     for (const { cat, key } of knownCategories) if (k.startsWith(key)) return cat
     for (const { cat, key } of knownCategories) if (k.includes(key)) return cat
-    return ''
+    /* Last resort, on shared words: "Private Piano — 30 min" belongs to
+       "PRIVATE PIANO LESSONS", but the name never says "lessons" so neither
+       string contains the other. Two words in common is enough to be sure;
+       a one-word category has to match that word outright, which the
+       containment passes above would already have caught. */
+    const w = words(name)
+    let best = null
+    for (const c of knownCategories) {
+      const shared = c.words.filter(x => w.includes(x)).length
+      if (shared >= 2 && shared > (best?.shared || 0)) best = { cat: c.cat, shared }
+    }
+    return best ? best.cat : ''
   }, [progBySquashed, knownCategories])
 
   const progFor = useCallback((name) =>
