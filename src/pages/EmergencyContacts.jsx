@@ -408,10 +408,31 @@ export default function EmergencyContacts({ onNavigate }) {
       if (c) return c
       return a.customer.localeCompare(b.customer, undefined, { sensitivity: 'base' })
     })
-  }, [allRows, search, missingOnly, sort])
+  }, [allRows, search, missingOnly, showInactive, colFilters, sort])
 
-  const anyFilterActive = !!search || missingOnly
-  const clearAllFilters = () => { setSearch(''); setMissingOnly(false) }
+  /* Only values that are actually present, so a filter never offers a
+     choice that returns nothing. */
+  const filterOptions = useMemo(() => {
+    const out = {}
+    for (const c of COLS) {
+      const vals = new Set()
+      for (const r of allRows) {
+        if (c.k === 'students') r.students.forEach(s => { const n = studentName(s); if (n) vals.add(n) })
+        else if (r[c.k]) vals.add(String(r[c.k]))
+      }
+      out[c.k] = [...vals].sort((x, y) => x.localeCompare(y, undefined, { numeric: true }))
+    }
+    return out
+  }, [allRows])
+
+  const anyFilterActive = !!search || missingOnly || showInactive
+    || Object.values(colFilters).some(Boolean)
+  const clearAllFilters = () => {
+    setSearch(''); setMissingOnly(false); setShowInactive(false); setColFilters({})
+  }
+
+  const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
+  const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
   const exportCsv = () => {
     const esc = (v) => {
