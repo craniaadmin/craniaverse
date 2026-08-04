@@ -1905,11 +1905,20 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
     const name = `${record.student?.firstName || ''} ${record.student?.lastName || ''}`.trim() || 'this student'
     if (!opts.silent) {
       const ok = await dialog.confirm(
-        `Delete ${name}? This also removes their linked customer and guardian information, and cannot be undone.`)
+        `Delete ${name}? This also removes their linked customer and guardian information. You can undo this.`)
       if (!ok) return
     }
     try {
+      // Kept whole so Undo can put it back exactly, enrolments included.
+      const snapshot = JSON.parse(JSON.stringify(record))
       await deleteRegistration(record.id)
+      if (!opts.noHistory) {
+        pushHistory({
+          label: `Delete ${name}`,
+          undo: () => restoreRegistration(snapshot),
+          redo: () => deleteRegistration(snapshot.id),
+        })
+      }
       if (detailId === record.id || !opts.silent) {
         // Jump to a remaining sibling if there is one, else back to the list.
         // Only match a real guardian identity — a blank student has none, so
@@ -1925,7 +1934,8 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
 
   /* Deleting a family row removes every child in it. Named in full in the
      prompt, because on a family row the count is not obvious from what is
-     under the cursor. */
+     under the cursor. The whole family goes onto the undo stack as one
+     entry, so undoing brings all the siblings back together. */
   const handleDeleteFamily = async (recordList) => {
     const list = recordList.filter(Boolean)
     if (!list.length) return
@@ -1933,10 +1943,16 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
     const names = list.map(r => `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim() || 'a student')
     const ok = await dialog.confirm(
       `Delete all ${list.length} students in this family — ${names.join(', ')}? ` +
-      'This also removes their linked customer and guardian information, and cannot be undone.',
+      'This also removes their linked customer and guardian information. You can undo this.',
       { title: 'Delete Family' })
     if (!ok) return
-    for (const r of list) await handleDelete(r, { silent: true })
+    const snapshots = list.map(r => JSON.parse(JSON.stringify(r)))
+    for (const r of list) await handleDelete(r, { silent: true, noHistory: true })
+    pushHistory({
+      label: `Delete ${list.length} students`,
+      undo: async () => { for (const s of snapshots) await restoreRegistration(s) },
+      redo: async () => { for (const s of snapshots) await deleteRegistration(s.id) },
+    })
     setDetailId(null)
   }
 
