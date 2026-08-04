@@ -1349,7 +1349,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
                     setSelected(e.target.checked ? new Set(visible.map(r => r.id)) : new Set())} />
                 </th>
                 {orderedCols.map(c => (
-                  <th key={c.k} className="colh" draggable data-col={c.k}
+                  <th key={c.k} className={'colh' + (sort.key === c.k ? ' sorted' : '')} draggable data-col={c.k}
                     onDragStart={() => { dragCol.current = c.k }}
                     onDragOver={e => e.preventDefault()}
                     onDrop={() => onDrop(c.k)}>
