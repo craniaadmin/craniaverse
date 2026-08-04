@@ -379,6 +379,13 @@ export default function EmergencyContacts({ onNavigate }) {
     const q = search.trim().toLowerCase()
     const out = allRows.filter(r => {
       if (missingOnly && !r.missing) return false
+      if (!showInactive && r.inactive) return false
+      for (const [k, want] of Object.entries(colFilters)) {
+        if (!want) continue
+        // Students is a list, so the row matches if any of them is the pick.
+        if (k === 'students') { if (!r.students.some(s => studentName(s) === want)) return false }
+        else if (String(r[k] || '') !== want) return false
+      }
       if (!q) return true
       return r.contact.toLowerCase().includes(q) ||
              r.relationship.toLowerCase().includes(q) ||
