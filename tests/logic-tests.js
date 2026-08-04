@@ -3,7 +3,7 @@
 // DELETE removes it cleanly. Each test cleans up after itself
 // so re-running doesn't accumulate junk records.
 
-import { assert, runTest } from './framework.js'
+import { assert, assertEq, runTest } from './framework.js'
 import { authedFetch } from './utils/auth.js'
 
 // Authed HTTP helper — everything below /api/health goes through
