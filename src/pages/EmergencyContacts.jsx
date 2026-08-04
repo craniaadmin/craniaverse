@@ -434,14 +434,16 @@ export default function EmergencyContacts({ onNavigate }) {
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
-  const exportCsv = () => {
+  /* Everything by default, or just the ticked rows — a printed call list
+     for one class or one trip is the reason to tick anything here. */
+  const exportCsv = (rows) => {
     const esc = (v) => {
       const s = String(v ?? '')
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
     }
     const head = ['Emergency Contact', 'Relationship', 'Phone', 'Email', 'Customer', 'Students', 'Status']
     const lines = [head.join(',')]
-    for (const r of allRows) {
+    for (const r of (rows && rows.length ? rows : allRows)) {
       lines.push([r.contact, r.relationship, r.phone, r.email, r.customer, r.studentNames,
         r.missing ? 'Missing' : 'On file'].map(esc).join(','))
     }
