@@ -68,17 +68,22 @@ const DEFAULT_CAT_COLOR = '#F1F3F4'
 const TINTS = ['#A6E2F9', '#DEF2DE', '#FBF3CE', '#FBDDE4', '#E7DEF5',
   '#BEEBE8', '#FCE6D2', '#E8F3C2', '#CAD6F2', '#E2CDA0']
 
-function autoTint(cat) {
-  const s = String(cat || '')
-  let h = 0
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
-  return TINTS[h % TINTS.length]
+/* Assigned by position in a sorted list, not by hashing the name: hashing
+   put two pairs of categories on the same colour while three palette
+   entries went unused, which is the whole problem again for those pairs.
+   Sorting keeps a category's colour stable as others are added. */
+function autoTints(categories) {
+  const names = [...new Set((categories || []).filter(Boolean))].sort()
+  const m = new Map()
+  names.forEach((c, i) => m.set(c, TINTS[i % TINTS.length]))
+  return m
 }
 
-const tintFor = (cat, catColors) => {
+const makeTintFor = (catColors, auto) => (cat) => {
   if (!cat) return DEFAULT_CAT_COLOR
   const set = catColors && catColors[cat]
-  return set && set.toUpperCase() !== DEFAULT_CAT_COLOR ? set : autoTint(cat)
+  if (set && set.toUpperCase() !== DEFAULT_CAT_COLOR) return set
+  return auto.get(cat) || DEFAULT_CAT_COLOR
 }
 
 /* Readable text for a chosen background. The palette runs from white to
@@ -880,7 +885,7 @@ function CustomersSettings({ onClose, categories, catColors, onCatColor }) {
           <div className="sp-meta">No programme types in use yet.</div>
         ) : categories.map(({ cat, n }) => (
           <div key={cat} className="sp-catrow">
-            <ColorDot color={catColors[cat] || DEFAULT_CAT_COLOR} onPick={c => onCatColor(cat, c)} />
+            <ColorDot color={tintFor(cat, catColors)} onPick={c => onCatColor(cat, c)} />
             <span className="sp-catname">{cat}</span>
             <span className="sp-rcount">{n}</span>
           </div>
@@ -1329,7 +1334,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
             const name = p.program || ''
             const prog = progFor(name)
             const cat = categoryOf(name)
-            const bg = (cat && catColors[cat]) || DEFAULT_CAT_COLOR
+            const bg = tintFor(cat, catColors)
             return (
               <button key={name + i} className="stupill tinted"
                 style={{ background: bg, color: inkOn(bg) }}

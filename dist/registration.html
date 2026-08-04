@@ -96,6 +96,9 @@
   .pp-off:last-child{border-bottom:none;}
   .pp-off input{accent-color:var(--btn-teal); width:16px; height:16px;}
   .pp-off-spots{font-size:11.5px; color:#777;}
+  /* A full class stays visible but cannot be chosen. */
+  .reg-check.pp-full{opacity:.55; cursor:not-allowed;}
+  .reg-check.pp-full input{cursor:not-allowed;}
   .pp-empty{padding:18px; text-align:center; color:#777; font-size:13px; font-style:italic;}
   .sc-item{background:#fff; border:1px solid rgba(42,55,68,.18); border-radius:8px; padding:12px 14px; margin-bottom:10px;}
   .sc-head{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
@@ -559,6 +562,17 @@ var DOW_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var DOW_RANK  = { 1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 0:6 };
 var LOCATIONS_BY_ID = {}; // filled by loadLocations()
 
+/* Places taken per session, from /api/program-spots. Keyed on the same four
+   things the admin side matches a registration against, so both agree on
+   what "this class, this site, this day, this time" means. */
+var SPOTS_BY_SESSION = {};
+function spotKey(program, locationId, day, start){
+  return String(program||'').trim().toUpperCase()
+    + '|' + (locationId || '')
+    + '|' + (day == null ? '' : day)
+    + '|' + (start || '');
+}
+
 function locationName(id){
   if(!id) return '';
   if(LOCATIONS_BY_ID[id]) return LOCATIONS_BY_ID[id];
@@ -620,13 +634,20 @@ function buildMergedPrograms(){
           var sig = d + '|' + start;
           if(variant.seen[sig]) return;   // same slot from a duplicate record
           variant.seen[sig] = true;
+          /* Places LEFT, not the size of the room. This used to show the
+             raw capacity, so a full class still advertised "7 spots". */
+          var seat = SPOTS_BY_SESSION[spotKey(p.name, o.locationId, d, start)];
+          var cap = (o.capacity === '' || o.capacity == null) ? null : Number(o.capacity);
+          var left = seat && seat.remaining != null ? seat.remaining
+            : (cap == null ? null : cap);
           variant.sessions.push({
             day: d == null ? '' : (DOW_NAMES[d] || ''),
             dayNum: d,
             start: start,
             end: (t && t.end) || '',
             teacher: o.instructor || '',
-            spots: (o.capacity === '' || o.capacity == null) ? null : Number(o.capacity),
+            spots: left,
+            full: left != null && left <= 0,
           });
         });
       });
@@ -847,8 +868,16 @@ function renderPrograms(studentIdx){
             var oIdx = o.offeringIdx;
             var checked = (card.offerings || []).some(function(s){ return s.offeringIdx === oIdx; });
             var teacher = o.teacher ? ' · '+escapeHtml(o.teacher) : '';
-            var spots = o.spots!=null ? ' · '+o.spots+' spots' : '';
-            html += '<label class="reg-check"><input type="checkbox"'+(checked?' checked':'')+' onchange="toggleCardOffering('+studentIdx+','+i+','+oIdx+',this)"> ';
+            /* A full class says so and cannot be picked. It stays listed —
+               knowing the class exists and is full is worth more than the
+               slot quietly disappearing. Anyone already holding the slot
+               keeps it, so a re-render cannot drop their choice. */
+            var isFull = o.full && !checked;
+            var spots = o.spots == null ? ''
+              : (o.spots <= 0 ? ' · FULL' : ' · '+o.spots+(o.spots === 1 ? ' spot left' : ' spots left'));
+            html += '<label class="reg-check'+(isFull?' pp-full':'')+'">'
+              + '<input type="checkbox"'+(checked?' checked':'')+(isFull?' disabled':'')
+              + ' onchange="toggleCardOffering('+studentIdx+','+i+','+oIdx+',this)"> ';
             html += escapeHtml(o.day || '')+' · '+escapeHtml(fmtTime(o.start))+teacher+spots+'</label>';
           });
           html += '</div>';
@@ -1124,24 +1153,6 @@ function renderPage(){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function collectOfferingDecrements(students){
-  var decrements = [];
-  (students || []).forEach(function(student){
-    (student.programs || []).forEach(function(card){
-      if(card.mergedIdx != null && card.variantIdx != null){
-        var merged = MERGED_PROGRAMS[card.mergedIdx];
-        var variant = merged && merged.variants[card.variantIdx];
-        if(variant){
-          (card.offerings || []).forEach(function(o){
-            decrements.push({ programIdx: variant.programIdx, offeringIdx: o.offeringIdx });
-          });
-        }
-      }
-    });
-  });
-  return decrements;
-}
-
 function flattenPrograms(cards){
   // ONE entry per program card. Multiple time slots within one card get
   // combined into the day / time / schedule fields, so the admin views
@@ -1245,22 +1256,16 @@ function submitForm(){
   });
 
   registrationPromise.then(function(){
-    // Decrement spots for registered offerings
-    var decrements = collectOfferingDecrements(state.students);
-    var decrementPromise = decrements.length ? fetch('/api/programs/decrement-spots', {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(decrements)
-    }).catch(function(){ /* silent fail */ }) : Promise.resolve();
-
-    return decrementPromise.then(function(){
-      var names = state.students.map(function(s){ return s.firstName + " " + s.lastName; }).join(", ");
-      document.getElementById("success-message").textContent = names + " has been registered. A Crania Schools team member will be in touch shortly.";
-      allPages.push("success");
-      state.currentPage = allPages.indexOf("success");
-      renderPage();
-      document.getElementById("submit-btn").disabled = false;
-    });
+    /* Nothing to decrement: the seat count is derived from the register, so
+       saving the registration IS the decrement. The call that used to be
+       here wrote to a field no offering has and was rejected as
+       unauthenticated anyway. */
+    var names = state.students.map(function(s){ return s.firstName + " " + s.lastName; }).join(", ");
+    document.getElementById("success-message").textContent = names + " has been registered. A Crania Schools team member will be in touch shortly.";
+    allPages.push("success");
+    state.currentPage = allPages.indexOf("success");
+    renderPage();
+    document.getElementById("submit-btn").disabled = false;
   }).catch(function(err){
     alert("Error submitting registration: "+err.message);
     document.getElementById("submit-btn").disabled = false;
@@ -1311,6 +1316,18 @@ function loadPrograms(){
       LOCATIONS_BY_ID = {};
       (Array.isArray(locs) ? locs : []).forEach(function(l){
         if(l && l.id) LOCATIONS_BY_ID[l.id] = l.name || '';
+      });
+      return fetch('/api/program-spots', HDRS);
+    })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .catch(function(){ return []; })
+    .then(function(rows){
+      /* Places already taken, counted from the register. Keyed the same way
+         the form builds its sessions, so a slot can look itself up. */
+      SPOTS_BY_SESSION = {};
+      (Array.isArray(rows) ? rows : []).forEach(function(s){
+        if(!s || !s.program) return;
+        SPOTS_BY_SESSION[spotKey(s.program, s.locationId, s.day, s.start)] = s;
       });
       return fetch('/api/programs', HDRS);
     })
