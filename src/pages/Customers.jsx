@@ -245,6 +245,37 @@ const CSS = `
 .cu .metric.on{outline:2px solid var(--teal);outline-offset:1px}
 .cu .metric.mstu{border-bottom-color:var(--yellow)}
 .cu .metric.menr{border-bottom-color:var(--light-blue)}
+.cu .actions .hbtn:disabled{opacity:.4;cursor:default}
+.cu .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
+.cusettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
+    margin-top:4px}
+.cusettings .sp-card{background:#fff;border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 8px 24px rgba(46,37,22,.18);padding:13px 15px}
+.cusettings .sp-card-title{font-size:12.5px;font-weight:700;color:var(--teal);text-transform:uppercase;
+    letter-spacing:.4px;margin-bottom:6px}
+.cusettings .sp-hint{font-size:11.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
+.cusettings .sp-meta{font-size:11.5px;color:var(--dark-brown);font-weight:600;margin-bottom:9px}
+.cusettings .sp-err{font-size:11.5px;color:var(--danger);margin-top:8px;line-height:1.4}
+.cusettings .sp-btnrow{display:flex;gap:8px}
+.cusettings .sp-btn{background:var(--pill);border:1px solid var(--field);border-radius:8px;padding:6px 11px;
+    font:inherit;font-size:12px;font-weight:600;color:var(--dark-brown);cursor:pointer}
+.cusettings .sp-btn:hover:not(:disabled){border-color:var(--teal)}
+.cusettings .sp-btn:disabled{opacity:.45;cursor:default}
+.cusettings .sp-restore-list{margin-top:9px;border-top:1px solid var(--line);padding-top:8px;
+    max-height:220px;overflow:auto}
+.cusettings .sp-restore-row{display:flex;align-items:center;gap:8px;padding:5px 0}
+.cusettings .sp-rlabel{flex:1;min-width:0;font-size:11.5px;color:var(--dark-brown);
+    display:flex;flex-direction:column;line-height:1.3}
+.cusettings .sp-rcount{font-size:10.5px;color:var(--faint);font-weight:600}
+.cusettings .sp-catrow{display:flex;align-items:center;gap:9px;padding:4px 0}
+.cusettings .sp-catname{flex:1;min-width:0;font-size:12px;font-weight:600;color:var(--dark-brown);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cusettings .cdot{width:22px;height:22px;border-radius:50%;flex:none;border:2px solid #fff;
+    box-shadow:0 0 0 1px #d8d3c6;cursor:pointer;padding:0}
+.cupop-sw{position:fixed;z-index:301;background:#fff;border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 8px 24px rgba(46,37,22,.22);padding:10px;display:flex;gap:7px;flex-wrap:wrap;width:172px}
+.cupop-sw .sw{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid #fff;
+    box-shadow:0 0 0 1px #d8d3c6}
 .cu .metric.mpend{border-bottom-color:#7a6417}
 .cu .metric.mnone{border-bottom-color:#c0392b}
 .cu .metric.mowed{border-bottom-color:#8a6a00}
