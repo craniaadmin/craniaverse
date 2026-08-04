@@ -680,6 +680,19 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     return m
   }, [programs])
 
+  /* Programme pills are tinted by category — the kind of programme it is,
+     which is what you scan a family's row for. The colours are the ones the
+     Programs page already keeps in programsState.catColors, so recolouring
+     in either place shows up in both rather than the two drifting apart.
+     Status is still carried, in the tooltip. */
+  const catColors = useMemo(() => programsState?.catColors || {}, [programsState])
+  const categoryOf = useCallback((name) =>
+    progByName.get(String(name || '').trim().toUpperCase())?.category || '', [progByName])
+
+  const setCatColor = useCallback((cat, color) => {
+    setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
+  }, [setProgramsState])
+
   /* One entry per student, carrying both its own values and its family's.
      Rows are still built per student because filtering, searching, sorting,
      selection and the metrics all reason about students; they are gathered
