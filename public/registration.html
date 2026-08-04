@@ -1271,22 +1271,16 @@ function submitForm(){
   });
 
   registrationPromise.then(function(){
-    // Decrement spots for registered offerings
-    var decrements = collectOfferingDecrements(state.students);
-    var decrementPromise = decrements.length ? fetch('/api/programs/decrement-spots', {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(decrements)
-    }).catch(function(){ /* silent fail */ }) : Promise.resolve();
-
-    return decrementPromise.then(function(){
-      var names = state.students.map(function(s){ return s.firstName + " " + s.lastName; }).join(", ");
-      document.getElementById("success-message").textContent = names + " has been registered. A Crania Schools team member will be in touch shortly.";
-      allPages.push("success");
-      state.currentPage = allPages.indexOf("success");
-      renderPage();
-      document.getElementById("submit-btn").disabled = false;
-    });
+    /* Nothing to decrement: the seat count is derived from the register, so
+       saving the registration IS the decrement. The call that used to be
+       here wrote to a field no offering has and was rejected as
+       unauthenticated anyway. */
+    var names = state.students.map(function(s){ return s.firstName + " " + s.lastName; }).join(", ");
+    document.getElementById("success-message").textContent = names + " has been registered. A Crania Schools team member will be in touch shortly.";
+    allPages.push("success");
+    state.currentPage = allPages.indexOf("success");
+    renderPage();
+    document.getElementById("submit-btn").disabled = false;
   }).catch(function(err){
     alert("Error submitting registration: "+err.message);
     document.getElementById("submit-btn").disabled = false;
