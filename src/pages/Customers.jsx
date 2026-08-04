@@ -1554,7 +1554,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
      The store is updated as well as the server: the list reads the store,
      and without this it kept the old programs until the next full refresh. */
   const persistPrograms = (next) => {
-    const synced = next.map(p => syncProgramMoney({ ...p, ...engineInputs(p) }))
+    const synced = next.map(syncEntryMoney)
     updatePrograms(selected.id, synced)
     fetch(`${API_BASE}/api/registrations/${selected.id}/programs`, {
       method: 'PUT', headers: HEADERS, body: JSON.stringify(synced),
