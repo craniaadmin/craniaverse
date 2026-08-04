@@ -20,6 +20,9 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
+import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
+import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
+import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
 import {
   ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS, currentAcademicYear,
   buildScheduledRows as buildScheduledRowsShared, dedupeProgramTabs, tabKeyOf,
@@ -89,10 +92,10 @@ function useStudentIds(records, assign) {
    the leftover space to any pixel column, starving the text ones on a
    wide screen. Sized so nothing is squeezed at the 860px min-width. */
 const SEL_W = '3%'
-const ACT_W = '5%'
+const ACT_W = '9%'
 const COL_W = {
-  name: '20%', login: '14%', grade: '7%',
-  medical: '20%', cash: '9%', classes: '22%',
+  studentId: '8%', name: '18%', login: '12%', grade: '6%',
+  medical: '17%', cash: '8%', classes: '19%',
 }
 
 const CPREF_KEY = 'students-cols'
@@ -110,7 +113,7 @@ function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(
 const classesOf = (r) =>
   Array.from(new Set((r.programs || []).map(p => p.program).filter(Boolean)))
 
-const CSS = `
+const CSS = BACKUP_CSS + CATCOLORS_CSS + `
 .st{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
@@ -731,8 +734,8 @@ function CommentsSection({ studentId, initialPrograms }) {
 
 // ── Student list view ──────────────────────────────────────────────────────
 
-function StudentList({ onSelect, onAdd, onDelete, onNavigate }) {
-  const { records, programs } = useStore()
+function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, studentIds }) {
+  const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
   const [medicalOnly, setMedicalOnly] = useState(false)
@@ -741,6 +744,7 @@ function StudentList({ onSelect, onAdd, onDelete, onNavigate }) {
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const dragCol = useRef(null)
   const popRef = useRef(null)
 
@@ -785,21 +789,28 @@ function StudentList({ onSelect, onAdd, onDelete, onNavigate }) {
 
   const onSort = (k) => setSort(s => s.key === k ? { key: k, dir: -s.dir } : { key: k, dir: 1 })
 
-  const progByName = useMemo(() => {
-    const m = new Map()
-    for (const p of (programs || [])) if (p.name) m.set(String(p.name).trim().toUpperCase(), p)
-    return m
-  }, [programs])
+  /* Same lookup the Customers page uses, so a class is the same colour on
+     both and a recolour in either settings panel shows up on both. */
+  const { progFor, categoryOf, tintFor, catColors } =
+    useMemo(() => buildCategoryLookup(programs, programsState), [programs, programsState])
+
+  const usedCategories = useMemo(() => categoriesInUse(records, categoryOf), [records, categoryOf])
+
+  const setCatColor = useCallback((cat, color) => {
+    setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
+  }, [setProgramsState])
 
   const allRows = useMemo(() => records.filter(r => r.id !== 'seed').map(r => ({
     id: r.id, record: r,
+    studentId: studentIds.get(r.id) || '',
+    progList: r.programs || [],
     name: `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim(),
     login: usernameFor(r.student?.firstName, r.student?.lastName) || '',
     grade: r.student?.grade || '',
     medical: r.student?.medical || '',
     cash: r.student?.craniaCash ?? '',
     classList: classesOf(r),
-  })), [records])
+  })), [records, studentIds])
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -1001,19 +1012,24 @@ function StudentList({ onSelect, onAdd, onDelete, onNavigate }) {
                       } else if (k === 'medical') {
                         if (r.medical) cls += ' hasmed'
                         content = r.medical || <span className="dash">—</span>
+                      } else if (k === 'studentId') {
+                        content = r.studentId
+                          ? <span className="sref">{r.studentId}</span>
+                          : <span className="dash">—</span>
                       } else if (k === 'classes') {
                         title = r.classList.join(', ')
-                        content = r.classList.length === 0 ? <span className="dash">—</span> : r.classList.map((c2, i) => {
-                          const prog = progByName.get(c2.trim().toUpperCase())
+                        content = r.progList.length === 0 ? <span className="dash">—</span> : r.progList.map((p2, i) => {
+                          const nm = p2.program || ''
+                          const prog = progFor(nm)
+                          const cat = categoryOf(nm)
+                          const bg = tintFor(cat)
                           return (
-                            <React.Fragment key={c2}>
-                              {i > 0 && ', '}
-                              {prog ? (
-                                <button className="clink" title={`Open ${c2} in Programs`}
-                                  onClick={e => { e.stopPropagation(); onNavigate && onNavigate('Programs', prog.id) }}
-                                >{c2}</button>
-                              ) : <span title="Not in the Programs list">{c2}</span>}
-                            </React.Fragment>
+                            <button key={nm + i} className="stupill"
+                              style={{ background: bg, color: inkOn(bg) }}
+                              title={`${nm}${cat ? ` — ${cat}` : ' — no programme type'} — ${p2.status || 'no status'}`
+                                + (prog ? ' · click to open in Programs' : '')}
+                              onClick={e => { e.stopPropagation(); if (prog) onNavigate && onNavigate('Programs', prog.id) }}
+                            >{nm || '—'}</button>
                           )
                         })
                       } else {
