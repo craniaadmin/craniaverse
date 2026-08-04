@@ -710,6 +710,24 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
   }, [setProgramsState])
 
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
+  /* Only the categories families are actually enrolled in — a colour picker
+     listing every category in the catalogue would mostly be noise here. */
+  const usedCategories = useMemo(() => {
+    const counts = new Map()
+    for (const r of records) {
+      if (r.id === 'seed') continue
+      for (const p of (r.programs || [])) {
+        const cat = categoryOf(p.program)
+        if (!cat) continue
+        counts.set(cat, (counts.get(cat) || 0) + 1)
+      }
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .map(([cat, n]) => ({ cat, n }))
+  }, [records, categoryOf])
+
   /* One entry per student, carrying both its own values and its family's.
      Rows are still built per student because filtering, searching, sorting,
      selection and the metrics all reason about students; they are gathered
