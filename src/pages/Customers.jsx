@@ -42,6 +42,23 @@ const STATUS_STYLE = {
 }
 const statusStyle = (s) => STATUS_STYLE[s] || STATUS_STYLE.Inactive
 
+/* Programme-type colours. The same palette and default the Programs page
+   uses, because both read and write programsState.catColors. */
+const LPAL = ['#F1F3F4', '#A6E2F9', '#5FA09E', '#E0DE85', '#2E2516', '#FBDDE4', '#FCE6D2',
+  '#FBF3CE', '#E8F3C2', '#DEF2DE', '#BEEBE8', '#D8ECF8', '#CAD6F2', '#E7DEF5', '#E2CDA0', '#FFFFFF']
+const DEFAULT_CAT_COLOR = '#F1F3F4'
+
+/* Readable text for a chosen background. The palette runs from white to
+   #2E2516, so a fixed ink colour would vanish at one end or the other. */
+function inkOn(bg) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(bg || '').trim())
+  if (!m) return '#2E2516'
+  const n = parseInt(m[1], 16)
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+  // Rec. 601 luma — good enough to choose between two inks.
+  return (0.299 * r + 0.587 * g + 0.114 * b) > 145 ? '#2E2516' : '#FFFFFF'
+}
+
 
 /* A row is a family. `scope` decides how a cell fills:
 
