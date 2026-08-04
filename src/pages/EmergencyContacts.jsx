@@ -605,8 +605,23 @@ export default function EmergencyContacts({ onNavigate }) {
       <div className="filters">
         <input type="search" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search contact, customer or student…" autoComplete="off" />
+        <label className="toggle" title="Families whose programs have all finished">
+          <input type="checkbox" checked={showInactive}
+            onChange={e => setShowInactive(e.target.checked)} />
+          Show inactive
+        </label>
         {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
       </div>
+
+      {selected.size > 0 && (
+        <div className="bulkbar">
+          <span className="n">{selected.size} selected</span>
+          <span className="acts">
+            <button className="exp" onClick={() => exportCsv(selectedRows)}>Export Selected</button>
+            <button className="clr" onClick={() => setSelected(new Set())}>Clear Selection</button>
+          </span>
+        </div>
+      )}
 
       <div className="card">
         {allRows.length === 0 ? (
