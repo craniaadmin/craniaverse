@@ -1312,6 +1312,18 @@ function loadPrograms(){
       (Array.isArray(locs) ? locs : []).forEach(function(l){
         if(l && l.id) LOCATIONS_BY_ID[l.id] = l.name || '';
       });
+      return fetch('/api/program-spots', HDRS);
+    })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .catch(function(){ return []; })
+    .then(function(rows){
+      /* Places already taken, counted from the register. Keyed the same way
+         the form builds its sessions, so a slot can look itself up. */
+      SPOTS_BY_SESSION = {};
+      (Array.isArray(rows) ? rows : []).forEach(function(s){
+        if(!s || !s.program) return;
+        SPOTS_BY_SESSION[spotKey(s.program, s.locationId, s.day, s.start)] = s;
+      });
       return fetch('/api/programs', HDRS);
     })
     .then(function(r){ return r.ok ? r.json() : []; })
