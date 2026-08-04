@@ -2110,6 +2110,8 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
   useEffect(() => {
     const onKey = (e) => {
       if (!(e.ctrlKey || e.metaKey) || detailId) return
+      // Never while typing, and never on auto-repeat: one press, one step.
+      if (e.repeat || inEditableField(e.target)) return
       const k = e.key.toLowerCase()
       if (k === 'z' && !e.shiftKey) { e.preventDefault(); doUndo() }
       else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); doRedo() }
