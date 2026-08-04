@@ -25,6 +25,7 @@ import {
   MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
+import { buildFamilyIndex, familyOf } from '../data/family'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
@@ -1036,7 +1037,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     const real = records.filter(r => r.id !== 'seed')
     const byFamily = new Map()
     for (const r of real) {
-      const key = guardianIdentity(r) || `unknown-${r.id}`
+      const key = familyIndex.get(r.id) || `unknown-${r.id}`
       if (!byFamily.has(key)) byFamily.set(key, [])
       byFamily.get(key).push(r)
     }
@@ -1106,7 +1107,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       }
     }
     return rows
-  }, [records, familyIds])
+  }, [records, familyIds, familyIndex])
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -1796,11 +1797,7 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
   const { records, updateCustomerField, updateStudentField, updatePrograms } = useStore()
   const selected = records.find(r => r.id === recordId) || records[0]
 
-  const selectedIdentity = guardianIdentity(selected)
-  const siblings = (selectedIdentity
-    ? records.filter(r => guardianIdentity(r) === selectedIdentity)
-    : [selected]
-  ).sort((a, b) => (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
+  const siblings = familyOf(records, selected.id).sort((a, b) => (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
 
   const [showOnlyActive, setShowOnlyActive] = useState(false)
   const [progs, setProgs] = useState(selected.programs || [])
@@ -2333,10 +2330,7 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
       }
       if (detailId === record.id || !opts.silent) {
         // Jump to a remaining sibling if there is one, else back to the list.
-        // Only match a real guardian identity — a blank student has none, so
-        // it should return to the list rather than jump to another blank.
-        const identity = guardianIdentity(record)
-        const sibling = identity && records.find(r => r.id !== record.id && guardianIdentity(r) === identity)
+        const sibling = familyOf(records, record.id).find(r => r.id !== record.id)
         setDetailId(sibling && detailId === record.id ? sibling.id : null)
       }
     } catch (err) {
