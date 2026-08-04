@@ -21,6 +21,7 @@ import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { currentAcademicYear } from '../src/data/scheduleUtils.js'
+import { buildEnrolmentIndex, sessionsOf, sessionKey } from '../src/data/enrolment.js'
 import { sendRegistrationEmails, sendBoothSignupEmail } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
 import {

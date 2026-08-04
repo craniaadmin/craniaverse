@@ -136,6 +136,10 @@ const PUBLIC_MATCHERS = [
   //     school publicly offers; /api/locations returns ids and names only.
   (m, p) => m === 'GET'  && p === '/api/programs',
   (m, p) => m === 'GET'  && p === '/api/locations',
+  //   - /api/program-spots is how the form knows a class is full. It is a
+  //     count per session and nothing else — no names, no records — so it
+  //     says only what a "3 spots left" label on the form already says.
+  (m, p) => m === 'GET'  && p === '/api/program-spots',
   // Test-runner status: names + error strings only, no credentials.
   // Public so the scheduled Claude agent can poll without a stored password.
   (m, p) => m === 'GET'  && p === '/api/tests/last-run',
