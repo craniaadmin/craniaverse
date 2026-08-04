@@ -35,10 +35,7 @@ const norm = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ')
 const fullName = (g) => norm(`${(g && g['First Name']) || ''} ${(g && g['Last Name']) || ''}`)
 const emailOf = (g) => norm(g && g['Email'])
 
-function guardians(record) {
-  const c = record.customer || {}
-  return [c.guardian1 || {}, c.guardian2 || {}]
-}
+const guardianOne = (record) => (record.customer || {}).guardian1 || {}
 
 /* Union-find. Small enough that the array form is plenty. */
 function makeDisjointSet() {
