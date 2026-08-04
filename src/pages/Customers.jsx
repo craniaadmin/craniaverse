@@ -21,7 +21,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, Trash2, Copy, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
 import {
-  engineForEntry, outstandingFor, money, syncEntryMoney, MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
+  engineForEntry, outstandingFor, money, syncEntryMoney, feeCalcFor, paymentStateOf,
+  MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
 
@@ -916,8 +917,49 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
      in either place shows up in both rather than the two drifting apart.
      Status is still carried, in the tooltip. */
   const catColors = useMemo(() => programsState?.catColors || {}, [programsState])
-  const categoryOf = useCallback((name) =>
-    progByName.get(String(name || '').trim().toUpperCase())?.category || '', [progByName])
+
+  /* Registrations name their program as free text, and it rarely matches the
+     catalogue character for character — "Private Piano — 30 min" against
+     "PRIVATE PIANO LESSONS - 30 MIN", em-dash against hyphen, title case
+     against caps. Exact matching left almost everything uncategorised and so
+     untinted, which is why the column looked colourless.
+
+     So: compare on letters and digits alone, and if the catalogue still has
+     nothing, read the category off the front of the name — the categories
+     are named after the programs ("FLEX", "SUMMER CAMP", "TEKNOKIDS
+     CODING"), so the longest one the name starts with is the right one. */
+  const squash = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+
+  const progBySquashed = useMemo(() => {
+    const m = new Map()
+    for (const p of (programs || [])) if (p.name) m.set(squash(p.name), p)
+    return m
+  }, [programs])
+
+  const knownCategories = useMemo(() => {
+    const names = new Set([
+      ...Object.keys(catColors),
+      ...(programsState?.categoryOrder || []),
+      ...(programs || []).map(p => p.category).filter(Boolean),
+    ])
+    // Longest first so "TEKNOKIDS CODING" wins over a shorter overlap.
+    return [...names].map(c => ({ cat: c, key: squash(c) }))
+      .filter(x => x.key).sort((a, b) => b.key.length - a.key.length)
+  }, [catColors, programsState, programs])
+
+  const categoryOf = useCallback((name) => {
+    const k = squash(name)
+    if (!k) return ''
+    const hit = progBySquashed.get(k)
+    if (hit?.category) return hit.category
+    for (const { cat, key } of knownCategories) if (k.startsWith(key)) return cat
+    for (const { cat, key } of knownCategories) if (k.includes(key)) return cat
+    return ''
+  }, [progBySquashed, knownCategories])
+
+  const progFor = useCallback((name) =>
+    progByName.get(String(name || '').trim().toUpperCase()) || progBySquashed.get(squash(name)) || null,
+  [progByName, progBySquashed])
 
   const setCatColor = useCallback((cat, color) => {
     setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
