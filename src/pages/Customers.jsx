@@ -149,16 +149,22 @@ function useFamilyIds(records, familyIndex, assign) {
     let highest = 0
     for (const r of (records || [])) highest = Math.max(highest, refNumber(r.customer?.meta?.familyId))
     const out = new Map()
+    const taken = new Set()
     for (const [key, members] of byFamily) {
-      /* Where two records that were kept apart are now recognised as one
-         family, they arrive carrying a reference each. Keep the lower —
-         it is the one the family has had longest — and the other number is
-         simply retired, never reissued. */
+      /* Records arrive carrying whatever reference they were last given.
+         Prefer the lowest — it is the one the family has held longest — but
+         only if no other family has already claimed it. Two families can
+         hold the same number after a grouping that was wrong is corrected:
+         splitting them leaves both sides stamped with it, and without this
+         check both would keep it and read as one family again. */
       const existing = members
         .map(m => m.customer?.meta?.familyId)
         .filter(v => refNumber(v) > 0)
-        .sort((a, b) => refNumber(a) - refNumber(b))[0]
-      out.set(key, existing || familyRef(++highest))
+        .sort((a, b) => refNumber(a) - refNumber(b))
+        .find(v => !taken.has(v))
+      const ref = existing || familyRef(++highest)
+      taken.add(ref)
+      out.set(key, ref)
     }
     return out
   }, [byFamily, records])
