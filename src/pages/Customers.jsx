@@ -60,6 +60,27 @@ const LPAL = ['#F1F3F4', '#A6E2F9', '#5FA09E', '#E0DE85', '#2E2516', '#FBDDE4', 
   '#FBF3CE', '#E8F3C2', '#DEF2DE', '#BEEBE8', '#D8ECF8', '#CAD6F2', '#E7DEF5', '#E2CDA0', '#FFFFFF']
 const DEFAULT_CAT_COLOR = '#F1F3F4'
 
+/* Every category ships with the same grey, so out of the box a Flex pill
+   and an Enrichment pill are identical and the colour tells you nothing.
+   Where a category has no colour of its own — or still has that grey — it
+   gets a stable one picked from the palette by name, so the types are
+   telling apart immediately. Choosing a colour in settings overrides it. */
+const TINTS = ['#A6E2F9', '#DEF2DE', '#FBF3CE', '#FBDDE4', '#E7DEF5',
+  '#BEEBE8', '#FCE6D2', '#E8F3C2', '#CAD6F2', '#E2CDA0']
+
+function autoTint(cat) {
+  const s = String(cat || '')
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
+  return TINTS[h % TINTS.length]
+}
+
+const tintFor = (cat, catColors) => {
+  if (!cat) return DEFAULT_CAT_COLOR
+  const set = catColors && catColors[cat]
+  return set && set.toUpperCase() !== DEFAULT_CAT_COLOR ? set : autoTint(cat)
+}
+
 /* Readable text for a chosen background. The palette runs from white to
    #2E2516, so a fixed ink colour would vanish at one end or the other. */
 function inkOn(bg) {
