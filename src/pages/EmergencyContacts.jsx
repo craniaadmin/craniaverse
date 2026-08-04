@@ -498,7 +498,11 @@ export default function EmergencyContacts({ onNavigate }) {
     const groupKey = r.missing ? '__missing__' : r.contactKey
     const sameGroup = prevKey !== null && prevKey === groupKey
     if (prevKey !== null && prevKey !== groupKey) {
-      bodyRows.push(<tr className="grpsep" key={'sep-' + r.linkId}><td colSpan={orderedCols.length} /></tr>)
+      bodyRows.push(
+        <tr className="grpsep" key={'sep-' + r.linkId}>
+          <td className="nosep" /><td colSpan={orderedCols.length} />
+        </tr>
+      )
     }
     prevKey = groupKey
 
