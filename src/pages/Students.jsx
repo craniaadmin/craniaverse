@@ -1400,10 +1400,41 @@ function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
     }
   }
 
+  /* Copy a student under the same guardians, marked so the duplicate is
+     obvious until it is edited. Programs are deliberately not copied:
+     enrolments are per child and per session, and silently double-booking a
+     class is worse than retyping one. The copy is a new student, so it gets
+     its own number rather than inheriting one. */
+  const handleDuplicate = async (record) => {
+    const s = record.student || {}
+    const g1 = record.customer?.guardian1 || {}
+    const g2 = record.customer?.guardian2 || {}
+    const em = record.customer?.emergency || {}
+    try {
+      const id = await addRegistration({
+        studentFirstName: s.firstName || 'New',
+        studentLastName: `${s.lastName || 'Student'} (copy)`,
+        grade: s.grade, school: s.school, forceNew: true,
+        g1FirstName: g1['First Name'], g1LastName: g1['Last Name'], g1Relationship: g1['Relationship'],
+        g1PhoneHome: g1['Phone (Home)'], g1PhoneMobile: g1['Phone (Mobile)'], g1Email: g1['Email'],
+        g1Address1: g1['Street Address'], g1Address2: g1['Unit'], g1City: g1['City'],
+        g1Province: g1['Province'], g1Postal: g1['Postal Code'], g1Occupation: g1['Occupation'],
+        g2FirstName: g2['First Name'], g2LastName: g2['Last Name'], g2Relationship: g2['Relationship'],
+        g2PhoneHome: g2['Phone (Home)'], g2PhoneMobile: g2['Phone (Mobile)'], g2Email: g2['Email'],
+        emFirstName: em['First Name'], emLastName: em['Last Name'], emRelationship: em['Relationship'],
+        emPhone: em['Phone (Mobile)'], emEmail: em['Email'],
+      })
+      if (id) setDetailId(id)
+    } catch (err) {
+      dialog.alert('Could not duplicate', String(err.message || err))
+    }
+  }
+
   if (detailId) {
     return <StudentDetail recordId={detailId} onBack={() => setDetailId(null)} onNavigate={onNavigate}
       onDelete={handleDelete} />
   }
 
-  return <StudentList onSelect={handleSelect} onAdd={handleAdd} onDelete={handleDelete} onNavigate={onNavigate} />
+  return <StudentList onSelect={handleSelect} onAdd={handleAdd} onDelete={handleDelete}
+    onDuplicate={handleDuplicate} onNavigate={onNavigate} studentIds={studentIds} />
 }
