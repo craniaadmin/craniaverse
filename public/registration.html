@@ -854,8 +854,16 @@ function renderPrograms(studentIdx){
             var oIdx = o.offeringIdx;
             var checked = (card.offerings || []).some(function(s){ return s.offeringIdx === oIdx; });
             var teacher = o.teacher ? ' · '+escapeHtml(o.teacher) : '';
-            var spots = o.spots!=null ? ' · '+o.spots+' spots' : '';
-            html += '<label class="reg-check"><input type="checkbox"'+(checked?' checked':'')+' onchange="toggleCardOffering('+studentIdx+','+i+','+oIdx+',this)"> ';
+            /* A full class says so and cannot be picked. It stays listed —
+               knowing the class exists and is full is worth more than the
+               slot quietly disappearing. Anyone already holding the slot
+               keeps it, so a re-render cannot drop their choice. */
+            var isFull = o.full && !checked;
+            var spots = o.spots == null ? ''
+              : (o.spots <= 0 ? ' · FULL' : ' · '+o.spots+(o.spots === 1 ? ' spot left' : ' spots left'));
+            html += '<label class="reg-check'+(isFull?' pp-full':'')+'">'
+              + '<input type="checkbox"'+(checked?' checked':'')+(isFull?' disabled':'')
+              + ' onchange="toggleCardOffering('+studentIdx+','+i+','+oIdx+',this)"> ';
             html += escapeHtml(o.day || '')+' · '+escapeHtml(fmtTime(o.start))+teacher+spots+'</label>';
           });
           html += '</div>';
