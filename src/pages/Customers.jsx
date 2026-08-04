@@ -1664,7 +1664,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
           <div style={{ display: 'flex', gap: 3, alignItems: 'center', justifyContent: 'center' }}>
             {FEE_KEYS.map((k, i) => (
               <FeeSquare key={k} state={prog.fees?.[k] || 'empty'}
-                amount={e ? e.amountFor(MONTH_KEYS[i]) : null}
+                amount={engine.amountFor(MONTH_KEYS[i])}
                 label={FEE_LABELS[i]}
                 onChange={s => onFeeChange(prog, k, s)} />
             ))}
