@@ -225,7 +225,9 @@ function classesOf(record) {
 }
 
 const CSS = `
-.cu{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
+/* position:relative anchors the settings panel, which hangs off the gear
+   button in the actions row. */
+.cu{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
 .cu .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
