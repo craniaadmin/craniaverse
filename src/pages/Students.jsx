@@ -95,7 +95,7 @@ const SEL_W = '3%'
 const ACT_W = '9%'
 const COL_W = {
   studentId: '8%', name: '18%', login: '12%', grade: '6%',
-  medical: '17%', cash: '8%', classes: '19%',
+  medical: '15%', cash: '10%', classes: '19%',
 }
 
 const CPREF_KEY = 'students-cols'
@@ -174,8 +174,14 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + `
 /* The sort arrow and eye sit absolutely at right:3px, so only the RIGHT
    padding reserves anything — the matching 30px on the left bought nothing
    and truncated short headers like "Grade". Right side unchanged; left cut. */
-.st table.slist thead th.colh .lbl{display:block;text-align:center;padding:0 30px 0 4px;
-    overflow:hidden;text-overflow:ellipsis}
+/* Centred across the whole cell. Reserving 30px for icons that are pinned
+   absolutely pushed short headings — Student ID, Grade, Crania Cash — out
+   of the space they had. The icons carry the header background so they read
+   cleanly where they overlap; only a sorted column reserves room, for the
+   arrow that is always showing. */
+.st table.slist thead th.colh .lbl{display:block;text-align:center;padding:0 6px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st table.slist thead th.colh.sorted .lbl{padding-right:20px}
 .st table.slist thead th.selcol,.st table.slist thead th:empty,.st table.slist thead th.blankhead,
 .st table.slist tbody td.selcol,.st table.slist tbody td.actcell{background:transparent}
 .st table.slist thead th.selcol input,.st table.slist tbody td.selcol input{width:12px;height:12px;margin:0;
@@ -185,7 +191,8 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + `
 .st table.slist thead th .arw{opacity:.85;font-size:10px}
 .st table.slist thead th.colh{cursor:grab}
 .st table.slist thead th.colh .thicons{position:absolute;right:3px;top:50%;transform:translateY(-50%);
-    display:inline-flex;align-items:center;gap:2px;line-height:1}
+    display:inline-flex;align-items:center;gap:2px;line-height:1;
+    background:var(--teal);padding-left:4px;border-radius:3px}
 .st table.slist thead th.colh .eye{cursor:pointer;opacity:0;font-size:11px;transition:opacity .12s}
 .st table.slist thead th.colh:hover .eye{opacity:1}
 .st table.slist thead th .sortable{cursor:pointer}
@@ -905,10 +912,10 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
       const s = String(v ?? '')
       return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
     }
-    const head = ['Name', 'Login', 'Grade', 'School', 'Medical', 'Crania Cash', 'Classes']
+    const head = ['Student ID', 'Name', 'Login', 'Grade', 'School', 'Medical', 'Crania Cash', 'Classes']
     const lines = [head.join(',')]
     for (const r of allRows) {
-      lines.push([r.name, r.login, r.grade, r.record.student?.school || '', r.medical, r.cash,
+      lines.push([r.studentId, r.name, r.login, r.grade, r.record.student?.school || '', r.medical, r.cash,
         r.classList.join('; ')].map(esc).join(','))
     }
     const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
@@ -1013,7 +1020,7 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
                     setSelected(e.target.checked ? new Set(visible.map(r => r.id)) : new Set())} />
                 </th>
                 {orderedCols.map(c => (
-                  <th key={c.k} className="colh" draggable data-col={c.k}
+                  <th key={c.k} className={'colh' + (sort.key === c.k ? ' sorted' : '')} draggable data-col={c.k}
                     onDragStart={() => { dragCol.current = c.k }}
                     onDragOver={e => e.preventDefault()}
                     onDrop={() => onDrop(c.k)}>

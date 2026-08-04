@@ -784,6 +784,15 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
 
   const usedCategories = useMemo(() => categoriesInUse(records, categoryOf), [records, categoryOf])
 
+  const setCatColor = useCallback((cat, color) => {
+    setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
+  }, [setProgramsState])
+
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  // { fam, kid } — kid null means the pointer is over something the whole
+  // family shares, so the whole block lights up.
+  const [hover, setHover] = useState({ fam: null, kid: null })
+
   /* One entry per student, carrying both its own values and its family's.
      Rows are still built per student because filtering, searching, sorting,
      selection and the metrics all reason about students; they are gathered
