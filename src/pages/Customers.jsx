@@ -1547,10 +1547,10 @@ function Field({ label, value, readOnly, onChange, highlightEmail = true }) {
    carries a border of its own darker shade, so a square reads as a square on
    any row background. */
 const FEE_SQUARE = {
-  paid:    { bg: '#cfe6b4', bd: '#7fa35c' },
-  pending: { bg: '#f6e3a1', bd: '#c4a544' },
-  overdue: { bg: '#e8503f', bd: '#b33526' },
-  empty:   { bg: '#ffffff', bd: '#b9c3c9' },
+  paid:    { bg: '#DEF2DE', bd: '#8CC79A' },
+  pending: { bg: '#F5E27A', bd: '#C9B93E' },
+  overdue: { bg: '#FADBD8', bd: '#D9695C' },
+  empty:   { bg: '#ffffff', bd: '#D5D0C4' },
 }
 
 function FeeSquare({ state, onChange, amount, label }) {
