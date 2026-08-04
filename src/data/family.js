@@ -11,16 +11,25 @@
 // any of several signals, and the joins are transitive: if A matches B on
 // email and B matches C on name, all three are one family.
 //
-// The signals, strongest first:
+// Membership is decided by GUARDIAN 1 alone, on two signals:
 //
-//   1. The same stored family reference. Set by hand, so it is taken as
-//      given — this is how you force two records together.
-//   2. A shared guardian email address. An address identifies a person, so
-//      this is safe on its own.
-//   3. The same guardian name, but only where the emails do not contradict
-//      it. Two "John Smith" records with different addresses are two
-//      different families and stay apart; a "John Smith" with an address and
-//      a "John Smith" without are the same one.
+//   1. The same guardian 1 email address. An address identifies a person.
+//   2. The same guardian 1 name, where the emails do not contradict it. Two
+//      "John Smith" records with different addresses are two families and
+//      stay apart; a "John Smith" with an address and one without are the
+//      same family.
+//
+// Two things are deliberately NOT used.
+//
+// Guardian 2, and email matching across the two slots. Pooling both slots
+// merged two unrelated children whose records happened to share one address
+// between different guardian fields.
+//
+// The stored family reference. It is an OUTPUT of this grouping, so feeding
+// it back in as an input makes any bad grouping permanent: once a wrong
+// merge has stamped one reference onto both records, that reference is then
+// the evidence keeping them merged. Grouping is derived fresh from the
+// guardians every time, and the references follow it.
 
 const norm = (s) => String(s || '').trim().toLowerCase().replace(/\s+/g, ' ')
 const fullName = (g) => norm(`${(g && g['First Name']) || ''} ${(g && g['Last Name']) || ''}`)
