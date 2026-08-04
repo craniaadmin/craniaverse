@@ -18,7 +18,7 @@
 // are brought into line.
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
+import { Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink, Pencil, Copy } from 'lucide-react'
 import { useStore } from '../data/store'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
@@ -114,7 +114,7 @@ const classesOf = (r) =>
   Array.from(new Set((r.programs || []).map(p => p.program).filter(Boolean)))
 
 const CSS = BACKUP_CSS + CATCOLORS_CSS + `
-.st{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
+.st{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
 .st .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
@@ -206,6 +206,18 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + `
 .st .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;margin:0;line-height:1;
     cursor:pointer;transition:color .15s;display:inline-flex;vertical-align:middle}
 .st .rowbtn.rb-del:hover{color:#c0392b}
+.st .rowbtn.rb-edit:hover,.st .rowbtn.rb-dup:hover{color:#5FA09E}
+.st .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
+.stsettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
+    margin-top:4px}
+/* Issued once and never reused, so it reads as an identifier rather than a
+   position in the list. */
+.st .sref{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);font-weight:600}
+.st .stupill{display:inline-block;max-width:100%;border:1px solid rgba(46,37,22,.16);border-radius:5px;
+    padding:1px 7px;margin:1px 3px 1px 0;font:inherit;font-size:11.5px;font-weight:600;line-height:1.5;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;cursor:pointer;
+    font-family:inherit}
+.st table.slist tbody td.col-classes{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px}
 .st .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .st .empty b{color:var(--dark-brown)}
 .st .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
@@ -734,6 +746,30 @@ function CommentsSection({ studentId, initialPrograms }) {
 
 // ── Student list view ──────────────────────────────────────────────────────
 
+/* Same two cards as Customers: snapshots of the registrations students are
+   held on, and the programme-type colours both pages share. */
+function StudentsSettings({ onClose, categories, tintFor, onCatColor }) {
+  const ref = useRef(null)
+  const dialog = useDialog()
+  const { refresh } = useStore()
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
+  }, [onClose])
+
+  return (
+    <div className="stsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
+      <BackupPanel base="customers" confirm={dialog.confirm}
+        hint={'Students are held on the registrations, so these are the same snapshots the '
+          + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
+        onRestored={async () => { await refresh(); onClose() }} />
+      <CategoryColors categories={categories} tintFor={tintFor} onCatColor={onCatColor} />
+    </div>
+  )
+}
+
 function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, studentIds }) {
   const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
@@ -904,7 +940,14 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
         <button title="Download every student as a CSV file" onClick={exportCsv}>
           <Download size={13} /> Export CSV
         </button>
+        <button className="gearbtn" title="Backups and programme colours"
+          onClick={() => setSettingsOpen(true)}>⚙</button>
       </div>
+
+      {settingsOpen && (
+        <StudentsSettings onClose={() => setSettingsOpen(false)}
+          categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
+      )}
 
       <div className="metrics">
         <div className="metric">
@@ -1305,11 +1348,25 @@ export default function Students(props) {
 }
 
 function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
-  const { select, addRegistration, deleteRegistration } = useStore()
+  const { records, select, addRegistration, deleteRegistration, updateCustomerField } = useStore()
   const dialog = useDialog()
   const [detailId, setDetailId] = useState(null)
 
   const handleSelect = (id) => { select(id); setDetailId(id) }
+
+  /* Write the student's number onto the record, once. Stored beside the
+     family reference on customer.meta so both survive a reload; nothing
+     ever rewrites one that is already there. */
+  const assignStudentId = useCallback((recordId, ref) => {
+    const rec = records.find(r => r.id === recordId)
+    const meta = { ...(rec?.customer?.meta || {}), studentId: ref }
+    updateCustomerField(recordId, 'meta', 'studentId', ref)
+    fetch(`${API_BASE}/api/registrations/${recordId}/customer`, {
+      method: 'PUT', headers: HEADERS, body: JSON.stringify({ meta }),
+    }).catch(() => {})
+  }, [records, updateCustomerField])
+
+  const studentIds = useStudentIds(records, assignStudentId)
 
   // Opened via onNavigate('Students', recordId) from another page.
   useEffect(() => {
