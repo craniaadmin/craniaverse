@@ -1,12 +1,15 @@
 import fs from 'fs'
 import { generateFeeSchedulePdf } from './server/pdf-fee-schedule.js'
-const inst = ['sep','oct','nov','dec','jan','feb','mar','apr','may','jun']
-  .map(mo => ({ month: mo, kind: 'full', amount: 199 }))
+// A late start: September skipped, October pro-rated.
+const months = ['sep','oct','nov','dec','jan','feb','mar','apr','may','jun']
+const inst = months.map((mo, k) => k === 0
+  ? { month: mo, kind: 'skip', amount: 0 }
+  : { month: mo, kind: k === 1 ? 'prorated' : 'full', amount: k === 1 ? 231.43 : 270 })
 const buf = await generateFeeSchedulePdf({
-  studentName: 'Test Studentone', programName: 'FLEX MATH - SINGLE',
+  studentName: 'Mina Okafor', programName: 'TEKNOKIDS CODING: JAVASCRIPT/AI',
   yearLabel: '2026–27', yearStart: 2026, weeksPerYear: 35,
-  firstLesson: 1, scheduledWeeks: 35,
-  tuition: 1990, regFee: 79, matFee: 59, total: 2128,
+  firstLesson: 5, scheduledWeeks: 31,
+  tuition: 2391.43, regFee: 79, matFee: 59, total: 2529.43,
   installments: inst,
 })
 fs.writeFileSync('scratch-fee.pdf', buf)

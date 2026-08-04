@@ -89,14 +89,20 @@ export function generateFeeSchedulePdf(data) {
       y += 18
 
       // ── Student · Program (bold) / First Week · Scheduled Weeks ──
+      /* Measured, not assumed: a long program name — "TEKNOKIDS CODING:
+         JAVASCRIPT/AI" — wraps to a second line, and a fixed step left the
+         next heading sitting on top of it. */
+      const titleText = `${studentName}  -  ${programName}`
+      const titleWidth = contentWidth * 0.6
       doc.font('Helvetica-Bold').fontSize(14).fillColor(INK)
-      doc.text(`${studentName}  -  ${programName}`, left, y, { width: contentWidth * 0.65 })
+      const titleHeight = doc.heightOfString(titleText, { width: titleWidth })
+      doc.text(titleText, left, y, { width: titleWidth })
       doc.font('Helvetica').fontSize(11).fillColor(INK)
         .text(
           `First Week: ${firstLesson}   ·   Scheduled Weeks: ${scheduledWeeks}`,
           left, y + 3, { align: 'right', width: contentWidth },
         )
-      y += 32
+      y += Math.max(32, titleHeight + 12)
 
       // ── Meta row ─────────────────────────────────────────
       doc.font('Helvetica-Bold').fontSize(14).fillColor(INK).text(`${weeksPerYear}-Week Year`, left, y)
