@@ -394,8 +394,12 @@ const CSS = `
 .cu .stupill.stuname{background:transparent;color:#3d7f7d;font-weight:700;padding-left:0;cursor:pointer}
 .cu .stupill.stuname:hover{text-decoration:underline}
 .cu button.stupill{cursor:pointer;font-family:inherit}
-.cu .cp{display:inline-block;border-radius:5px;padding:1px 8px;font-size:11px;font-weight:600;
-    line-height:1.5;white-space:nowrap}
+/* The template's payment chip: a full-width block filling the cell rather
+   than a pill floating in it, so a column of them reads as one strip. */
+.cu .paychip{display:block;text-align:center;height:22px;line-height:20px;border-radius:5px;
+    font-size:11px;font-weight:700;border:1px solid transparent;box-sizing:border-box}
+.cu .cp{display:inline-block;border-radius:5px;padding:1px 8px;font-size:11px;font-weight:700;
+    line-height:1.5;white-space:nowrap;border:1px solid transparent}
 .cu tbody tr.grpsep td{background:transparent;height:1px;padding:0;border-radius:0;
     border-top:1px solid #CFD6D8}
 .cu tbody tr.grpsep td.nosep{border-top:none}
@@ -1309,7 +1313,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         } else if (k === 'payment') {
           const ps = PAYMENT_STYLE[s.payment]
           content = !s.payment ? <span className="dash">—</span>
-            : <span className="cp" style={{ background: ps.bg, color: ps.fg }}>{s.payment}</span>
+            : <span className="cp" style={{ background: ps.bg, color: ps.fg, borderColor: ps.bd }}>{s.payment}</span>
         } else if (k === 'fees' || k === 'paid' || k === 'balance') {
           content = s[k] > 0 ? money(s[k]) : <span className="dash">—</span>
           title = s[k] > 0 ? money(s[k]) : ''
@@ -1664,7 +1668,8 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
             ))}
           </div>
         </td>
-        <td>{payment && <span className="pill" style={{ background: ps.bg, color: ps.fg }}>{payment}</span>}</td>
+        <td>{payment && <span className="paychip" title="Worked out from the ticked payment squares"
+          style={{ background: ps.bg, color: ps.fg, borderColor: ps.bd }}>{payment}</span>}</td>
         <td>
           <button className="feebtn" onClick={onToggleExpand}>
             Fees {expanded ? '▴' : '▾'}
