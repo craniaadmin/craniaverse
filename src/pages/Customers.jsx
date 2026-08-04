@@ -1567,12 +1567,10 @@ function SessionRows({ prog, onChange }) {
 function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSessionsChange, expanded, onToggleExpand, onPdf, pdfBusy }) {
   const status = prog.active ? 'Active' : 'Inactive'
   const ss = statusStyle(status)
-  /* Payment now follows the money, not just the square colours: a program
-     is Paid when the ticked squares cover the total the engine computes. */
-  const e = prog.feeCalc ? engineForEntry(prog) : null
-  const payment = e
-    ? (e.total > 0 && e.paid >= e.total - 0.005 ? 'Paid' : e.paid > 0 ? 'Partial' : 'Unpaid')
-    : derivedPayment(prog.fees)
+  /* Paid only when the ticked squares cover the whole total. This used to
+     fall back, for a program with no feeCalc, to "every square that is not
+     empty says paid" — so ticking the first box marked the year Paid. */
+  const payment = paymentStateOf(prog)
   const ps = PAYMENT_STYLE[payment] || { bg: '#eef1f4', fg: '#6B6455' }
   const fc = feeCalcFor(prog)
   const setCalc = (patch) => onCalcChange(prog, { ...fc, ...patch })
