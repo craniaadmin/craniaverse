@@ -323,6 +323,10 @@ export default function EmergencyContacts({ onNavigate }) {
 
   const [search, setSearch] = useState('')
   const [missingOnly, setMissingOnly] = useState(false)
+  const [showInactive, setShowInactive] = useState(false)
+  const [colFilters, setColFilters] = useState({})
+  const [selected, setSelected] = useState(() => new Set())
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const [sort, setSort] = useState({ key: 'contact', dir: 1 })
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
