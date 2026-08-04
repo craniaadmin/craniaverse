@@ -665,27 +665,48 @@ app.put('/api/programs', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
-app.put('/api/programs/decrement-spots', wrap(async (req, res) => {
-  const decrements = req.body || []
-  if (!Array.isArray(decrements)) return res.status(400).json({ error: 'body must be an array of {programIdx, offeringIdx}' })
-  const programs = await getPrograms()
-  let count = 0
-  decrements.forEach(function(d) {
-    const programIdx = parseInt(d.programIdx, 10)
-    const offeringIdx = parseInt(d.offeringIdx, 10)
-    if (!isNaN(programIdx) && !isNaN(offeringIdx)) {
-      const p = programs[programIdx]
-      if (p && p.offerings && p.offerings[offeringIdx]) {
-        const spots = p.offerings[offeringIdx].spots
-        if (spots > 0) {
-          p.offerings[offeringIdx].spots--
-          count++
-        }
-      }
+/* How many places are left in each session, counted from the registrations
+   themselves rather than from a stored tally.
+
+   There used to be a PUT /api/programs/decrement-spots that the form called
+   after a successful sign-up. It never worked: it decremented `spots`, a
+   field no offering has — they carry `capacity` — so it matched nothing and
+   wrote nothing, on all 110 offerings. It was not on the public allowlist
+   either, so an actual registrant's call was rejected before it got that
+   far, and the form ignored the failure.
+
+   Counting is the better answer regardless. A stored tally only moves one
+   way: cancel a registration or delete a student and the seat is never
+   given back, so the number drifts away from the register and no one knows
+   which to believe. Derived from the registrations it is right by
+   construction, including after a deletion.
+
+   Public, and deliberately aggregate — session and a number, never who. */
+app.get('/api/program-spots', wrap(async (_req, res) => {
+  const [programs, records, state] = await Promise.all([
+    getPrograms(), getRegistrations(), getProgramsState(),
+  ])
+  const locNames = new Map((state?.locations || []).map(l => [l.id, l.name || '']))
+  const counts = buildEnrolmentIndex(records, programs, id => locNames.get(id) || '')
+
+  const out = []
+  for (const p of (programs || [])) {
+    if (!p?.name) continue
+    for (const s of sessionsOf(p)) {
+      const taken = counts.get(sessionKey(p.name, s.locationId, s.day, s.start)) || 0
+      out.push({
+        program: p.name,
+        locationId: s.locationId || '',
+        day: s.day,
+        start: s.start || '',
+        capacity: s.capacity,
+        taken,
+        // null capacity means uncapped, which is not the same as full.
+        remaining: s.capacity == null ? null : Math.max(0, s.capacity - taken),
+      })
     }
-  })
-  if (count > 0) await commitPrograms(programs)
-  res.json({ ok: true, decremented: count })
+  }
+  res.json(out)
 }))
 
 /* Public: just the site ids and names. The registration form needs them to
