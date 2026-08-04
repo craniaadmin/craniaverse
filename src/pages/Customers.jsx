@@ -461,6 +461,9 @@ const CSS = `
 .cu .ptable tbody td{background:var(--pill);border-radius:5px;font-size:12px;padding:5px 8px;
     text-align:center;vertical-align:middle;white-space:nowrap}
 .cu .ptable tbody tr:hover td{background:#E4EFF3}
+.cu .feesq{width:16px;height:16px;border-radius:3px;border:1px solid;cursor:pointer;padding:0;
+    flex-shrink:0;box-sizing:border-box}
+.cu .feesq:hover{outline:2px solid var(--teal);outline-offset:1px}
 .cu .ptable .pname{font-weight:600;text-transform:uppercase;text-align:left}
 .cu .pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:700;
     letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
