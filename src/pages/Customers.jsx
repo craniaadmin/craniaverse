@@ -258,6 +258,8 @@ const CSS = `
 .cu .metric.mstu{border-bottom-color:var(--yellow)}
 .cu .metric.menr{border-bottom-color:var(--light-blue)}
 .cu .actions .hbtn:disabled{opacity:.4;cursor:default}
+.cu .histnote{margin:0 0 10px;padding:7px 12px;border-radius:8px;background:#FBF3CE;
+    border:1px solid #E8DCA0;color:#7a6417;font-size:12px;font-weight:600}
 .cu .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
 .cusettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
     margin-top:4px}
@@ -844,7 +846,7 @@ function CustomersSettings({ onClose, categories, catColors, onCatColor }) {
    edits someone else made in the meantime. Field edits have their own stack
    in the detail view, where they happen. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
-  onNavigate, familyIds, onUndo, onRedo, histBusy, undoLabel, redoLabel }) {
+  onNavigate, familyIds, onUndo, onRedo, histBusy, histNote, undoLabel, redoLabel }) {
   const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
@@ -1290,6 +1292,8 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         <button className="gearbtn" title="Backups and programme colours"
           onClick={() => setSettingsOpen(true)}>⚙</button>
       </div>
+
+      {histNote && <div className="histnote" role="status">{histNote}</div>}
 
       {settingsOpen && (
         <CustomersSettings onClose={() => setSettingsOpen(false)}
@@ -2280,7 +2284,7 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
   return <CustomerList onSelect={handleSelect} onAdd={handleAdd} onAddSibling={handleAddSibling}
     onDuplicate={handleDuplicate} onDelete={handleDelete} onDeleteFamily={handleDeleteFamily}
     onNavigate={onNavigate} familyIds={familyIds}
-    onUndo={doUndo} onRedo={doRedo} histBusy={histBusy}
+    onUndo={doUndo} onRedo={doRedo} histBusy={histBusy} histNote={histNote}
     undoLabel={undoStack.length ? undoStack[undoStack.length - 1].label : ''}
     redoLabel={redoStack.length ? redoStack[redoStack.length - 1].label : ''} />
 }
