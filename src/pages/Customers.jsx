@@ -1790,6 +1790,26 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
   const [undoStack, setUndoStack] = useState([])
   const [redoStack, setRedoStack] = useState([])
   const [histBusy, setHistBusy] = useState(false)
+  // Undoing an add has to read the record as it stands now, not as it was
+  // created — it may have been edited since.
+  const recordsRef = useRef(records)
+  recordsRef.current = records
+
+  /* Undo of a create is a delete, and redo of that is a restore, so the
+     record has to be captured at the moment it is removed. */
+  const historyForCreate = (id, label) => {
+    let snap = null
+    return {
+      label,
+      undo: async () => {
+        const live = recordsRef.current.find(r => r.id === id)
+        if (live) snap = JSON.parse(JSON.stringify(live))
+        await deleteRegistration(id)
+        setDetailId(d => (d === id ? null : d))
+      },
+      redo: async () => { if (snap) await restoreRegistration(snap) },
+    }
+  }
 
   const pushHistory = useCallback((entry) => {
     setUndoStack(s => [...s.slice(-19), entry])
