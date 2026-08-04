@@ -1013,13 +1013,26 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
       <h2 className="page-title">Customers</h2>
 
       <div className="actions">
-        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
+        <button className="hbtn" disabled={!undoLabel || histBusy} style={{ marginRight: 'auto' }}
+          title={undoLabel ? `Undo: ${undoLabel}  (Ctrl+Z)` : 'Nothing to undo'}
+          onClick={onUndo}><Undo2 size={13} /> Undo</button>
+        <button className="hbtn" disabled={!redoLabel || histBusy}
+          title={redoLabel ? `Redo: ${redoLabel}  (Ctrl+Y)` : 'Nothing to redo'}
+          onClick={onRedo}><Redo2 size={13} /></button>
+        <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
         ><Eye size={13} /> Columns</button>
         <button title="Download every student as a CSV file" onClick={exportCsv}>
           <Download size={13} /> Export CSV
         </button>
+        <button className="gearbtn" title="Backups and programme colours"
+          onClick={() => setSettingsOpen(true)}>⚙</button>
       </div>
+
+      {settingsOpen && (
+        <CustomersSettings onClose={() => setSettingsOpen(false)}
+          categories={usedCategories} catColors={catColors} onCatColor={setCatColor} />
+      )}
 
       <div className="metrics">
         <div className="metric">
