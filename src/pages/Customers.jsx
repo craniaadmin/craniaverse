@@ -1308,10 +1308,21 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         )
       }
 
+      /* Hovering a child lights that child's own cells; hovering anything
+         the family shares lights the whole block. CSS :hover cannot express
+         this — a rowSpan cell belongs to the first child's <tr>, so the
+         browser would light the guardians whenever you were over the eldest
+         and never when you were over a younger one. */
+      const famHot = hover.fam === fam.key && hover.kid == null
+      const kidHot = hover.kid === s.id
       bodyRows.push(
-        <tr key={s.id} className={(selected.has(s.id) ? 'sel ' : '') + (first ? 'famtop' : 'famcont')}
+        <tr key={s.id}
+          className={(selected.has(s.id) ? 'sel ' : '') + (first ? 'famtop' : 'famcont')
+            + (famHot ? ' famhot' : '') + (kidHot ? ' kidhot' : '')}
           title="Click to open this student; right-click for more"
           onClick={() => onSelect(s.id)}
+          onMouseEnter={() => setHover({ fam: fam.key, kid: s.id })}
+          onMouseLeave={() => setHover(h => (h.kid === s.id ? { fam: null, kid: null } : h))}
           onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: s }) }}>
           {tds}
         </tr>
