@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, Trash2, Copy, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
 import {
-  engineForEntry, outstandingFor, money, MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
+  engineForEntry, outstandingFor, money, syncEntryMoney, MONTH_KEYS, SCHEDULE_UNITS, TOTAL_LESSONS,
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
 
@@ -618,7 +618,7 @@ function CtxMenu({ x, y, items, onClose }) {
    Field edits are undoable where they happen, in the detail view. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
   onNavigate, familyIds }) {
-  const { records, programs } = useStore()
+  const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
   const [noClassesOnly, setNoClassesOnly] = useState(false)
@@ -1437,7 +1437,7 @@ function FeePanel({ prog, fc, engine, setCalc, onBilling, onSessions, onPdf, pdf
 }
 
 function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDelete, onNavigate }) {
-  const { records, updateCustomerField, updateStudentField } = useStore()
+  const { records, updateCustomerField, updateStudentField, updatePrograms } = useStore()
   const selected = records.find(r => r.id === recordId) || records[0]
 
   const selectedIdentity = guardianIdentity(selected)
@@ -1771,11 +1771,58 @@ export default function Customers(props) {
 }
 
 function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) {
-  const { records, select, addRegistration, deleteRegistration, updateCustomerField } = useStore()
+  const { records, select, addRegistration, deleteRegistration, restoreRegistration, updateCustomerField } = useStore()
   const dialog = useDialog()
   const [detailId, setDetailId] = useState(null)
 
   const handleSelect = (id) => { select(id); setDetailId(id) }
+
+  /* Undo/redo for the list's own actions — adding, duplicating and deleting
+     whole registrations. Each entry stores how to reverse itself and how to
+     do it again, rather than a snapshot of the table: the records are large,
+     several people may be working at once, and replacing the whole table to
+     undo one delete would silently discard everyone else's edits.
+
+     Deletes are reversible because the server has a restore route that keeps
+     the original id, so the student comes back with their enrolments and fee
+     history. Field edits are not on this stack; they belong to the detail
+     view, which has its own. */
+  const [undoStack, setUndoStack] = useState([])
+  const [redoStack, setRedoStack] = useState([])
+  const [histBusy, setHistBusy] = useState(false)
+
+  const pushHistory = useCallback((entry) => {
+    setUndoStack(s => [...s.slice(-19), entry])
+    setRedoStack([])
+  }, [])
+
+  const runHistory = useCallback(async (from, setFrom, setTo, dir) => {
+    const entry = from[from.length - 1]
+    if (!entry || histBusy) return
+    setHistBusy(true)
+    try {
+      await (dir === 'undo' ? entry.undo() : entry.redo())
+      setFrom(s => s.slice(0, -1))
+      setTo(s => [...s.slice(-19), entry])
+    } catch (err) {
+      dialog.alert(dir === 'undo' ? 'Could not undo' : 'Could not redo', String(err.message || err))
+    }
+    setHistBusy(false)
+  }, [histBusy, dialog])
+
+  const doUndo = useCallback(() => runHistory(undoStack, setUndoStack, setRedoStack, 'undo'), [runHistory, undoStack])
+  const doRedo = useCallback(() => runHistory(redoStack, setRedoStack, setUndoStack, 'redo'), [runHistory, redoStack])
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (!(e.ctrlKey || e.metaKey) || detailId) return
+      const k = e.key.toLowerCase()
+      if (k === 'z' && !e.shiftKey) { e.preventDefault(); doUndo() }
+      else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); doRedo() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [doUndo, doRedo, detailId])
 
   /* Stamp the family reference onto any record missing one, then leave it
      alone forever — it is the identifier, not a position in a list. */
