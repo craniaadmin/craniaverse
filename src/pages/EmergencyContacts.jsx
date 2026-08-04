@@ -241,6 +241,30 @@ function NameLink({ children, onClick, title }) {
   )
 }
 
+/* Emergency contacts are stored on the registrations, so the snapshots here
+   are the same ones the Customers page takes — same endpoint, same list.
+   Said plainly in the hint, so a restore from this page is not a surprise. */
+function EmergencySettings({ onClose }) {
+  const ref = useRef(null)
+  const { refresh } = useStore()
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
+  }, [onClose])
+
+  return (
+    <div className="ecsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
+      <BackupPanel base="customers"
+        hint={'Emergency contacts are held on the registrations, so these are the same '
+          + 'snapshots the Customers page takes — restoring one replaces every registration '
+          + '(last 14 kept).'}
+        onRestored={async () => { await refresh(); onClose() }} />
+    </div>
+  )
+}
+
 function useEmergencyRows() {
   const { records } = useStore()
 
