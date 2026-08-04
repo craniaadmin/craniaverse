@@ -268,11 +268,23 @@ function useEmergencyRows() {
       const source = fam.records.find(r => emergencyHasContent(r.customer?.emergency))
       const students = [...fam.records].sort((a, b) =>
         (a.student?.firstName || '').localeCompare(b.student?.firstName || '', undefined, { sensitivity: 'base' }))
+      /* Inactive means finished, not merely not-running: a family that has
+         just registered is exactly who you want a contact for. Same rule as
+         the Customers list. */
+      const isDone = (p) => ['completed', 'cancelled', 'inactive']
+        .includes(String(p.status || '').toLowerCase())
+      const inactive = students.every(s => {
+        const progs = s.programs || []
+        return progs.length > 0 && progs.every(isDone)
+      })
+
       const base = {
+        id: (source || fam.records[0])?.id,
         customer: fam.customerName,
         students,
         studentNames: students.map(studentName).join(', '),
         linkId: (source || fam.records[0])?.id,
+        inactive,
       }
       if (source) {
         const em = source.customer.emergency

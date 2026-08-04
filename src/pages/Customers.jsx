@@ -26,6 +26,7 @@ import {
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
 import { buildFamilyIndex, familyOf } from '../data/family'
+import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
@@ -270,7 +271,7 @@ function classesOf(record) {
   return out
 }
 
-const CSS = `
+const CSS = BACKUP_CSS + `
 /* position:relative anchors the settings panel, which hangs off the gear
    button in the actions row. */
 .cu{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
@@ -298,24 +299,7 @@ const CSS = `
 .cu .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
 .cusettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
     margin-top:4px}
-.cusettings .sp-card{background:#fff;border:1px solid var(--line);border-radius:12px;
-    box-shadow:0 8px 24px rgba(46,37,22,.18);padding:13px 15px}
-.cusettings .sp-card-title{font-size:12.5px;font-weight:700;color:var(--teal);text-transform:uppercase;
-    letter-spacing:.4px;margin-bottom:6px}
-.cusettings .sp-hint{font-size:11.5px;color:var(--muted);line-height:1.45;margin-bottom:8px}
-.cusettings .sp-meta{font-size:11.5px;color:var(--dark-brown);font-weight:600;margin-bottom:9px}
-.cusettings .sp-err{font-size:11.5px;color:var(--danger);margin-top:8px;line-height:1.4}
-.cusettings .sp-btnrow{display:flex;gap:8px}
-.cusettings .sp-btn{background:var(--pill);border:1px solid var(--field);border-radius:8px;padding:6px 11px;
-    font:inherit;font-size:12px;font-weight:600;color:var(--dark-brown);cursor:pointer}
-.cusettings .sp-btn:hover:not(:disabled){border-color:var(--teal)}
-.cusettings .sp-btn:disabled{opacity:.45;cursor:default}
-.cusettings .sp-restore-list{margin-top:9px;border-top:1px solid var(--line);padding-top:8px;
-    max-height:220px;overflow:auto}
-.cusettings .sp-restore-row{display:flex;align-items:center;gap:8px;padding:5px 0}
-.cusettings .sp-rlabel{flex:1;min-width:0;font-size:11.5px;color:var(--dark-brown);
-    display:flex;flex-direction:column;line-height:1.3}
-.cusettings .sp-rcount{font-size:10.5px;color:var(--faint);font-weight:600}
+
 .cusettings .sp-catrow{display:flex;align-items:center;gap:9px;padding:4px 0}
 .cusettings .sp-catname{flex:1;min-width:0;font-size:12px;font-weight:600;color:var(--dark-brown);
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -780,10 +764,6 @@ function ColorDot({ color, onPick }) {
    picking the wrong one is recoverable. */
 function CustomersSettings({ onClose, categories, tintFor, onCatColor }) {
   const ref = useRef(null)
-  const [backups, setBackups] = useState(null)
-  const [busy, setBusy] = useState(false)
-  const [restoreOpen, setRestoreOpen] = useState(false)
-  const [err, setErr] = useState('')
   const dialog = useDialog()
   const { refresh } = useStore()
 
@@ -793,101 +773,25 @@ function CustomersSettings({ onClose, categories, tintFor, onCatColor }) {
     return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
   }, [onClose])
 
-  const loadBackups = () => fetch(`${API_BASE}/api/customers/backups`, { headers: HEADERS })
-    .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
-    .then(setBackups)
-    .catch(() => setBackups([]))
-
-  useEffect(() => { loadBackups() }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const backupNow = async () => {
-    setBusy(true); setErr('')
-    try {
-      const res = await fetch(`${API_BASE}/api/customers/backup`, {
-        method: 'POST', headers: HEADERS,
-        body: JSON.stringify({ label: new Date().toLocaleString() }),
-      })
-      if (!res.ok) throw new Error(`Server returned ${res.status}`)
-      await loadBackups()
-    } catch (e) {
-      setErr('Backup failed — the customers_backups collection may be missing (run pb-setup.js).')
-    }
-    setBusy(false)
-  }
-
-  const doRestore = async (b) => {
-    const ok = await dialog.confirm(
-      `Replace every registration with the snapshot from ${b.label || new Date(b.created).toLocaleString()}`
-      + ` (${b.count} record${b.count === 1 ? '' : 's'})? A snapshot of the current data is saved first.`,
-      { title: 'Restore Backup' })
-    if (!ok) return
-    setBusy(true); setErr('')
-    try {
-      const res = await fetch(`${API_BASE}/api/customers/restore/${b.id}`, { method: 'POST', headers: HEADERS })
-      if (!res.ok) throw new Error(`Server returned ${res.status}`)
-      await refresh()
-      setRestoreOpen(false)
-      onClose()
-    } catch (e) {
-      setErr('Restore failed — nothing was changed.')
-    }
-    setBusy(false)
-  }
-
-  const last = backups?.[0]
-  const lastLine = last
-    ? `Last backup: ${last.label || new Date(last.created).toLocaleString()} (${last.count} records)`
-    : backups === null ? 'Loading…' : 'No backups yet'
-
   return (
     <div className="cusettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
-      <div className="sp-card">
-        <div className="sp-card-title">Backups</div>
-        <div className="sp-hint">
-          Snapshots of every registration, saved to the database (last 14 kept).
-          Back up before an import or a bulk delete.
-        </div>
-        <div className="sp-meta">{lastLine}</div>
-        <div className="sp-btnrow">
-          <button type="button" className="sp-btn" disabled={busy} onClick={backupNow}>
-            {busy ? 'Working…' : 'Back Up Now'}
-          </button>
-          <button type="button" className="sp-btn" disabled={busy || !backups?.length}
-            onClick={() => setRestoreOpen(v => !v)}>
-            Restore{restoreOpen ? ' ▾' : '…'}
-          </button>
-        </div>
-        {err && <div className="sp-err">{err}</div>}
-        {restoreOpen && backups && (
-          <div className="sp-restore-list">
-            {backups.map(b => (
-              <div key={b.id} className="sp-restore-row">
-                <span className="sp-rlabel">
-                  {b.label || new Date(b.created).toLocaleString()}
-                  <span className="sp-rcount">{b.count} records</span>
-                </span>
-                <button type="button" className="sp-btn" disabled={busy} onClick={() => doRestore(b)}>
-                  Restore
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <BackupPanel base="customers" confirm={dialog.confirm}
+        hint="Snapshots of every registration, saved to the database (last 14 kept). Back up before an import or a bulk delete."
+        onRestored={async () => { await refresh(); onClose() }} />
 
-      <div className="sp-card">
-        <div className="sp-card-title">Programme Colours</div>
-        <div className="sp-hint">
+      <div className="bkp-card">
+        <div className="bkp-title">Programme Colours</div>
+        <div className="bkp-hint">
           Programme pills are tinted by type. These are the same colours the
           Programs page uses, so a change here shows up there too.
         </div>
         {categories.length === 0 ? (
-          <div className="sp-meta">No programme types in use yet.</div>
+          <div className="bkp-meta">No programme types in use yet.</div>
         ) : categories.map(({ cat, n }) => (
           <div key={cat} className="sp-catrow">
             <ColorDot color={tintFor(cat)} onPick={c => onCatColor(cat, c)} />
             <span className="sp-catname">{cat}</span>
-            <span className="sp-rcount">{n}</span>
+            <span className="bkp-count">{n}</span>
           </div>
         ))}
       </div>
