@@ -19,6 +19,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildFamilyIndex } from '../data/family'
+import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { Phone, Mail, Eye, Download } from 'lucide-react'
 import { useStore } from '../data/store'
 
@@ -83,7 +84,7 @@ function contactKey(em) {
     .join('|').trim().toLowerCase()
 }
 
-const CSS = `
+const CSS = BACKUP_CSS + `
 .ec{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
@@ -117,6 +118,31 @@ const CSS = `
 .ec .clearf{background:#fff;border:1px solid var(--field);border-radius:8px;padding:8px 12px;
     font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;font-family:inherit}
 .ec .clearf:hover{background:#f1f5f4}
+.ec .toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);
+    font-weight:600;cursor:pointer;user-select:none}
+.ec .toggle input{width:14px;height:14px;accent-color:var(--teal);cursor:pointer;margin:0}
+.ec .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
+.ecsettings{position:absolute;right:34px;z-index:240;width:330px;margin-top:4px}
+.ec .bulkbar{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:#E4EFF3;border:1px solid var(--light-blue);border-radius:10px;
+    padding:8px 12px;margin-bottom:10px;font-size:12.5px;color:var(--dark-brown)}
+.ec .bulkbar .n{font-weight:700}
+.ec .bulkbar .acts{display:inline-flex;align-items:center;gap:8px}
+.ec .bulkbar button{border:none;border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;
+    cursor:pointer;font-family:inherit}
+.ec .bulkbar .exp{background:var(--teal);color:#fff}
+.ec .bulkbar .clr{background:transparent;border:1px solid var(--field);color:var(--muted)}
+/* Filter row and the select column, matching Customers. */
+.ec thead tr.colfrow th{background:#eaf3f2;padding:5px 6px;border-radius:0}
+.ec thead tr.colfrow th:empty{background:transparent}
+.ec .colf{width:100%;background:#fff;border:1px solid var(--field);border-radius:7px;padding:4px 6px;
+    font-size:11.5px;color:var(--dark-brown);font-weight:600;cursor:pointer;font-family:inherit}
+.ec .colf.on{background:var(--light-blue);border-color:var(--light-blue)}
+.ec thead th.selcol,.ec tbody td.selcol{background:transparent;text-align:center}
+.ec thead th.selcol input,.ec tbody td.selcol input{width:12px;height:12px;margin:0;
+    accent-color:var(--teal);vertical-align:middle;cursor:pointer}
+.ec tbody tr.sel td{background:#DCEEEC}
+.ec tbody tr.grpsep td.nosep{border-top:none}
 
 .ec .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
