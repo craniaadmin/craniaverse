@@ -53,6 +53,7 @@ import {
   listChecklistBackups, createChecklistBackup, restoreChecklistBackup,
   listProjectBackups, createProjectBackup, restoreProjectBackup,
   listProgramsBackups, createProgramsBackup, restoreProgramsBackup,
+  listCustomersBackups, createCustomersBackup, restoreCustomersBackup,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
@@ -730,6 +731,18 @@ app.post('/api/programs/backup', wrap(async (req, res) => {
 app.post('/api/programs/restore/:id', wrap(async (req, res) => {
   const payload = await restoreProgramsBackup(req.params.id)
   res.json(payload)
+}))
+
+// ---- customers backups --------
+app.get('/api/customers/backups', wrap(async (_req, res) => res.json(await listCustomersBackups())))
+app.post('/api/customers/backup', wrap(async (req, res) => {
+  const label = (req.body?.label || '').trim() || new Date().toLocaleString()
+  const info = await createCustomersBackup(label)
+  res.json({ ok: true, ...info })
+}))
+app.post('/api/customers/restore/:id', wrap(async (req, res) => {
+  const payload = await restoreCustomersBackup(req.params.id)
+  res.json({ ok: true, count: payload.length })
 }))
 
 app.get('/api/staff-board', wrap(async (_req, res) => res.json(await loadStaffBoard())))

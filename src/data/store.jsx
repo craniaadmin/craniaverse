@@ -282,7 +282,25 @@ export function StoreProvider({ children }) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       await refresh()
     },
-  }), [records, selectedId, status, rules, staff, programs, programsState, refresh, updateCraniaCash, updateStudentField, updateCustomerField, addCashEntry, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms, setProgramsState])
+    /* Puts a deleted registration back under its original id, with its
+       enrolments and fee history intact. This is what Undo on the Customers
+       list calls; addRegistration cannot serve, because it builds a record
+       from a flat form and mints a new id. */
+    restoreRegistration: async (record) => {
+      const res = await fetch(`${ENDPOINT}/restore`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        body: JSON.stringify(record),
+      })
+      if (!res.ok) {
+        const msg = await res.json().catch(() => ({}))
+        throw new Error(msg.error || `HTTP ${res.status}`)
+      }
+      await refresh()
+      return record.id
+    },
+    updatePrograms,
+  }), [records, selectedId, status, rules, staff, programs, programsState, refresh, updateCraniaCash, updateStudentField, updateCustomerField, updatePrograms, addCashEntry, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms, setProgramsState])
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
