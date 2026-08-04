@@ -1659,7 +1659,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
         <td>
           {/* Each square is worth what that installment bills, so hovering
               one answers "how much is this?" without opening the panel. */}
-          <div style={{ display: 'flex', gap: 3, alignItems: 'center', justifyContent: 'center' }}>
+          <div className="feesqs">
             {FEE_KEYS.map((k, i) => (
               <FeeSquare key={k} state={prog.fees?.[k] || 'empty'}
                 amount={engine.amountFor(MONTH_KEYS[i])}
