@@ -1038,6 +1038,10 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
                       return <td key={k} className={cls} title={title}>{content}</td>
                     })}
                     <td className="actcell" onClick={e => e.stopPropagation()}>
+                      <button className="rowbtn rb-edit" title="Open this student"
+                        onClick={() => onSelect(r.id)}><Pencil size={12} /></button>
+                      <button className="rowbtn rb-dup" title={`Duplicate ${r.name || 'this student'}`}
+                        onClick={() => onDuplicate(r.record)}><Copy size={12} /></button>
                       <button className="rowbtn rb-del" title="Delete this student"
                         onClick={() => onDelete(r.record)}><Trash2 size={12} /></button>
                     </td>
