@@ -402,7 +402,11 @@ const CSS = `
     border-top:1px solid #CFD6D8}
 .cu tbody tr.grpsep td.nosep{border-top:none}
 .cu tbody tr{cursor:pointer}
-.cu tbody tr:hover td{background:#E4EFF3}
+/* Hover is driven by state, not :hover — see the note where famhot/kidhot
+   are set. Over a child: just that child's own columns. Over anything the
+   family shares: the whole block, siblings included. */
+.cu tbody tr.kidhot td:not(.famcell):not(.selcol):not(.actcell){background:#E4EFF3}
+.cu tbody tr.famhot td{background:#E4EFF3}
 .cu tbody tr.sel td{background:#DCEEEC}
 .cu td.col-grade{text-align:center}
 .cu .sname{font-weight:700;color:#3d7f7d}
