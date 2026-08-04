@@ -610,14 +610,13 @@ function CtxMenu({ x, y, items, onClose }) {
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
-/* No Undo/Redo on this view, unlike the template's toolbar. Nothing here is
-   an editable field — the only mutations are add, duplicate and delete, and
-   delete is a server-side DELETE with no restore endpoint. Re-posting the
-   record would give it a new id and lose its enrolments and fee history, so
-   an Undo button here would quietly destroy data rather than recover it.
-   Field edits are undoable where they happen, in the detail view. */
+/* Undo/redo here covers whole registrations — add, duplicate, delete —
+   which is all this view mutates. It reverses each action rather than
+   restoring a snapshot of the table, so undoing one delete cannot wipe out
+   edits someone else made in the meantime. Field edits have their own stack
+   in the detail view, where they happen. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
-  onNavigate, familyIds }) {
+  onNavigate, familyIds, onUndo, onRedo, histBusy, undoLabel, redoLabel }) {
   const { records, programs, programsState, setProgramsState } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
@@ -1868,7 +1867,7 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
   const handleAdd = async () => {
     try {
       const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student', forceNew: true })
-      if (id) setDetailId(id)
+      if (id) { setDetailId(id); pushHistory(historyForCreate(id, 'Add family')) }
     } catch (err) {
       dialog.alert('Could not add family', String(err.message || err))
     }
@@ -1914,6 +1913,7 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
         emFirstName: em['First Name'], emLastName: em['Last Name'], emRelationship: em['Relationship'],
         emPhone: em['Phone (Mobile)'], emEmail: em['Email'],
       })
+      if (id) pushHistory(historyForCreate(id, over.studentLastName ? 'Duplicate student' : 'Add sibling'))
       if (id && !over.studentLastName) setDetailId(id)
       return id
     } catch (err) {
@@ -1983,5 +1983,8 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
 
   return <CustomerList onSelect={handleSelect} onAdd={handleAdd} onAddSibling={handleAddSibling}
     onDuplicate={handleDuplicate} onDelete={handleDelete} onDeleteFamily={handleDeleteFamily}
-    onNavigate={onNavigate} familyIds={familyIds} />
+    onNavigate={onNavigate} familyIds={familyIds}
+    onUndo={doUndo} onRedo={doRedo} histBusy={histBusy}
+    undoLabel={undoStack.length ? undoStack[undoStack.length - 1].label : ''}
+    redoLabel={redoStack.length ? redoStack[redoStack.length - 1].label : ''} />
 }
