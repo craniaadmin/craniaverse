@@ -973,10 +973,13 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           content = s.progList.length === 0 ? <span className="dash">—</span> : s.progList.map((p, i) => {
             const name = p.program || ''
             const prog = progByName.get(name.trim().toUpperCase())
-            const st = statusStyle(p.status)
+            const cat = prog?.category || ''
+            const bg = (cat && catColors[cat]) || DEFAULT_CAT_COLOR
             return (
-              <button key={name + i} className="stupill" style={{ background: st.bg, color: st.fg }}
-                title={`${name} — ${p.status || 'no status'}${prog ? ' · click to open in Programs' : ''}`}
+              <button key={name + i} className="stupill"
+                style={{ background: bg, color: inkOn(bg) }}
+                title={`${name}${cat ? ` — ${cat}` : ''} — ${p.status || 'no status'}`
+                  + (prog ? ' · click to open in Programs' : '')}
                 onClick={e => { e.stopPropagation(); if (prog) onNavigate && onNavigate('Programs', prog.id) }}>
                 {name || '—'}
               </button>
