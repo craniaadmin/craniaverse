@@ -131,18 +131,18 @@ const refNumber = (ref) => {
 /* Give every family a stored reference, assigning above the highest ever
    issued. Runs once per record that lacks one; siblings inherit whatever
    the family already has rather than taking a fresh number. */
-function useFamilyIds(records, assign) {
+function useFamilyIds(records, familyIndex, assign) {
   const done = useRef(new Set())
   const byFamily = useMemo(() => {
     const m = new Map()
     for (const r of (records || [])) {
       if (r.id === 'seed') continue
-      const key = guardianIdentity(r) || `unknown-${r.id}`
+      const key = familyIndex.get(r.id) || `unknown-${r.id}`
       if (!m.has(key)) m.set(key, [])
       m.get(key).push(r)
     }
     return m
-  }, [records])
+  }, [records, familyIndex])
 
   const refs = useMemo(() => {
     let highest = 0
