@@ -206,7 +206,7 @@ export function outstandingFor(records) {
     if (r.id === 'seed') continue
     for (const entry of (r.programs || [])) {
       if (String(entry.status || '').toLowerCase() === 'cancelled') continue
-      if (!entry.feeCalc) continue
+      // No feeCalc is not "no money" — feeCalcFor prices it from the rate.
       const e = engineForEntry(entry)
       owed += Math.max(0, e.total - e.paid)
     }
