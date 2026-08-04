@@ -1638,6 +1638,7 @@ function ProgramRow({ prog, onToggleActive, onFeeChange, onCalcChange, onSession
   /* Paid only when the ticked squares cover the whole total. This used to
      fall back, for a program with no feeCalc, to "every square that is not
      empty says paid" — so ticking the first box marked the year Paid. */
+  const engine = engineForEntry(prog)
   const payment = paymentStateOf(prog)
   const ps = PAYMENT_STYLE[payment] || { bg: '#eef1f4', fg: '#6B6455' }
   const fc = feeCalcFor(prog)
