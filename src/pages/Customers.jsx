@@ -467,7 +467,12 @@ const CSS = `
 .cu .ptable .pname{font-weight:600;text-transform:uppercase;text-align:left}
 .cu .pill{display:inline-block;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:700;
     letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
-.cu .feelab{font-size:9px;color:#fff;font-weight:700;width:16px;display:inline-block;text-align:center}
+/* One label per square, same width and gap, so the letters sit over the
+   boxes they name. REG and MAT are three characters in a 16px box, so they
+   are set tighter than the single letters rather than colliding. */
+.cu .feelabs{display:flex;gap:3px;justify-content:center}
+.cu .feelab{font-size:8px;letter-spacing:-.3px;color:#fff;font-weight:700;width:16px;
+    display:inline-block;text-align:center;overflow:visible}
 .cu .feebtn{background:#fff;border:1px solid var(--field);border-radius:7px;padding:3px 9px;
     font-size:11.5px;font-weight:700;color:var(--dark-brown);cursor:pointer;font-family:inherit;white-space:nowrap}
 .cu .feebtn:hover{background:#f1f5f4}
