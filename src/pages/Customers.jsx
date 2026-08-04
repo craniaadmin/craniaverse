@@ -42,6 +42,16 @@ const STATUS_STYLE = {
 }
 const statusStyle = (s) => STATUS_STYLE[s] || STATUS_STYLE.Inactive
 
+/* Ctrl+Z inside a text box has to undo the typing. Without this the list's
+   undo shortcut fired while someone was editing the search field and put
+   back the family they had just deleted — and because key auto-repeat kept
+   firing, holding the keys walked the whole stack and restored several. */
+const inEditableField = (el) => {
+  if (!el) return false
+  const tag = el.tagName
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable === true
+}
+
 /* Programme-type colours. The same palette and default the Programs page
    uses, because both read and write programsState.catColors. */
 const LPAL = ['#F1F3F4', '#A6E2F9', '#5FA09E', '#E0DE85', '#2E2516', '#FBDDE4', '#FCE6D2',
