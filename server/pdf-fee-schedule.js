@@ -107,9 +107,12 @@ export function generateFeeSchedulePdf(data) {
         )
       y += 28
 
-      // ── Calendar strip ───────────────────────────────────
+      /* The calendar strip is optional. When no timeline is supplied it used
+         to draw nothing but still advance the cursor 58pt, leaving a band of
+         empty page between the header and the installments. */
+      if (timeline.length) {
       const gap = 2
-      const cellCount = timeline.length || 1
+      const cellCount = timeline.length
       const cellWidth = (contentWidth - gap * (cellCount - 1)) / cellCount
       const cellHeight = 18
 
