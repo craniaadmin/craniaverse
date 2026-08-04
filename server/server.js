@@ -278,7 +278,13 @@ async function migrateRegistrations() {
 // If the registrations collection is empty (first boot, no
 // import yet), drop in a single seed record so the admin UI
 // has something to render.
+//
+// Off unless SEED_IF_EMPTY=true. An empty registrations table is
+// now far more likely to be deliberate — someone has just cleared
+// it to start over — than to be a fresh install, and re-creating a
+// record on the next restart quietly undoes that.
 async function seedIfEmpty() {
+  if (String(process.env.SEED_IF_EMPTY || '').toLowerCase() !== 'true') return
   const records = await getRegistrations()
   if (records.length === 0) {
     await commitRegistrations([makeSeedRecord()])
