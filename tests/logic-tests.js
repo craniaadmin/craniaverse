@@ -260,5 +260,63 @@ export async function runLogicTests() {
         await http('DELETE', `/api/inventory/${id}`).catch(() => {})
       }
     }),
+
+    /* Pure logic, no server: which registrations count as one family.
+       Siblings each get their own registration carrying a copy of the
+       guardians' details, and this decides whether two of them are the same
+       household. It regressed once — two students with the same parents were
+       split into separate families with separate references, because one
+       record had the guardian's email and the other did not. */
+    await runTest('Family grouping: siblings group despite uneven guardian details', async () => {
+      const { buildFamilyIndex } = await import('../src/data/family.js')
+
+      const G = (first, last, email) => ({
+        'First Name': first, 'Last Name': last, ...(email ? { Email: email } : {}),
+      })
+      const rec = (id, g1, g2 = {}, familyId) => ({
+        id, student: { firstName: id },
+        customer: { guardian1: g1, guardian2: g2, meta: familyId ? { familyId } : {} },
+      })
+      // Groups as a sorted, stable string so the comparison reads plainly.
+      const shape = (records) => {
+        const idx = buildFamilyIndex(records)
+        const m = new Map()
+        for (const r of records) {
+          const k = idx.get(r.id)
+          if (!m.has(k)) m.set(k, [])
+          m.get(k).push(r.id)
+        }
+        return [...m.values()].map(g => g.sort().join('+')).sort().join(' | ')
+      }
+      const check = (label, records, expected) =>
+        assertEq(shape(records), expected, label)
+
+      check('one sibling has the guardian email, the other does not',
+        [rec('one', G('Ada', 'Test', 'ada@x.com')), rec('two', G('Ada', 'Test'))], 'one+two')
+
+      check('case and spacing differences do not split a family',
+        [rec('a', G('Ada', 'Test', 'Ada@X.com')), rec('b', G(' ada ', '  test ', 'ada@x.com'))], 'a+b')
+
+      check('a parent recorded in the second guardian slot still matches',
+        [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', {}, G('Ada', 'Test', 'ada@x.com'))], 'a+b')
+
+      check('matching is transitive across email and name',
+        [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', G('Ada', 'Test', 'ada@x.com')),
+          rec('c', G('Ada', 'Test'))], 'a+b+c')
+
+      check('a shared family reference forces a join',
+        [rec('a', G('Ada', 'Test', 'ada@x.com'), {}, 'F0001'),
+          rec('b', G('Zed', 'Other', 'z@x.com'), {}, 'F0001')], 'a+b')
+
+      // The other direction matters just as much: do not merge households.
+      check('same guardian name but different emails stays two families',
+        [rec('a', G('John', 'Smith', 'j1@x.com')), rec('b', G('John', 'Smith', 'j2@x.com'))], 'a | b')
+
+      check('unrelated families stay apart',
+        [rec('a', G('Ada', 'Test', 'ada@x.com')), rec('b', G('Bob', 'Other', 'bob@x.com'))], 'a | b')
+
+      check('blank records do not collapse into one fake family',
+        [rec('a', {}), rec('b', {})], 'a | b')
+    }),
   ]
 }
