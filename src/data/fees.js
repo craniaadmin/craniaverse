@@ -152,6 +152,24 @@ export function engineForEntry(entry) {
   })
 }
 
+/* The same job as syncProgramMoney, for our entry shape — lowercase
+   four-state `fees` and a separate `billing` cadence. Call it on every write
+   to a program so `fee`, `paid` and `payment` stay in step with the ticked
+   squares; the Customers list reads them rather than recomputing per row.
+
+   Returns a new object; it does not mutate what it is given. */
+export function syncEntryMoney(entry) {
+  const e = engineForEntry(entry)
+  const fee = Math.round(e.total * 100) / 100
+  const paid = Math.round(e.paid * 100) / 100
+  return {
+    ...entry,
+    fee,
+    paid,
+    payment: fee > 0 && paid >= fee - 0.005 ? 'Paid' : (paid > 0 ? 'Partial' : 'Unpaid'),
+  }
+}
+
 /* Total still owed across a set of registrations. Cancelled enrolments are
    not money anyone expects to collect, so they are left out. */
 export function outstandingFor(records) {
