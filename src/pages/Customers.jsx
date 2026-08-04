@@ -2090,8 +2090,8 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
             <col style={{ width: '66px' }} />
             <col />
             <col style={{ width: '86px' }} />
-            <col style={{ width: '283px' }} />
-            <col style={{ width: '88px' }} />
+            <col style={{ width: '209px' }} />
+            <col style={{ width: '96px' }} />
             <col style={{ width: '74px' }} />
           </colgroup>
           <thead>
