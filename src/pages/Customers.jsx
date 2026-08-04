@@ -1545,10 +1545,21 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
     return () => window.removeEventListener('keydown', onKey)
   }, [doUndo, doRedo])
 
+  /* Every write to a program goes through here, so this is where the stored
+     money is brought back into step — the template calls syncProgramMoney on
+     the same edits. It writes `fee`, `paid` and `payment` onto the entry
+     from the fee engine, which is what makes the Payment column on the list
+     follow the ticked squares instead of a value typed once and left.
+
+     The store is updated as well as the server: the list reads the store,
+     and without this it kept the old programs until the next full refresh. */
   const persistPrograms = (next) => {
+    const synced = next.map(p => syncProgramMoney({ ...p, ...engineInputs(p) }))
+    updatePrograms(selected.id, synced)
     fetch(`${API_BASE}/api/registrations/${selected.id}/programs`, {
-      method: 'PUT', headers: HEADERS, body: JSON.stringify(next),
+      method: 'PUT', headers: HEADERS, body: JSON.stringify(synced),
     }).catch(() => {})
+    return synced
   }
   const toggleActive = (prog) => {
     const updated = progs.map(p => p === prog ? { ...p, active: !p.active } : p)
