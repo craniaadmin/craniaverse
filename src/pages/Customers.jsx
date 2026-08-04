@@ -2064,6 +2064,15 @@ function CustomersPage({ initialRecordId, onConsumeInitialRecord, onNavigate }) 
   const [undoStack, setUndoStack] = useState([])
   const [redoStack, setRedoStack] = useState([])
   const [histBusy, setHistBusy] = useState(false)
+  const [histNote, setHistNote] = useState('')
+
+  // The note is a report of something that already happened, so it clears
+  // itself rather than needing to be dismissed.
+  useEffect(() => {
+    if (!histNote) return
+    const t = setTimeout(() => setHistNote(''), 6000)
+    return () => clearTimeout(t)
+  }, [histNote])
   // Undoing an add has to read the record as it stands now, not as it was
   // created — it may have been edited since.
   const recordsRef = useRef(records)
