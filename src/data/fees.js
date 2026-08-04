@@ -139,6 +139,23 @@ export const money = (n) =>
    rather than a boolean, and only `paid` is money actually received.
    And `schedule` on our entries is already the class time ("Mon 4:30 pm"),
    so the billing cadence lives on `billing`. */
+/* What a program costs when nobody has opened the calculator on it yet.
+   Most live enrolments have no feeCalc — they were created by the public
+   form, which records a rate and nothing else — so treating "no feeCalc" as
+   "no money" made every one of them read as unpriced. The template does the
+   same defaulting, seeding the monthly fee from the price the program is
+   sold at. */
+export function feeCalcFor(entry) {
+  if (entry && entry.feeCalc) return entry.feeCalc
+  const from = (entry && (entry.rate ?? entry.fee)) || ''
+  const n = Number(String(from).replace(/[^\d.]/g, ''))
+  return {
+    firstLesson: 1,
+    monthlyFee: Number.isFinite(n) ? n : 0,
+    regFee: 79, matFee: 59, discount: 0, discountType: '%',
+  }
+}
+
 export function engineForEntry(entry) {
   const fees = (entry && entry.fees) || {}
   const months = {}
@@ -148,8 +165,19 @@ export function engineForEntry(entry) {
   return feeEngine({
     schedule: (entry && entry.billing) || 'Monthly',
     months,
-    feeCalc: entry && entry.feeCalc,
+    feeCalc: feeCalcFor(entry),
   })
+}
+
+/* Paid / Partial / Unpaid from the money, which is the template's rule:
+   compare what has been received against the total. Deciding it from the
+   squares alone — "every square that is not empty says paid" — called a
+   program Paid as soon as the first box was ticked. */
+export function paymentStateOf(entry) {
+  const e = engineForEntry(entry)
+  if (e.total <= 0) return e.paid > 0 ? 'Partial' : 'Unpaid'
+  if (e.paid >= e.total - 0.005) return 'Paid'
+  return e.paid > 0 ? 'Partial' : 'Unpaid'
 }
 
 /* The same job as syncProgramMoney, for our entry shape — lowercase
