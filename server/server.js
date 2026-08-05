@@ -22,6 +22,7 @@ import dotenv from 'dotenv'
 import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { currentAcademicYear } from '../src/data/scheduleUtils.js'
 import { buildEnrolmentIndex, sessionsOf, sessionKey } from '../src/data/enrolment.js'
+import { reconcileAutoCash } from '../src/data/autoCash.js'
 import { sendRegistrationEmails, sendBoothSignupEmail } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
 import {
@@ -674,46 +675,13 @@ app.post('/api/registrations/:id/autoCash', wrap(async (req, res) => {
   const rec = records[idx]
   const log = Array.isArray(rec.cashLog) ? rec.cashLog : []
 
-  const want = new Map()
-  for (const a of awards) {
-    if (!a || !a.ruleId) continue
-    const delta = Number(a.delta)
-    if (!Number.isFinite(delta)) continue
-    want.set(String(a.ruleId), { delta, reason: String(a.reason || '').trim() || 'Rule' })
-  }
-
-  const mineForKey = (e) => e && e.auto && e.auto.key === key
-  const kept = []
-  const have = new Map()
-  for (const e of log) {
-    if (!mineForKey(e)) { kept.push(e); continue }
-    const ruleId = String(e.auto.ruleId || '')
-    const target = want.get(ruleId)
-    // Withdrawn if the rule no longer applies, or re-issued if its amount
-    // changed since — either way the stale entry does not survive.
-    if (target && target.delta === e.delta) { kept.push(e); have.set(ruleId, true) }
-  }
-
-  const added = []
-  for (const [ruleId, a] of want) {
-    if (have.has(ruleId)) continue
-    added.push({
-      ts: new Date().toISOString(), delta: a.delta, reason: a.reason,
-      auto: { key, ruleId },
-    })
-  }
-
-  const nextLog = [...kept, ...added]
-  const before = log.reduce((n, e) => n + (Number(e.delta) || 0), 0)
-  const after = nextLog.reduce((n, e) => n + (Number(e.delta) || 0), 0)
-  const balance = (rec.student?.craniaCash || 0) + (after - before)
-
-  const changed = added.length > 0 || nextLog.length !== log.length
-  if (changed) {
-    records[idx] = { ...rec, cashLog: nextLog, student: { ...rec.student, craniaCash: balance } }
+  const out = reconcileAutoCash(log, key, awards)
+  const balance = (rec.student?.craniaCash || 0) + out.delta
+  if (out.changed) {
+    records[idx] = { ...rec, cashLog: out.log, student: { ...rec.student, craniaCash: balance } }
     await commitRegistrations(records)
   }
-  res.json({ ok: true, changed, balance, added: added.length, removed: log.length - kept.length })
+  res.json({ ok: true, changed: out.changed, balance, added: out.added, removed: out.removed })
 }))
 
 app.get('/api/rules', wrap(async (_req, res) => res.json(await getRules())))

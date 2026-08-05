@@ -333,5 +333,61 @@ export async function runLogicTests() {
         [rec('a', G('Tas', 'Karim', 'tas@x.com'), {}, 'F0003'),
           rec('b', G('Different', 'Parent', 'diff@x.com'), {}, 'F0003')], 'a | b')
     }),
+    /* Pure logic, no server: automatic Crania Cash. Every case here is a
+       bug that shipped — awards were computed from the change to a field
+       rather than from the state of the lesson, so marking a register twice
+       paid twice and correcting a mistake never gave the point back. */
+    await runTest('Crania Cash: automatic awards follow the lesson, not the click', async () => {
+      const { awardsForRow, rowKeyOf, fieldCanTrigger, reconcileAutoCash } =
+        await import('../src/data/autoCash.js')
+
+      const RULES = [
+        { id: 'present',  reason: 'Present',  delta: 1,  when: { field: 'attendance', value: 'P' } },
+        { id: 'no-shirt', reason: 'No Shirt', delta: -5, when: { field: 'uniform', value: 'No' } },
+        { id: 'late',     reason: 'Late',     delta: -1, when: { field: 'attendance', value: 'L' } },
+        { id: 'manual',   reason: 'Contest winner', delta: 20, when: null },
+      ]
+      // What the server route does with the result.
+      const apply = (state, key, row, rules = RULES) => {
+        const out = reconcileAutoCash(state.log, key, awardsForRow(rules, row))
+        return { log: out.log, balance: state.balance + out.delta }
+      }
+
+      const KEY = rowKeyOf('26_27|FLEX MATH', { lessonNo: 3 }, 2)
+      const KEY2 = rowKeyOf('26_27|FLEX MATH', { lessonNo: 4 }, 3)
+      let s = { log: [{ delta: 20, reason: 'Contest winner' }], balance: 20 }
+
+      s = apply(s, KEY, { attendance: 'P' })
+      assertEq(s.balance, 21, 'marking P awards once')
+      s = apply(s, KEY, { attendance: 'P' })
+      assertEq(s.balance, 21, 're-marking P must not award twice')
+      s = apply(s, KEY, { attendance: 'A' })
+      assertEq(s.balance, 20, 'correcting P to A must take the point back')
+      s = apply(s, KEY, { attendance: 'P' })
+      assertEq(s.balance, 21, 'P then A then P is still just +1')
+      s = apply(s, KEY, { attendance: 'P', uniform: 'No' })
+      assertEq(s.balance, 16, 'two rules on one lesson both apply')
+      s = apply(s, KEY, { attendance: 'P', uniform: 'Yes' })
+      assertEq(s.balance, 21, 'fixing one mark refunds only that rule')
+      s = apply(s, KEY, { attendance: 'L' })
+      assertEq(s.balance, 19, 'a rule on Late fires — impossible before')
+      assertEq(s.log.filter(e => !e.auto).length, 1, 'manual entries are never touched')
+      s = apply(s, KEY2, { attendance: 'P' })
+      assertEq(s.balance, 20, 'a different lesson awards separately')
+      s = apply(s, KEY, { attendance: '' })
+      assertEq(s.balance, 21, 'clearing the mark withdraws the award')
+
+      let t = apply({ log: [], balance: 0 }, KEY, { attendance: 'P' })
+      t = apply(t, KEY, { attendance: 'P' }, [{ ...RULES[0], delta: 5 }])
+      assertEq(t.balance, 5, 'raising a rule re-issues rather than stacking')
+      assertEq(t.log.length, 1, 'and leaves one entry, not two')
+
+      assertEq(awardsForRow([], { attendance: 'P' }).length, 0,
+        'with no rules nothing fires — there is no hardcoded fallback')
+      assertEq(awardsForRow([RULES[3]], { attendance: 'P' }).length, 0,
+        'a rule with no trigger never fires by itself')
+      assertEq(fieldCanTrigger(RULES, 'performance'), false, 'untriggered fields are skipped')
+      assertEq(fieldCanTrigger(RULES, 'attendance'), true, 'triggered fields are watched')
+    }),
   ]
 }
