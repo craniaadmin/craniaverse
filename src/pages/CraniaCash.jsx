@@ -25,6 +25,7 @@ const COLS = [
   { k: 'name',       l: 'Name' },        // never hideable — it names the row
   { k: 'grade',      l: 'Grade',       cls: 'center' },
   { k: 'cash',       l: 'Crania Cash', cls: 'center' },
+  { k: 'level',      l: 'Level' },
   { k: 'entries',    l: 'Entries',     cls: 'center' },
   { k: 'last',       l: 'Last Change' },
   { k: 'lastReason', l: 'Last Reason' },
@@ -32,10 +33,10 @@ const COLS = [
 const LOCKED_COL = 'name'
 
 const SEL_W = '3%'
-const ACT_W = '7%'
+const ACT_W = '5%'
 const COL_W = {
-  studentId: '9%', name: '19%', grade: '7%', cash: '11%',
-  entries: '8%', last: '15%', lastReason: '21%',
+  studentId: '8%', name: '17%', grade: '6%', cash: '10%', level: '12%',
+  entries: '7%', last: '14%', lastReason: '19%',
 }
 
 const CPREF_KEY = 'craniacash-cols'
@@ -212,6 +213,20 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .cc .balcard .who{font-size:19px;font-weight:700}
 .cc .balcard .who .sub{font-size:12px;font-weight:600;color:var(--muted);margin-top:2px}
 .cc .balcard .amt{font-size:32px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+/* The animal ladder — a balance you can read at a glance, and the next
+   rung to aim at. */
+.cc .levelrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+    border-top:1px solid var(--line);padding-top:11px}
+.cc .lvl{display:inline-flex;align-items:center;gap:6px;background:var(--pill);border-radius:999px;
+    padding:3px 12px 3px 8px;font-size:12.5px;font-weight:700;color:var(--dark-brown);white-space:nowrap}
+.cc .lvl .e{font-size:15px;line-height:1}
+.cc .toGo{font-size:11.5px;color:var(--muted);font-weight:600}
+.cc .panel .sub{font-size:11.5px;color:var(--muted);margin:-4px 0 10px;line-height:1.45}
+.cc .custom label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;
+    color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.cc .custom label.grow{flex:1;min-width:150px}
+.cc .custom button:disabled{background:#cbd1d6;cursor:default}
+.cc tbody td.col-level{overflow:visible}
 .cc .quick{display:flex;flex-wrap:wrap;gap:8px}
 .cc .quick button{border:none;border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600;
     cursor:pointer;font-family:inherit}
@@ -503,6 +518,7 @@ function CashList({ onSelect, onNavigate }) {
       name: studentName(r),
       grade: r.student?.grade || '',
       cash: r.student?.craniaCash || 0,
+      level: levelFor(r.student?.craniaCash || 0).name,
       entries: log.length,
       last: latest ? fmtTs(latest.ts) : '',
       lastTs: latest ? latest.ts : '',
@@ -776,6 +792,9 @@ function CashList({ onSelect, onNavigate }) {
                         content = r.studentId ? <span className="sref">{r.studentId}</span> : <span className="dash">—</span>
                       } else if (k === 'name') {
                         content = <span className="sname">{r.name || <span className="dash">—</span>}</span>
+                      } else if (k === 'level') {
+                        const lv = levelFor(r.cash)
+                        content = <span className="lvl"><span className="e">{lv.emoji}</span>{lv.name}</span>
                       } else if (k === 'cash') {
                         const tone = r.cash > 0 ? 'pos' : r.cash < 0 ? 'neg' : 'zero'
                         content = <span className={'bal ' + tone}>{r.cash}</span>
@@ -790,10 +809,6 @@ function CashList({ onSelect, onNavigate }) {
                     <td className="actcell" onClick={e => e.stopPropagation()}>
                       <button className="rowbtn" title="Open this student's Crania Cash"
                         onClick={() => onSelect(r.id)}><Pencil size={12} /></button>
-                      <button className="rowbtn" title="Open this student in Students"
-                        onClick={() => onNavigate && onNavigate('Students', r.id)}>
-                        <ExternalLink size={12} />
-                      </button>
                     </td>
                   </tr>
                 )
