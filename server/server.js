@@ -56,6 +56,7 @@ import {
   listProjectBackups, createProjectBackup, restoreProjectBackup,
   listProgramsBackups, createProgramsBackup, restoreProgramsBackup,
   listCustomersBackups, createCustomersBackup, restoreCustomersBackup,
+  listStaffBackups,     createStaffBackup,     restoreStaffBackup,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,
@@ -862,13 +863,25 @@ app.put('/api/staff-board', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+app.get('/api/staff/backups', wrap(async (_req, res) => res.json(await listStaffBackups())))
+app.post('/api/staff/backup', wrap(async (req, res) => {
+  const label = (req.body?.label || '').trim() || new Date().toLocaleString()
+  const info = await createStaffBackup(label)
+  res.json({ ok: true, ...info })
+}))
+app.post('/api/staff/restore/:id', wrap(async (req, res) => {
+  const payload = await restoreStaffBackup(req.params.id)
+  cache.staff = null
+  res.json({ ok: true, count: payload.length })
+}))
+
 app.get('/api/staff', wrap(async (_req, res) => res.json(await getStaff())))
 
 app.post('/api/staff', wrap(async (req, res) => {
+  /* No name requirement: Add Staff creates the row and the form fills it
+     in, the same way Add Family works. An id in the body is honoured, which
+     is what makes undo of a delete a true restore rather than a re-add. */
   const body = req.body || {}
-  if (!String(body.firstName || '').trim() || !String(body.lastName || '').trim()) {
-    return res.status(400).json({ error: 'firstName and lastName are required' })
-  }
   const staff = await getStaff()
   const id = `staff-${Date.now().toString(36)}`
   const record = {
