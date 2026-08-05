@@ -68,7 +68,7 @@ export function rowKeyOf(tabKey, row, rowIdx) {
 /* True when a change to this field could alter what a row earns — used to
    skip the round-trip on the many fields that never trigger anything. */
 export function fieldCanTrigger(rules, field) {
-  return (rules || []).some(r => r && r.when && r.when.field === field)
+  return normaliseRules(rules).some(r => r && r.when && r.when.field === field)
 }
 
 // The fields a rule can watch, and what each one can be set to. Kept here
