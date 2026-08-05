@@ -489,10 +489,7 @@ export default function Logins({ onNavigate }) {
       <div className="filters">
         <input type="search" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search student, username, email or ID…" autoComplete="off" />
-        <label className="toggle" title="Only logins that were changed by hand">
-          <input type="checkbox" checked={customOnly} onChange={e => setCustomOnly(e.target.checked)} />
-          Changed only
-        </label>
+        <span className="hinttext">Double-click a username or password to change it.</span>
         {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
       </div>
 
