@@ -1,8 +1,16 @@
 // Student portal login (username + password) — shared by the Students
-// detail page's "Login" panel and the standalone Logins page. Both are
-// deterministic functions of the student's name, not stored data, so
-// there's nothing to save/sync: any surface can recompute the same
-// username/password for a given student at any time.
+// detail page's "Login" panel and the standalone Logins page.
+//
+// The generated values are deterministic functions of the student's name,
+// so any surface can work them out without storing anything. That is
+// convenient and it is also the whole problem: the password can be derived
+// by anyone who knows the naming rule, it cannot be changed if it gets out,
+// and two students with the same name get the same login.
+//
+// So a student may carry an override — student.loginUsername and
+// student.loginPassword. When one is set it wins; when it is blank the
+// generated value is used, which is what every existing student has. Read
+// logins through resolveLogin() so the two never disagree.
 
 export function usernameFor(firstName, lastName) {
   return firstName && lastName
