@@ -327,6 +327,8 @@ function StudentCashDetail({ record, onBack, onNavigate }) {
   const balance = record.student?.craniaCash || 0
   const log = [...(record.cashLog || [])].reverse() // newest first
   const tone = balance > 0 ? 'var(--good)' : balance < 0 ? '#922b21' : 'var(--muted)'
+  const lvl = levelFor(balance)
+  const next = nextLevel(balance)
 
   const submit = () => {
     const d = Number(amount)
