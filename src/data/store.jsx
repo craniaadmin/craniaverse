@@ -55,6 +55,7 @@ export function StoreProvider({ children }) {
   const [programsState, setProgramsStateData] = useState() // undefined until first load
   const programsSaveTimer = useRef(null)
   const programsStateSaveTimer = useRef(null)
+  const warnedAutoCash = useRef(false)
   const selectedRef = useRef(selectedId)
   selectedRef.current = selectedId
 
