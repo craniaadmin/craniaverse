@@ -23,6 +23,7 @@ import { useStore } from '../data/store'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
+import { awardsForRow, rowKeyOf, fieldCanTrigger } from '../data/autoCash'
 import {
   ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS, currentAcademicYear,
   buildScheduledRows as buildScheduledRowsShared, dedupeProgramTabs, tabKeyOf,
@@ -474,7 +475,7 @@ function SField({ label, value, variant, readOnly, onChange }) {
 // row, so there is nothing to keep in sync here.
 
 function CommentsSection({ studentId, initialPrograms }) {
-  const { rules, addCashEntry, programs: allPrograms } = useStore()
+  const { rules, syncAutoCash, programs: allPrograms } = useStore()
   const dialog = useDialog()
   const { weekDates } = useAfterschoolWeeks()
 
@@ -580,12 +581,6 @@ function CommentsSection({ studentId, initialPrograms }) {
       saveTimer.current[activeTab] = setTimeout(() => persistTab(activeTab, next), 800)
       return updated
     })
-  }
-
-  const findRule = (matchers, fallbackDelta) => {
-    const lc = (s) => String(s || '').toLowerCase()
-    const found = rules.find(r => matchers.some(m => lc(r.id) === m || lc(r.reason) === m))
-    return found || { delta: fallbackDelta, reason: matchers[0] }
   }
 
   const update = (rowIdx, field, value) => {

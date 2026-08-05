@@ -74,15 +74,24 @@ export function useCommentsRows() {
 
   // Patch one field on one row. Debounced-saves the whole tab's row
   // array, same as the Student detail page's Comments tab does.
+  /* Marking the register here awards Crania Cash exactly as it does on the
+     student's own page. It did not before: this writes the same attendance
+     and uniform fields to the same stored row, but the award lived only in
+     the Students page's own handler — so the same action gave a point in one
+     place and nothing in the other. */
   const updateRow = useCallback((studentId, tabKey, rowIdx, field, value) => {
     const composite = `${studentId}::${tabKey}`
     setRowsByTab(prev => {
       const current = prev[composite] || []
       const nextRows = current.map((row, i) => i === rowIdx ? { ...row, [field]: value } : row)
       persist(studentId, tabKey, nextRows)
+      if (fieldCanTrigger(rules, field)) {
+        const row = nextRows[rowIdx] || {}
+        syncAutoCash(studentId, rowKeyOf(tabKey, row, rowIdx), awardsForRow(rules, row))
+      }
       return { ...prev, [composite]: nextRows }
     })
-  }, [persist])
+  }, [persist, rules, syncAutoCash])
 
   // Patch multiple fields on one row at once (used by the Comments
   // page's edit modal, which saves several text fields together).
