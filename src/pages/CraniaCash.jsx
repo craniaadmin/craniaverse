@@ -286,7 +286,25 @@ function RulesEditor() {
     setDraft(d => d.map((r, idx) => (idx === i ? { ...r, ...patch } : r)))
   }
   const remove = (i) => { setDirty(true); setDraft(d => d.filter((_, idx) => idx !== i)) }
-  const add = () => { setDirty(true); setDraft(d => [...d, { id: 'r' + Date.now(), reason: '', delta: 0 }]) }
+  const add = () => { setDirty(true); setDraft(d => [...d, { id: 'r' + Date.now(), reason: '', delta: 0, when: null }]) }
+
+  /* The two the school started with. Offered rather than assumed, because
+     whether attendance earns anything is the school's call — but losing
+     them by accident should not be a silent failure. */
+  const addStandard = () => {
+    setDirty(true)
+    setDraft(d => {
+      const has = (id) => d.some(r => String(r.id).toLowerCase() === id)
+      const extra = []
+      if (!has('present')) {
+        extra.push({ id: 'present', reason: 'Present', delta: 1, when: { field: 'attendance', value: 'P' } })
+      }
+      if (!has('no-shirt')) {
+        extra.push({ id: 'no-shirt', reason: 'No Shirt', delta: -5, when: { field: 'uniform', value: 'No' } })
+      }
+      return [...d, ...extra]
+    })
+  }
   const save = () => { updateRules(draft.filter(r => r.reason.trim())); setDirty(false) }
 
   return (
