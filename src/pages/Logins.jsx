@@ -390,18 +390,29 @@ export default function Logins({ onNavigate }) {
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
-  /* Writes both fields at once. A blank string is stored rather than the key
-     removed, and resolveLogin treats blank as "no override" — so clearing a
-     box really does hand the student back to the generated value. */
-  const saveLogin = (recordId, username, password) => {
-    updateStudentField(recordId, 'loginUsername', username)
-    updateStudentField(recordId, 'loginPassword', password)
+  /* A blank string is stored rather than the key removed, and resolveLogin
+     reads blank as "no override" — so clearing a field really does hand the
+     student back to the generated value. */
+  const writeLogin = (recordId, patch) => {
+    for (const [k, v] of Object.entries(patch)) updateStudentField(recordId, k, v)
     fetch(`${API_BASE}/api/registrations/${recordId}/student`, {
-      method: 'PUT', headers: HEADERS,
-      body: JSON.stringify({ loginUsername: username, loginPassword: password }),
+      method: 'PUT', headers: HEADERS, body: JSON.stringify(patch),
     }).catch(() => {})
     setEditing(null)
   }
+
+  /* Typing the generated value back in stores nothing, so the field goes on
+     tracking the name instead of freezing today's spelling of it. */
+  const saveField = (recordId, field, value) => {
+    const row = allRows.find(r => r.id === recordId)
+    const generated = field === 'username'
+      ? row?.login.generatedUsername : row?.login.generatedPassword
+    const store = value === generated ? '' : value
+    writeLogin(recordId, { [field === 'username' ? 'loginUsername' : 'loginPassword']: store })
+  }
+
+  const resetLogin = (recordId) =>
+    writeLogin(recordId, { loginUsername: '', loginPassword: '' })
 
   const exportCsv = (rows) => {
     const esc = (v) => {
