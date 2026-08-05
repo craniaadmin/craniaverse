@@ -365,26 +365,30 @@ function Th({ children, align = 'left', light }) {
 // Register class-card table, so both views use the exact same
 // editing widget and the exact same onChange -> updateRow() write
 // path (i.e. one place this ever writes data, not two).
+/* The focus ring is CSS, not a style mutated in an onFocus handler. The
+   handler version was undone by the next render — and this box re-renders
+   on every keystroke, so the ring vanished the moment you started typing. */
+const COMMENT_CSS = `
+.cmt-note{width:100%;min-height:40px;box-sizing:border-box;border:1px solid #d5d0c4;
+    outline:none;resize:vertical;font-family:inherit;font-size:12.5px;background:#fff;
+    padding:6px 8px;border-radius:6px;color:var(--ink)}
+.cmt-note:focus{border-color:#5FA09E;box-shadow:0 0 0 1px #5FA09E}
+.cmt-note::placeholder{color:#b9b3a6}
+`
+
 function CommentCell({ value, onChange }) {
   /* The box is always drawn. It used to be transparent until focused, so a
-     cell with no note in it looked like empty space and you had to know to
-     click there — the one thing this page is for was the thing you could
-     not see. Focus now deepens the border rather than conjuring one. */
+     lesson with no note looked like empty space and you had to know to click
+     there — the one thing this page is for was the thing you could not see.
+     Focus deepens the border rather than conjuring one. */
   return (
     <td style={{ padding: '2px' }}>
       <textarea
+        className="cmt-note"
         value={value || ''}
         onChange={e => onChange(e.target.value)}
         rows={Math.max(2, (value || '').split('\n').length)}
         placeholder="Add a note…"
-        style={{
-          width: '100%', minHeight: 40, boxSizing: 'border-box',
-          border: '1px solid #d5d0c4', outline: 'none',
-          resize: 'vertical', fontFamily: 'inherit', fontSize: 12.5, background: '#fff',
-          padding: '6px 8px', borderRadius: 6, color: 'var(--ink)',
-        }}
-        onFocus={e => { e.target.style.borderColor = '#5FA09E'; e.target.style.boxShadow = '0 0 0 1px #5FA09E' }}
-        onBlur={e => { e.target.style.borderColor = '#d5d0c4'; e.target.style.boxShadow = 'none' }}
       />
     </td>
   )
