@@ -611,6 +611,47 @@ export async function restoreCustomersBackup(backupId) {
   return row.payload
 }
 
+// ---- staff backups --------------------------------------
+// Same shape and same 14-deep retention as the customers ones above, over
+// the staff collection instead of the registrations.
+const MAX_STAFF_BACKUPS = 14
+
+export async function listStaffBackups() {
+  await ensureAuth()
+  const rows = await pb().collection('staff_backups').getFullList()
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  return rows.map(r => ({
+    id: r.id, label: r.label || '', created: r.created,
+    count: Array.isArray(r.payload) ? r.payload.length : 0,
+  }))
+}
+
+export async function createStaffBackup(label) {
+  await ensureAuth()
+  const staff = await loadStaff()
+  await pb().collection('staff_backups').create({ label: label || '', payload: staff })
+  const all = await pb().collection('staff_backups').getFullList()
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  for (const old of all.slice(MAX_STAFF_BACKUPS)) {
+    await pb().collection('staff_backups').delete(old.id)
+  }
+  return { count: staff.length }
+}
+
+export async function restoreStaffBackup(backupId) {
+  await ensureAuth()
+  const row = await pb().collection('staff_backups').getOne(backupId)
+  if (!row?.payload || !Array.isArray(row.payload)) throw new Error('Backup not found or empty')
+  /* Snapshot what is there now before overwriting it — restoring the wrong
+     backup should not be the end of the story. */
+  const current = await loadStaff()
+  await pb().collection('staff_backups').create({
+    label: `Before restore — ${new Date().toLocaleString()}`, payload: current,
+  })
+  await saveStaff(row.payload)
+  return row.payload
+}
+
 // ---- projects (kanban board — singleton payload) --------
 // Schema mirrors the "crania-projects.json" file the client's
 // v20 kanban mockup writes to disk, so exports/imports round-trip.
