@@ -29,15 +29,13 @@ const COLS = [
   { k: 'email',     l: 'Email' },
   { k: 'username',  l: 'Username' },
   { k: 'password',  l: 'Password' },
-  { k: 'source',    l: 'Set By',   cls: 'center' },
 ]
 const LOCKED_COL = 'name'
 
 const SEL_W = '3%'
-const ACT_W = '6%'
 const COL_W = {
-  studentId: '9%', name: '17%', grade: '6%', email: '19%',
-  username: '15%', password: '15%', source: '10%',
+  studentId: '11%', name: '20%', grade: '7%', email: '22%',
+  username: '18%', password: '19%',
 }
 
 const CPREF_KEY = 'logins-cols'
