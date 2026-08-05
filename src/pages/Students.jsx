@@ -600,16 +600,13 @@ function CommentsSection({ studentId, initialPrograms }) {
     clearTimeout(saveTimer.current[activeTab])
     saveTimer.current[activeTab] = setTimeout(() => persistTab(activeTab, next), 800)
 
-    // Auto-apply Crania Cash rules when transitioning into a triggering state
-    if (studentId) {
-      if (field === 'attendance' && value === 'P') {
-        const rule = findRule(['present'], 1)
-        addCashEntry(studentId, { delta: rule.delta, reason: `${rule.reason || 'Present'} (auto · lesson ${prevRow.lessonNo || rowIdx + 1})` })
-      }
-      if (field === 'uniform' && value === 'No') {
-        const rule = findRule(['no-shirt', 'no shirt'], -5)
-        addCashEntry(studentId, { delta: rule.delta, reason: `${rule.reason || 'No Shirt'} (auto · lesson ${prevRow.lessonNo || rowIdx + 1})` })
-      }
+    /* Bring this lesson's automatic Crania Cash into line with what the row
+       now says. Reconciled from the row rather than fired on the change, so
+       correcting a mistake takes the award back and re-marking the same
+       value does not award twice. */
+    if (studentId && fieldCanTrigger(rules, field)) {
+      const row = next[rowIdx] || {}
+      syncAutoCash(studentId, rowKeyOf(activeTab, row, rowIdx), awardsForRow(rules, row))
     }
   }
 

@@ -284,6 +284,7 @@ export function StoreProvider({ children }) {
     updateStudentField,
     updateCustomerField,
     addCashEntry,
+    syncAutoCash,
     updateRules,
     // Add a registration via the API (used by the public form at /register,
     // and by the "+ Add" buttons on Students/Customers). Returns the new
@@ -331,7 +332,7 @@ export function StoreProvider({ children }) {
       return record.id
     },
     updatePrograms,
-  }), [records, selectedId, status, rules, staff, programs, programsState, refresh, updateCraniaCash, updateStudentField, updateCustomerField, updatePrograms, addCashEntry, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms, setProgramsState])
+  }), [records, selectedId, status, rules, staff, programs, programsState, refresh, updateCraniaCash, updateStudentField, updateCustomerField, updatePrograms, addCashEntry, syncAutoCash, updateRules, updateStaffField, addStaff, deleteStaff, setPrograms, setProgramsState])
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
