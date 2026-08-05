@@ -260,16 +260,19 @@ export function StoreProvider({ children }) {
     } catch {}
   }, [])
 
-  const addStaff = useCallback(async () => {
+  /* `seed` fills the new record: {} for a blank hire, a copy for Duplicate,
+     or a whole deleted record — id and all — to put one back, which is how
+     undo of a delete restores rather than re-adds. */
+  const addStaff = useCallback(async (seed = {}) => {
     try {
       const res = await fetch(`${API_BASE}/api/staff`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
-        body: JSON.stringify({ firstName: 'New', lastName: 'Staff' }),
+        body: JSON.stringify(seed),
       })
       if (!res.ok) return null
       const rec = await res.json()
-      setStaff(prev => [...prev, rec])
+      setStaff(prev => [...prev.filter(s => s.id !== rec.id), rec])
       return rec.id
     } catch { return null }
   }, [])
