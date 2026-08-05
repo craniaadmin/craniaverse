@@ -36,8 +36,8 @@ const LOCKED_COL = 'name'
 const SEL_W = '3%'
 const ACT_W = '5%'
 const COL_W = {
-  studentId: '8%', name: '17%', grade: '6%', cash: '10%', level: '12%',
-  entries: '7%', last: '14%', lastReason: '19%',
+  studentId: '10%', name: '17%', grade: '6%', cash: '10%', level: '12%',
+  entries: '7%', last: '14%', lastReason: '17%',
 }
 
 const CPREF_KEY = 'craniacash-cols'
@@ -153,7 +153,10 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .cc .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
     border-bottom:3px solid var(--teal);overflow-x:auto}
-.cc table{width:100%;min-width:820px;table-layout:fixed;border-collapse:separate;
+/* Scoped to the list table. Unscoped, its 820px floor also applied to the
+   three-column history table in the detail panel, which forced that table
+   wider than the card and pushed the Change column outside it. */
+.cc .card > table{width:100%;min-width:1000px;table-layout:fixed;border-collapse:separate;
     border-spacing:5px 5px;background:#fff}
 .cc thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
@@ -244,7 +247,9 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 /* Fixed layout with the widths declared on the colgroup. Left to size
    itself, the border-spacing pushed the Change column past the right edge
    of the panel — the header ran out at Reason and the amount was cut off. */
-.cc .logtable{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:5px 5px}
+.cc .logtable{width:100%;min-width:0;table-layout:fixed;border-collapse:separate;border-spacing:5px 5px}
+/* Nothing may spill outside the card it lives in. */
+.cc .panel{overflow-x:auto}
 .cc .logtable th{background:var(--teal);color:#fff;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 8px;border-radius:6px}
 .cc .logtable td{background:var(--pill);border-radius:5px;padding:6px 9px;font-size:12px}
