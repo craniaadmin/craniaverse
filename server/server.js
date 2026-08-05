@@ -628,6 +628,71 @@ app.post('/api/registrations/:id/cashEntry', wrap(async (req, res) => {
   res.json({ ok: true, balance: newBalance, entry })
 }))
 
+/* Make the automatic entries for ONE lesson match what that lesson is
+   currently worth. The client sends the lesson's key and the awards it
+   should now carry; anything auto-awarded against that key that is not in
+   the list is withdrawn, and anything missing is added.
+
+   This replaces firing an award when a field changed. Reconciling from the
+   row's state is what makes correcting a mistake work: marking P then A
+   used to leave the point awarded, and marking P, A, P again used to award
+   twice. Running this twice with the same body changes nothing.
+
+   Only entries this route created are ever touched — they carry `auto`.
+   Manual entries have no such mark and are left alone. */
+app.post('/api/registrations/:id/autoCash', wrap(async (req, res) => {
+  const { key, awards } = req.body || {}
+  if (!key || typeof key !== 'string') return res.status(400).json({ error: 'key is required' })
+  if (!Array.isArray(awards)) return res.status(400).json({ error: 'awards must be an array' })
+
+  const records = await getRegistrations()
+  const idx = records.findIndex((r) => r.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'not found' })
+  const rec = records[idx]
+  const log = Array.isArray(rec.cashLog) ? rec.cashLog : []
+
+  const want = new Map()
+  for (const a of awards) {
+    if (!a || !a.ruleId) continue
+    const delta = Number(a.delta)
+    if (!Number.isFinite(delta)) continue
+    want.set(String(a.ruleId), { delta, reason: String(a.reason || '').trim() || 'Rule' })
+  }
+
+  const mineForKey = (e) => e && e.auto && e.auto.key === key
+  const kept = []
+  const have = new Map()
+  for (const e of log) {
+    if (!mineForKey(e)) { kept.push(e); continue }
+    const ruleId = String(e.auto.ruleId || '')
+    const target = want.get(ruleId)
+    // Withdrawn if the rule no longer applies, or re-issued if its amount
+    // changed since — either way the stale entry does not survive.
+    if (target && target.delta === e.delta) { kept.push(e); have.set(ruleId, true) }
+  }
+
+  const added = []
+  for (const [ruleId, a] of want) {
+    if (have.has(ruleId)) continue
+    added.push({
+      ts: new Date().toISOString(), delta: a.delta, reason: a.reason,
+      auto: { key, ruleId },
+    })
+  }
+
+  const nextLog = [...kept, ...added]
+  const before = log.reduce((n, e) => n + (Number(e.delta) || 0), 0)
+  const after = nextLog.reduce((n, e) => n + (Number(e.delta) || 0), 0)
+  const balance = (rec.student?.craniaCash || 0) + (after - before)
+
+  const changed = added.length > 0 || nextLog.length !== log.length
+  if (changed) {
+    records[idx] = { ...rec, cashLog: nextLog, student: { ...rec.student, craniaCash: balance } }
+    await commitRegistrations(records)
+  }
+  res.json({ ok: true, changed, balance, added: added.length, removed: log.length - kept.length })
+}))
+
 app.get('/api/rules', wrap(async (_req, res) => res.json(await getRules())))
 app.put('/api/rules', wrap(async (req, res) => {
   if (!Array.isArray(req.body)) return res.status(400).json({ error: 'body must be an array' })
