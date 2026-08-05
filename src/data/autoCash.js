@@ -19,13 +19,38 @@
 // missing and withdrawing what no longer applies. Doing it twice changes
 // nothing, which is what makes it safe to call on every edit.
 
+/* Before triggers existed, two rules fired by name and nothing else could.
+   A rule saved back then has no `when`, so it keeps exactly the behaviour
+   it had; anything else becomes manual, which is what it already was.
+
+   The server migrates on read too. This is here as well because the two
+   deploy separately: a browser running the new bundle against an API that
+   has not restarted yet would otherwise see no triggers on any rule and
+   award nothing at all — worse than the bug being fixed. */
+const LEGACY_TRIGGERS = {
+  present: { field: 'attendance', value: 'P' },
+  'no-shirt': { field: 'uniform', value: 'No' },
+  'no shirt': { field: 'uniform', value: 'No' },
+}
+
+export function normaliseRule(r) {
+  if (!r) return r
+  if (r.when && r.when.field && r.when.value) return r
+  if (r.when === null) return r          // explicitly set to manual — respect it
+  const legacy = LEGACY_TRIGGERS[String(r.id || '').toLowerCase()]
+    || LEGACY_TRIGGERS[String(r.reason || '').toLowerCase()]
+  return legacy ? { ...r, when: legacy } : r
+}
+
+export const normaliseRules = (rules) => (rules || []).map(normaliseRule)
+
 /* Rules carry their own trigger — `when: { field, value }` — so any rule
    can be automatic, not just the two that happened to be named right. A
    rule with no `when` is manual only: it shows as a quick-apply button and
    never fires by itself. */
 export function awardsForRow(rules, row) {
   if (!row) return []
-  return (rules || [])
+  return normaliseRules(rules)
     .filter(r => r && r.when && r.when.field && r.when.value)
     .filter(r => String(row[r.when.field] ?? '') === String(r.when.value))
     .map(r => ({ ruleId: r.id, delta: Number(r.delta) || 0, reason: r.reason || 'Rule' }))
