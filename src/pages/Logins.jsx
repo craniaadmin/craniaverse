@@ -206,54 +206,39 @@ function Copyable({ value, mono }) {
   )
 }
 
-/* Setting a login is the one write on this page, so it is deliberate: a
-   dialog rather than an inline edit, with the generated value shown as the
-   placeholder so it is obvious what clearing the box gets you back. */
-function EditLogin({ row, owners, onClose, onSave }) {
-  const [username, setUsername] = useState(row.login.customUsername ? row.login.username : '')
-  const [password, setPassword] = useState(row.login.customPassword ? row.login.password : '')
+/* Double-click a username or password to change it. The box opens on the
+   value that is actually in use rather than on a blank — the point of
+   editing here is to adjust the login you can see, not to fill in an empty
+   field.
 
-  const clash = !usernameAvailable(owners, username, row.id)
+   Enter or clicking away saves, Escape abandons. A username already taken
+   by someone else is refused while you type, because two students sharing
+   one username means neither can sign in. */
+function CellEdit({ row, field, owners, onCommit, onCancel }) {
+  const [value, setValue] = useState(row[field])
+  const ref = useRef(null)
+  useEffect(() => { const el = ref.current; if (el) { el.focus(); el.select() } }, [])
+
+  const v = value.trim()
+  const clash = field === 'username' && !usernameAvailable(owners, v, row.id)
+  const empty = v === ''
+  const blocked = clash || empty
+
+  const commit = () => { if (blocked) return; onCommit(row.id, field, v) }
 
   return (
-    <div className="ovl" onMouseDown={onClose}>
-      <div className="modal" onMouseDown={e => e.stopPropagation()}>
-        <h3>Login</h3>
-        <div className="who">{row.name}{row.studentId ? ` · ${row.studentId}` : ''}</div>
-
-        <div className="frow">
-          <label>Username</label>
-          <input value={username} onChange={e => setUsername(e.target.value)}
-            placeholder={row.login.generatedUsername || 'generated from the name'} />
-          {clash
-            ? <div className="err">Another student already uses that username.</div>
-            : <div className="note">Leave blank to use the generated one.</div>}
-        </div>
-
-        <div className="frow">
-          <label>Password</label>
-          <input value={password} onChange={e => setPassword(e.target.value)}
-            placeholder={row.login.generatedPassword || 'generated from the name'} />
-          <div className="note">
-            Leave blank to use the generated one. A generated password can be
-            worked out from the student's name, so set one here if it needs to
-            be private.
-          </div>
-        </div>
-
-        <div className="acts">
-          {row.login.custom && (
-            <button type="button" className="reset"
-              onClick={() => { setUsername(''); setPassword('') }}>
-              <RotateCcw size={12} /> Reset to generated
-            </button>
-          )}
-          <button type="button" className="cancel" onClick={onClose}>Cancel</button>
-          <button type="button" className="save" disabled={clash}
-            onClick={() => onSave(row.id, username.trim(), password.trim())}>Save</button>
-        </div>
-      </div>
-    </div>
+    <span className={'celledit' + (blocked ? ' bad' : '')}>
+      <input ref={ref} value={value} spellCheck={false} autoComplete="off"
+        onChange={e => setValue(e.target.value)}
+        onMouseDown={e => e.stopPropagation()}
+        onDoubleClick={e => e.stopPropagation()}
+        onBlur={() => (blocked ? onCancel() : commit())}
+        onKeyDown={e => {
+          if (e.key === 'Enter') { e.preventDefault(); commit() }
+          else if (e.key === 'Escape') { e.preventDefault(); onCancel() }
+        }} />
+      {clash && <span className="ehint">already taken</span>}
+    </span>
   )
 }
 
