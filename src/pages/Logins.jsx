@@ -3,16 +3,17 @@
 // Columns / Export CSV / settings toolbar, metric tiles that filter, a
 // filter row under every heading, a select column, and pill cells.
 //
-// The username and password are generated from the student's name unless
-// the student carries an override (see ../data/loginUtils). This page is
-// where an override is set and cleared, so a leaked password can actually
-// be changed — the generated one never could be.
+// Every row shows the real username and password. Both are generated from
+// the student's name by the usual pattern; double-click either one to type
+// something else, which is what makes a leaked password fixable. Typing the
+// generated value back in returns the field to being generated, so it keeps
+// following the name.
 //
 // Click-to-copy is kept from the old page: it is what this screen is most
 // used for.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Eye, Download, Copy, Check, Pencil, RotateCcw, AlertTriangle } from 'lucide-react'
+import { Eye, Download, Copy, Check, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
 import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } from '../data/loginUtils'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
