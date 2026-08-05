@@ -90,6 +90,9 @@ const LEGACY_TRIGGERS = {
 }
 function withTrigger(r) {
   if (r.when && r.when.field && r.when.value) return r
+  // An explicit null is a choice — the rule was set to manual only. Filling
+  // a trigger back in here would make that switch impossible to keep.
+  if (r.when === null) return r
   const key = String(r.id || '').toLowerCase()
   const byReason = String(r.reason || '').toLowerCase()
   const legacy = LEGACY_TRIGGERS[key] || LEGACY_TRIGGERS[byReason]
