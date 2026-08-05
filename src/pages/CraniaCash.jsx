@@ -193,7 +193,10 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .cc .custom input.why{flex:1;min-width:150px}
 .cc .custom button{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 16px;
     font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
-.cc .logtable{width:100%;border-collapse:separate;border-spacing:5px 5px}
+/* Fixed layout with the widths declared on the colgroup. Left to size
+   itself, the border-spacing pushed the Change column past the right edge
+   of the panel — the header ran out at Reason and the amount was cut off. */
+.cc .logtable{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:5px 5px}
 .cc .logtable th{background:var(--teal);color:#fff;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 8px;border-radius:6px}
 .cc .logtable td{background:var(--pill);border-radius:5px;padding:6px 9px;font-size:12px}
