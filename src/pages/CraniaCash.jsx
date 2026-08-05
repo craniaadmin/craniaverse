@@ -50,6 +50,38 @@ function loadColPrefs() {
 }
 function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ } }
 
+/* A ladder of animals, so a balance means something at a glance and there
+   is a next thing to reach for. Ordered low to high; a balance sits in the
+   last band whose floor it has reached. Below zero is its own state rather
+   than the bottom animal — being in debt is not the same as starting out. */
+const LEVELS = [
+  { min: 0,   name: 'Snail',    emoji: '🐌' },
+  { min: 10,  name: 'Rabbit',   emoji: '🐇' },
+  { min: 25,  name: 'Fox',      emoji: '🦊' },
+  { min: 50,  name: 'Owl',      emoji: '🦉' },
+  { min: 100, name: 'Dolphin',  emoji: '🐬' },
+  { min: 200, name: 'Falcon',   emoji: '🦅' },
+  { min: 350, name: 'Lion',     emoji: '🦁' },
+  { min: 500, name: 'Dragon',   emoji: '🐉' },
+]
+const IN_THE_RED = { name: 'In the red', emoji: '🔻', min: -Infinity }
+
+function levelFor(cash) {
+  const n = Number(cash) || 0
+  if (n < 0) return IN_THE_RED
+  let found = LEVELS[0]
+  for (const l of LEVELS) if (n >= l.min) found = l
+  return found
+}
+
+// The next rung, and how far off it is. Null once they are a Dragon.
+function nextLevel(cash) {
+  const n = Number(cash) || 0
+  const next = LEVELS.find(l => l.min > n)
+  return next ? { ...next, away: l0(next.min - n) } : null
+}
+const l0 = (n) => Math.max(0, Math.ceil(n))
+
 function fmtTs(ts) {
   if (!ts) return ''
   try {
