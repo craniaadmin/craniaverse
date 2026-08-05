@@ -253,6 +253,10 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .cc .logtable td.delta.down{color:#922b21}
 
 /* ── rules editor, inside the settings panel ── */
+.cc-rules .rwarn{background:#FBF3CE;border:1px solid #E8DCA0;color:#7a6417;border-radius:8px;
+    padding:8px 10px;font-size:11.5px;line-height:1.5;margin-bottom:9px}
+.cc-rules .rwarn .link{background:none;border:none;padding:0 0 0 3px;font:inherit;font-size:11.5px;
+    font-weight:700;color:#7a6417;text-decoration:underline;cursor:pointer}
 .cc-rules .rblock{padding:7px 0;border-bottom:1px solid #F1F3F4}
 .cc-rules .rrow{display:flex;align-items:center;gap:7px;padding:3px 0}
 .cc-rules .rrow.trig{font-size:11px;color:#6B6455}
