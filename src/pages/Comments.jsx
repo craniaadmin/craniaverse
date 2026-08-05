@@ -130,6 +130,7 @@ export default function Comments({ onNavigate }) {
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
+      <style>{COMMENT_CSS}</style>
       <div className="page-head">
         <h2 className="page-title">Comments</h2>
         <div style={{ display: 'flex', gap: 6 }}>
