@@ -570,10 +570,8 @@ export default function Logins({ onNavigate }) {
                 return (
                   <tr key={r.id}
                     className={(isSel ? 'sel ' : '') + (r.duplicate ? 'rdup' : '')}
-                    title="Click to change this login; right-click for more"
-                    onClick={() => setEditing(r)}
                     onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, row: r }) }}>
-                    <td className="selcol" onClick={e => e.stopPropagation()}>
+                    <td className="selcol">
                       <input type="checkbox" checked={isSel} onChange={e => setSelected(s => {
                         const n = new Set(s)
                         if (e.target.checked) n.add(r.id); else n.delete(r.id)
