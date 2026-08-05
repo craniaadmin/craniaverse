@@ -25,7 +25,6 @@ const HEADERS = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warnin
 const COLS = [
   { k: 'studentId', l: 'Student ID' },
   { k: 'name',      l: 'Student' },      // never hideable — it names the row
-  { k: 'grade',     l: 'Grade',    cls: 'center' },
   { k: 'email',     l: 'Email' },
   { k: 'username',  l: 'Username' },
   { k: 'password',  l: 'Password' },
@@ -34,8 +33,8 @@ const LOCKED_COL = 'name'
 
 const SEL_W = '5%'
 const COL_W = {
-  studentId: '11%', name: '20%', grade: '7%', email: '20%',
-  username: '18%', password: '19%',
+  studentId: '12%', name: '23%', email: '22%',
+  username: '19%', password: '19%',
 }
 
 const CPREF_KEY = 'logins-cols'
@@ -104,7 +103,7 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .lg .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
     border-bottom:3px solid var(--teal);overflow-x:auto}
-.lg .card > table{width:100%;min-width:860px;table-layout:fixed;border-collapse:separate;
+.lg .card > table{width:100%;min-width:780px;table-layout:fixed;border-collapse:separate;
     border-spacing:5px 5px;background:#fff}
 .lg thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
@@ -309,7 +308,6 @@ export default function Logins({ onNavigate }) {
       id: r.id, record: r,
       studentId: r.customer?.meta?.studentId || '',
       name: studentName(r) || '',
-      grade: r.student?.grade || '',
       email: r.student?.email || '',
       username: login.username,
       password: login.password,
@@ -332,13 +330,7 @@ export default function Logins({ onNavigate }) {
       return r.name.toLowerCase().includes(q) || r.username.toLowerCase().includes(q)
         || r.email.toLowerCase().includes(q) || r.studentId.toLowerCase().includes(q)
     })
-    const val = (r) => {
-      if (sort.key === 'grade') {
-        const n = parseFloat(String(r.grade).replace(/[^0-9.]/g, ''))
-        return Number.isFinite(n) ? n : 999
-      }
-      return String(r[sort.key] || '').toLowerCase()
-    }
+    const val = (r) => String(r[sort.key] || '').toLowerCase()
     return [...out].sort((a, b) => {
       const av = val(a), bv = val(b)
       if (av < bv) return -sort.dir
