@@ -366,19 +366,25 @@ function Th({ children, align = 'left', light }) {
 // editing widget and the exact same onChange -> updateRow() write
 // path (i.e. one place this ever writes data, not two).
 function CommentCell({ value, onChange }) {
+  /* The box is always drawn. It used to be transparent until focused, so a
+     cell with no note in it looked like empty space and you had to know to
+     click there — the one thing this page is for was the thing you could
+     not see. Focus now deepens the border rather than conjuring one. */
   return (
     <td style={{ padding: '2px' }}>
       <textarea
         value={value || ''}
         onChange={e => onChange(e.target.value)}
         rows={Math.max(2, (value || '').split('\n').length)}
+        placeholder="Add a note…"
         style={{
-          width: '100%', minHeight: 40, border: '1px solid transparent', outline: 'none',
-          resize: 'vertical', fontFamily: 'inherit', fontSize: 12.5, background: 'transparent',
+          width: '100%', minHeight: 40, boxSizing: 'border-box',
+          border: '1px solid #d5d0c4', outline: 'none',
+          resize: 'vertical', fontFamily: 'inherit', fontSize: 12.5, background: '#fff',
           padding: '6px 8px', borderRadius: 6, color: 'var(--ink)',
         }}
-        onFocus={e => { e.target.style.borderColor = '#d5d0c4'; e.target.style.background = '#fff' }}
-        onBlur={e => { e.target.style.borderColor = 'transparent'; e.target.style.background = 'transparent' }}
+        onFocus={e => { e.target.style.borderColor = '#5FA09E'; e.target.style.boxShadow = '0 0 0 1px #5FA09E' }}
+        onBlur={e => { e.target.style.borderColor = '#d5d0c4'; e.target.style.boxShadow = 'none' }}
       />
     </td>
   )
