@@ -63,7 +63,7 @@ const ROUTES = {
     <Students onNavigate={nav} initialRecordId={recId} onConsumeInitialRecord={clearRecId} />,
   'students:Attendance':     (nav) => <Attendance onNavigate={nav} />,
   'students:Comments':       (nav) => <Comments onNavigate={nav} />,
-  'students:Crania Cash':    () => <CraniaCash />,
+  'students:Crania Cash':    (nav) => <CraniaCash onNavigate={nav} />,
   'students:Logins':         (nav) => <Logins onNavigate={nav} />,
 
   'staff:Staff':             () => <StaffInformation />,
