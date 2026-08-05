@@ -7,6 +7,7 @@
 // sync automatically — there's only one copy of the data.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from './store'
+import { awardsForRow, rowKeyOf, fieldCanTrigger } from './autoCash'
 import { buildScheduledRows, tabKeyOf, dedupeProgramTabs } from './scheduleUtils'
 import { useAfterschoolWeeks } from './useAfterschoolWeeks'
 
@@ -14,7 +15,7 @@ const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
 
 export function useCommentsRows() {
-  const { records, programs: allPrograms, status: storeStatus } = useStore()
+  const { records, programs: allPrograms, status: storeStatus, rules, syncAutoCash } = useStore()
   const { weekDates, loading: weeksLoading } = useAfterschoolWeeks()
   const [bulk, setBulk] = useState(null) // null until the initial GET /api/comments resolves
   const [loading, setLoading] = useState(true)

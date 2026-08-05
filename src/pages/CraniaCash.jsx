@@ -287,20 +287,42 @@ function RulesEditor() {
     <div className="bkp-card cc-rules">
       <div className="bkp-title">Crania Cash Rules</div>
       <div className="bkp-hint">
-        Each rule becomes a quick-apply button on a student's page and in the
-        bulk bar. Only rules named “Present” and “No Shirt” are also applied
-        automatically when attendance is marked.
+        Every rule is a quick-apply button. Give one a trigger and it is also
+        applied by itself whenever a lesson is marked that way — on the
+        Attendance page and on a student's own page alike. Change the mark
+        later and the award follows.
       </div>
       {draft.length === 0 && <div className="bkp-meta">No rules yet.</div>}
       {draft.map((r, i) => (
-        <div key={r.id || i} className="rrow">
-          <input className="why" value={r.reason} placeholder="e.g. Completed homework"
-            onChange={e => setRow(i, { reason: e.target.value })} />
-          <input className="amt" type="number" value={r.delta}
-            onChange={e => setRow(i, { delta: Number(e.target.value) || 0 })} />
-          <button type="button" className="x" title="Remove rule" onClick={() => remove(i)}>
-            <Trash2 size={13} />
-          </button>
+        <div key={r.id || i} className="rblock">
+          <div className="rrow">
+            <input className="why" value={r.reason} placeholder="e.g. Completed homework"
+              onChange={e => setRow(i, { reason: e.target.value })} />
+            <input className="amt" type="number" value={r.delta}
+              onChange={e => setRow(i, { delta: Number(e.target.value) || 0 })} />
+            <button type="button" className="x" title="Remove rule" onClick={() => remove(i)}>
+              <Trash2 size={13} />
+            </button>
+          </div>
+          <div className="rrow trig">
+            <span className="w">Applies automatically when</span>
+            <select value={r.when?.field || ''}
+              onChange={e => {
+                const field = e.target.value
+                const first = TRIGGER_FIELDS.find(f => f.key === field)
+                setRow(i, { when: field ? { field, value: r.when?.value && first?.values.some(v => v.v === r.when.value) ? r.when.value : first.values[0].v } : null })
+              }}>
+              <option value="">Never — manual only</option>
+              {TRIGGER_FIELDS.map(f => <option key={f.key} value={f.key}>{f.label}</option>)}
+            </select>
+            {r.when?.field && (
+              <select value={r.when.value || ''}
+                onChange={e => setRow(i, { when: { field: r.when.field, value: e.target.value } })}>
+                {(TRIGGER_FIELDS.find(f => f.key === r.when.field)?.values || [])
+                  .map(v => <option key={v.v} value={v.v}>{v.label}</option>)}
+              </select>
+            )}
+          </div>
         </div>
       ))}
       <div className="foot">
