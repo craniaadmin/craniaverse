@@ -32,9 +32,9 @@ const COLS = [
 ]
 const LOCKED_COL = 'name'
 
-const SEL_W = '3%'
+const SEL_W = '5%'
 const COL_W = {
-  studentId: '11%', name: '20%', grade: '7%', email: '22%',
+  studentId: '11%', name: '20%', grade: '7%', email: '20%',
   username: '18%', password: '19%',
 }
 
