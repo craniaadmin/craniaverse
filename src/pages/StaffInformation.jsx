@@ -82,15 +82,18 @@ const startsInFuture = (startDate) => {
 }
 
 // ── Staff IDs ─────────────────────────────────────────────────────────────
-// An identifier, not a position: assigned once and then left alone. Deleting
-// E0003 does not renumber anyone, and the number is never handed out again.
+// An identifier, not a position: assigned once, written to the record, and
+// never recomputed. Deleting E0003 does not renumber anyone — everyone keeps
+// the number they were given. The next number comes from the highest one in
+// use, so deleting the highest does free it for the next hire; that matches
+// how family references behave on the Customers page.
 const staffRef = (n) => 'E' + String(n).padStart(4, '0')
 const refNumber = (ref) => {
   const m = /^E(\d+)$/.exec(String(ref || '').trim())
   return m ? parseInt(m[1], 10) : 0
 }
 
-function useStaffIds(staff, assign) {
+function useStaffIds(staff, assignStaffId) {
   const claimed = useRef(new Set())
   useEffect(() => {
     let highest = 0
@@ -99,9 +102,9 @@ function useStaffIds(staff, assign) {
       if (s.staffId || claimed.current.has(s.id)) continue
       claimed.current.add(s.id)
       highest += 1
-      assign(s.id, staffRef(highest))
+      assignStaffId(s.id, staffRef(highest))
     }
-  }, [staff, assign])
+  }, [staff, assignStaffId])
 }
 
 // ── Confirm dialog ────────────────────────────────────────────────────────
@@ -1028,7 +1031,11 @@ export default function StaffInformation() {
   const [detailId, setDetailId] = useState(null)
   const { confirm, node: dialogNode } = useConfirm()
 
-  useStaffIds(staff, updateStaffField)
+  /* updateStaffField takes (id, key, value); passing it straight in wrote a
+     field named after the reference instead of setting staffId. */
+  const assignStaffId = useCallback(
+    (id, ref) => updateStaffField(id, 'staffId', ref), [updateStaffField])
+  useStaffIds(staff, assignStaffId)
 
   /* Whole-record history: add, duplicate and delete. Field edits inside the
      form are not on this stack — the browser's own undo covers those. A
