@@ -70,6 +70,51 @@ export const TRIGGER_FIELDS = [
   },
 ]
 
+/* Rework a cash log so the automatic entries for ONE lesson are exactly the
+   given awards — adding what is missing, withdrawing what no longer applies,
+   and re-issuing any whose amount has changed. Pure, so the server route and
+   its tests run the same code rather than two versions of it.
+
+   Entries carrying no `auto` mark were added by hand and are never touched.
+
+   Returns { log, delta } where delta is how much the balance must move. */
+export function reconcileAutoCash(log, key, awards) {
+  const existing = Array.isArray(log) ? log : []
+
+  const want = new Map()
+  for (const a of (awards || [])) {
+    if (!a || !a.ruleId) continue
+    const delta = Number(a.delta)
+    if (!Number.isFinite(delta)) continue
+    want.set(String(a.ruleId), { delta, reason: String(a.reason || '').trim() || 'Rule' })
+  }
+
+  const kept = []
+  const have = new Set()
+  for (const e of existing) {
+    if (!e || !e.auto || e.auto.key !== key) { kept.push(e); continue }
+    const ruleId = String(e.auto.ruleId || '')
+    const target = want.get(ruleId)
+    if (target && target.delta === e.delta) { kept.push(e); have.add(ruleId) }
+  }
+
+  const added = []
+  for (const [ruleId, a] of want) {
+    if (have.has(ruleId)) continue
+    added.push({ ts: new Date().toISOString(), delta: a.delta, reason: a.reason, auto: { key, ruleId } })
+  }
+
+  const next = [...kept, ...added]
+  const sum = (rows) => rows.reduce((n, e) => n + (Number(e && e.delta) || 0), 0)
+  return {
+    log: next,
+    delta: sum(next) - sum(existing),
+    added: added.length,
+    removed: existing.length - kept.length,
+    changed: added.length > 0 || kept.length !== existing.length,
+  }
+}
+
 export const triggerLabel = (when) => {
   if (!when || !when.field || !when.value) return 'Manual only'
   const f = TRIGGER_FIELDS.find(x => x.key === when.field)

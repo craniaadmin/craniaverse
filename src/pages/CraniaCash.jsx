@@ -19,6 +19,7 @@ import { ChevronLeft, Eye, Download, Plus, Trash2, Pencil, ExternalLink } from '
 import { useStore } from '../data/store'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
+import { TRIGGER_FIELDS, triggerLabel } from '../data/autoCash'
 
 const COLS = [
   { k: 'studentId',  l: 'Student ID' },
@@ -252,7 +253,12 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .cc .logtable td.delta.down{color:#922b21}
 
 /* ── rules editor, inside the settings panel ── */
-.cc-rules .rrow{display:flex;align-items:center;gap:7px;padding:4px 0}
+.cc-rules .rblock{padding:7px 0;border-bottom:1px solid #F1F3F4}
+.cc-rules .rrow{display:flex;align-items:center;gap:7px;padding:3px 0}
+.cc-rules .rrow.trig{font-size:11px;color:#6B6455}
+.cc-rules .rrow.trig .w{font-weight:600;white-space:nowrap}
+.cc-rules .rrow.trig select{flex:1;min-width:0;padding:4px 6px;border:1px solid #D5D0C4;
+    border-radius:6px;font:inherit;font-size:11px;background:#fff;color:#2E2516}
 .cc-rules .rrow input{padding:6px 9px;border:1px solid var(--field);border-radius:7px;font:inherit;
     font-size:12px;background:#fff;color:#2E2516}
 .cc-rules .rrow input.why{flex:1;min-width:0}
