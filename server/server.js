@@ -222,6 +222,25 @@ async function getRules() {
     await saveRules(rules)
   }
   rules = rules.map(withTrigger)
+
+  /* Marking a student present awards 1 Crania Cash. That used to be true
+     because the code awarded it whether or not a rule said so; once awards
+     came only from rules, a rules list that had lost its Present rule
+     stopped paying and nothing said why.
+
+     So the rule is put back if it is not there. Keyed on the rule EXISTING,
+     not on its trigger, so turning the automation off is done by setting
+     its trigger to "Never — manual only" — that keeps the rule, and it is
+     not re-added. Deleting it outright brings it back on the next start,
+     which is the safer way round for something a register depends on. */
+  if (!rules.some((r) => String(r.id || '').toLowerCase() === 'present')) {
+    rules = [
+      { id: 'present', reason: 'Present', delta: 1, when: { field: 'attendance', value: 'P' } },
+      ...rules,
+    ]
+    await saveRules(rules)
+  }
+
   cache.rules = rules
   return cache.rules
 }
