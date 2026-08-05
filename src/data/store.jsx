@@ -195,6 +195,29 @@ export function StoreProvider({ children }) {
     } catch {}
   }, [])
 
+  /* Bring one lesson's automatic entries into line with what that lesson is
+     currently worth. Safe to call on every edit — the server adds what is
+     missing and withdraws what no longer applies, so calling it twice does
+     nothing the second time. The response carries the new balance, which is
+     applied locally so the Crania Cash page updates without a refetch. */
+  const syncAutoCash = useCallback(async (recordId, key, awards) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/registrations/${recordId}/autoCash`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        body: JSON.stringify({ key, awards }),
+      })
+      if (!res.ok) return
+      const out = await res.json()
+      if (!out || !out.changed) return
+      // The log itself is re-read on the next refresh; the balance is what
+      // is on screen, so keep that honest immediately.
+      setRecords(prev => prev.map(r => r.id === recordId
+        ? { ...r, student: { ...r.student, craniaCash: out.balance } }
+        : r))
+    } catch { /* offline — the next edit reconciles */ }
+  }, [])
+
   const updateRules = useCallback(async (newRules) => {
     setRules(newRules)
     try {

@@ -71,10 +71,29 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 dotenv.config({ path: path.join(__dirname, '.env') })
 const PORT = process.env.PORT || 4000
 
+/* A rule's trigger is part of the rule. It used to be implied by the id —
+   only 'present' and 'no-shirt' ever fired, whatever else you added — which
+   meant the Rules screen offered a promise it could not keep. */
 const DEFAULT_RULES = [
-  { id: 'present', reason: 'Present', delta: 1 },
-  { id: 'no-shirt', reason: 'No Shirt', delta: -5 },
+  { id: 'present',  reason: 'Present', delta: 1,  when: { field: 'attendance', value: 'P' } },
+  { id: 'no-shirt', reason: 'No Shirt', delta: -5, when: { field: 'uniform', value: 'No' } },
 ]
+
+/* Rules saved before triggers existed carry none. The two that used to fire
+   by name keep doing exactly what they did; everything else becomes manual,
+   which is also what it was in practice. */
+const LEGACY_TRIGGERS = {
+  present: { field: 'attendance', value: 'P' },
+  'no-shirt': { field: 'uniform', value: 'No' },
+  'no shirt': { field: 'uniform', value: 'No' },
+}
+function withTrigger(r) {
+  if (r.when && r.when.field && r.when.value) return r
+  const key = String(r.id || '').toLowerCase()
+  const byReason = String(r.reason || '').toLowerCase()
+  const legacy = LEGACY_TRIGGERS[key] || LEGACY_TRIGGERS[byReason]
+  return legacy ? { ...r, when: legacy } : { ...r, when: null }
+}
 
 // The original hardcoded Family Feedback Survey, now the first-class
 // "built-in" survey row — still editable/deletable like any other,
@@ -201,6 +220,7 @@ async function getRules() {
     rules = [...DEFAULT_RULES]
     await saveRules(rules)
   }
+  rules = rules.map(withTrigger)
   cache.rules = rules
   return cache.rules
 }
@@ -578,7 +598,10 @@ app.put('/api/registrations/:id/programs', wrap(async (req, res) => {
 
 app.put('/api/registrations/:id/craniaCash', wrap(async (req, res) => {
   const { craniaCash } = req.body
-  if (typeof craniaCash !== 'number' || craniaCash < 0) return res.status(400).json({ error: 'craniaCash must be a non-negative number' })
+  // Negatives are allowed: cashEntry can take a balance below zero and the
+  // Crania Cash page counts those students, so refusing them here only made
+  // the two write paths disagree.
+  if (typeof craniaCash !== 'number' || !Number.isFinite(craniaCash)) return res.status(400).json({ error: 'craniaCash must be a finite number' })
   const records = await getRegistrations()
   const idx = records.findIndex((r) => r.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
@@ -702,6 +725,9 @@ app.put('/api/rules', wrap(async (req, res) => {
       id: String(r.id || Math.random().toString(36).slice(2, 9)),
       reason: String(r.reason || '').trim(),
       delta: Number(r.delta) || 0,
+      when: r.when && r.when.field && r.when.value
+        ? { field: String(r.when.field), value: String(r.when.value) }
+        : null,
     }))
   await commitRules(cleaned)
   res.json({ ok: true, rules: cleaned })
