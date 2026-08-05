@@ -59,11 +59,11 @@ export function resolveLogin(student) {
   }
 }
 
-/* Usernames must stay unique — they are what a student types to sign in.
-   Two children called the same thing generate the same username, and an
-   override can collide with anyone. Returns the ids sharing each clashing
-   username so the page can point at them rather than just refusing. */
-export function duplicateUsernames(records) {
+/* Who holds each username, lowercased. Every username, not only the
+   contested ones — checking a proposed username against the clash list
+   alone would wave through anything already held by exactly one student,
+   which is most of them. */
+export function usernameOwners(records) {
   const by = new Map()
   for (const r of (records || [])) {
     if (!r || r.id === 'seed') continue
@@ -72,7 +72,24 @@ export function duplicateUsernames(records) {
     if (!by.has(u)) by.set(u, [])
     by.get(u).push(r.id)
   }
+  return by
+}
+
+/* Usernames must stay unique — they are what a student types to sign in.
+   Two children called the same thing generate the same username, and an
+   override can collide with anyone. Returns the ids sharing each clashing
+   username so the page can point at them rather than just refusing. */
+export function duplicateUsernames(records) {
   const out = new Map()
-  for (const [u, ids] of by) if (ids.length > 1) out.set(u, ids)
+  for (const [u, ids] of usernameOwners(records)) if (ids.length > 1) out.set(u, ids)
   return out
+}
+
+/* Is this username free for that student? Free means nobody holds it, or
+   only they do. */
+export function usernameAvailable(owners, username, recordId) {
+  const u = String(username || '').trim().toLowerCase()
+  if (!u) return true
+  const held = owners.get(u)
+  return !held || held.every(id => id === recordId)
 }
