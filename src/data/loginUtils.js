@@ -19,8 +19,13 @@ export function usernameFor(firstName, lastName) {
 }
 
 export function generatePassword(firstName, lastName) {
+  /* A missing name gives no character at all — `''[0]` is undefined, and
+     calling toUpperCase on it threw, which took down any page listing a
+     student who had only one name. Returning null is what the callers
+     already expect: no password can be generated. */
   const letter = (ch) => {
-    const n = (ch.toUpperCase().charCodeAt(0) - 64)
+    if (!ch) return null
+    const n = (String(ch).toUpperCase().charCodeAt(0) - 64)
     return n >= 1 && n <= 26 ? String(n).padStart(2, '0') : null
   }
   const first = letter((firstName || '')[0])

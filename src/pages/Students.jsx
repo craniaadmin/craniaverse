@@ -29,7 +29,7 @@ import {
   buildScheduledRows as buildScheduledRowsShared, dedupeProgramTabs, tabKeyOf,
 } from '../data/scheduleUtils'
 import { useAfterschoolWeeks } from '../data/useAfterschoolWeeks'
-import { usernameFor, generatePassword } from '../data/loginUtils'
+import { resolveLogin } from '../data/loginUtils'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
@@ -840,7 +840,7 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
     studentId: studentIds.get(r.id) || '',
     progList: r.programs || [],
     name: `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim(),
-    login: usernameFor(r.student?.firstName, r.student?.lastName) || '',
+    login: resolveLogin(r.student).username || '',
     grade: r.student?.grade || '',
     medical: r.student?.medical || '',
     cash: r.student?.craniaCash ?? '',
@@ -1237,7 +1237,11 @@ function StudentDetail({ recordId, onBack, onNavigate, onDelete }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [doUndo, doRedo])
 
-  const handleGenerate = () => { setGeneratedPw(generatePassword(fields.firstName, fields.lastName)); setCopied(false) }
+  /* The login actually in force, so this panel and the Logins page can
+     never show a student different credentials. Changing one is done on
+     the Logins page; this is a read-only view of the result. */
+  const login = resolveLogin(fields)
+  const handleGenerate = () => { setGeneratedPw(login.password); setCopied(false) }
   const handleCopy = () => {
     if (!generatedPw) return
     navigator.clipboard.writeText(generatedPw).then(() => {
@@ -1311,7 +1315,7 @@ function StudentDetail({ recordId, onBack, onNavigate, onDelete }) {
           <div className="sec-h">Login</div>
           <div className="frow">
             <label>Username:</label>
-            <div className="ro">{usernameFor(fields.firstName, fields.lastName) || '—'}</div>
+            <div className="ro">{login.username || '—'}</div>
           </div>
           <div className="frow">
             <label>Password:</label>
