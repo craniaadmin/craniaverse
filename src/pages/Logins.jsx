@@ -104,7 +104,7 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .lg .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
     border-bottom:3px solid var(--teal);overflow-x:auto}
-.lg .card > table{width:100%;min-width:1000px;table-layout:fixed;border-collapse:separate;
+.lg .card > table{width:100%;min-width:860px;table-layout:fixed;border-collapse:separate;
     border-spacing:5px 5px;background:#fff}
 .lg thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
@@ -125,7 +125,7 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .lg .colf{width:100%;background:#fff;border:1px solid var(--field);border-radius:7px;padding:4px 6px;
     font-size:11.5px;color:var(--dark-brown);font-weight:600;cursor:pointer;font-family:inherit}
 .lg .colf.on{background:var(--light-blue);border-color:var(--light-blue)}
-.lg thead th.selcol,.lg thead th.blankhead,.lg tbody td.selcol,.lg tbody td.actcell{background:transparent}
+.lg thead th.selcol,.lg tbody td.selcol{background:transparent}
 .lg thead th.selcol input,.lg tbody td.selcol input{width:12px;height:12px;margin:0;
     accent-color:var(--teal);vertical-align:middle;cursor:pointer}
 .lg .selcol{text-align:center}
@@ -133,7 +133,7 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .lg tbody td{padding:0 7px;background:var(--pill);border-radius:5px;font-size:12px;font-weight:400;
     vertical-align:middle;white-space:nowrap;line-height:1.35;height:26px;overflow:hidden;text-overflow:ellipsis}
 .lg tbody td.center{text-align:center}
-.lg tbody tr{cursor:pointer}
+.lg tbody td.editable{cursor:text}
 .lg tbody tr:hover td{background:#E4EFF3}
 .lg tbody tr.sel td{background:#DCEEEC}
 .lg tbody tr.rdup td{background:#FBF3CE}
@@ -150,38 +150,22 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .lg .copybtn{background:none;border:none;padding:1px;cursor:pointer;color:var(--faint);
     display:inline-flex;flex:none}
 .lg .copybtn:hover{color:var(--teal)}
-.lg .tag{display:inline-block;border-radius:5px;padding:1px 8px;font-size:11px;font-weight:700}
-.lg .tag.gen{background:var(--pill);color:var(--muted)}
-.lg .tag.set{background:#DEF2DE;color:var(--good)}
 .lg .warnrow{display:flex;align-items:center;gap:7px;background:#FBF3CE;border:1px solid #E8DCA0;
     color:#7a6417;border-radius:9px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;font-weight:600}
 .lg .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .lg .empty b{color:var(--dark-brown)}
 .lg .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 
-/* ── edit dialog ── */
-.lg .ovl{position:fixed;inset:0;background:rgba(46,37,22,.35);z-index:300;
-    display:flex;align-items:center;justify-content:center;padding:20px}
-.lg .modal{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(46,37,22,.3);
-    padding:18px 20px;width:100%;max-width:430px}
-.lg .modal h3{margin:0 0 4px;font-size:15px;color:var(--dark-brown)}
-.lg .modal .who{font-size:12px;color:var(--muted);margin-bottom:14px}
-.lg .modal .frow{margin-bottom:12px}
-.lg .modal label{display:block;font-size:11px;font-weight:700;color:var(--muted);
-    text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.lg .modal input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--field);
-    border-radius:8px;font:inherit;font-size:13px;background:#fff;color:var(--dark-brown)}
-.lg .modal input:focus{outline:none;border-color:var(--teal)}
-.lg .modal .note{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.45}
-.lg .modal .err{font-size:11.5px;color:var(--danger);margin-top:4px;font-weight:600}
-.lg .modal .acts{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:16px}
-.lg .modal button{border-radius:8px;padding:8px 15px;font:inherit;font-size:12.5px;
-    font-weight:700;cursor:pointer;border:none}
-.lg .modal .save{background:var(--teal);color:#fff}
-.lg .modal .save:disabled{background:#cbd1d6;cursor:default}
-.lg .modal .cancel{background:var(--pill);border:1px solid var(--field);color:var(--dark-brown)}
-.lg .modal .reset{background:transparent;border:1px solid var(--field);color:var(--muted);
-    margin-right:auto;display:inline-flex;align-items:center;gap:5px}
+/* ── inline edit ── */
+.lg td.editable:hover{outline:1px dashed #b9c6c5;outline-offset:-1px}
+.lg .celledit{display:block;position:relative}
+.lg .celledit input{width:100%;box-sizing:border-box;padding:1px 5px;border:1px solid var(--teal);
+    border-radius:4px;background:#fff;color:var(--dark-brown);font-family:ui-monospace,Consolas,monospace;
+    font-size:12px;font-weight:700;letter-spacing:.3px;outline:none}
+.lg .celledit.bad input{border-color:var(--danger);background:#FDF1EF}
+.lg .celledit .ehint{position:absolute;left:0;top:100%;margin-top:3px;z-index:5;white-space:nowrap;
+    background:var(--danger);color:#fff;border-radius:4px;padding:2px 6px;font-size:10.5px;font-weight:700}
+.lg .hinttext{font-size:11.5px;color:var(--muted);font-style:italic}
 `
 
 function Copyable({ value, mono }) {
@@ -263,7 +247,6 @@ function LoginsSettings({ onClose }) {
 export default function Logins({ onNavigate }) {
   const { records, status: fetchStatus, updateStudentField } = useStore()
   const [search, setSearch] = useState('')
-  const [customOnly, setCustomOnly] = useState(false)
   const [dupsOnly, setDupsOnly] = useState(false)
   const [colFilters, setColFilters] = useState({})
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
@@ -340,7 +323,6 @@ export default function Logins({ onNavigate }) {
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase()
     const out = allRows.filter(r => {
-      if (customOnly && !r.login.custom) return false
       if (dupsOnly && !r.duplicate) return false
       for (const [k, want] of Object.entries(colFilters)) {
         if (!want) continue
@@ -363,7 +345,7 @@ export default function Logins({ onNavigate }) {
       if (av > bv) return sort.dir
       return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
     })
-  }, [allRows, search, customOnly, dupsOnly, colFilters, sort])
+  }, [allRows, search, dupsOnly, colFilters, sort])
 
   const metrics = useMemo(() => ({
     students: allRows.length,
@@ -382,9 +364,9 @@ export default function Logins({ onNavigate }) {
     return out
   }, [allRows])
 
-  const anyFilterActive = !!search || customOnly || dupsOnly || Object.values(colFilters).some(Boolean)
+  const anyFilterActive = !!search || dupsOnly || Object.values(colFilters).some(Boolean)
   const clearAllFilters = () => {
-    setSearch(''); setCustomOnly(false); setDupsOnly(false); setColFilters({})
+    setSearch(''); setDupsOnly(false); setColFilters({})
   }
 
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
@@ -521,7 +503,6 @@ export default function Logins({ onNavigate }) {
             <colgroup>
               <col style={{ width: SEL_W }} />
               {orderedCols.map(c => <col key={c.k} style={{ width: COL_W[c.k] }} />)}
-              <col style={{ width: ACT_W }} />
             </colgroup>
             <thead>
               {/* Not `frow` — that name belongs to the detail field rows on
@@ -539,7 +520,6 @@ export default function Logins({ onNavigate }) {
                     </select>
                   </th>
                 ))}
-                <th />
               </tr>
               <tr>
                 <th className="selcol">
@@ -561,7 +541,6 @@ export default function Logins({ onNavigate }) {
                     </span>
                   </th>
                 ))}
-                <th className="blankhead" />
               </tr>
             </thead>
             <tbody>
@@ -632,19 +611,16 @@ export default function Logins({ onNavigate }) {
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[
-          { label: 'Change Login', on: () => setEditing(rowCtx.row) },
+          { label: 'Change Password', on: () => setEditing({ id: rowCtx.row.id, field: 'password' }) },
+          { label: 'Change Username', on: () => setEditing({ id: rowCtx.row.id, field: 'username' }) },
           { label: 'Open in Students', on: () => onNavigate && onNavigate('Students', rowCtx.row.id) },
           ...(rowCtx.row.login.custom
-            ? [{ label: 'Reset to Generated', on: () => saveLogin(rowCtx.row.id, '', '') }]
+            ? [{ label: 'Reset to Generated', on: () => resetLogin(rowCtx.row.id) }]
             : []),
           { label: 'Export This Student', on: () => exportCsv([rowCtx.row]) },
         ]} />
       )}
 
-      {editing && (
-        <EditLogin row={editing} owners={owners}
-          onClose={() => setEditing(null)} onSave={saveLogin} />
-      )}
     </div>
   )
 }
