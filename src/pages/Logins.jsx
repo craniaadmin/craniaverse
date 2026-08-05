@@ -586,21 +586,26 @@ export default function Logins({ onNavigate }) {
                       } else if (k === 'name') {
                         content = <span className="sname">{r.name || <span className="dash">—</span>}</span>
                       } else if (k === 'username' || k === 'password') {
-                        content = <Copyable value={r[k]} mono />
-                      } else if (k === 'source') {
-                        content = <span className={'tag ' + (r.login.custom ? 'set' : 'gen')}>{r.source}</span>
+                        const on = editing && editing.id === r.id && editing.field === k
+                        content = on
+                          ? <CellEdit row={r} field={k} owners={owners} onCommit={saveField}
+                              onCancel={() => setEditing(null)} />
+                          : r[k]
+                            ? <Copyable value={r[k]} mono />
+                            : <span className="dash">—</span>
                       } else {
                         content = r[k] === '' || r[k] == null ? <span className="dash">—</span> : r[k]
                       }
+                      const editable = k === 'username' || k === 'password'
                       return (
-                        <td key={k} className={`col-${k}${c.cls ? ' ' + c.cls : ''}`}
-                          title={String(r[k] ?? '')}>{content}</td>
+                        <td key={k}
+                          className={`col-${k}${c.cls ? ' ' + c.cls : ''}${editable ? ' editable' : ''}`}
+                          title={editable ? 'Double-click to change' : String(r[k] ?? '')}
+                          onDoubleClick={editable ? () => setEditing({ id: r.id, field: k }) : undefined}>
+                          {content}
+                        </td>
                       )
                     })}
-                    <td className="actcell" onClick={e => e.stopPropagation()}>
-                      <button className="rowbtn" title="Change this login"
-                        onClick={() => setEditing(r)}><Pencil size={12} /></button>
-                    </td>
                   </tr>
                 )
               })}
