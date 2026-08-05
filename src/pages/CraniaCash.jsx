@@ -321,8 +321,12 @@ function StudentCashDetail({ record, onBack, onNavigate }) {
         </div>
       </div>
 
+      {/* Two ways to add, kept apart. The custom row used to sit inside this
+          panel, under the Quick Apply heading, so it read as part of the
+          buttons rather than as the other way of doing it. */}
       <div className="panel">
-        <div className="t">Quick Apply</div>
+        <div className="t">Quick Apply — One Click</div>
+        <div className="sub">Applies the rule straight away, no confirmation.</div>
         <div className="quick">
           {rules.length === 0 ? (
             <div style={{ fontSize: 12.5, color: 'var(--muted)', fontStyle: 'italic' }}>
@@ -335,14 +339,23 @@ function StudentCashDetail({ record, onBack, onNavigate }) {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="panel">
+        <div className="t">Add Your Own Entry</div>
+        <div className="sub">For anything the rules above do not cover. Use a minus for a deduction.</div>
         <div className="custom">
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)',
-            textTransform: 'uppercase', letterSpacing: '.5px' }}>Custom</span>
-          <input className="amt" type="number" value={amount} placeholder="±amount"
-            onChange={e => setAmount(e.target.value)} />
-          <input className="why" value={reason} placeholder="Reason"
-            onChange={e => setReason(e.target.value)} />
-          <button onClick={submit}>Add Entry</button>
+          <label>
+            Amount
+            <input className="amt" type="number" value={amount} placeholder="e.g. 5 or -5"
+              onChange={e => setAmount(e.target.value)} />
+          </label>
+          <label className="grow">
+            Reason
+            <input className="why" value={reason} placeholder="What is it for?"
+              onChange={e => setReason(e.target.value)} />
+          </label>
+          <button disabled={!Number(amount)} onClick={submit}>Add Entry</button>
         </div>
       </div>
 
@@ -350,18 +363,23 @@ function StudentCashDetail({ record, onBack, onNavigate }) {
         <div className="t">History</div>
         {log.length === 0 ? (
           <div style={{ padding: '22px 0', textAlign: 'center', color: 'var(--muted)', fontSize: 12.5 }}>
-            No activity yet — apply a rule or add a custom entry above.
+            No activity yet — apply a rule or add an entry above.
           </div>
         ) : (
           <table className="logtable">
+            <colgroup>
+              <col style={{ width: '30%' }} />
+              <col />
+              <col style={{ width: '16%' }} />
+            </colgroup>
             <thead>
-              <tr><th style={{ width: '28%' }}>When</th><th>Reason</th><th style={{ width: '14%' }}>Change</th></tr>
+              <tr><th>When</th><th>Reason</th><th>Change</th></tr>
             </thead>
             <tbody>
               {log.map((e, i) => (
                 <tr key={i}>
                   <td style={{ color: 'var(--muted)' }}>{fmtTs(e.ts)}</td>
-                  <td>{e.reason}</td>
+                  <td title={e.reason}>{e.reason}</td>
                   <td className={'delta ' + (e.delta >= 0 ? 'up' : 'down')}>
                     {e.delta >= 0 ? '+' : ''}{e.delta}
                   </td>
@@ -371,11 +389,6 @@ function StudentCashDetail({ record, onBack, onNavigate }) {
           </table>
         )}
       </div>
-
-      <button className="back" style={{ marginTop: 4 }}
-        onClick={() => onNavigate && onNavigate('Students', record.id)}>
-        <ExternalLink size={14} /> Open this student in Students
-      </button>
     </div>
   )
 }
