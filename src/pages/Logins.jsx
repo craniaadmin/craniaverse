@@ -474,12 +474,6 @@ export default function Logins({ onNavigate }) {
           <div className="label">Students</div><div className="value">{metrics.students}</div>
           <div className="hint">with a portal login</div>
         </div>
-        <div className={'metric mcustom clickable' + (customOnly ? ' on' : '')}
-          title="Click to show only logins that were set by hand"
-          onClick={() => setCustomOnly(v => !v)}>
-          <div className="label">Changed</div><div className="value">{metrics.custom}</div>
-          <div className="hint">set by hand, not generated</div>
-        </div>
         <div className={'metric mdup clickable' + (dupsOnly ? ' on' : '')}
           title="Click to show only clashing usernames"
           onClick={() => setDupsOnly(v => !v)}>
