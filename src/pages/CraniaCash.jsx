@@ -351,6 +351,14 @@ function StudentCashDetail({ record, onBack, onNavigate }) {
               textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 2 }}>Crania Cash</div>
           </div>
         </div>
+        <div className="levelrow">
+          <span className="lvl" title={`Level: ${lvl.name}`}>
+            <span className="e">{lvl.emoji}</span>{lvl.name}
+          </span>
+          {next
+            ? <span className="toGo">{next.away} more to {next.emoji} {next.name}</span>
+            : <span className="toGo">Top level reached</span>}
+        </div>
       </div>
 
       {/* Two ways to add, kept apart. The custom row used to sit inside this
