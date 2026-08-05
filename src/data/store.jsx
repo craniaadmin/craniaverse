@@ -207,7 +207,20 @@ export function StoreProvider({ children }) {
         headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         body: JSON.stringify({ key, awards }),
       })
-      if (!res.ok) return
+      if (!res.ok) {
+        /* A 404 here means the API predates this route — the bundle has been
+           deployed but the server has not restarted. Say so once, loudly,
+           because the symptom is silent: marking the register simply awards
+           nothing and there is nothing on screen to explain why. */
+        if (res.status === 404 && !warnedAutoCash.current) {
+          warnedAutoCash.current = true
+          console.error(
+            '[Crania Cash] POST /api/registrations/:id/autoCash returned 404. '
+            + 'Automatic awards need the API restarted: pm2 restart craniaverse-api',
+          )
+        }
+        return
+      }
       const out = await res.json()
       if (!out || !out.changed) return
       // The log itself is re-read on the next refresh; the balance is what
