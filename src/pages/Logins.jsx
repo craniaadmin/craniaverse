@@ -14,7 +14,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Eye, Download, Copy, Check, Pencil, RotateCcw, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
-import { resolveLogin, duplicateUsernames } from '../data/loginUtils'
+import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } from '../data/loginUtils'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 
@@ -210,12 +210,11 @@ function Copyable({ value, mono }) {
 /* Setting a login is the one write on this page, so it is deliberate: a
    dialog rather than an inline edit, with the generated value shown as the
    placeholder so it is obvious what clearing the box gets you back. */
-function EditLogin({ row, taken, onClose, onSave }) {
+function EditLogin({ row, owners, onClose, onSave }) {
   const [username, setUsername] = useState(row.login.customUsername ? row.login.username : '')
   const [password, setPassword] = useState(row.login.customPassword ? row.login.password : '')
 
-  const wanted = username.trim().toLowerCase()
-  const clash = Boolean(wanted && taken.has(wanted) && !taken.get(wanted).includes(row.id))
+  const clash = !usernameAvailable(owners, username, row.id)
 
   return (
     <div className="ovl" onMouseDown={onClose}>
@@ -334,6 +333,7 @@ export default function Logins({ onNavigate }) {
 
   const onSort = (k) => setSort(s => (s.key === k ? { key: k, dir: -s.dir } : { key: k, dir: 1 }))
 
+  const owners = useMemo(() => usernameOwners(records), [records])
   const taken = useMemo(() => duplicateUsernames(records), [records])
 
   const allRows = useMemo(() => records.filter(r => r.id !== 'seed').map(r => {
@@ -653,7 +653,7 @@ export default function Logins({ onNavigate }) {
       )}
 
       {editing && (
-        <EditLogin row={editing} taken={taken}
+        <EditLogin row={editing} owners={owners}
           onClose={() => setEditing(null)} onSave={saveLogin} />
       )}
     </div>
