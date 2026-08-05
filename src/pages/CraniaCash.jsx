@@ -298,6 +298,19 @@ function RulesEditor() {
         Attendance page and on a student's own page alike. Change the mark
         later and the award follows.
       </div>
+      {/* Nothing here fires by itself unless a rule says when to. Before
+          triggers existed the code awarded +1 for Present whether or not a
+          rule said so, so deleting the rule appeared to change nothing —
+          and then marking a register silently stopped paying. Say it. */}
+      {draft.length > 0 && !draft.some(r => r.when && r.when.field && r.when.value) && (
+        <div className="rwarn">
+          No rule applies automatically, so marking a register awards nothing.
+          Give a rule a trigger below, or
+          <button type="button" className="link" onClick={addStandard}>
+            add the standard attendance rules
+          </button>.
+        </div>
+      )}
       {draft.length === 0 && <div className="bkp-meta">No rules yet.</div>}
       {draft.map((r, i) => (
         <div key={r.id || i} className="rblock">
