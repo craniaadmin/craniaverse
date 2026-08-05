@@ -208,21 +208,27 @@ export function StoreProvider({ children }) {
         headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         body: JSON.stringify({ key, awards }),
       })
+      /* Every failure here used to be silent: marking a register simply
+         awarded nothing, with nothing on screen and nothing in the console
+         to say why. Report all of them, with the status and the body, and
+         keep the last one on window for a one-line check. */
       if (!res.ok) {
-        /* A 404 here means the API predates this route — the bundle has been
-           deployed but the server has not restarted. Say so once, loudly,
-           because the symptom is silent: marking the register simply awards
-           nothing and there is nothing on screen to explain why. */
-        if (res.status === 404 && !warnedAutoCash.current) {
+        const body = await res.text().catch(() => '')
+        const detail = `${res.status} ${body.slice(0, 200)}`
+        window.__craniaCashLastError = { at: new Date().toISOString(), recordId, key, awards, detail }
+        if (!warnedAutoCash.current) {
           warnedAutoCash.current = true
           console.error(
-            '[Crania Cash] POST /api/registrations/:id/autoCash returned 404. '
-            + 'Automatic awards need the API restarted: pm2 restart craniaverse-api',
+            `[Crania Cash] award failed — POST /api/registrations/${recordId}/autoCash -> ${detail}`
+            + (res.status === 404
+              ? '\nA 404 means the API predates this route: pm2 restart craniaverse-api'
+              : ''),
           )
         }
         return
       }
       const out = await res.json()
+      window.__craniaCashLastResult = out
       if (!out || !out.changed) return
       // The log itself is re-read on the next refresh; the balance is what
       // is on screen, so keep that honest immediately.
