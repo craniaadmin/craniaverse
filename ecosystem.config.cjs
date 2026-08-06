@@ -73,9 +73,17 @@ module.exports = {
       // tries to render the dashboard, fails (no TTY under PM2), and exits.
       args: '/c ngrok http 4000 --url=craniaverse.ngrok.app --log=stdout --log-format=logfmt --log-level=info',
       autorestart: true,
-      // Throttle restarts if ngrok keeps dying (e.g. account auth issue)
       min_uptime: 10000,
-      max_restarts: 10,
+      // 2026-08-05 incident: a transient ngrok/network hiccup on boot burned
+      // through max_restarts:10 in minutes, so PM2 gave up and left the
+      // tunnel "errored" for hours with no one aware. Raised to 200 (PM2's
+      // restart counter is cumulative across the process's life, so this is
+      // a large budget, not "200 restarts per incident") and paired with
+      // exp_backoff_restart_delay so repeated failures back off instead of
+      // hammering. craniaverse-tunnel-monitor now emails if it ever does
+      // exhaust the budget and lands back in "errored".
+      max_restarts: 200,
+      exp_backoff_restart_delay: 5000,
     },
     {
       // Public sign-up tunnel — serves the booth kiosk on a separate
