@@ -501,7 +501,6 @@ function StaffList({
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const dragCol = useRef(null)
   const popRef = useRef(null)
 
