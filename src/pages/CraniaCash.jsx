@@ -755,19 +755,15 @@ function CashList({ onSelect, onNavigate, hist, award }) {
           + 'snapshots the Customers page takes — restoring one replaces every registration '
           + '(last 14 kept).'}
         onRestored={refresh}
-        /* Columns joins the rules editor already behind the gear. It closes
-           the panel on the way: the chooser is a fixed popover at a lower
-           z-index and would otherwise open behind it. */
+        /* Columns closes the panel on the way: the chooser is a fixed
+           popover at a lower z-index and would otherwise open behind it. */
         settingsExtra={close => (
-          <>
-            <button title="Choose which columns are shown"
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                close()
-                setPop({ kind: 'cols', rect })
-              }}><Eye size={13} /> Columns</button>
-            <RulesEditor pushHist={hist.push} />
-          </>
+          <button title="Choose which columns are shown"
+            onClick={e => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              close()
+              setPop({ kind: 'cols', rect })
+            }}><Eye size={13} /> Columns</button>
         )}
       />
 
