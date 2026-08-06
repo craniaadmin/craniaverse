@@ -22,20 +22,15 @@ const PJ_CSS = `
 .pj-colspop .allrow{border-top:1px solid #EDEAE2;margin-top:4px;padding-top:4px;}
 .pj-colspop .allrow button{background:none;border:none;color:var(--brand-dark-blue);font-weight:700;font-size:12.5px;text-align:left;padding:6px 10px;border-radius:6px;width:100%;cursor:pointer;}
 .pj-colspop .allrow button:hover{background:#f4f2ea;}
-.pj-settings{position:fixed;z-index:200;background:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:14px;width:300px;top:120px;right:16px;}
-.pj-settings .sp-card-title{font-weight:700;font-size:14px;margin-bottom:6px;color:var(--brand-dark-brown);}
-.pj-settings .sp-hint{font-size:12px;color:#6b6455;line-height:1.4;margin-bottom:4px;}
-.pj-settings .sp-meta{font-size:12.5px;color:#6B6455;margin-bottom:2px;}
-.pj-settings .sp-btnrow{display:flex;gap:8px;margin-top:4px;}
-.pj-settings .sp-btn{background:var(--brand-dark-blue);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
-.pj-settings .sp-btn:hover:not(:disabled){filter:brightness(1.08);}
-.pj-settings .sp-btn:disabled{opacity:.5;cursor:default;}
-.pj-settings .sp-restore-list{margin-top:8px;max-height:170px;overflow-y:auto;}
-.pj-settings .sp-restore-row{display:flex;align-items:center;padding:5px 6px;border-radius:6px;font-size:12px;margin-bottom:2px;background:#fff;}
-.pj-settings .sp-restore-row:hover{background:#f4f2ea;}
-.pj-settings .sp-restore-row .sp-rlabel{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b6455;}
-.pj-settings .sp-restore-row .sp-btn{padding:3px 8px;font-size:11px;}
-.pj-settings .sp-time{border:1px solid #d5d0c4;border-radius:8px;padding:5px 8px;font:inherit;font-size:13px;background:#fff;color:var(--brand-dark-brown);}
+/* Board settings sit inside the gear panel now, so these style a block in
+   the flow rather than a floating card of its own — no positioning, no
+   surface, and sized to match the rest of the panel. */
+.pj-boardset .sp-card-title{font-weight:700;font-size:12.5px;margin-bottom:4px;color:var(--brand-dark-brown);}
+.pj-boardset .sp-hint{font-size:11.5px;color:#6b6455;line-height:1.4;margin-bottom:4px;}
+.pj-boardset .sp-btnrow{display:flex;gap:8px;margin-top:4px;align-items:center;}
+.pj-boardset .sp-btn{background:var(--brand-dark-blue);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+.pj-boardset .sp-btn:hover:not(:disabled){filter:brightness(1.08);}
+.pj-boardset .sp-time{border:1px solid #d5d0c4;border-radius:8px;padding:5px 8px;font:inherit;font-size:12.5px;background:#fff;color:var(--brand-dark-brown);}
 /* Hiding a column is a quiet action — the eye only shows on the header it belongs to. */
 .kb-col-head .kb-colhide{background:none;border:none;color:inherit;opacity:0;font-size:11px;padding:0 2px;margin-left:4px;cursor:pointer;transition:opacity .12s;}
 .kb-col-head:hover .kb-colhide{opacity:.75;}
