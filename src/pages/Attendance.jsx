@@ -392,7 +392,7 @@ export default function Attendance({ onNavigate }) {
 }
 
 // ---------- Register: one class-group card ----------
-function ClassGroup({ program, rows, onNavigate, updateRow }) {
+function ClassGroup({ program, rows, onNavigate, markRow }) {
   return (
     <div style={{ background: '#fff', borderRadius: 10, boxShadow: 'var(--brand-shadow)', overflow: 'hidden' }}>
       <div style={{
