@@ -863,14 +863,20 @@ function ContestsPage({ onNavigate }) {
     <div className="page ct" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
 
-      <div className="actions">
-        <button title="Undo (Ctrl+Z)" disabled={!undoLen} onClick={doUndo}><Undo2 size={13} /> Undo</button>
-        <button title="Redo (Ctrl+Shift+Z)" disabled={!redoLen} onClick={doRedo}><Redo2 size={13} /></button>
-        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
+      <PageActions
+        onUndo={doUndo} onRedo={doRedo}
+        undoLabel={undoLen ? 'last contest change' : ''}
+        redoLabel={redoLen ? 'last undone change' : ''}
+        csvName="crania-contests-export"
+        csvColumns={CSV_COLUMNS}
+        csvRows={() => visible}
+        backupCollection="contests"
+        backupHint="Snapshots of the manual contest rows and the edits layered over the program ones (last 14 kept)."
+      >
+        <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
         ><Eye size={13} /> Columns</button>
-        <button title="Download all contests as a CSV file" onClick={exportCsv}><Download size={13} /> Export CSV</button>
-      </div>
+      </PageActions>
 
       {fetchStatus === 'offline' && (
         <div className="offline">Working offline — changes will retry when the server is reachable.</div>
