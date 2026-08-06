@@ -22,6 +22,7 @@ import { buildFamilyIndex } from '../data/family'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { Phone, Mail, Eye, Download } from 'lucide-react'
 import { useStore } from '../data/store'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 const COLS = [
   { k: 'contact',      l: 'Emergency Contact' },  // never hideable — it names the row
