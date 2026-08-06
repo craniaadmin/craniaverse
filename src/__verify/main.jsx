@@ -54,7 +54,7 @@ for (const [name, load] of PAGES) {
     document.body.appendChild(host)
     const Boundary = makeBoundary(err => { caught = err })
     const root = createRoot(host)
-    root.render(<Boundary><Page /></Boundary>)
+    root.render(<StoreProvider><Boundary><Page /></Boundary></StoreProvider>)
     // Let the stubbed fetch resolve and force the second render.
     await new Promise(r => setTimeout(r, 400))
     root.unmount()
