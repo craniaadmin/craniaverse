@@ -46,6 +46,27 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
         </button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-forms"
+        csvColumns={[
+          { key: 'title', label: 'Form' },
+          { key: 'fields', label: 'Fields' },
+          { key: 'description', label: 'Description' },
+          { key: 'url', label: 'Public Link' },
+        ]}
+        csvRows={() => forms.map(f => ({
+          title: f.title || 'Untitled Form',
+          fields: (f.fields || []).length,
+          description: f.description || '',
+          url: publicUrl(f),
+        }))}
+        backupCollection="forms"
+        backupHint="Snapshots of every form definition (last 14 kept). Submissions are not included."
+      >
+        <button title="Build a new form" onClick={onNew}><Plus size={13} /> New Form</button>
+      </PageActions>
+
       <div style={{ display: 'grid', gap: 12 }}>
         {/* Built-in: Booth Sign-Up */}
         <div style={{
