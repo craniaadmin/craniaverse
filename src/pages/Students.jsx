@@ -914,21 +914,34 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
     <div className="page st" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
 
-      <div className="actions">
-        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
-        ><Eye size={13} /> Columns</button>
-        <button title="Download every student as a CSV file" onClick={exportCsv}>
-          <Download size={13} /> Export CSV
+      <PageActions
+        onUndo={onUndo} onRedo={onRedo} undoLabel={undoLabel} redoLabel={redoLabel}
+        histBusy={histBusy} histNote={histNote}
+        csvName="crania-students-export"
+        csvColumns={csvColumns}
+        csvRows={csvRows}
+        settingsExtra={close => (
+          <>
+            {/* Closes the panel on the way: the column chooser is a fixed
+                popover underneath it, so it would open invisible. */}
+            <button title="Choose which columns are shown"
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                close()
+                setPop({ kind: 'cols', rect })
+              }}><Eye size={13} /> Columns</button>
+            <BackupPanel base="customers" confirm={dialog.confirm}
+              hint={'Students are held on the registrations, so these are the same snapshots the '
+                + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
+              onRestored={async () => { await refresh(); close() }} />
+            <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
+          </>
+        )}
+      >
+        <button className="st-add" title="Add a new student" onClick={onAdd}>
+          <UserPlus size={13} /> Add Student
         </button>
-        <button className="gearbtn" title="Backups and programme colours"
-          onClick={() => setSettingsOpen(true)}>⚙</button>
-      </div>
-
-      {settingsOpen && (
-        <StudentsSettings onClose={() => setSettingsOpen(false)}
-          categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
-      )}
+      </PageActions>
 
       <div className="metrics">
         <div className="metric">
