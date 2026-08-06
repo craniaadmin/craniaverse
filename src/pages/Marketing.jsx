@@ -125,6 +125,36 @@ export default function Marketing() {
         </button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-campaigns"
+        csvColumns={[
+          { key: 'name', label: 'Campaign' },
+          { key: 'channel', label: 'Channel' },
+          { key: 'status', label: 'Status' },
+          { key: 'startDate', label: 'Start' },
+          { key: 'endDate', label: 'End' },
+          { key: 'owner', label: 'Owner' },
+          { key: 'notes', label: 'Notes' },
+        ]}
+        csvRows={() => visible.map(c => ({
+          name: c.name || 'Untitled Campaign',
+          channel: c.channel || '',
+          status: c.status || 'Planned',
+          startDate: c.startDate || '',
+          endDate: c.endDate || '',
+          owner: c.owner || '',
+          notes: c.notes || '',
+        }))}
+        backupCollection="campaigns"
+        backupHint="Snapshots of the whole campaign list (last 14 kept)."
+        onRestored={refresh}
+      >
+        <button title="Add a new campaign" onClick={() => setEditing({ mode: 'new' })}>
+          <Plus size={13} /> Add Campaign
+        </button>
+      </PageActions>
+
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
