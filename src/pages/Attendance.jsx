@@ -257,7 +257,7 @@ export default function Attendance({ onNavigate }) {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {dayGroups.map(([program, rows]) => (
-                <ClassGroup key={program} program={program} rows={rows} onNavigate={onNavigate} updateRow={updateRow} />
+                <ClassGroup key={program} program={program} rows={rows} onNavigate={onNavigate} markRow={markRow} />
               ))}
             </div>
           )}
