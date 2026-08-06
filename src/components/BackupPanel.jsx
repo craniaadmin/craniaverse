@@ -62,7 +62,11 @@ export default function BackupPanel({
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       await load()
     } catch {
-      setErr(`Backup failed — the ${base}_backups collection may be missing (run pb-setup.js).`)
+      /* `base` is either a page name ("customers" -> customers_backups)
+         or the shared "snapshots/<collection>" route, so name the right
+         missing collection rather than gluing _backups onto both. */
+      setErr(`Backup failed — the ${base.startsWith('snapshots/') ? 'snapshots' : base + '_backups'}`
+        + ' collection may be missing (run pb-setup.js).')
     }
     setBusy(false)
   }
