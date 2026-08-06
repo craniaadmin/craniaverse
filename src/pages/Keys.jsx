@@ -247,7 +247,6 @@ export default function Keys({ onNavigate }) {
   const [colFilters, setColFilters] = useState({})
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const [editing, setEditing] = useState(null)   // { rowId, field }
   const [adding, setAdding] = useState(false)
