@@ -41,6 +41,31 @@ export default function Receipts() {
 
   return (
     <PageShell>
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-receipts"
+        csvColumns={[
+          { key: 'receiptNumber', label: 'Receipt #' },
+          { key: 'date', label: 'Date' },
+          { key: 'customerName', label: 'Customer' },
+          { key: 'invoiceNumber', label: 'Invoice #' },
+          { key: 'method', label: 'Method' },
+          { key: 'reference', label: 'Reference' },
+          { key: 'amount', label: 'Amount' },
+        ]}
+        csvRows={() => filtered.map(p => ({
+          receiptNumber: p.receiptNumber || '',
+          date: p.date || '',
+          customerName: p.customerName || '',
+          invoiceNumber: p.invoiceId ? (invoiceById[p.invoiceId]?.number || '') : '',
+          method: p.method || '',
+          reference: p.reference || '',
+          amount: Number(p.amount || 0),
+        }))}
+        backupCollection="finance"
+        backupHint="Snapshots of every invoice and payment (last 14 kept)."
+        onRestored={refresh}
+      />
 
       {status === 'offline' && <OfflineBanner />}
 
