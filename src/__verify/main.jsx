@@ -1,55 +1,76 @@
 // TEMPORARY verification harness — delete after use.
-// Mounts the real Contacts page with fetch stubbed, so the component goes
-// through loading:true -> loading:false exactly as it does in the app.
-// That transition is what triggered "rendered more hooks than during the
-// previous render" when useHistory sat below the `loading` early return.
+// Mounts each repaired page with fetch stubbed so it goes through
+// loading:true -> loading:false, the transition that triggered
+// "rendered more hooks than during the previous render" when useHistory
+// sat below the `loading` early return.
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 
+// Superset payload: whichever key a page reads, it gets an array.
 const FIXTURE = {
-  contacts: [
-    { id: 'a1', name: 'Acme Supplies', category: 'Vendor/Supplier', contactPerson: 'Dana Reed', email: 'dana@acme.test', phone: '555-0100' },
-    { id: 'b2', name: 'Northside Partner School', category: 'Partner School', contactPerson: 'Sam Ito', email: 'sam@northside.test', phone: '555-0111' },
-  ],
+  contacts: [{ id: 'a1', name: 'Acme Supplies', category: 'Vendor/Supplier' }],
+  leads: [{ id: 'l1', name: 'Sample Lead', status: 'New' }],
+  campaigns: [{ id: 'c1', name: 'Sample Campaign' }],
+  items: [], accounts: [], products: [], inventory: [], store: [], data: {},
 }
 
-// Answer every request the page makes, a tick later so `loading` is true first.
 window.fetch = (url, opts = {}) => {
   const method = (opts.method || 'GET').toUpperCase()
   const body = method === 'GET' ? FIXTURE : { ok: true }
   return new Promise(resolve =>
     setTimeout(() => resolve({
-      ok: true,
-      status: 200,
+      ok: true, status: 200,
       json: async () => body,
       text: async () => JSON.stringify(body),
     }), 10))
 }
 
-const errors = []
-class Boundary extends React.Component {
-  constructor(p) { super(p); this.state = { err: null } }
-  static getDerivedStateFromError(err) { return { err } }
-  componentDidCatch(err) { errors.push(err); console.error('[VERIFY] component threw:', err.message) }
-  render() {
-    if (this.state.err) return <pre id="verify-result">FAIL: {this.state.err.message}</pre>
-    return this.props.children
+const PAGES = [
+  ['Contacts',    () => import('../pages/Contacts.jsx')],
+  ['Marketing',   () => import('../pages/Marketing.jsx')],
+  ['Leads',       () => import('../pages/Leads.jsx')],
+  ['ITAccounts',  () => import('../pages/ITAccounts.jsx')],
+  ['CraniaStore', () => import('../pages/CraniaStore.jsx')],
+  ['Inventory',   () => import('../pages/Inventory.jsx')],
+]
+
+function makeBoundary(onError) {
+  return class extends React.Component {
+    constructor(p) { super(p); this.state = { err: null } }
+    static getDerivedStateFromError(err) { return { err } }
+    componentDidCatch(err) { onError(err) }
+    render() { return this.state.err ? null : this.props.children }
   }
 }
 
-const { default: Contacts } = await import('../pages/Contacts.jsx')
+const results = []
 
-createRoot(document.getElementById('root')).render(
-  <Boundary><Contacts /></Boundary>
-)
+for (const [name, load] of PAGES) {
+  let caught = null
+  try {
+    const { default: Page } = await load()
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const Boundary = makeBoundary(err => { caught = err })
+    const root = createRoot(host)
+    root.render(<Boundary><Page /></Boundary>)
+    // Let the stubbed fetch resolve and force the second render.
+    await new Promise(r => setTimeout(r, 400))
+    root.unmount()
+    host.remove()
+  } catch (err) {
+    caught = err
+  }
+  const hookErr = caught && /rendered more hooks|fewer hooks|order of Hooks/i.test(caught.message)
+  results.push({ name, ok: !hookErr, message: caught ? caught.message : null })
+}
 
-// Give the fetch + re-render time to land, then report.
-setTimeout(() => {
-  const el = document.createElement('div')
-  el.id = 'verify-verdict'
-  el.textContent = errors.length === 0
-    ? 'VERIFY_PASS: Contacts rendered through loading->loaded with no hook error'
-    : `VERIFY_FAIL: ${errors.map(e => e.message).join(' | ')}`
-  document.body.appendChild(el)
-  console.log(el.textContent)
-}, 600)
+const failures = results.filter(r => !r.ok)
+const out = document.createElement('pre')
+out.id = 'verify-verdict'
+out.textContent = JSON.stringify({
+  verdict: failures.length === 0 ? 'ALL_PASS_NO_HOOK_ERRORS' : 'HOOK_ERRORS_REMAIN',
+  results,
+}, null, 2)
+document.body.appendChild(out)
+console.log(out.textContent)
