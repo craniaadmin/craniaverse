@@ -433,7 +433,7 @@ function ClassGroup({ program, rows, onNavigate, markRow }) {
               </select>
               <select
                 value={r.row.attendance || ''}
-                onChange={e => updateRow(r.studentId, r.tabKey, r.rowIdx, 'attendance', e.target.value)}
+                onChange={e => markRow(r, 'attendance', e.target.value)}
                 title={r.row.attendance ? ATTEND_LABEL[r.row.attendance.toUpperCase()] : 'Not marked'}
                 style={{
                   border: 'none', outline: 'none', cursor: 'pointer',
