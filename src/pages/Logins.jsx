@@ -400,17 +400,21 @@ export default function Logins({ onNavigate }) {
     <div className="page lg" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
 
-      <div className="actions">
-        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
+      <PageActions
+        csvName="crania-logins"
+        csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
+        csvRows={() => visible}
+        settingsExtra={
+          <BackupPanel base="customers"
+            hint={'Logins are held on the registrations, so these are the same snapshots the '
+              + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
+            onRestored={refresh} />
+        }
+      >
+        <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
         ><Eye size={13} /> Columns</button>
-        <button title="Download the logins as a CSV file" onClick={() => exportCsv()}>
-          <Download size={13} /> Export CSV
-        </button>
-        <button className="gearbtn" title="Backups" onClick={() => setSettingsOpen(true)}>⚙</button>
-      </div>
-
-      {settingsOpen && <LoginsSettings onClose={() => setSettingsOpen(false)} />}
+      </PageActions>
 
       {fetchStatus === 'offline' && (
         <div className="offline">Working offline — showing cached data.</div>
