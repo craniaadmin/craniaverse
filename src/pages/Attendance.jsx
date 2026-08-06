@@ -55,6 +55,7 @@ export default function Attendance({ onNavigate }) {
      render is a "rendered more hooks than during the previous render"
      crash, and the page dies on open. Keep them all up here. */
   const hist = useActionHistory()
+  const pushHist = hist.push
 
   /* The mark as it stands has to be read at the moment of the change, not
      closed over from a render — several people mark the same register. */
