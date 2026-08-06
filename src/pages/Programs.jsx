@@ -2011,7 +2011,7 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
           </table>
         )}
       </div>
-      <div className="tcount">Count={shownCount}{shownCount !== allRows.length ? ` of ${allRows.length}` : ''}</div>
+      <RowCount shown={shownCount} total={allRows.length} />
 
       {pop && pop.kind === 'filter' && (
         <FilterPop ref={popRef} rect={pop.rect} fk={pop.fk}
