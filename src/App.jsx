@@ -186,6 +186,7 @@ export default function App() {
   return (
     <StoreProvider>
       <div className="app">
+        <style>{ACCOUNT_CSS + SESSION_CSS}</style>
         <TopNav section={section} sub={sub} onSubSelect={setSub} onLogout={logout} user={user} />
         <SessionTimer expiresAt={expiresAt} onExtend={setExpiresAt} onExpire={logout} />
         <div className="app-shell">
