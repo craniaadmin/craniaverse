@@ -294,27 +294,27 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 
 // ── Small editable building blocks ────────────────────────────────────────
 function TextField({ label, value, onChange, type = 'text', variant }) {
-  let cls = 'field-val'
-  if (variant === 'highlight') cls += ' highlight'
   return (
-    <div className="field-row" style={{ gridTemplateColumns: '110px 1fr' }}>
+    <div className="frow">
       <label>{label}:</label>
       <input
         type={type}
-        className={cls}
+        className={variant === 'highlight' ? 'highlight' : undefined}
         value={value || ''}
         onChange={e => onChange && onChange(e.target.value)}
-        style={{ width: '100%', fontFamily: 'inherit', fontSize: 'inherit', boxSizing: 'border-box' }}
       />
     </div>
   )
 }
 
+/* Derived values — age, time at Crania. Given the same grey treatment
+   the other detail pages use for a read-only field, so it is obvious at
+   a glance which boxes you can type in. */
 function ReadOnlyField({ label, value }) {
   return (
-    <div className="field-row" style={{ gridTemplateColumns: '110px 1fr' }}>
+    <div className="frow">
       <label>{label}:</label>
-      <div className="field-val">{value || ' '}</div>
+      <div className="ro">{value || '—'}</div>
     </div>
   )
 }
