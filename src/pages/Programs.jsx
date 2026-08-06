@@ -1891,12 +1891,15 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
           <>
             <button title="Draw the schedule currently on screen as an image"
               onClick={() => { close(); createScheduleImage() }}>🖼 Create Schedule</button>
-            <button title="Choose which columns are shown"
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                close()
-                setPop({ kind: 'cols', rect })
-              }}>👁 Columns</button>
+            <ColumnsMenu cols={menuColsFor(colOrder)} hiddenCols={hiddenCols}
+              onToggle={(k, on) => setHiddenCols(h => {
+                const n = { ...h }
+                if (on) delete n[k]; else n[k] = true
+                return n
+              })}
+              onAll={() => setHiddenCols({})}
+              onNone={() => setHiddenCols(Object.fromEntries(
+                COLS.filter(c => c.l && c.k !== 'name').map(c => [c.k, true])))} />
           </>
         )}
       />

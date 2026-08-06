@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildFamilyIndex } from '../data/family'
 import { Phone, Mail, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions from '../components/PageActions'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 
 const COLS = [
   { k: 'contact',      l: 'Emergency Contact' },  // never hideable — it names the row
@@ -208,33 +208,6 @@ const CSS = `
 .ecmenu .sep:hover{background:#E7EBE7}
 `
 
-const ColsPop = React.forwardRef(function ColsPop({ rect, hiddenCols, onToggle, onAll, onNone }, ref) {
-  const style = {
-    top: Math.min(rect.bottom + 6, window.innerHeight - 320),
-    left: Math.max(8, Math.min(rect.left, window.innerWidth - 230)),
-  }
-  return (
-    <div className="ecpop" ref={ref} style={style}>
-      <div className="h">Show Columns</div>
-      {COLS.map(c => {
-        const locked = c.k === LOCKED_COL
-        return (
-          <label key={c.k} className={'ch' + (locked ? ' locked' : '')}
-            title={locked ? 'The contact name always stays visible' : undefined}>
-            <input type="checkbox" disabled={locked} checked={locked || !hiddenCols[c.k]}
-              onChange={e => onToggle(c.k, e.target.checked)} />
-            {c.l}
-          </label>
-        )
-      })}
-      <div className="allrow">
-        <button onClick={onAll}>Show All</button>
-        <button onClick={onNone}>Hide All</button>
-      </div>
-    </div>
-  )
-})
-
 function CtxMenu({ x, y, items, onClose }) {
   const ref = useRef(null)
   useEffect(() => {
@@ -355,10 +328,8 @@ export default function EmergencyContacts({ onNavigate }) {
   const [selected, setSelected] = useState(() => new Set())
   const [sort, setSort] = useState({ key: 'contact', dir: 1 })
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   const setPrefs = useCallback((mut) => {
     setColPrefs(prev => {
@@ -481,12 +452,6 @@ export default function EmergencyContacts({ onNavigate }) {
     URL.revokeObjectURL(a.href)
   }
 
-  useEffect(() => {
-    if (!pop) return
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    window.addEventListener('mousedown', onDown)
-    return () => window.removeEventListener('mousedown', onDown)
-  }, [pop])
 
   const arrow = k => sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null
 
@@ -717,18 +682,6 @@ export default function EmergencyContacts({ onNavigate }) {
         Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
       </div>
 
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} hiddenCols={hiddenCols}
-          onToggle={(k, on) => setPrefs(p => {
-            const n = { ...p.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            p.hiddenCols = n
-          })}
-          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
-          onNone={() => setPrefs(p => {
-            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
-      )}
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[

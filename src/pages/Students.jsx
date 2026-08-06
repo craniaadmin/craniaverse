@@ -22,7 +22,7 @@ import { Trash2, Undo2, Redo2, Eye, UserPlus, ExternalLink, Pencil, Copy } from 
 import { useStore } from '../data/store'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
-import PageActions from '../components/PageActions'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 import { awardsForRow, rowKeyOf, fieldCanTrigger } from '../data/autoCash'
 import {
@@ -400,33 +400,6 @@ function DialogHost({ children }) {
 
 // ── Shared bits ────────────────────────────────────────────────────────────
 
-const ColsPop = React.forwardRef(function ColsPop({ rect, hiddenCols, onToggle, onAll, onNone }, ref) {
-  const style = {
-    top: Math.min(rect.bottom + 6, window.innerHeight - 320),
-    left: Math.max(8, Math.min(rect.left, window.innerWidth - 230)),
-  }
-  return (
-    <div className="stpop" ref={ref} style={style}>
-      <div className="h">Show Columns</div>
-      {COLS.map(c => {
-        const locked = c.k === LOCKED_COL
-        return (
-          <label key={c.k} className={'ch' + (locked ? ' locked' : '')}
-            title={locked ? 'The student name always stays visible' : undefined}>
-            <input type="checkbox" disabled={locked} checked={locked || !hiddenCols[c.k]}
-              onChange={e => onToggle(c.k, e.target.checked)} />
-            {c.l}
-          </label>
-        )
-      })}
-      <div className="allrow">
-        <button onClick={onAll}>Show All</button>
-        <button onClick={onNone}>Hide All</button>
-      </div>
-    </div>
-  )
-})
-
 function CtxMenu({ x, y, items, onClose }) {
   const ref = useRef(null)
   useEffect(() => {
@@ -760,10 +733,8 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   const setPrefs = useCallback((mut) => {
     setColPrefs(prev => {
@@ -898,12 +869,6 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
     classes: r.classList.join('; '),
   }))
 
-  useEffect(() => {
-    if (!pop) return
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    window.addEventListener('mousedown', onDown)
-    return () => window.removeEventListener('mousedown', onDown)
-  }, [pop])
 
   const arrow = k => sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null
 
@@ -1091,18 +1056,6 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
         Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
       </div>
 
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} hiddenCols={hiddenCols}
-          onToggle={(k, on) => setPrefs(p => {
-            const n = { ...p.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            p.hiddenCols = n
-          })}
-          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
-          onNone={() => setPrefs(p => {
-            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
-      )}
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[
