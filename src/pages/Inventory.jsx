@@ -334,52 +334,15 @@ export default function Inventory() {
         backupHint="Snapshots of every stock item and its change log (last 14 kept)."
         onRestored={refresh}
       >
-        <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
-          {view === 'inventory' && (
-            <>
-              <button
-                onClick={() => setColsOpen(v => !v)}
-                title="Choose which columns are shown"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
-                  padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
-                }}
-              ><Eye size={14} /> Columns</button>
-              {colsOpen && (
-                <div style={{
-                  position: 'absolute', top: '100%', right: 88, marginTop: 4, zIndex: 10,
-                  background: '#fff', border: '1px solid var(--line)', borderRadius: 8,
-                  boxShadow: '0 4px 12px rgba(0,0,0,.1)', padding: '8px 4px', minWidth: 170,
-                }}>
-                  {data.colOrder.map(key => (
-                    <label key={key} style={{
-                      display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px',
-                      fontSize: 13, cursor: 'pointer', fontWeight: 500,
-                    }}>
-                      <input
-                        type="checkbox"
-                        checked={!data.hiddenCols[key]}
-                        onChange={() => toggleColHidden(key)}
-                        style={{ accentColor: 'var(--logo-teal)' }}
-                      />
-                      {COLUMN_LABELS[key] || key}
-                    </label>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-          <button
-            onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
-            style={{
-              background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
-              padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            {view === 'log' ? '← Back to Inventory' : '📓 Log'}
-          </button>
-        </div>
+        <button
+          onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
+          style={{
+            background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+            padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+          }}
+        >
+          {view === 'log' ? '← Back to Inventory' : '📓 Log'}
+        </button>
         {view === 'inventory' && (
           <button onClick={() => setEditing({ mode: 'new', item: null })} title="Add a stock item">
             <Plus size={13} /> Add Item
