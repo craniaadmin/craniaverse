@@ -1463,10 +1463,30 @@ function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
         emFirstName: em['First Name'], emLastName: em['Last Name'], emRelationship: em['Relationship'],
         emPhone: em['Phone (Mobile)'], emEmail: em['Email'],
       })
-      if (id) setDetailId(id)
+      if (id) { setDetailId(id); pushHist(historyForCreate(id, 'Duplicate student')) }
     } catch (err) {
       dialog.alert('Could not duplicate', String(err.message || err))
     }
+  }
+
+  /* One undo step for the whole selection, so undoing a bulk delete brings
+     everyone back together rather than one student per press. */
+  const handleBulkDelete = async (list) => {
+    if (!list.length) return false
+    const n = list.length
+    const ok = await dialog.confirm(
+      `Delete ${n} student${n === 1 ? '' : 's'}? This also removes their linked customer `
+      + 'and guardian information. You can undo this.',
+      { title: 'Delete Selected' })
+    if (!ok) return false
+    const snapshots = list.map(r => JSON.parse(JSON.stringify(r)))
+    for (const r of list) await handleDelete(r, { silent: true, noHistory: true })
+    pushHist({
+      label: `Delete ${n} student${n === 1 ? '' : 's'}`,
+      undo: async () => { for (const s of snapshots) await restoreRegistration(s) },
+      redo: async () => { for (const s of snapshots) await deleteRegistration(s.id) },
+    })
+    return true
   }
 
   if (detailId) {
@@ -1475,5 +1495,8 @@ function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
   }
 
   return <StudentList onSelect={handleSelect} onAdd={handleAdd} onDelete={handleDelete}
-    onDuplicate={handleDuplicate} onNavigate={onNavigate} studentIds={studentIds} />
+    onDuplicate={handleDuplicate} onBulkDelete={handleBulkDelete}
+    onNavigate={onNavigate} studentIds={studentIds}
+    onUndo={hist.onUndo} onRedo={hist.onRedo} undoLabel={hist.undoLabel} redoLabel={hist.redoLabel}
+    histBusy={hist.histBusy} histNote={hist.histNote} />
 }
