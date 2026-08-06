@@ -50,6 +50,35 @@ export default function Attendance({ onNavigate }) {
   const [includeFuture, setIncludeFuture] = useState(false)
   const today = todayISO()
 
+  /* Undo/redo. Every hook on this page has to be called before the
+     `if (loading)` return below — a hook that only runs on the second
+     render is a "rendered more hooks than during the previous render"
+     crash, and the page dies on open. Keep them all up here. */
+  const hist = useActionHistory()
+
+  /* The mark as it stands has to be read at the moment of the change, not
+     closed over from a render — several people mark the same register. */
+  const rowsRef = useRef(flatRows)
+  rowsRef.current = flatRows
+
+  /* One step per mark. Marking is a single click, so there is no burst to
+     coalesce: each one is its own thing to take back. */
+  const markRow = useCallback((r, field, value) => {
+    const live = rowsRef.current.find(x => x.studentId === r.studentId
+      && x.tabKey === r.tabKey && x.rowIdx === r.rowIdx) || r
+    const before = live.row?.[field] ?? ''
+    if (before === value) return
+    updateRow(r.studentId, r.tabKey, r.rowIdx, field, value)
+    const what = field === 'attendance'
+      ? (value ? (ATTEND_LABEL[String(value).toUpperCase()] || value) : 'unmarked')
+      : (value || 'blank')
+    hist.push({
+      label: `${r.studentName} — ${field === 'attendance' ? 'attendance' : 'uniform'} ${what}`,
+      undo: () => updateRow(r.studentId, r.tabKey, r.rowIdx, field, before),
+      redo: () => updateRow(r.studentId, r.tabKey, r.rowIdx, field, value),
+    })
+  }, [updateRow, hist])
+
   const programs = useMemo(() => {
     const seen = new Set()
     const out = []
