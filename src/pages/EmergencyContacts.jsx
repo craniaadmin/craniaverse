@@ -672,15 +672,13 @@ export default function EmergencyContacts({ onNavigate }) {
           </table>
         )}
       </div>
-      <div className="tcount">
-        {missingCount > 0 && !missingOnly && (
-          <span className="tnote">
+      <RowCount shown={visible.length} total={allRows.length}
+        note={missingCount > 0 && !missingOnly && (
+          <>
             {missingCount} customer{missingCount === 1 ? ' has' : 's have'} no emergency contact — tinted below,
             or click the Missing Contact tile.
-          </span>
-        )}
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
-      </div>
+          </>
+        )} />
 
 
       {rowCtx && (
