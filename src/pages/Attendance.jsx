@@ -159,6 +159,7 @@ export default function Attendance({ onNavigate }) {
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName={view === 'register' ? `crania-register-${selectedDate}` : 'crania-attendance-history'}
         csvColumns={[
           { key: 'date', label: 'Date' },
