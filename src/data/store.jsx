@@ -10,6 +10,7 @@
 // ============================================================
 import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { student as seedStudent, customer as seedCustomer } from './mockData'
+import { registerFlush } from './pendingSaves'
 
 // Where the API lives. In dev (when this file is served by Vite on :5173) the
 // backend is at localhost:4000. In production the React build is served BY the
@@ -54,6 +55,8 @@ export function StoreProvider({ children }) {
   const [programs, setProgramsData] = useState([])
   const [programsState, setProgramsStateData] = useState() // undefined until first load
   const programsSaveTimer = useRef(null)
+  const programsRef = useRef([])
+  const programsStateRef = useRef()
   const programsStateSaveTimer = useRef(null)
   const warnedAutoCash = useRef(false)
   const selectedRef = useRef(selectedId)
@@ -106,6 +109,7 @@ export function StoreProvider({ children }) {
   const setPrograms = useCallback((updater) => {
     setProgramsData(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater
+      programsRef.current = next
       clearTimeout(programsSaveTimer.current)
       programsSaveTimer.current = setTimeout(() => {
         fetch(`${API_BASE}/api/programs`, {
