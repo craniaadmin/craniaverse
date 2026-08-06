@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import TopNav from './components/TopNav'
 import Sidebar from './components/Sidebar'
 import Login from './components/Login'
+import SessionTimer, { SESSION_CSS } from './components/SessionTimer'
+import { ACCOUNT_CSS } from './components/AccountMenu'
 import { SUBMENUS } from './data/mockData'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -109,6 +111,8 @@ function resolveNav(target) {
 
 export default function App() {
   const [authed, setAuthed] = useState(false)
+  const [user, setUser] = useState(null)
+  const [expiresAt, setExpiresAt] = useState(0)
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [section, setSection] = useState('home')
   const [sub, setSub] = useState('Dashboard')
@@ -120,7 +124,13 @@ export default function App() {
 
   useEffect(() => {
     fetch(`${API_BASE}/api/me`, { credentials: 'include' })
-      .then(r => setAuthed(r.ok))
+      .then(async r => {
+        if (!r.ok) { setAuthed(false); return }
+        const body = await r.json().catch(() => ({}))
+        setAuthed(true)
+        setUser(body.user || null)
+        setExpiresAt(body.expiresAt || 0)
+      })
       .catch(() => setAuthed(false))
       .finally(() => setCheckingAuth(false))
   }, [])
@@ -129,7 +139,7 @@ export default function App() {
     try {
       await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' })
     } catch (err) { console.error(err) }
-    setAuthed(false)
+    setAuthed(false); setUser(null); setExpiresAt(0)
   }
 
   // Clicking a sidebar section jumps to that section's first submenu.
@@ -166,12 +176,18 @@ export default function App() {
       </div>
     )
   }
-  if (!authed) return <Login onSignIn={() => { setAuthed(true); setSection('home'); setSub('Dashboard') }} />
+  if (!authed) {
+    return <Login onSignIn={(who, exp) => {
+      setUser(who || null); setExpiresAt(exp || 0)
+      setAuthed(true); setSection('home'); setSub('Dashboard')
+    }} />
+  }
 
   return (
     <StoreProvider>
       <div className="app">
-        <TopNav section={section} sub={sub} onSubSelect={setSub} onLogout={logout} />
+        <TopNav section={section} sub={sub} onSubSelect={setSub} onLogout={logout} user={user} />
+        <SessionTimer expiresAt={expiresAt} onExtend={setExpiresAt} onExpire={logout} />
         <div className="app-shell">
           <Sidebar section={section} onSelect={selectSection} />
           <main className="app-main">
