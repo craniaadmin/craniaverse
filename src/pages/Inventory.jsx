@@ -309,7 +309,12 @@ export default function Inventory() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(data, next => mutate(() => next), { label: 'inventory change', enabled: !loading })
+  /* Object.assign onto the draft, not `() => next`. This page's mutate
+     hands the mutator a draft and keeps that draft — it ignores what the
+     mutator returns — so returning the snapshot threw it away and Undo
+     moved the stack without changing a thing. */
+  const hist = useHistory(data, next => mutate(d => Object.assign(d, next)),
+    { label: 'inventory change', enabled: !loading })
 
   if (loading) {
     return (
