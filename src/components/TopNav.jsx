@@ -28,7 +28,7 @@ export default function TopNav({ section, sub, onSubSelect, onLogout, user }) {
       </div>
       <button className="icon-btn" title="Notifications"><Bell size={16} /></button>
       <button className="icon-btn" title="Sign out" onClick={onLogout}><LogOut size={16} /></button>
-      <div className="avatar">AD</div>
+      <AccountMenu user={user} onLogout={onLogout} />
     </header>
   )
 }
