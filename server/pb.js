@@ -250,6 +250,8 @@ export async function saveRegistrations(records) {
       await pb().collection('registrations').delete(row.id)
     }
   }
+  // What the database holds now, for the next save to compare against.
+  knownRegistrationIds = new Set(incomingIds)
 }
 
 // ---- staff -----------------------------------------------
