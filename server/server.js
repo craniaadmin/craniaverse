@@ -1466,9 +1466,22 @@ app.put('/api/contacts', wrap(async (req, res) => {
 }))
 
 // Error handler — any thrown error from a wrap()-ed handler lands here
+/* PocketBase's own error text used to be forwarded verbatim. When the
+   server's database token went stale every page showed PocketBase saying
+   the request "requires superuser authorization" — which reads as though
+   the person signing in lacks permission, when nothing about them or their
+   account is involved. There is one access level in this app and they
+   already have it. Keep the detail in the log, tell the browser something
+   true instead. */
+const isDbError = (err) => typeof err?.url === 'string' && typeof err?.status === 'number'
+
 app.use((err, _req, res, _next) => {
   console.error('[api error]', err?.response || err?.message || err)
-  res.status(500).json({ error: err?.message || 'internal error' })
+  res.status(500).json({
+    error: isDbError(err)
+      ? 'The server could not reach the database. Please try again in a moment.'
+      : (err?.message || 'internal error'),
+  })
 })
 
 async function start() {
