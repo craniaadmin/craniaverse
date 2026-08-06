@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Plus, X, GripVertical, Trash2 } from 'lucide-react'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 // Trello-style board: lists (columns) of cards (tasks).
 // Persisted on the API as a single JSON document at /api/staff-board.
