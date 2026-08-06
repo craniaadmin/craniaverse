@@ -133,6 +133,31 @@ export function StoreProvider({ children }) {
     })
   }, [])
 
+  /* The two 400ms writers above hold the only copy of an unsaved edit
+     until their timer fires. Registering them lets the session timeout
+     push them out before signing someone out, rather than letting the
+     timer lose a race it does not know it is in. */
+  useEffect(() => registerFlush(async () => {
+    if (programsSaveTimer.current) {
+      clearTimeout(programsSaveTimer.current)
+      programsSaveTimer.current = null
+      await fetch(`${API_BASE}/api/programs`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        body: JSON.stringify(programsRef.current),
+      })
+    }
+    if (programsStateSaveTimer.current) {
+      clearTimeout(programsStateSaveTimer.current)
+      programsStateSaveTimer.current = null
+      await fetch(`${API_BASE}/api/programs-state`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+        body: JSON.stringify(programsStateRef.current),
+      })
+    }
+  }), [])
+
   const refreshStaff = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/api/staff`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
