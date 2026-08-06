@@ -439,6 +439,10 @@ export default function Logins({ onNavigate }) {
         csvName="crania-logins"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => visible}
+        backupBase="customers"
+        backupHint={'Logins are held on the registrations, so these are the same snapshots the '
+          + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
+        onRestored={refresh}
         /* Choosing columns is something you do once and live with, so it
            belongs under the gear rather than on the bar beside Undo. It
            closes the panel on the way: the chooser is a fixed popover at a
