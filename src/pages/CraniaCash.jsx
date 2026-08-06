@@ -289,7 +289,9 @@ const CSS = TABLECHROME_CSS + `
     letter-spacing:.4px;padding:4px 0 6px;border-bottom:1px solid var(--line)}
 .cc .cc-rules .rhead .hwhy{flex:1;min-width:0}
 .cc .cc-rules .rhead .hamt{width:80px;text-align:right}
-.cc .cc-rules .rhead .htrig{width:calc(190px + 150px + 9px + 24px)}
+/* Spans the two trigger selects and the remove button, plus the two gaps
+   between them, so the label sits over the column it names. */
+.cc .cc-rules .rhead .htrig{width:calc(190px + 150px + 24px + 9px + 9px)}
 .cc .cc-rules .rblock{padding:7px 0;border-bottom:1px solid #F1F3F4;flex-wrap:wrap}
 .cc .cc-rules .rblock input,.cc .cc-rules .rblock select{padding:6px 9px;border:1px solid var(--field);
     border-radius:7px;font:inherit;font-size:12px;background:#fff;color:#2E2516}
