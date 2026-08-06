@@ -439,17 +439,25 @@ export default function Logins({ onNavigate }) {
         csvName="crania-logins"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => visible}
-        settingsExtra={
-          <BackupPanel base="customers"
-            hint={'Logins are held on the registrations, so these are the same snapshots the '
-              + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
-            onRestored={refresh} />
-        }
-      >
-        <button title="Choose which columns are shown"
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
-        ><Eye size={13} /> Columns</button>
-      </PageActions>
+        /* Choosing columns is something you do once and live with, so it
+           belongs under the gear rather than on the bar beside Undo. It
+           closes the panel on the way: the chooser is a fixed popover at a
+           lower z-index and would otherwise open behind it. */
+        settingsExtra={close => (
+          <>
+            <button title="Choose which columns are shown"
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                close()
+                setPop({ kind: 'cols', rect })
+              }}><Eye size={13} /> Columns</button>
+            <BackupPanel base="customers"
+              hint={'Logins are held on the registrations, so these are the same snapshots the '
+                + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
+              onRestored={async () => { await refresh(); close() }} />
+          </>
+        )}
+      />
 
       {fetchStatus === 'offline' && (
         <div className="offline">Working offline — showing cached data.</div>
