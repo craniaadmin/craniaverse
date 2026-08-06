@@ -344,10 +344,19 @@ export default function ClassLists({ onNavigate }) {
         backupCollection="registrations"
         backupHint="Snapshots of the registrations these rosters are built from (last 14 kept)."
         onRestored={refreshStore}
-      >
-        <button onClick={expandAll} title="Open every class card">Expand all</button>
-        <button onClick={collapseAll} title="Close every class card">Collapse all</button>
-      </PageActions>
+        /* Opening or closing every card at once is something you do when
+           you arrive, not while you work — under the gear with Export CSV
+           rather than on the bar. Both close the panel, so you can see
+           what they did to the page behind it. */
+        settingsExtra={close => (
+          <>
+            <button title="Open every class card"
+              onClick={() => { close(); expandAll() }}>Expand all</button>
+            <button title="Close every class card"
+              onClick={() => { close(); collapseAll() }}>Collapse all</button>
+          </>
+        )}
+      />
 
       {fetchStatus === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
