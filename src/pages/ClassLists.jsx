@@ -202,7 +202,7 @@ function useClassLists() {
 const cardShadow = { boxShadow: 'var(--brand-shadow)' }
 
 export default function ClassLists({ onNavigate }) {
-  const { status: fetchStatus } = useStore()
+  const { status: fetchStatus, refresh: refreshStore } = useStore()
   const locNameOf = useLocName()
   const { classes, unlisted } = useClassLists()
   const [search, setSearch] = useState('')
