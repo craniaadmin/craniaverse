@@ -472,7 +472,7 @@ function StudentCashDetail({ record, onBack, onNavigate, award }) {
             </div>
           ) : rules.map(rule => (
             <button key={rule.id} className={rule.delta >= 0 ? 'up' : 'down'}
-              onClick={() => addCashEntry(record.id, { delta: rule.delta, reason: rule.reason })}>
+              onClick={() => award(record.id, { delta: rule.delta, reason: rule.reason }, studentName(record))}>
               {rule.reason} <b>({rule.delta >= 0 ? '+' : ''}{rule.delta})</b>
             </button>
           ))}
