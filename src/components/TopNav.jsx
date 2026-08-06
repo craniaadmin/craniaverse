@@ -32,7 +32,9 @@ export default function TopNav({ section, sub, onSubSelect, onLogout, user }) {
         ))}
       </div>
       <button className="icon-btn" title="Notifications"><Bell size={16} /></button>
-      <button className="icon-btn" title="Sign out" onClick={onLogout}><LogOut size={16} /></button>
+      {/* Sign out lives under the avatar with the rest of the account
+          items. A second one out here, one click from anything, was the
+          only unguarded destructive control in the bar. */}
       <AccountMenu user={user} onLogout={onLogout} />
     </header>
   )
