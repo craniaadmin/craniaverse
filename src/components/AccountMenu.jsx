@@ -132,6 +132,13 @@ export const ACCOUNT_CSS = `
 .acctmodal .iconbtn:hover{color:#C0392B}
 .acctmodal .addrow{border-top:1px solid #E7EBE7;margin-top:14px;padding-top:6px}
 .acctmodal .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* Keeps the Show button on the same line as the box it reveals. */
+.acctmodal .pwfield{display:flex;gap:8px;align-items:center}
+.acctmodal .pwfield input{flex:1;min-width:0}
+.acctmodal .pwfield .peek{background:#F1F3F4;border:1px solid #D5D0C4;border-radius:8px;
+  padding:8px 11px;font:inherit;font-size:11.5px;font-weight:700;color:#2E2516;cursor:pointer;
+  white-space:nowrap}
+.acctmodal .pwfield .peek:hover{border-color:#5FA09E}
 .acctmodal .self{font-size:11px;color:#6B6455;font-style:italic}
 `
 
