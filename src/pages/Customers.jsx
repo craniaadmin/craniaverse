@@ -267,10 +267,10 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + PAGEACTIONS_CSS + `
 /* Scoped to this input. The old rule was a bare input::placeholder in a
    page-level <style>, which turned every placeholder on the page white. */
 .cu .filters input[type=search]::placeholder{color:var(--faint)}
-.cu .filters .addbtn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;
-    background:var(--light-blue);color:var(--dark-brown);cursor:pointer;font-family:inherit;margin-left:auto;
-    display:inline-flex;align-items:center;gap:5px}
-.cu .filters .addbtn:hover{filter:brightness(1.08)}
+/* Add Family moved into the shared bar and keeps its light-blue fill, so
+   the one control on the bar that creates something still says so. */
+.pgacts .cu-add{background:var(--brand-light-blue,#A6E2F9);border:none;color:#2E2516}
+.pgacts .cu-add:hover:not(:disabled){filter:brightness(1.06);background:#A6E2F9}
 .cu .clearf{background:#fff;border:1px solid var(--field);border-radius:8px;padding:8px 12px;
     font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;font-family:inherit}
 .cu .clearf:hover{background:#f1f5f4}
