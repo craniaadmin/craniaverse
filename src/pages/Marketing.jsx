@@ -69,11 +69,11 @@ function useCampaigns() {
     })
   }, [])
 
-  return { campaigns, loading, status, mutate }
+  return { campaigns, loading, status, mutate, refresh }
 }
 
 export default function Marketing() {
-  const { campaigns, loading, status, mutate } = useCampaigns()
+  const { campaigns, loading, status, mutate, refresh } = useCampaigns()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [editing, setEditing] = useState(null) // null | { mode:'new'|'edit', campaign? }
