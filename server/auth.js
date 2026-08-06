@@ -116,6 +116,53 @@ export function checkPassword(input) {
   return crypto.timingSafeEqual(a, b)
 }
 
+// ---- login throttling ---------------------------------------
+/* The CAPTCHA raises the cost of a scripted guess; this caps how many
+   guesses are possible at all. Counted per account and per source
+   address, because either one alone leaves a hole: per-account lets
+   one host work through every account, per-address lets a botnet work
+   through one account. */
+const LOCK_AFTER = 6
+const LOCK_MS = 15 * 60 * 1000
+const attempts = new Map()
+
+const nowMs = () => Date.now()
+
+function bucket(key) {
+  const b = attempts.get(key)
+  if (!b || b.until < nowMs()) return { count: 0, until: 0 }
+  return b
+}
+
+export function loginBlocked(email, ip) {
+  for (const key of [`e:${email}`, `i:${ip}`]) {
+    const b = attempts.get(key)
+    if (b && b.count >= LOCK_AFTER && b.until > nowMs()) {
+      return Math.ceil((b.until - nowMs()) / 60000)
+    }
+  }
+  return 0
+}
+
+export function noteLoginFailure(email, ip) {
+  for (const key of [`e:${email}`, `i:${ip}`]) {
+    const b = bucket(key)
+    const count = b.count + 1
+    attempts.set(key, { count, until: nowMs() + LOCK_MS })
+  }
+  if (attempts.size > 2000) {
+    for (const [k, v] of attempts) if (v.until < nowMs()) attempts.delete(k)
+  }
+}
+
+export function clearLoginFailures(email, ip) {
+  attempts.delete(`e:${email}`)
+  attempts.delete(`i:${ip}`)
+}
+
+// Test seam — the attempt counters are process-wide state.
+export function __resetAttempts() { attempts.clear() }
+
 // ---- Public-path allowlist ---------------------------------
 // Anything not matched here that starts with /api/ requires a
 // valid session. Public HTML endpoints (`/register`, `/sign-up`,
