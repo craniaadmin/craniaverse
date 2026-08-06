@@ -691,18 +691,16 @@ function CashList({ onSelect, onNavigate }) {
 
   return (
     <>
-      <div className="actions">
-        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
+      <PageActions
+        csvName="crania-cash"
+        csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
+        csvRows={() => visible}
+        settingsExtra={<CashSettings />}
+      >
+        <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
         ><Eye size={13} /> Columns</button>
-        <button title="Download the balances as a CSV file" onClick={() => exportCsv()}>
-          <Download size={13} /> Export CSV
-        </button>
-        <button className="gearbtn" title="Backups and Crania Cash rules"
-          onClick={() => setSettingsOpen(true)}>⚙</button>
-      </div>
-
-      {settingsOpen && <CashSettings onClose={() => setSettingsOpen(false)} />}
+      </PageActions>
 
       <div className="metrics">
         <div className="metric">
