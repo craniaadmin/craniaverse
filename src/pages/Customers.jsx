@@ -693,7 +693,7 @@ function CustomersSettings({ onClose, categories, tintFor, onCatColor }) {
    in the detail view, where they happen. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
   onNavigate, familyIds, familyIndex, onUndo, onRedo, histBusy, histNote, undoLabel, redoLabel }) {
-  const { records, programs, programsState, setProgramsState } = useStore()
+  const { records, programs, programsState, setProgramsState, refresh } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
   const [showInactive, setShowInactive] = useState(false)
