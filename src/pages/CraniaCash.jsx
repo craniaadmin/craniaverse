@@ -397,23 +397,6 @@ function RulesEditor({ pushHist }) {
   )
 }
 
-/* Backups and the rules editor, both of which live behind the gear. Rendered
-   inside PageActions' settings popover, which owns the positioning and the
-   click-outside-to-close that this used to do for itself. */
-function CashSettings({ pushHist }) {
-  const { refresh } = useStore()
-  return (
-    <>
-      <BackupPanel base="customers"
-        hint={'Balances and their history are held on the registrations, so these are the same '
-          + 'snapshots the Customers page takes — restoring one replaces every registration '
-          + '(last 14 kept).'}
-        onRestored={refresh} />
-      <RulesEditor pushHist={pushHist} />
-    </>
-  )
-}
-
 // ─── Detail: one student's balance, quick actions and log ──────────────────
 function StudentCashDetail({ record, onBack, onNavigate, award }) {
   const { rules } = useStore()
