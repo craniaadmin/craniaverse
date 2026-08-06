@@ -284,8 +284,70 @@ export default function ClassLists({ onNavigate }) {
   const expandAll = () => setExpanded(new Set(visible.map((c) => c.program.id || (c.program.name + c.program.number))))
   const collapseAll = () => setExpanded(new Set())
 
+  /* One CSV line per student per register they appear on, across whatever
+     classes the filters currently leave on screen — the printed roster, not
+     the whole catalogue. */
+  const csvRows = () => {
+    const out = []
+    const push = (c, sessionLabelText, session, row) => {
+      const { record: r, entry } = row
+      const contact = guardianContact(r.customer)
+      out.push({
+        category: c.program.category || '',
+        className: c.program.name || '',
+        session: sessionLabelText,
+        instructor: session?.instructor || '',
+        location: session?.locationId ? locNameOf(session.locationId) : '',
+        student: `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim(),
+        grade: r.student?.grade || '',
+        school: r.student?.school || '',
+        guardian: contact.name,
+        phone: contact.phone,
+        email: contact.email,
+        says: entry.schedule || '',
+        year: entry.year || '',
+        status: entry.status || 'Active',
+      })
+    }
+    for (const c of visible) {
+      for (const s of c.sessions) {
+        for (const row of s.rows) push(c, sessionLabel(s.session), s.session, row)
+      }
+      for (const row of c.unspecified) push(c, 'Unmatched session', null, row)
+      if (c.sessions.length === 0) for (const row of c.roster) push(c, 'Unscheduled', null, row)
+    }
+    return out
+  }
+
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-class-lists"
+        csvColumns={[
+          { key: 'category', label: 'Category' },
+          { key: 'className', label: 'Class' },
+          { key: 'session', label: 'Session' },
+          { key: 'instructor', label: 'Instructor' },
+          { key: 'location', label: 'Location' },
+          { key: 'student', label: 'Student' },
+          { key: 'grade', label: 'Grade' },
+          { key: 'school', label: 'School' },
+          { key: 'guardian', label: 'Guardian' },
+          { key: 'phone', label: 'Guardian Phone' },
+          { key: 'email', label: 'Guardian Email' },
+          { key: 'says', label: 'Registration Says' },
+          { key: 'year', label: 'Year' },
+          { key: 'status', label: 'Status' },
+        ]}
+        csvRows={csvRows}
+        backupCollection="registrations"
+        backupHint="Snapshots of the registrations these rosters are built from (last 14 kept)."
+        onRestored={refreshStore}
+      >
+        <button onClick={expandAll} title="Open every class card">Expand all</button>
+        <button onClick={collapseAll} title="Close every class card">Collapse all</button>
+      </PageActions>
 
       {fetchStatus === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
