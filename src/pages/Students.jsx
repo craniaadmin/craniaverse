@@ -20,7 +20,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Trash2, Undo2, Redo2, Eye, UserPlus, ExternalLink, Pencil, Copy } from 'lucide-react'
 import { useStore } from '../data/store'
-import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
