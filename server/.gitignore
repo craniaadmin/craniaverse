@@ -6,6 +6,13 @@ data.json
 # known tunnel status between cron fires, not source.
 scripts/.tunnel-monitor-state.json
 
+# Database backup dumps written by the backup scripts. These contain
+# real registration records — student names, dates of birth, medical
+# conditions, home addresses, and guardian contact details. This repo
+# is public, so they must never be committed. Keep them on disk (and
+# in offline/encrypted storage), out of git.
+backup-*.json
+
 # PocketBase runtime data — created on first start of the pocketbase
 # binary. Contains the SQLite database, uploaded files, and the
 # auto-applied migrations history. Per-machine; never commit.
