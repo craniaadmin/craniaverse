@@ -132,6 +132,36 @@ export default function StaffHub() {
         <button className="icon-btn solid" onClick={addList} title="Add list"><Plus size={20} /></button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-staff-board"
+        csvColumns={[
+          { key: 'list', label: 'List' },
+          { key: 'position', label: 'Position' },
+          { key: 'title', label: 'Card' },
+          { key: 'assignee', label: 'Assignee' },
+          { key: 'due', label: 'Due' },
+          { key: 'labels', label: 'Labels' },
+          { key: 'description', label: 'Description' },
+        ]}
+        csvRows={() => board.lists.flatMap(l => l.cards.map((c, i) => ({
+          list: l.title || '',
+          position: i + 1,
+          title: c.title || '',
+          assignee: c.assignee || '',
+          due: c.due || '',
+          labels: (c.labels || []).join('; '),
+          description: c.description || '',
+        })))}
+        backupCollection="staffBoard"
+        backupHint="Snapshots of the whole staff board — every list and card (last 14 kept)."
+        onRestored={load}
+      >
+        <button onClick={addList} title="Add a list to the board">
+          <Plus size={13} /> Add List
+        </button>
+      </PageActions>
+
       {/* Board scroll area */}
       <div style={{
         display: 'flex', gap: 14, overflowX: 'auto', alignItems: 'flex-start',
