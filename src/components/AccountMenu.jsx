@@ -5,7 +5,7 @@
 // preference held in the browser. Hiding a button from someone who may
 // not use it is a courtesy; the refusal that matters happens on the
 // server, so nothing here can be clicked around.
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LogOut, KeyRound, Users, X, Trash2, ShieldCheck } from 'lucide-react'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
