@@ -107,6 +107,27 @@ function SurveysList({ surveys, respCounts, onNew, onTake, onEdit, onDelete, onO
         </button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-surveys"
+        csvColumns={[
+          { key: 'title', label: 'Survey' },
+          { key: 'questions', label: 'Questions' },
+          { key: 'responses', label: 'Responses' },
+          { key: 'description', label: 'Description' },
+        ]}
+        csvRows={() => surveys.map(s => ({
+          title: s.title || 'Untitled Survey',
+          questions: (s.questions || []).length,
+          responses: respCounts[s.id] || 0,
+          description: s.description || '',
+        }))}
+        backupCollection="surveys"
+        backupHint="Snapshots of every survey definition (last 14 kept). Responses are not included."
+      >
+        <button title="Build a new survey" onClick={onNew}><Plus size={13} /> New Survey</button>
+      </PageActions>
+
       <div style={{ display: 'grid', gap: 12 }}>
         {surveys.length === 0 ? (
           <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: '40px 20px', textAlign: 'center', color: 'var(--muted)' }}>
