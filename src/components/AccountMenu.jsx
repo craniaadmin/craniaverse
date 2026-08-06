@@ -316,36 +316,12 @@ function UsersModal({ me, onClose }) {
         {err && <div className="err">{err}</div>}
         {note && <div className="ok">{note}</div>}
 
-        <table>
-          <thead>
-            <tr><th>Person</th><th>Level</th><th>Last signed in</th><th></th></tr>
-          </thead>
-          <tbody>
-            {users.map(u => (
-              <tr key={u.id} className={u.active ? '' : 'off'}>
-                <td>
-                  <div style={{ fontWeight: 700 }}>{u.name || '—'}</div>
-                  <div style={{ color: '#6B6455' }}>{u.email}</div>
-                  {u.id === me.id && <div className="self">this is you</div>}
-                </td>
-                <td>
-                  <select value={u.role} onChange={e => apply(u.id, { role: e.target.value })}>
-                    {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                  </select>
-                </td>
-                <td>{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : 'never'}</td>
-                <td>
-                  <label className="self" style={{ marginRight: 8 }}>
-                    <input type="checkbox" checked={u.active}
-                      onChange={e => apply(u.id, { active: e.target.checked })} /> active
-                  </label>
-                  <button className="iconbtn" title="Remove this account"
-                    onClick={() => remove(u)}><Trash2 size={14} /></button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="acctusers">
+          {users.map(u => (
+            <AccountRow key={u.id} u={u} isMe={u.id === me.id}
+              onPatch={apply} onRemove={remove} onSetPassword={setPassword} />
+          ))}
+        </div>
 
         <div className="addrow">
           <h2 style={{ fontSize: 14, marginTop: 8 }}>Add someone</h2>
