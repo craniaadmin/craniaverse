@@ -366,7 +366,7 @@ export default function Projects() {
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [colsOpen, settingsOpen])
+  }, [colsOpen])
 
   /* Archived cards, newest first, and honouring the same search box. */
   const archivedCards = useMemo(() => {
