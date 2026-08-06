@@ -288,19 +288,6 @@ export default function CraniaStore() {
 
   return (
     <div className="page">
-      <div className="page-head">
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
-            style={{
-              background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
-              padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
-            }}
-          >
-            {view === 'log' ? '← Back to Store' : '📓 Log'}
-          </button>
-        </div>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       {view === 'inventory' ? (
@@ -346,6 +333,17 @@ export default function CraniaStore() {
           backupHint="Snapshots of every store item and its stock-change log (last 14 kept)."
           onRestored={refresh}
         >
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
+              style={{
+                background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
+                padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
+              }}
+            >
+              {view === 'log' ? '← Back to Store' : '📓 Log'}
+            </button>
+          </div>
           <button onClick={() => setEditing({ mode: 'new', item: null })} title="Add a store item">
             <Plus size={13} /> Add Item
           </button>

@@ -119,11 +119,6 @@ export default function Marketing() {
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
-      <div className="page-head">
-        <button className="icon-btn solid" title="New campaign" onClick={() => setEditing({ mode: 'new' })}>
-          <Plus size={22} />
-        </button>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -150,6 +145,9 @@ export default function Marketing() {
         backupHint="Snapshots of the whole campaign list (last 14 kept)."
         onRestored={refresh}
       >
+        <button className="icon-btn solid" title="New campaign" onClick={() => setEditing({ mode: 'new' })}>
+          <Plus size={22} />
+        </button>
         <button title="Add a new campaign" onClick={() => setEditing({ mode: 'new' })}>
           <Plus size={13} /> Add Campaign
         </button>

@@ -108,11 +108,6 @@ export default function Contacts() {
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
-      <div className="page-head">
-        <button className="icon-btn solid" title="New contact" onClick={() => setEditing({ mode: 'new' })}>
-          <Plus size={22} />
-        </button>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -141,6 +136,9 @@ export default function Contacts() {
         backupHint="Snapshots of the whole contact directory (last 14 kept)."
         onRestored={refresh}
       >
+        <button className="icon-btn solid" title="New contact" onClick={() => setEditing({ mode: 'new' })}>
+          <Plus size={22} />
+        </button>
         <button title="Add a new contact" onClick={() => setEditing({ mode: 'new' })}>
           <Plus size={13} /> Add Contact
         </button>

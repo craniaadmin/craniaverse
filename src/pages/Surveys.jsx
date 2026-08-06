@@ -101,11 +101,6 @@ function GoogleReviewPrompt() {
 function SurveysList({ surveys, respCounts, onNew, onTake, onEdit, onDelete, onOpenSubs }) {
   return (
     <div className="page">
-      <div className="page-head">
-        <button className="icon-btn solid" title="New survey" onClick={onNew}>
-          <Plus size={22} />
-        </button>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -125,6 +120,9 @@ function SurveysList({ surveys, respCounts, onNew, onTake, onEdit, onDelete, onO
         backupCollection="surveys"
         backupHint="Snapshots of every survey definition (last 14 kept). Responses are not included."
       >
+        <button className="icon-btn solid" title="New survey" onClick={onNew}>
+          <Plus size={22} />
+        </button>
         <button title="Build a new survey" onClick={onNew}><Plus size={13} /> New Survey</button>
       </PageActions>
 

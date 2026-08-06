@@ -318,7 +318,16 @@ export default function Inventory() {
 
   return (
     <div className="page">
-      <div className="page-head">
+
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName={view === 'log' ? 'crania-inventory-log' : 'crania-inventory'}
+        csvColumns={view === 'log' ? LOG_CSV_COLUMNS : ITEM_CSV_COLUMNS}
+        csvRows={csvRows}
+        backupCollection="stock"
+        backupHint="Snapshots of every stock item and its change log (last 14 kept)."
+        onRestored={refresh}
+      >
         <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
           {view === 'inventory' && (
             <>
@@ -365,17 +374,6 @@ export default function Inventory() {
             {view === 'log' ? '← Back to Inventory' : '📓 Log'}
           </button>
         </div>
-      </div>
-
-      <style>{PAGEACTIONS_CSS}</style>
-      <PageActions
-        csvName={view === 'log' ? 'crania-inventory-log' : 'crania-inventory'}
-        csvColumns={view === 'log' ? LOG_CSV_COLUMNS : ITEM_CSV_COLUMNS}
-        csvRows={csvRows}
-        backupCollection="stock"
-        backupHint="Snapshots of every stock item and its change log (last 14 kept)."
-        onRestored={refresh}
-      >
         {view === 'inventory' && (
           <button onClick={() => setEditing({ mode: 'new', item: null })} title="Add a stock item">
             <Plus size={13} /> Add Item
