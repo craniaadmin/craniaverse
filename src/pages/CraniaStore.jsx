@@ -487,7 +487,7 @@ export default function CraniaStore() {
               </thead>
               <tbody>
                 {filteredItems.length === 0 && (
-                  <tr><td colSpan={14} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
+                  <tr><td colSpan={visibleCols.length} style={{ padding: 32, textAlign: 'center', color: 'var(--muted)' }}>
                     {data.items.length === 0
                       ? 'No items yet — click + Add Item to start stocking the store.'
                       : 'No items match your filters.'}
