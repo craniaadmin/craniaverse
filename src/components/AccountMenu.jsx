@@ -147,6 +147,103 @@ function PasswordModal({ user, onClose }) {
   )
 }
 
+/* One account, everything about it editable in place.
+
+   Name and email commit when you leave the field rather than on every
+   keystroke — a PUT per character would be a lot of requests and would
+   reject every half-typed address on the way. Level and active apply at
+   once, because a dropdown and a tick have no half-finished state.
+
+   Setting a password is offered for other people only. The server asks
+   for the current password when you change your own, which an admin
+   acting on their own row cannot supply here — that is what the Change
+   password item in the menu is for. */
+function AccountRow({ u, isMe, onPatch, onRemove, onSetPassword }) {
+  const [name, setName] = useState(u.name || '')
+  const [email, setEmail] = useState(u.email || '')
+  const [pwOpen, setPwOpen] = useState(false)
+  const [pw, setPw] = useState('')
+  const [pwBusy, setPwBusy] = useState(false)
+
+  /* Re-sync when the row is replaced by the server's copy, so a rejected
+     edit snaps back to what is actually stored rather than sitting there
+     looking saved. */
+  useEffect(() => { setName(u.name || '') }, [u.name])
+  useEffect(() => { setEmail(u.email || '') }, [u.email])
+
+  const commit = (field, value, current) => {
+    const v = value.trim()
+    if (v === String(current || '')) return
+    onPatch(u.id, { [field]: v })
+  }
+
+  const savePw = async () => {
+    setPwBusy(true)
+    const ok = await onSetPassword(u.id, pw)
+    setPwBusy(false)
+    if (ok) { setPw(''); setPwOpen(false) }
+  }
+
+  return (
+    <div className={'acctuser' + (u.active ? '' : ' off')}>
+      <div className="r1">
+        <div>
+          <span className="lbl">Name</span>
+          <input value={name} placeholder="Full name"
+            onChange={e => setName(e.target.value)}
+            onBlur={() => commit('name', name, u.name)} />
+        </div>
+        <div>
+          <span className="lbl">Email</span>
+          <input type="email" value={email}
+            onChange={e => setEmail(e.target.value)}
+            onBlur={() => commit('email', email, u.email)} />
+        </div>
+      </div>
+
+      <div className="r2">
+        <select value={u.role} title="Access level"
+          onChange={e => onPatch(u.id, { role: e.target.value })}>
+          {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </select>
+
+        <label className="tog" title={u.active ? 'Switch this account off' : 'Switch this account on'}>
+          <input type="checkbox" checked={u.active}
+            onChange={e => onPatch(u.id, { active: e.target.checked })} />
+          Active
+        </label>
+
+        {!isMe && (
+          <button type="button" className="linkbtn" onClick={() => setPwOpen(v => !v)}>
+            {pwOpen ? 'Cancel' : 'Set password'}
+          </button>
+        )}
+
+        <button className="iconbtn" title="Remove this account" onClick={() => onRemove(u)}>
+          <Trash2 size={14} />
+        </button>
+
+        <span className="meta">
+          {isMe && <em>this is you · </em>}
+          {u.lastLoginAt
+            ? `last signed in ${new Date(u.lastLoginAt).toLocaleDateString()}`
+            : 'never signed in'}
+        </span>
+      </div>
+
+      {pwOpen && (
+        <div className="pwrow">
+          <input type="text" value={pw} placeholder="New password — at least 9 characters"
+            onChange={e => setPw(e.target.value)} />
+          <button disabled={pwBusy || !pw} onClick={savePw}>
+            {pwBusy ? 'Saving…' : 'Save password'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ---- admin: accounts and levels -----------------------------
 function UsersModal({ me, onClose }) {
   const [users, setUsers] = useState([])
