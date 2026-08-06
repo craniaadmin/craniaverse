@@ -49,9 +49,11 @@ export function verifyPassword(password, stored) {
 /* Passwords people pick for a shared admin tool are the ones that get
    guessed. This refuses only what is genuinely weak rather than
    demanding a symbol and a capital, which mostly produces Password1!. */
+export const MIN_PASSWORD = 9
+
 export function passwordProblem(password) {
   const p = String(password || '')
-  if (p.length < 10) return 'Use at least 10 characters.'
+  if (p.length < MIN_PASSWORD) return `Use at least ${MIN_PASSWORD} characters.`
   if (/^\d+$/.test(p)) return 'Digits alone are too easy to guess — add some words.'
   if (/^(.)\1+$/.test(p)) return 'That is the same character repeated.'
   const common = ['password', 'craniaverse', 'crania', 'letmein', 'qwerty', 'welcome', 'admin']
