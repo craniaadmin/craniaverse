@@ -35,6 +35,7 @@ import {
   loginBlocked,
   noteLoginFailure,
   clearLoginFailures,
+  captchaExempt,
   SESSION_HOURS,
 } from './auth.js'
 import { createChallenge, verifyChallenge } from './captcha.js'

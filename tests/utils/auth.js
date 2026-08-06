@@ -15,6 +15,13 @@ function readPassword() {
   return process.env.TEST_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || ''
 }
 
+/* Sign-in is per-account now, so the address matters as much as the
+   password. Change the admin's email in the app and this needs to
+   follow, which is what TEST_ADMIN_EMAIL is for. */
+function readEmail() {
+  return process.env.TEST_ADMIN_EMAIL || process.env.ADMIN_EMAIL || 'admin@craniaverse.ca'
+}
+
 export async function loginAndGetCookie() {
   if (cachedCookie) return cachedCookie
   const pw = readPassword()
@@ -24,10 +31,13 @@ export async function loginAndGetCookie() {
       '(the same value used to sign in via the UI) or TEST_ADMIN_PASSWORD.',
     )
   }
+  /* No captcha fields: the server skips the image for processes on the
+     same machine (see captchaExempt in server/auth.js). Tests run
+     against localhost, so they never see one. */
   const r = await fetch(`${BASE_URL}/api/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: pw }),
+    body: JSON.stringify({ email: readEmail(), password: pw }),
   })
   if (!r.ok) {
     const text = await r.text().catch(() => '')
