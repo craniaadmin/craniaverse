@@ -441,16 +441,6 @@ export default function Inventory() {
                          textDecoration: 'underline', cursor: 'pointer', fontSize: 13 }}
               >Clear</button>
             )}
-            <button
-              onClick={() => setEditing({ mode: 'new', item: null })}
-              style={{
-                marginLeft: 'auto', background: 'var(--brand-light-blue)', color: 'var(--brand-dark-brown)',
-                border: 'none', padding: '7px 14px', fontSize: 13, fontWeight: 700, borderRadius: 8,
-                cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4,
-              }}
-            >
-              <Plus size={14} /> Add Item
-            </button>
           </div>
 
           {/* Table */}
