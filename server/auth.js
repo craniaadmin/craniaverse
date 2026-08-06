@@ -208,6 +208,15 @@ const PUBLIC_MATCHERS = [
   // The login screen has to be able to draw its CAPTCHA before anyone
   // has a session — that is the whole point of it.
   (m, p) => m === 'GET'  && p === '/api/captcha',
+  //   - The staff form at /staff-form is filled in by the person being
+  //     hired, who has no account. It creates its record on the first
+  //     save and then autosaves into it, so both verbs are needed.
+  //     Creation is open the way registration is; the update is not —
+  //     the route itself demands the edit token handed back at creation,
+  //     so a public PUT can only reach the record it just made rather
+  //     than any staff record whose id someone guesses.
+  (m, p) => m === 'POST' && p === '/api/staff',
+  (m, p) => m === 'PUT'  && /^\/api\/staff\/[^/]+$/.test(p),
 ]
 
 export function isPublicApi(method, pathname) {
