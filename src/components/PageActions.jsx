@@ -92,8 +92,13 @@ export function downloadCsv(filename, columns, rows) {
   URL.revokeObjectURL(a.href)
 }
 
-function Settings({ collection, hint, onRestored, onClose, onExport, canExport, children }) {
+function Settings({ collection, base, hint, confirm, onRestored, onClose, onExport, canExport, children }) {
   const ref = useRef(null)
+  /* A page either names a shared snapshots collection or its own older
+     route ("customers", "staff"). Both resolve to the same panel in the
+     same place, so the gear reads the same on every page rather than the
+     older ones showing their backups folded in among the tools. */
+  const backupBase = base || (collection ? `snapshots/${collection}` : null)
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
     const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
