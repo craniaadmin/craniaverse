@@ -157,5 +157,19 @@ if (opts.password !== undefined) {
   console.log('Their password is the one you passed — it is not printed here,')
   console.log('and it cannot be read back out of the database.')
 }
-console.log('\nAnyone already signed in keeps their session until it expires (3 hours).')
-console.log('Restart the API to end those now:  pm2 restart craniaverse-api\n')
+  console.log('\nAnyone already signed in keeps their session until it expires (3 hours).')
+  console.log('Restart the API to end those now:  pm2 restart craniaverse-api\n')
+}
+
+try {
+  await main()
+} catch (err) {
+  if (err instanceof Stop) {
+    console.error(`\n${err.message}\n`)
+  } else {
+    console.error('\nSomething went wrong talking to the database:\n')
+    console.error(`  ${err?.message || err}\n`)
+    console.error('Nothing was changed.\n')
+  }
+  process.exitCode = 1
+}
