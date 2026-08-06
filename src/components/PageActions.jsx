@@ -165,7 +165,8 @@ export default function PageActions({
         onClick={() => setSettingsOpen(v => !v)}>⚙</button>
 
       {settingsOpen && (
-        <Settings collection={backupCollection} hint={backupHint}
+        <Settings collection={backupCollection} base={backupBase} hint={backupHint}
+          confirm={backupConfirm}
           onRestored={onRestored} onClose={() => setSettingsOpen(false)}
           canExport={canExport}
           onExport={() => {
