@@ -406,20 +406,41 @@ function DocumentsEditor({ value, onChange }) {
   )
 }
 
-// ── Address group ─────────────────────────────────────────────────────────
-function AddressGroup({ heading, value, onChange }) {
+// ── Address fields ────────────────────────────────────────────────────────
+// No heading of its own — the Section around it supplies that, so an
+// address looks like every other group instead of a panel inside a panel.
+function AddressFields({ value, onChange }) {
   const v = value || {}
   const set = (k, val) => onChange({ ...v, [k]: val })
   return (
-    <div>
-      <div className="panel-teal-head">{heading}</div>
-      <TextField label="# Street" value={v.street} onChange={x => set('street', x)} />
+    <>
+      <TextField label="Street" value={v.street} onChange={x => set('street', x)} />
       <TextField label="Unit" value={v.unit} onChange={x => set('unit', x)} />
       <TextField label="City" value={v.city} onChange={x => set('city', x)} />
       <TextField label="Province" value={v.province} onChange={x => set('province', x)} />
       <TextField label="Postal Code" value={v.postalCode} onChange={x => set('postalCode', x)} />
       <TextField label="Country" value={v.country} onChange={x => set('country', x)} />
-    </div>
+    </>
+  )
+}
+
+/* One section of the form. The heading is a fixed height whatever the
+   words in it, so headings sitting in the same grid row line up to the
+   pixel — the previous bars were as tall as their own text and drifted
+   apart. `span` widens a section that needs the room (the availability
+   table, the six-column references list). */
+function Section({ title, hint, count, span, children }) {
+  return (
+    <section className={'sect' + (span === 2 ? ' span2' : '')}>
+      <div className="secthead">
+        <span className="t">{title}</span>
+        {count && <span className="cnt">{count}</span>}
+      </div>
+      <div className="sectbody">
+        {hint && <div className="secthint">{hint}</div>}
+        {children}
+      </div>
+    </section>
   )
 }
 
@@ -881,127 +902,148 @@ function StaffDetail({ staffId, onBack, onDelete }) {
         <button className="delbtn" onClick={() => onDelete(record)}>Delete</button>
       </div>
 
-      <div className="detailgrid" style={{ marginTop: 14 }}>
-        {/* ── LEFT COLUMN ───────────────────────────────────────────────── */}
-        <div>
-          <div className="panel-teal-head">Staff Name</div>
+      {/* One grid rather than three stacked columns. Each section is a
+          grid item, so every heading in a row starts at the same height
+          — which is what the three independent columns could never do,
+          because each one drifted by however tall its own contents
+          happened to be. Sections are ordered across the row, so the
+          things you read together sit together. */}
+      <div className="detailgrid">
+        <Section title="Staff Name">
           <TextField label="First Name" value={local.firstName} onChange={v => setField('firstName', v)} />
           <TextField label="Middle Name" value={local.middleName} onChange={v => setField('middleName', v)} />
           <TextField label="Last Name" value={local.lastName} onChange={v => setField('lastName', v)} />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Date of Birth</div>
+        <Section title="Date of Birth">
           <TextField label="DOB" value={local.dob} type="date" onChange={v => setField('dob', v)} />
-          <ReadOnlyField label="Current Age" value={ageFromDob(local.dob)} />
+          <ReadOnlyField label="Current Age" value={ageFromDob(local.dob) ? `${ageFromDob(local.dob)} years` : ''} />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Gender</div>
+        <Section title="Gender">
           <TextField label="Gender" value={local.gender} onChange={v => setField('gender', v)} />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Concerns (optional)</div>
-          <TextField label="Health" value={local.healthConcerns} onChange={v => setField('healthConcerns', v)} />
-          <TextField label="Other" value={local.otherConcerns} onChange={v => setField('otherConcerns', v)} />
-
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Contact</div>
+        <Section title="Contact">
           <TextField label="Home" value={local.phoneHome} onChange={v => setField('phoneHome', v)} />
           <TextField label="Mobile" value={local.phoneMobile} onChange={v => setField('phoneMobile', v)} />
-          <TextField label="Email" value={local.email} onChange={v => setField('email', v)} />
+          <TextField label="Email" value={local.email} type="email" onChange={v => setField('email', v)} />
+        </Section>
 
-          <div style={{ marginTop: 16 }}>
-            <AddressGroup heading="Current Address" value={local.currentAddress}
-              onChange={v => setField('currentAddress', v)} />
-          </div>
-          <div style={{ marginTop: 16 }}>
-            <AddressGroup heading="Permanent Address" value={local.permanentAddress}
-              onChange={v => setField('permanentAddress', v)} />
-          </div>
-        </div>
+        <Section title="Current Address">
+          <AddressFields value={local.currentAddress} onChange={v => setField('currentAddress', v)} />
+        </Section>
 
-        {/* ── MIDDLE COLUMN ─────────────────────────────────────────────── */}
-        <div>
-          <div className="panel-teal-head">Availability / Preferences</div>
+        <Section title="Permanent Address">
+          <AddressFields value={local.permanentAddress} onChange={v => setField('permanentAddress', v)} />
+        </Section>
+
+        <Section title="Start Date">
+          <TextField label="Start Date" value={local.startDate} type="date" onChange={v => setField('startDate', v)} />
+          <ReadOnlyField label="Time at Crania" value={timeWithCompany(local.startDate)} />
+        </Section>
+
+        <Section title="Compensation">
+          <TextField label="Rate / Hour" value={local.ratePerHour} variant="highlight"
+            onChange={v => setField('ratePerHour', v)} />
+          <TextField label="Role" value={local.role} onChange={v => setField('role', v)} />
+        </Section>
+
+        <Section title="SIN Number" hint="Kept for payroll. Visible to admins only.">
+          <TextField label="SIN" value={local.sin} onChange={v => setField('sin', v)} />
+        </Section>
+
+        <Section title="Emergency Contact">
+          <TextField label="First Name" value={local.emergencyFirstName} onChange={v => setField('emergencyFirstName', v)} />
+          <TextField label="Last Name" value={local.emergencyLastName} onChange={v => setField('emergencyLastName', v)} />
+          <TextField label="Phone" value={local.emergencyPhone} onChange={v => setField('emergencyPhone', v)} />
+          <TextField label="Email" value={local.emergencyEmail} type="email" onChange={v => setField('emergencyEmail', v)} />
+        </Section>
+
+        <Section title="Concerns" hint="Optional.">
+          <TextField label="Health" value={local.healthConcerns} onChange={v => setField('healthConcerns', v)} />
+          <TextField label="Other" value={local.otherConcerns} onChange={v => setField('otherConcerns', v)} />
+        </Section>
+
+        <Section title="Documents Required" count={`${DOCUMENTS.length - missingDocs(local)}/${DOCUMENTS.length}`}>
+          <DocumentsEditor value={local.documents} onChange={v => setField('documents', v)} />
+        </Section>
+
+        <Section title="Availability" span={2}>
           <AvailabilityEditor value={local.availability} onChange={v => setField('availability', v)} />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Education</div>
+        <Section title="Programs" hint="Set on the Programs page.">
+          {taughtPrograms.length === 0 ? (
+            <div className="emptynote">No programs assigned yet.</div>
+          ) : (
+            taughtPrograms.map((p, i) => (
+              <div key={i} className="progpill">
+                <div className="t">{p.title}</div>
+                <div className="s">{p.location} · {p.slots}</div>
+              </div>
+            ))
+          )}
+        </Section>
+
+        <Section title="Education">
           <RowsEditor
             columns={[
-              { key: 'degree', label: 'Degree(s)' },
-              { key: 'institution', label: 'Institution(s)' },
-              { key: 'from', label: 'From', width: '90px', type: 'date' },
-              { key: 'to', label: 'To', width: '90px', type: 'date' },
+              { key: 'degree', label: 'Degree' },
+              { key: 'institution', label: 'Institution' },
+              { key: 'from', label: 'From', width: '104px', type: 'date' },
+              { key: 'to', label: 'To', width: '104px', type: 'date' },
             ]}
             rows={local.education || []}
             onChange={v => setField('education', v)}
+            addLabel="+ Add qualification"
           />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Work Experience</div>
+        <Section title="Work Experience">
           <RowsEditor
             columns={[
               { key: 'title', label: 'Title' },
               { key: 'organization', label: 'Organization' },
-              { key: 'from', label: 'From', width: '90px', type: 'date' },
-              { key: 'to', label: 'To', width: '90px', type: 'date' },
+              { key: 'from', label: 'From', width: '104px', type: 'date' },
+              { key: 'to', label: 'To', width: '104px', type: 'date' },
             ]}
             rows={local.workExperience || []}
             onChange={v => setField('workExperience', v)}
+            addLabel="+ Add role"
           />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Teachables</div>
+        <Section title="Teachables">
           <RowsEditor
             columns={[
               { key: 'subject', label: 'Subject' },
-              { key: 'comfort', label: 'Comfort (1-5)', width: '80px' },
-              { key: 'gradeRange', label: 'Grade Range', width: '90px' },
-              { key: 'years', label: 'Years', width: '60px' },
+              { key: 'comfort', label: 'Comfort 1-5', width: '78px' },
+              { key: 'gradeRange', label: 'Grades', width: '78px' },
+              { key: 'years', label: 'Years', width: '62px' },
             ]}
             rows={local.teachables || []}
             onChange={v => setField('teachables', v)}
+            addLabel="+ Add subject"
           />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Programs (auto)</div>
-          {taughtPrograms.length === 0 ? (
-            <div style={{ fontSize: 12, fontStyle: 'italic', color: 'var(--muted)', padding: '4px 2px' }}>
-              No programs assigned yet. Assign on the Programs page.
-            </div>
-          ) : (
-            taughtPrograms.map((p, i) => (
-              <div key={i} style={{ background: '#eef1f2', borderRadius: 5, padding: '6px 10px', marginBottom: 4, fontSize: 12 }}>
-                <div style={{ fontWeight: 700 }}>{p.title}</div>
-                <div style={{ color: 'var(--ink-soft)' }}>{p.location} · {p.slots}</div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* ── RIGHT COLUMN ──────────────────────────────────────────────── */}
-        <div>
-          <div className="panel-teal-head">Start Date</div>
-          <TextField label="Start Date" value={local.startDate} type="date" onChange={v => setField('startDate', v)} />
-          <ReadOnlyField label="Time at Crania" value={timeWithCompany(local.startDate)} />
-
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>SIN Number</div>
-          <TextField label="SIN" value={local.sin} onChange={v => setField('sin', v)} />
-
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Emergency Contact</div>
-          <TextField label="First Name" value={local.emergencyFirstName} onChange={v => setField('emergencyFirstName', v)} />
-          <TextField label="Last Name" value={local.emergencyLastName} onChange={v => setField('emergencyLastName', v)} />
-          <TextField label="Phone" value={local.emergencyPhone} onChange={v => setField('emergencyPhone', v)} />
-          <TextField label="Email" value={local.emergencyEmail} onChange={v => setField('emergencyEmail', v)} />
-
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Documents Required</div>
-          <DocumentsEditor value={local.documents} onChange={v => setField('documents', v)} />
-
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Keys</div>
+        <Section title="Keys">
           <RowsEditor
             columns={[
               { key: 'description', label: 'Description' },
-              { key: 'dateOut', label: 'Date Out', width: '90px', type: 'date' },
-              { key: 'dateIn', label: 'Date In', width: '90px', type: 'date' },
-              { key: 'formSigned', label: 'Signed', width: '60px', type: 'check' },
+              { key: 'dateOut', label: 'Out', width: '104px', type: 'date' },
+              { key: 'dateIn', label: 'In', width: '104px', type: 'date' },
+              { key: 'formSigned', label: 'Signed', width: '54px', type: 'check' },
             ]}
             rows={local.keys || []}
             onChange={v => setField('keys', v)}
+            addLabel="+ Add key"
           />
+        </Section>
 
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>References (Min. Two)</div>
+        <Section title="References" span={2}
+          hint={(local.references || []).length < 2 ? 'Two are required.' : undefined}>
           <RowsEditor
             columns={[
               { key: 'name', label: 'Name' },
@@ -1013,12 +1055,9 @@ function StaffDetail({ staffId, onBack, onDelete }) {
             ]}
             rows={local.references || []}
             onChange={v => setField('references', v)}
+            addLabel="+ Add reference"
           />
-
-          <div className="panel-teal-head" style={{ marginTop: 16 }}>Compensation</div>
-          <TextField label="Rate / Hour" value={local.ratePerHour} variant="highlight" onChange={v => setField('ratePerHour', v)} />
-          <TextField label="Role" value={local.role} onChange={v => setField('role', v)} />
-        </div>
+        </Section>
       </div>
     </div>
   )
