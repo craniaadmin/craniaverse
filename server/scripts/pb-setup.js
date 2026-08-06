@@ -503,14 +503,24 @@ async function main() {
     await ensureCollection(spec)
   }
 
-  console.log('\nImporting JSON data:')
-  await importRegistrations()
-  await importStaff()
-  await importPrograms()
-  await importProgramsState()
-  await importRules()
-  await importComments()
-  await importStaffBoard()
+  /* The seed import is opt-in. It re-creates every record in the JSON
+     files, so running this script to add a collection — which is the
+     only reason anyone runs it now — also put every registration in
+     data.json back, including ones deliberately deleted. The
+     collections are the safe, idempotent part; the data is not. */
+  if (!IMPORT_DATA) {
+    console.log('\nSkipping the JSON seed import (collections only).')
+    console.log('Pass --import to load server/*.json into the database.')
+  } else {
+    console.log('\nImporting JSON data:')
+    await importRegistrations()
+    await importStaff()
+    await importPrograms()
+    await importProgramsState()
+    await importRules()
+    await importComments()
+    await importStaffBoard()
+  }
 
   console.log('\n✓ PocketBase setup complete.')
 }
