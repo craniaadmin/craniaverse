@@ -194,12 +194,44 @@ function PasswordModal({ user, onClose }) {
    for the current password when you change your own, which an admin
    acting on their own row cannot supply here — that is what the Change
    password item in the menu is for. */
-function AccountRow({ u, isMe, onPatch, onRemove, onSetPassword }) {
+/* A password box that starts hidden with a Show beside it. Used for both
+   setting someone's password and creating an account — a password typed
+   in the clear is readable by whoever is standing behind you, and these
+   screens get used at a front desk. */
+function PasswordBox({ value, onChange, placeholder, autoFocus }) {
+  const [shown, setShown] = useState(false)
+  return (
+    <>
+      <input type={shown ? 'text' : 'password'} value={value} placeholder={placeholder}
+        autoFocus={autoFocus} autoComplete="new-password"
+        onChange={e => onChange(e.target.value)} />
+      <button type="button" className="peek" aria-pressed={shown}
+        title={shown ? 'Hide the password' : 'Show what you have typed'}
+        onClick={() => setShown(v => !v)}>{shown ? 'Hide' : 'Show'}</button>
+    </>
+  )
+}
+
+/* One account as a row, everything about it editable in place.
+
+   Name and email commit when you leave the field rather than on every
+   keystroke — a PUT per character would be a lot of requests and would
+   reject every half-typed address on the way. Level and active apply at
+   once, because a dropdown and a tick have no half-finished state.
+
+   Setting a password is offered for other people only. The server asks
+   for the current password when you change your own, which an admin
+   acting on their own row cannot supply here — that is what the Change
+   password item in the menu is for. */
+function AccountRow({ u, isMe, cols, onPatch, onRemove, onSetPassword }) {
   const [name, setName] = useState(u.name || '')
   const [email, setEmail] = useState(u.email || '')
   const [pwOpen, setPwOpen] = useState(false)
   const [pw, setPw] = useState('')
   const [pwBusy, setPwBusy] = useState(false)
+  const [confirmDel, setConfirmDel] = useState(false)
+  const [typed, setTyped] = useState('')
+  const [delBusy, setDelBusy] = useState(false)
 
   /* Re-sync when the row is replaced by the server's copy, so a rejected
      edit snaps back to what is actually stored rather than sitting there
@@ -220,63 +252,96 @@ function AccountRow({ u, isMe, onPatch, onRemove, onSetPassword }) {
     if (ok) { setPw(''); setPwOpen(false) }
   }
 
+  /* Deleting takes the account and its history with it and there is no
+     undo, so it asks, names who, and wants the email typed back. Reading
+     the address off the row above is easy; doing it by accident is not. */
+  const armed = typed.trim().toLowerCase() === String(u.email || '').toLowerCase()
+  const doDelete = async () => {
+    if (!armed) return
+    setDelBusy(true)
+    await onRemove(u)
+    setDelBusy(false)
+  }
+
   return (
-    <div className={'acctuser' + (u.active ? '' : ' off')}>
-      <div className="r1">
-        <div>
-          <span className="lbl">Name</span>
-          <input value={name} placeholder="Full name"
+    <>
+      <tr className={(u.active ? '' : 'off ') + (isMe ? 'me' : '')}>
+        <td>
+          <input type="text" value={name} placeholder="Full name" title="Click to edit"
             onChange={e => setName(e.target.value)}
             onBlur={() => commit('name', name, u.name)} />
-        </div>
-        <div>
-          <span className="lbl">Email</span>
-          <input type="email" value={email}
+        </td>
+        <td>
+          <input type="email" value={email} title="Click to edit"
             onChange={e => setEmail(e.target.value)}
             onBlur={() => commit('email', email, u.email)} />
-        </div>
-      </div>
-
-      <div className="r2">
-        <select value={u.role} title="Access level"
-          onChange={e => onPatch(u.id, { role: e.target.value })}>
-          {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-        </select>
-
-        <label className="tog" title={u.active ? 'Switch this account off' : 'Switch this account on'}>
-          <input type="checkbox" checked={u.active}
-            onChange={e => onPatch(u.id, { active: e.target.checked })} />
-          Active
-        </label>
-
-        {!isMe && (
-          <button type="button" className="linkbtn" onClick={() => setPwOpen(v => !v)}>
-            {pwOpen ? 'Cancel' : 'Set password'}
+        </td>
+        <td>
+          <select className={'lvl ' + u.role} value={u.role} title={ROLE_BLURB[u.role]}
+            onChange={e => onPatch(u.id, { role: e.target.value })}>
+            {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+        </td>
+        <td>
+          <label className="tog" title={u.active ? 'Switch this account off' : 'Switch this account on'}>
+            <input type="checkbox" checked={u.active}
+              onChange={e => onPatch(u.id, { active: e.target.checked })} />
+            Active
+          </label>
+        </td>
+        <td className="when">
+          {u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString() : 'never'}
+          {isMe && <em style={{ color: '#5FA09E', fontWeight: 700 }}> · you</em>}
+        </td>
+        <td className="actcell">
+          {!isMe && (
+            <button type="button" className="linkbtn"
+              onClick={() => { setPwOpen(v => !v); setConfirmDel(false) }}>
+              {pwOpen ? 'Cancel' : 'Password'}
+            </button>
+          )}
+          <button className="iconbtn" title="Remove this account"
+            onClick={() => { setConfirmDel(v => !v); setPwOpen(false); setTyped('') }}>
+            <Trash2 size={14} />
           </button>
-        )}
-
-        <button className="iconbtn" title="Remove this account" onClick={() => onRemove(u)}>
-          <Trash2 size={14} />
-        </button>
-
-        <span className="meta">
-          {isMe && <em>this is you · </em>}
-          {u.lastLoginAt
-            ? `last signed in ${new Date(u.lastLoginAt).toLocaleDateString()}`
-            : 'never signed in'}
-        </span>
-      </div>
+        </td>
+      </tr>
 
       {pwOpen && (
-        <div className="pwrow">
-          <input type="text" value={pw} placeholder="New password — at least 9 characters"
-            onChange={e => setPw(e.target.value)} />
-          <button disabled={pwBusy || !pw} onClick={savePw}>
-            {pwBusy ? 'Saving…' : 'Save password'}
-          </button>
-        </div>
+        <tr className="subrow">
+          <td colSpan={cols}>
+            <div className="pwrow">
+              <PasswordBox value={pw} onChange={setPw} autoFocus
+                placeholder={`New password for ${u.name || u.email} — at least 9 characters`} />
+              <button className="go" disabled={pwBusy || !pw} onClick={savePw}>
+                {pwBusy ? 'Saving…' : 'Save password'}
+              </button>
+            </div>
+          </td>
+        </tr>
       )}
-    </div>
+
+      {confirmDel && (
+        <tr className="subrow">
+          <td colSpan={cols}>
+            <div className="delrow">
+              <span className="q">
+                Delete {u.name || u.email}? This cannot be undone — type
+                {' '}<strong>{u.email}</strong> to confirm.
+              </span>
+              <input type="text" value={typed} placeholder="Type the email"
+                onChange={e => setTyped(e.target.value)} />
+              <button className="danger" disabled={!armed || delBusy} onClick={doDelete}>
+                {delBusy ? 'Deleting…' : 'Delete account'}
+              </button>
+              <button className="keep" onClick={() => { setConfirmDel(false); setTyped('') }}>
+                Keep it
+              </button>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   )
 }
 
