@@ -556,6 +556,7 @@ export default function Registrations({ onNavigate }) {
       <style>{CSS}</style>
 
       <PageActions
+        {...hist}
         csvName="crania-registrations"
         csvColumns={csvColumns}
         csvRows={csvRows}
