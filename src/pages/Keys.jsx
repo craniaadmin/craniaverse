@@ -425,13 +425,6 @@ export default function Keys({ onNavigate }) {
       `Log ${entry.description} to ${fullName(who) || 'staff'}`)
   }
 
-  useEffect(() => {
-    if (!pop) return undefined
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    const id = setTimeout(() => window.addEventListener('mousedown', onDown), 0)
-    return () => { clearTimeout(id); window.removeEventListener('mousedown', onDown) }
-  }, [pop])
-
   const arrow = k => (sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null)
 
   return (
