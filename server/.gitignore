@@ -2,6 +2,10 @@ node_modules/
 data.json
 .env
 
+# Runtime state for server/scripts/monitor-tunnels.js — tracks last
+# known tunnel status between cron fires, not source.
+scripts/.tunnel-monitor-state.json
+
 # PocketBase runtime data — created on first start of the pocketbase
 # binary. Contains the SQLite database, uploaded files, and the
 # auto-applied migrations history. Per-machine; never commit.
