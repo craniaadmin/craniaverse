@@ -76,21 +76,6 @@ function minToTime(m) {
   return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
 }
 
-// ─── CSV export ───
-// Kept for the year-image/download plumbing below; the events CSV itself now
-// goes through PageActions' shared downloadCsv.
-const csvCell = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'
-function unusedDownloadCsv(filename, rows) {
-  const BOM = '﻿'
-  const text = BOM + rows.map(r => r.map(csvCell).join(',')).join('\r\n')
-  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' })
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
-  a.download = filename
-  document.body.appendChild(a); a.click(); a.remove()
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000)
-}
-
 /* "Every 2 weekly (Mon, Wed) until 2027-06-30" — the CSV should say what the
    repeat actually is, not just its frequency. */
 function recurLabel(rc) {
@@ -585,7 +570,6 @@ export default function CalendarView({
   const [ctxMenu, setCtxMenu] = useState(null) // { x, y, items }
   const [colorPick, setColorPick] = useState(null) // { x, y, calId }
   const [dragEv, setDragEv] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const timeGridRef = useRef(null)
 
   // close context menu on any click
@@ -2183,106 +2167,6 @@ function ConfirmDialog({ msg, onYes, onNo }) {
 // ═══════════════════════════════════════
 // ─── Context Menu ───
 // ═══════════════════════════════════════
-// ═══════════════════════════════════════
-// ─── Calendar Settings Popover ───
-// ═══════════════════════════════════════
-function CalSettingsPopover({ onClose }) {
-  const ref = useRef(null)
-  const [backups, setBackups] = useState(null)
-  const [err, setErr] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [restoreOpen, setRestoreOpen] = useState(false)
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
-    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
-  }, [onClose])
-
-  useEffect(() => {
-    fetch(`${API_BASE}/api/calendar/backups`, { headers: HEADERS })
-      .then(r => r.json())
-      .then(setBackups)
-      .catch(() => setBackups([]))
-  }, [])
-
-  const backupNow = async () => {
-    setBusy(true); setErr('')
-    try {
-      const res = await fetch(`${API_BASE}/api/calendar/backup`, {
-        method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ label: new Date().toLocaleString() }),
-      })
-      if (!res.ok) throw new Error(`Server returned ${res.status}`)
-      const list = await fetch(`${API_BASE}/api/calendar/backups`, { headers: HEADERS }).then(r => r.json())
-      setBackups(list)
-    } catch (e) {
-      console.error('Calendar backup failed:', e)
-      setErr('Backup failed — check that the calendar_backups collection exists (run pb-setup.js).')
-    }
-    setBusy(false)
-  }
-
-  const doRestore = async (id) => {
-    setBusy(true); setErr('')
-    try {
-      const res = await fetch(`${API_BASE}/api/calendar/restore/${id}`, { method: 'POST', headers: HEADERS })
-      if (!res.ok) throw new Error(`Server returned ${res.status}`)
-      window.location.reload()
-    } catch (e) {
-      console.error('Calendar restore failed:', e)
-      setErr('Restore failed — the backup may be missing or the server unreachable.')
-      setBusy(false)
-    }
-  }
-
-  const lastBackup = backups?.[0]
-  const lastLine = lastBackup
-    ? `Last backup: ${lastBackup.label || new Date(lastBackup.created).toLocaleString()}`
-    : backups === null ? 'Loading…' : 'No backups yet'
-
-  return (
-    <div className="settings-popover" ref={ref} onMouseDown={(e) => e.stopPropagation()}>
-      <div className="sp-card">
-        <div className="sp-card-title">Backups</div>
-        <div className="sp-hint">
-          Snapshots are saved to the database (last 14 kept).
-          Back up before big changes, or restore to roll back.
-        </div>
-        <div className="sp-meta">{lastLine}</div>
-        {err && <div className="sp-err">{err}</div>}
-        <div className="sp-btnrow">
-          <button type="button" className="sp-btn" disabled={busy} onClick={backupNow}>
-            {busy ? 'Saving…' : 'Back Up Now'}
-          </button>
-          <button type="button" className="sp-btn" disabled={busy} onClick={() => setRestoreOpen(v => !v)}>
-            Restore{restoreOpen ? ' ▾' : '…'}
-          </button>
-        </div>
-        {restoreOpen && backups && (
-          <div className="sp-restore-list">
-            {backups.length === 0 && (
-              <div style={{ color: '#9a948a', padding: '10px 12px', textAlign: 'center', fontSize: 12 }}>
-                No backups yet — click Back Up Now to create one.
-              </div>
-            )}
-            {backups.map(b => (
-              <div key={b.id} className="sp-restore-row">
-                <span className="sp-rlabel">
-                  {b.label || new Date(b.created).toLocaleString()}
-                </span>
-                <button type="button" className="sp-btn" disabled={busy} onClick={() => doRestore(b.id)}>
-                  Restore
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
 /* Palette popover for recolouring a calendar straight from its chip. */
 function CalColorPop({ x, y, current, onPick, onClose }) {
   return (

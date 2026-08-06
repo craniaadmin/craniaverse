@@ -7,5 +7,11 @@
 import CalendarView from './CalendarView'
 
 export default function MarketingCalendar() {
-  return <CalendarView apiPath="/api/marketing-calendar" title="Marketing Calendar" />
+  return (
+    <CalendarView
+      apiPath="/api/marketing-calendar"
+      title="Marketing Calendar"
+      backupCollection="marketingCalendar"
+    />
+  )
 }
