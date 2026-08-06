@@ -356,7 +356,7 @@ export default function Comments({ onNavigate }) {
                       {fmtDate(r.row.date)}<br /><span style={{ fontSize: 11 }}>{r.row.day}</span>
                     </td>
                     {COMMENT_FIELDS.map(f => (
-                      <CommentCell key={f.key} value={r.row[f.key]} onChange={v => updateRow(r.studentId, r.tabKey, r.rowIdx, f.key, v)} />
+                      <CommentCell key={f.key} value={r.row[f.key]} onChange={v => editCell(r, f.key, v)} />
                     ))}
                   </tr>
                 ))}
