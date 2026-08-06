@@ -64,20 +64,20 @@ function verify(token) {
   return obj
 }
 
-export function makeSessionCookie() {
+export function makeSessionCookie(user) {
   const now = Date.now()
-  const token = sign({ iat: now, exp: now + SESSION_DAYS * 86400 * 1000 })
-  const maxAge = SESSION_DAYS * 86400
+  const exp = now + SESSION_MS
+  const token = sign({ uid: user?.id || '', role: user?.role || 'staff', iat: now, exp })
   const parts = [
     `${COOKIE_NAME}=${token}`,
     'Path=/',
-    `Max-Age=${maxAge}`,
+    `Max-Age=${Math.floor(SESSION_MS / 1000)}`,
     'HttpOnly',
     'SameSite=Lax',
   ]
   // ngrok/craniaverse is always https; safe to force Secure.
   if (process.env.NODE_ENV === 'production') parts.push('Secure')
-  return parts.join('; ')
+  return { cookie: parts.join('; '), expiresAt: exp }
 }
 
 export function clearSessionCookie() {
