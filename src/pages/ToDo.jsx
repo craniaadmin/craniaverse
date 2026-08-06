@@ -1069,11 +1069,6 @@ function TodoView({
     if (await askConfirm(`Delete "${it.text}"?`)) deleteItem(it.id)
   }
 
-  const footerText = (() => {
-    const total = (state.items || []).length
-    const shown = totalShown
-    return `CraniaVerse · To-Do · Count=${shown}` + (shown !== total ? ` of ${total}` : '')
-  })()
 
   return (
     <>
