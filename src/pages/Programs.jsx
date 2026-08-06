@@ -947,7 +947,6 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
   const [pop, setPop] = useState(null)        // {kind:'filter'|'cols', fk?, rect}
   const [editing, setEditing] = useState(null) // program modal
   const [bulkOpen, setBulkOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [managing, setManaging] = useState(null)  // gear key: cat | loc | prog | platform | grade | day | time
   const [rowCtx, setRowCtx] = useState(null)      // {x, y, row}
   const [catCtx, setCatCtx] = useState(null)      // {x, y, cat}
