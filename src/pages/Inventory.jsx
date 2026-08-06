@@ -122,12 +122,12 @@ function useStock() {
     })
   }, [])
 
-  return { data, loading, status, mutate }
+  return { data, loading, status, mutate, refresh }
 }
 
 // ---------- Inventory page ----------
 export default function Inventory() {
-  const { data, loading, status, mutate } = useStock()
+  const { data, loading, status, mutate, refresh } = useStock()
   const [view, setView]          = useState('inventory') // 'inventory' | 'log'
   const [query, setQuery]        = useState('')
   const [catFilter, setCatFilter]     = useState('all')
