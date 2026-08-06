@@ -665,11 +665,11 @@ export default function Registrations({ onNavigate }) {
           </table>
         )}
       </div>
-      <div className="tcount">
-        {visible.length} registration{visible.length === 1 ? '' : 's'} · {totalRows} row
-        {totalRows === 1 ? '' : 's'}
-        {visible.length !== submissions.length ? ` of ${submissions.length}` : ''}
-      </div>
+      {/* A submission can carry more than one child, so rows and
+          registrations are different numbers — the count is registrations,
+          with the row total alongside it. */}
+      <RowCount shown={visible.length} total={submissions.length}
+        note={`${totalRows} row${totalRows === 1 ? '' : 's'}`} />
 
       {editing && (
         <EditRegistration sub={editing.sub} child={editing.child}
