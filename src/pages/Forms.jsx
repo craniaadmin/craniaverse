@@ -30,8 +30,9 @@ const BLANK_FIELD = () => ({
 const BLANK_FORM = { title: '', description: '', fields: [] }
 
 // ------------------------------ FORMS LIST ------------------------------
-function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations }) {
+function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations, onOpenStaff }) {
   const registerUrl = `${API_BASE || window.location.origin}/register`
+  const staffUrl = `${API_BASE || window.location.origin}/staff-form`
   const [copied, setCopied] = useState(null)
   const copy = async (url, key) => {
     try {
@@ -91,6 +92,38 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
               <ExternalLink size={16} />
             </button>
             <button className="icon-btn" title="View registrations" onClick={onOpenRegistrations}>
+              <Eye size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div style={{
+          background: '#f2fbfc',
+          border: '1px solid #d5ecef', borderRadius: 12,
+          padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr auto',
+          gap: 12, alignItems: 'center', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
+          marginBottom: 12,
+        }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Star size={15} style={{ color: '#5FA09E', fill: '#5FA09E' }} />
+              Staff Form
+              <span style={{ background: '#5FA09E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, letterSpacing: '.4px', textTransform: 'uppercase' }}>Built-in</span>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <span>New staff details · availability · qualifications · documents</span>
+              <span>·</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{staffUrl}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="icon-btn" title={copied === 'staff' ? 'Copied!' : 'Copy public link'} onClick={() => copy(staffUrl, 'staff')}>
+              <Copy size={16} />
+            </button>
+            <button className="icon-btn" title="Open public form" onClick={() => window.open(staffUrl, '_blank')}>
+              <ExternalLink size={16} />
+            </button>
+            <button className="icon-btn" title="View staff records" onClick={onOpenStaff}>
               <Eye size={16} />
             </button>
           </div>
@@ -684,7 +717,7 @@ function BoothSignupsView({ onBack }) {
    Forms. As its own nav entry it needs somewhere to start, so it asks
    which form you mean — including the two built-in ones, whose
    submissions live elsewhere. */
-function PickForm({ forms, onPick, onBooth, onRegistrations }) {
+function PickForm({ forms, onPick, onBooth, onRegistrations, onStaff }) {
   const Row = ({ title, blurb, onClick }) => (
     <button onClick={onClick} style={{
       display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center',
@@ -706,6 +739,8 @@ function PickForm({ forms, onPick, onBooth, onRegistrations }) {
       </div>
       <Row title="Registration Form" blurb="Enrolments from the public registration form"
         onClick={onRegistrations} />
+      <Row title="Staff Form" blurb="New staff details — these become records on the Staff page"
+        onClick={onStaff} />
       <Row title="Booth Sign-Up" blurb="Free assessments, open house RSVPs and agenda orders"
         onClick={onBooth} />
       {forms.length === 0 ? (
@@ -917,7 +952,8 @@ export default function Forms({ onNavigate, initialView = 'list' }) {
       <PickForm forms={forms}
         onPick={(id) => setView({ mode: 'subs', id })}
         onBooth={() => setView({ mode: 'booth' })}
-        onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])} />
+        onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])}
+        onStaff={() => onNavigate && onNavigate(['staff', 'Staff'])} />
     )
   }
   if (view.mode === 'templates') {
@@ -938,6 +974,7 @@ export default function Forms({ onNavigate, initialView = 'list' }) {
       boothUrl={boothUrl}
       onOpenBooth={() => setView({ mode: 'booth' })}
       onOpenRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])}
+      onOpenStaff={() => onNavigate && onNavigate(['staff', 'Staff'])}
     />
   )
 }
