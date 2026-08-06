@@ -336,7 +336,7 @@ function useCalendar(apiPath) {
 }
 
 // ─── CSS ───
-const CSS = `
+const CSS = PAGEACTIONS_CSS + `
 .calroot{--light-blue:#A6E2F9;--dark-blue:#5FA09E;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--shadow:0 1px 3px rgba(46,37,22,.15);
   color:var(--dark-brown);font-family:inherit;}
 
