@@ -29,7 +29,7 @@ export default function StaffHub() {
   const [openCard, setOpenCard] = useState(null) // { listId, card }
 
   // Load
-  useEffect(() => {
+  const load = useCallback(() => (
     fetch(`${API_BASE}/api/staff-board`, { headers: HEADERS })
       .then(r => r.ok ? r.json() : DEFAULT_BOARD)
       .then(data => {
@@ -37,7 +37,9 @@ export default function StaffHub() {
         setStatus('online')
       })
       .catch(() => setStatus('offline'))
-  }, [])
+  ), [])
+
+  useEffect(() => { load() }, [load])
 
   // Save (debounced)
   const persist = useCallback((next) => {
