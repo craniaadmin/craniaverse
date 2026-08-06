@@ -123,12 +123,14 @@ input, select, textarea { font-family: inherit; }
 .topbar-v7 .brandwrap img {
   height: 34px; width: auto; display: block; object-fit: contain;
 }
+/* Sans, matching the sidebar and the rest of the chrome — the serif
+   was the odd one out up here. */
 .topbar-v7 .title {
   font-weight: 700; font-size: 18px; color: #fff; white-space: nowrap;
-  font-family: var(--serif);
-  display: inline-flex; align-items: baseline; gap: 8px;
+  font-family: var(--sans);
+  display: inline-flex; align-items: baseline; gap: 7px;
 }
-.topbar-v7 .title .sep { opacity: .5; font-weight: 400; }
+.topbar-v7 .title .sep { opacity: .85; }
 .topbar-v7 .spacer { flex: 1; }
 .topbar-v7 .submenu {
   display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
