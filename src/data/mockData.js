@@ -4,6 +4,15 @@
 
 // Sidebar sections — order matches the client's mockup. `divider:true`
 // inserts a horizontal rule between groups in the sidebar.
+/* Hiding a page means taking it out of here, not deleting it. Every
+   page below still exists in src/pages/ and every route is still wired
+   in App.jsx — they are simply unreachable from the nav, so putting one
+   back is a one-line change here.
+
+   Currently hidden, all at the client's request:
+     sections   Marketing, Merchandise, Contacts, Day School
+     pages      Assessments (programs), Emergency Contacts (customers),
+                IT Accounts (operations), Tuition Schedules (financial) */
 export const SECTIONS = [
   { id: 'home',        label: 'Home' },
   { id: 'programs',    label: 'Programs' },
@@ -12,30 +21,21 @@ export const SECTIONS = [
   { id: 'staff',       label: 'Staff' },
   { id: 'operations',  label: 'Operations' },
   { id: 'financial',   label: 'Financial' },
-  { id: 'marketing',   label: 'Marketing' },
-  { id: 'merchandise', label: 'Merchandise' },
-  { id: 'contacts',    label: 'Contacts' },
   { divider: true },
   { id: 'forms',       label: 'Forms' },
-  { divider: true },
-  { id: 'dayschool',   label: 'Day School' },
 ]
 
 // Submenu shown in the top bar when a section is active. First entry
 // is the default sub-page when the section is opened.
 export const SUBMENUS = {
   home:        ['Dashboard', 'Calendar', 'To-Do', 'Checklists', 'Projects'],
-  programs:    ['Programs', 'Class Lists', 'Contests', 'Assessments'],
-  customers:   ['Customers', 'Emergency Contacts'],
+  programs:    ['Programs', 'Class Lists', 'Contests'],
+  customers:   ['Customers'],
   students:    ['Students', 'Attendance', 'Comments', 'Crania Cash', 'Logins'],
   staff:       ['Staff', 'Schedules', 'Keys'],
-  operations:  ['Inventory', 'Crania Store', 'IT Accounts'],
-  financial:   ['Tuition Schedules', 'Invoices', 'Receipts'],
-  marketing:   ['Marketing', 'Calendar', 'Leads', 'Surveys'],
-  merchandise: ['Merchandise'],
-  contacts:    ['Contacts'],
+  operations:  ['Inventory', 'Crania Store'],
+  financial:   ['Invoices', 'Receipts', 'Payroll'],
   forms:       ['All Forms', 'Registrations', 'Submissions', 'Templates', 'Form Builder'],
-  dayschool:   ['Day School'],
 }
 
 // Legacy flat nav used by the old top-nav-dropdown component and
