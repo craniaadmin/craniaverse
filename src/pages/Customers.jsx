@@ -26,7 +26,6 @@ import {
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
 import { buildFamilyIndex, familyOf } from '../data/family'
-import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
