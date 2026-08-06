@@ -2126,10 +2126,6 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
           onClose={() => setBulkOpen(false)} onApply={applyBulk} />
       )}
 
-      {settingsOpen && (
-        <SettingsModal onClose={() => setSettingsOpen(false)} setPrograms={setPrograms} />
-      )}
-
       {managing && (
         <ManageModal
           kind={managing}
