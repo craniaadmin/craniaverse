@@ -139,6 +139,31 @@ export default function Attendance({ onNavigate }) {
         </div>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName={view === 'register' ? `crania-register-${selectedDate}` : 'crania-attendance-history'}
+        csvColumns={[
+          { key: 'date', label: 'Date' },
+          { key: 'student', label: 'Student' },
+          { key: 'program', label: 'Program' },
+          { key: 'lessonNo', label: 'Lesson #' },
+          { key: 'attendance', label: 'Attendance' },
+          { key: 'uniform', label: 'Uniform' },
+        ]}
+        csvRows={() => (view === 'register' ? dayRows : visible).map(r => ({
+          date: r.row.date || '',
+          student: r.studentName,
+          program: r.program || '',
+          lessonNo: r.row.lessonNo ?? '',
+          attendance: r.row.attendance
+            ? (ATTEND_LABEL[r.row.attendance.toUpperCase()] || r.row.attendance)
+            : 'Unmarked',
+          uniform: r.row.uniform || '',
+        }))}
+        backupCollection="registrations"
+        backupHint="Snapshots of the student records these registers are built from (last 14 kept)."
+      />
+
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
