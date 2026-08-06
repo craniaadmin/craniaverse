@@ -380,25 +380,20 @@ function RulesEditor() {
   )
 }
 
-function CashSettings({ onClose }) {
-  const ref = useRef(null)
+/* Backups and the rules editor, both of which live behind the gear. Rendered
+   inside PageActions' settings popover, which owns the positioning and the
+   click-outside-to-close that this used to do for itself. */
+function CashSettings() {
   const { refresh } = useStore()
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
-    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
-  }, [onClose])
-
   return (
-    <div className="ccsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
+    <>
       <BackupPanel base="customers"
         hint={'Balances and their history are held on the registrations, so these are the same '
           + 'snapshots the Customers page takes — restoring one replaces every registration '
           + '(last 14 kept).'}
-        onRestored={async () => { await refresh(); onClose() }} />
+        onRestored={refresh} />
       <RulesEditor />
-    </div>
+    </>
   )
 }
 
