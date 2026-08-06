@@ -593,6 +593,173 @@ export default function Registrations({ onNavigate }) {
   )
 }
 
+/* Editing a registration touches three separate stores on the record —
+   the child, the household, and the enrolments — so the dialog collects
+   all of it and writes whichever parts actually changed. Sending all
+   three every time would rewrite the household for a spelling fix on a
+   child's name. */
+function EditRegistration({ sub, child, onClose, onSaved }) {
+  const rec = child.record
+  const cust = rec.customer || {}
+  const [student, setStudent] = useState({
+    firstName: rec.student?.firstName || '', lastName: rec.student?.lastName || '',
+    dob: rec.student?.dob || '', grade: rec.student?.grade || '',
+    school: rec.student?.school || '', medical: rec.student?.medical || '',
+  })
+  const [g1, setG1] = useState({ ...(cust.guardian1 || {}) })
+  const [g2, setG2] = useState({ ...(cust.guardian2 || {}) })
+  const [em, setEm] = useState({ ...(cust.emergency || {}) })
+  const [meta, setMeta] = useState({ ...(cust.meta || {}) })
+  const [programs, setPrograms] = useState(() =>
+    JSON.parse(JSON.stringify(child.rawPrograms || [])))
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState('')
+
+  const setP = (i, k, v) => setPrograms(ps => ps.map((p, n) => (n === i ? { ...p, [k]: v } : p)))
+  const removeP = (i) => setPrograms(ps => ps.filter((_, n) => n !== i))
+
+  const changed = (a, b) => JSON.stringify(a) !== JSON.stringify(b)
+
+  const save = async () => {
+    setBusy(true); setErr('')
+    const base = import.meta.env?.VITE_API_URL || ''
+    const H = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
+    const calls = []
+    if (changed(student, {
+      firstName: rec.student?.firstName || '', lastName: rec.student?.lastName || '',
+      dob: rec.student?.dob || '', grade: rec.student?.grade || '',
+      school: rec.student?.school || '', medical: rec.student?.medical || '',
+    })) {
+      calls.push(fetch(`${base}/api/registrations/${rec.id}/student`,
+        { method: 'PUT', headers: H, body: JSON.stringify(student) }))
+    }
+    if (changed(g1, cust.guardian1 || {}) || changed(g2, cust.guardian2 || {})
+      || changed(em, cust.emergency || {}) || changed(meta, cust.meta || {})) {
+      calls.push(fetch(`${base}/api/registrations/${rec.id}/customer`, {
+        method: 'PUT', headers: H,
+        body: JSON.stringify({ guardian1: g1, guardian2: g2, emergency: em, meta }),
+      }))
+    }
+    if (changed(programs, child.rawPrograms || [])) {
+      calls.push(fetch(`${base}/api/registrations/${rec.id}/programs`,
+        { method: 'PUT', headers: H, body: JSON.stringify(programs) }))
+    }
+    if (!calls.length) { onClose(); return }
+    try {
+      const results = await Promise.all(calls)
+      const bad = results.find(r => !r.ok)
+      if (bad) { setErr(`The server refused the change (HTTP ${bad.status}).`); setBusy(false); return }
+      await onSaved()
+      onClose()
+    } catch {
+      setErr('Could not reach the server. Nothing was saved.')
+      setBusy(false)
+    }
+  }
+
+  const F = ({ label, value, onChange, type = 'text', wide }) => (
+    <label className={'ef' + (wide ? ' wide' : '')}>
+      <span>{label}</span>
+      <input type={type} value={value || ''} onChange={e => onChange(e.target.value)} />
+    </label>
+  )
+
+  return (
+    <div className="rgov" onMouseDown={onClose}>
+      <div className="rgmodal" onMouseDown={e => e.stopPropagation()}>
+        <h2>Edit registration</h2>
+        <div className="who">{sub.ref} · {child.name || 'unnamed child'}</div>
+
+        <div className="egroup">Child</div>
+        <div className="egrid">
+          <F label="First name" value={student.firstName} onChange={v => setStudent(s => ({ ...s, firstName: v }))} />
+          <F label="Last name" value={student.lastName} onChange={v => setStudent(s => ({ ...s, lastName: v }))} />
+          <F label="Date of birth" type="date" value={student.dob} onChange={v => setStudent(s => ({ ...s, dob: v }))} />
+          <F label="Grade" value={student.grade} onChange={v => setStudent(s => ({ ...s, grade: v }))} />
+          <F label="School" value={student.school} onChange={v => setStudent(s => ({ ...s, school: v }))} wide />
+          <F label="Allergies / medical" value={student.medical} onChange={v => setStudent(s => ({ ...s, medical: v }))} wide />
+        </div>
+
+        <div className="egroup">Guardian 1</div>
+        <div className="egrid">
+          <F label="First name" value={g1['First Name']} onChange={v => setG1(o => ({ ...o, 'First Name': v }))} />
+          <F label="Last name" value={g1['Last Name']} onChange={v => setG1(o => ({ ...o, 'Last Name': v }))} />
+          <F label="Relationship" value={g1['Relationship']} onChange={v => setG1(o => ({ ...o, Relationship: v }))} />
+          <F label="Phone" value={g1['Phone']} onChange={v => setG1(o => ({ ...o, Phone: v }))} />
+          <F label="Email" value={g1['Email']} onChange={v => setG1(o => ({ ...o, Email: v }))} wide />
+        </div>
+
+        <div className="egroup">Guardian 2</div>
+        <div className="egrid">
+          <F label="First name" value={g2['First Name']} onChange={v => setG2(o => ({ ...o, 'First Name': v }))} />
+          <F label="Last name" value={g2['Last Name']} onChange={v => setG2(o => ({ ...o, 'Last Name': v }))} />
+          <F label="Relationship" value={g2['Relationship']} onChange={v => setG2(o => ({ ...o, Relationship: v }))} />
+          <F label="Phone" value={g2['Phone']} onChange={v => setG2(o => ({ ...o, Phone: v }))} />
+          <F label="Email" value={g2['Email']} onChange={v => setG2(o => ({ ...o, Email: v }))} wide />
+        </div>
+
+        <div className="egroup">Emergency contact</div>
+        <div className="egrid">
+          <F label="First name" value={em['First Name']} onChange={v => setEm(o => ({ ...o, 'First Name': v }))} />
+          <F label="Last name" value={em['Last Name']} onChange={v => setEm(o => ({ ...o, 'Last Name': v }))} />
+          <F label="Relationship" value={em['Relationship']} onChange={v => setEm(o => ({ ...o, Relationship: v }))} />
+          <F label="Phone" value={em['Phone']} onChange={v => setEm(o => ({ ...o, Phone: v }))} />
+        </div>
+
+        <div className="egroup">Submission</div>
+        <div className="egrid">
+          <F label="Source" value={meta.source} onChange={v => setMeta(o => ({ ...o, source: v }))} />
+          <F label="Notes" value={meta.notes} onChange={v => setMeta(o => ({ ...o, notes: v }))} wide />
+        </div>
+
+        {/* Guardian and emergency details belong to the household, so
+            editing them here changes them for every child on this
+            submission — worth saying rather than surprising someone. */}
+        {sub.childCount > 1 && (
+          <div className="enote">
+            Guardian, emergency and submission details are shared with the
+            other {sub.childCount - 1} child{sub.childCount - 1 === 1 ? '' : 'ren'} on {sub.ref}.
+          </div>
+        )}
+
+        <div className="egroup">Enrolments</div>
+        {programs.length === 0 && <div className="enote">No enrolments on this child.</div>}
+        {programs.map((p, i) => (
+          <div className="eprog" key={i}>
+            <div className="egrid">
+              <F label="Program" value={p.title} onChange={v => setP(i, 'title', v)} wide />
+              <F label="Year" value={p.year} onChange={v => setP(i, 'year', v)} />
+              <F label="Location" value={p.location} onChange={v => setP(i, 'location', v)} />
+              <F label="Day" value={p.day} onChange={v => setP(i, 'day', v)} />
+              <F label="Time" value={p.time} onChange={v => setP(i, 'time', v)} />
+              <F label="Fee" type="number" value={p.fee} onChange={v => setP(i, 'fee', v === '' ? '' : Number(v))} />
+              <label className="ef">
+                <span>Active</span>
+                <input type="checkbox" checked={p.active !== false}
+                  onChange={e => setP(i, 'active', e.target.checked)} />
+              </label>
+            </div>
+            <button type="button" className="edrop" onClick={() => removeP(i)}>Remove enrolment</button>
+          </div>
+        ))}
+        <button type="button" className="eadd"
+          onClick={() => setPrograms(ps => [...ps, { title: '', year: '', location: '', day: '', time: '', fee: '', active: true }])}>
+          + Add enrolment
+        </button>
+
+        {err && <div className="eerr">{err}</div>}
+
+        <div className="eacts">
+          <button type="button" className="cancel" onClick={onClose} disabled={busy}>Cancel</button>
+          <button type="button" className="go" onClick={save} disabled={busy}>
+            {busy ? 'Saving…' : 'Save changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ---- cell helpers -------------------------------------------------------
 function k0Notes(record) {
   return record?.customer?.meta?.notes || record?.student?.notes || ''
