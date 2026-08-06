@@ -55,7 +55,7 @@ export function downloadCsv(filename, columns, rows) {
   URL.revokeObjectURL(a.href)
 }
 
-function Settings({ collection, hint, onRestored, onClose, children }) {
+function Settings({ collection, hint, onRestored, onClose, onExport, canExport, children }) {
   const ref = useRef(null)
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
@@ -64,11 +64,24 @@ function Settings({ collection, hint, onRestored, onClose, children }) {
   }, [onClose])
   return (
     <div className="pgsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
+      {/* Export and the page's own occasional controls live in here now.
+          They were in the bar, where they sat beside Undo and Redo and
+          made every page look like it had five equally important
+          actions. Undo and Redo are the ones reached often; the rest are
+          a few times a term. */}
+      <div className="pgscard">
+        <div className="pgshead">Tools</div>
+        <button className="pgsitem" disabled={!canExport} onClick={onExport}
+          title={canExport ? 'Download what is on this page as a CSV file'
+            : 'Nothing on this page to export yet'}>
+          <Download size={13} /> Export CSV
+        </button>
+        {children}
+      </div>
       {collection && (
         <BackupPanel base={`snapshots/${collection}`} hint={hint}
           onRestored={async () => { if (onRestored) await onRestored(); onClose() }} />
       )}
-      {children}
     </div>
   )
 }
