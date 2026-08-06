@@ -573,34 +573,44 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   }
 
   // ---------- Export CSV ----------
-  const exportCsv = () => {
-    const stamp = isoLocal(new Date())
+  // Columns and rows follow whichever of the two views is on screen.
+  const CHECKLIST_CSV_COLUMNS = [
+    { key: 'checklist', label: 'Checklist' },
+    { key: 'list', label: 'List' },
+    { key: 'entry', label: 'Entry' },
+    { key: 'freq', label: 'Frequency' },
+    { key: 'active', label: 'Active' },
+    { key: 'priority', label: 'Priority' },
+  ]
+  const TODO_CSV_COLUMNS = [
+    { key: 'list', label: 'List' },
+    { key: 'todo', label: 'To-Do' },
+    { key: 'priority', label: 'Priority' },
+    { key: 'due', label: 'Due Date' },
+    { key: 'done', label: 'Done' },
+    { key: 'notes', label: 'Notes' },
+  ]
+  const csvRows = () => {
     if (view === 'checklists') {
-      const rows = [['Checklist', 'List', 'Entry', 'Frequency', 'Active', 'Priority']]
-      for (const cl of state.checklists) {
-        for (const en of cl.entries) {
-          const list = state.lists.find(l => l.id === en.listId)
-          rows.push([
-            cl.name || '', list?.name || '', en.text || '',
-            en.freq || 'daily', en.active === false ? 'No' : 'Yes',
-            PRI_LABEL[en.priority || 'high'] || en.priority || '',
-          ])
-        }
-      }
-      downloadCsv(`crania-checklists-${stamp}.csv`, rows)
-    } else {
-      const rows = [['List', 'To-Do', 'Priority', 'Due Date', 'Done', 'Notes']]
-      for (const list of state.lists) {
-        for (const it of state.items.filter(i => i.listId === list.id)) {
-          rows.push([
-            list.name || '', it.text || '',
-            PRI_LABEL[it.priority || 'low'] || it.priority || '',
-            it.due || '', it.done ? 'Yes' : 'No', it.notes || '',
-          ])
-        }
-      }
-      downloadCsv(`crania-todo-export-${stamp}.csv`, rows)
+      return state.checklists.flatMap(cl => cl.entries.map(en => ({
+        checklist: cl.name || '',
+        list: state.lists.find(l => l.id === en.listId)?.name || '',
+        entry: en.text || '',
+        freq: en.freq || 'daily',
+        active: en.active === false ? 'No' : 'Yes',
+        priority: PRI_LABEL[en.priority || 'high'] || en.priority || '',
+      })))
     }
+    return state.lists.flatMap(list => state.items
+      .filter(i => i.listId === list.id)
+      .map(it => ({
+        list: list.name || '',
+        todo: it.text || '',
+        priority: PRI_LABEL[it.priority || 'low'] || it.priority || '',
+        due: it.due || '',
+        done: it.done ? 'Yes' : 'No',
+        notes: it.notes || '',
+      })))
   }
 
   // ---------- Filters ----------
