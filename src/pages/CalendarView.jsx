@@ -987,24 +987,23 @@ export default function CalendarView({
     setColorPick(null)
   }
 
-  // ─── CSV export ───
-  const exportCSV = () => {
-    const header = ['Calendar', 'Title', 'Date', 'All Day', 'Start', 'End', 'Repeats', 'Notes']
-    const rows = [header]
-    /* Chronological, so the file reads like a schedule rather than like the
-       order things happened to be created in. */
-    const sorted = [...data.events].sort((a, b) =>
+  /* Events on the calendars currently ticked on the chip bar, chronological,
+     so the file reads like a schedule rather than like the order things
+     happened to be created in. */
+  const csvRows = () => [...data.events]
+    .filter(ev => !data.hidden[ev.calId])
+    .sort((a, b) =>
       (a.date || '').localeCompare(b.date || '') || (a.start || '').localeCompare(b.start || ''))
-    for (const ev of sorted) {
-      const cal = calById[ev.calId]
-      rows.push([
-        cal?.name || '', ev.title || '', ev.date || '',
-        ev.allDay ? 'Yes' : 'No', ev.start || '', ev.end || '',
-        recurLabel(ev.recur), ev.notes || '',
-      ])
-    }
-    downloadCsv(`crania-calendar-export-${iso(new Date())}.csv`, rows)
-  }
+    .map(ev => ({
+      calendar: calById[ev.calId]?.name || '',
+      title: ev.title || '',
+      date: ev.date || '',
+      allDay: ev.allDay ? 'Yes' : 'No',
+      start: ev.start || '',
+      end: ev.end || '',
+      repeats: recurLabel(ev.recur),
+      notes: ev.notes || '',
+    }))
 
   /* The picture is the year, not the current view — every calendar is drawn
      whether or not it is ticked on screen, and each day takes the colour of a
