@@ -18,6 +18,16 @@
         "dev"
       ],
       "port": 5173
+    },
+    {
+      "name": "hpreview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "vite.hpreview.config.js"
+      ],
+      "port": 5199
     }
   ]
 }

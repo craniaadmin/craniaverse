@@ -32,6 +32,12 @@ export default function useHistory(value, apply, opts = {}) {
     label = 'change',      // what the tooltip calls one step
     coalesceMs = 700,      // a burst of edits is one step, not thirty
     max = 40,
+    /* Pass `enabled: !loading`. A page starts with an empty value and
+       fills it from the server, and to a value-watcher that arrival looks
+       exactly like an edit — so Undo was armed the moment the page opened
+       and one click replaced the whole collection with the empty list it
+       started as, and saved that. Held off until the data is in, the first
+       real value is the baseline instead of a step. */
     enabled = true,
   } = opts
 

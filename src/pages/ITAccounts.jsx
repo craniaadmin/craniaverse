@@ -176,7 +176,7 @@ export default function ITAccounts() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(data, next => mutate(() => next), { label: 'account change' })
+  const hist = useHistory(data, next => mutate(() => next), { label: 'account change', enabled: !loading })
 
   if (loading) {
     return (

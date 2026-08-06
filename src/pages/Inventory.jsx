@@ -310,7 +310,7 @@ export default function Inventory() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(data, next => mutate(() => next), { label: 'inventory change' })
+  const hist = useHistory(data, next => mutate(() => next), { label: 'inventory change', enabled: !loading })
 
   if (loading) {
     return (

@@ -100,7 +100,7 @@ export default function Contacts() {
   }).sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }))
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change' })
+  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change', enabled: !loading })
 
   if (loading) {
     return (

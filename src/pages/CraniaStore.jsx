@@ -280,7 +280,7 @@ export default function CraniaStore() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(data, next => mutate(() => next), { label: 'store change' })
+  const hist = useHistory(data, next => mutate(() => next), { label: 'store change', enabled: !loading })
 
   if (loading) {
     return (

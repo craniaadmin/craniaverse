@@ -111,7 +111,7 @@ export default function Marketing() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(campaigns, next => mutate(() => next), { label: 'campaign change' })
+  const hist = useHistory(campaigns, next => mutate(() => next), { label: 'campaign change', enabled: !loading })
 
   if (loading) {
     return (

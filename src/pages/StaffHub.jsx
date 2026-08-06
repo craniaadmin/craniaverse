@@ -123,7 +123,7 @@ export default function StaffHub() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(board, update, { label: 'board change' })
+  const hist = useHistory(board, update, { label: 'board change', enabled: status !== 'loading' })
 
   return (
     <div className="page" style={{ paddingBottom: 24 }}>
