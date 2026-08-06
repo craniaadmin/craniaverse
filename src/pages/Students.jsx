@@ -18,11 +18,13 @@
 // are brought into line.
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
-import { Trash2, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink, Pencil, Copy } from 'lucide-react'
+import { Trash2, Undo2, Redo2, Eye, UserPlus, ExternalLink, Pencil, Copy } from 'lucide-react'
 import { useStore } from '../data/store'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useActionHistory from '../data/useActionHistory'
 import { awardsForRow, rowKeyOf, fieldCanTrigger } from '../data/autoCash'
 import {
   ATTEND_STYLE, EMPTY_ROW, DEFAULT_ROWS, ACADEMIC_YEARS, currentAcademicYear,
@@ -114,10 +116,13 @@ function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(
 const classesOf = (r) =>
   Array.from(new Set((r.programs || []).map(p => p.program).filter(Boolean)))
 
-const CSS = BACKUP_CSS + CATCOLORS_CSS + `
+const CSS = BACKUP_CSS + CATCOLORS_CSS + PAGEACTIONS_CSS + `
 .st{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
+/* The list toolbar is gone — it is the shared bar now. This is the
+   detail view own row: that student field history, and the two things
+   you do to the student in front of you. */
 .st .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
 .st .actions button{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:6px 12px;
     font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;
@@ -147,10 +152,10 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + `
 /* Scoped to this input. The old rule was a bare input::placeholder in a
    page-level <style>, which turned every placeholder on the page white. */
 .st .filters input[type=search]::placeholder{color:var(--faint)}
-.st .filters .addbtn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;
-    background:var(--light-blue);color:var(--dark-brown);cursor:pointer;font-family:inherit;margin-left:auto;
-    display:inline-flex;align-items:center;gap:5px}
-.st .filters .addbtn:hover{filter:brightness(1.08)}
+/* Add Student moved into the shared bar and keeps its light-blue fill,
+   so the one control on the bar that creates something still says so. */
+.pgacts .st-add{background:var(--brand-light-blue,#A6E2F9);border:none;color:#2E2516}
+.pgacts .st-add:hover:not(:disabled){filter:brightness(1.06);background:#A6E2F9}
 .st .clearf{background:#fff;border:1px solid var(--field);border-radius:8px;padding:8px 12px;
     font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;font-family:inherit}
 .st .clearf:hover{background:#f1f5f4}
@@ -215,9 +220,6 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + `
     cursor:pointer;transition:color .15s;display:inline-flex;vertical-align:middle}
 .st .rowbtn.rb-del:hover{color:#c0392b}
 .st .rowbtn.rb-edit:hover,.st .rowbtn.rb-dup:hover{color:#5FA09E}
-.st .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
-.stsettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
-    margin-top:4px}
 /* Issued once and never reused, so it reads as an identifier rather than a
    position in the list. */
 .st .sref{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;color:var(--muted);font-weight:600}
