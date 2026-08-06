@@ -1871,16 +1871,31 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
     <div className="page pg" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
 
-      <div className="actions">
-        <button title="Undo (Ctrl+Z)" disabled={!history.undo.length} onClick={doUndo}>↶ Undo</button>
-        <button title="Redo (Ctrl+Shift+Z)" disabled={!history.redo.length} onClick={doRedo}>↷</button>
+      <PageActions
+        onUndo={doUndo} onRedo={doRedo}
+        undoLabel={history.undo.length ? 'last program change' : ''}
+        redoLabel={history.redo.length ? 'last undone change' : ''}
+        csvName="crania-programs"
+        csvColumns={CSV_COLUMNS}
+        csvRows={() => rs}
+        backupCollection="programs"
+        backupHint="Snapshots of the whole programs catalogue (last 14 kept)."
+        settingsExtra={
+          /* The page's own programs_backups snapshots predate the shared
+             ones and restore in place without a reload, so they stay
+             reachable rather than being stranded. */
+          <div className="bkp-card">
+            <div className="bkp-title">Earlier Backups</div>
+            <div className="bkp-hint">Snapshots taken by this page before backups moved to the shared panel above.</div>
+            <button className="bkp-btn" onClick={() => setSettingsOpen(true)}>Open</button>
+          </div>
+        }
+      >
         <button title="Draw the schedule currently on screen as an image"
-          style={{ marginLeft: 'auto' }} onClick={createScheduleImage}>🖼 Create Schedule</button>
+          onClick={createScheduleImage}>🖼 Create Schedule</button>
         <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}>👁 Columns</button>
-        <button title="Settings" onClick={() => setSettingsOpen(true)}>⚙</button>
-        <button title="Download all programs as a CSV file" onClick={exportCsv}>⤓ Export CSV</button>
-      </div>
+      </PageActions>
 
       <div className="metrics">
         <div className="metric">
