@@ -296,8 +296,6 @@ export default function ClassLists({ onNavigate }) {
     next.has(key) ? next.delete(key) : next.add(key)
     return next
   })
-  const expandAll = () => setExpanded(new Set(visible.map((c) => c.program.id || (c.program.name + c.program.number))))
-  const collapseAll = () => setExpanded(new Set())
 
   /* One CSV line per student per register they appear on, across whatever
      classes the filters currently leave on screen — the printed roster, not
@@ -519,7 +517,7 @@ export default function ClassLists({ onNavigate }) {
                         No students enrolled yet.
                       </div>
                     ) : c.sessions.length === 0 ? (
-                      <Roster rows={c.roster} onNavigate={onNavigate} />
+                      <Roster rows={c.roster} onNavigate={onNavigate} hiddenCols={hiddenCols} />
                     ) : (
                       <>
                         {c.sessions.filter((s) => s.rows.length > 0).map((s, i) => (
@@ -532,7 +530,7 @@ export default function ClassLists({ onNavigate }) {
                               {s.session.locationId ? ` · ${locNameOf(s.session.locationId)}` : ''}
                               {s.session.capacity != null && ` (${s.rows.length}/${s.session.capacity})`}
                             </div>
-                            <Roster rows={s.rows} onNavigate={onNavigate} />
+                            <Roster rows={s.rows} onNavigate={onNavigate} hiddenCols={hiddenCols} />
                           </div>
                         ))}
                         {c.unspecified.length > 0 && (
@@ -570,7 +568,7 @@ export default function ClassLists({ onNavigate }) {
                                     </>}
                               </span>
                             </div>
-                            <Roster rows={c.unspecified} onNavigate={onNavigate} showSchedule />
+                            <Roster rows={c.unspecified} onNavigate={onNavigate} showSchedule hiddenCols={hiddenCols} />
                           </div>
                         )}
                       </>
