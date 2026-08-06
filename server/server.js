@@ -434,8 +434,9 @@ app.post('/api/login', wrap(async (req, res) => {
   }
 
   /* Checked before the password so a wrong code costs an attempt and
-     tells you nothing about whether the password was right. */
-  const cap = verifyChallenge(captchaToken, captchaAnswer)
+     tells you nothing about whether the password was right. Skipped for
+     processes on this machine — see captchaExempt. */
+  const cap = captchaExempt(req) ? { ok: true } : verifyChallenge(captchaToken, captchaAnswer)
   if (!cap.ok) {
     return res.status(400).json({
       error: cap.reason === 'expired'
