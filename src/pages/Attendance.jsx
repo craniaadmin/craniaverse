@@ -160,7 +160,7 @@ export default function Attendance({ onNavigate }) {
             : 'Unmarked',
           uniform: r.row.uniform || '',
         }))}
-        backupCollection="registrations"
+        backupCollection="comments"
         backupHint="Snapshots of the student records these registers are built from (last 14 kept)."
       />
 
