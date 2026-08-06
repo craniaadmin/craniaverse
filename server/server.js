@@ -23,6 +23,7 @@ import { registrationToRecord, makeSeedRecord } from './mapping.js'
 import { currentAcademicYear } from '../src/data/scheduleUtils.js'
 import { buildEnrolmentIndex, sessionsOf, sessionKey } from '../src/data/enrolment.js'
 import { reconcileAutoCash } from '../src/data/autoCash.js'
+import crypto from 'crypto'
 import { sendRegistrationEmails, sendBoothSignupEmail } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
 import {
@@ -176,6 +177,7 @@ const DEFAULT_STAFF = [
 // each store and refresh from PocketBase on demand.
 const cache = {
   registrations: null,
+  users:         null,
   staff:         null,
   programs:      null,
   programsState: null,
@@ -500,6 +502,112 @@ app.post('/api/session/extend', wrap(async (req, res) => {
 
 app.use(authRequired)
 app.use(roleRequired)
+
+// ---- accounts -----------------------------------------------
+// roleRequired already limits /api/users/* to admins, except the two
+// "my own account" routes below, which are opened back up explicitly.
+app.get('/api/users', wrap(async (_req, res) => {
+  res.json((await getUsers()).map(publicUser))
+}))
+
+app.post('/api/users', wrap(async (req, res) => {
+  const { email, name, password, role } = req.body || {}
+  const addr = normaliseEmail(email)
+  if (!addr || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(addr)) {
+    return res.status(400).json({ error: 'A valid email address is required.' })
+  }
+  if (role && !isRole(role)) return res.status(400).json({ error: `Role must be one of: ${ROLES.join(', ')}` })
+  const problem = passwordProblem(password)
+  if (problem) return res.status(400).json({ error: problem })
+
+  const users = await getUsers()
+  if (users.some(u => normaliseEmail(u.email) === addr)) {
+    return res.status(409).json({ error: 'An account with that email already exists.' })
+  }
+  const user = makeUser({ email: addr, name, password, role })
+  await commitUsers([...users, user])
+  res.status(201).json(publicUser(user))
+}))
+
+app.put('/api/users/:id', wrap(async (req, res) => {
+  const users = await getUsers()
+  const idx = users.findIndex(u => u.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'No such account.' })
+
+  const { name, role, active, email } = req.body || {}
+  const next = { ...users[idx] }
+  if (typeof name === 'string') next.name = name.trim()
+  if (email !== undefined) {
+    const addr = normaliseEmail(email)
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(addr)) {
+      return res.status(400).json({ error: 'A valid email address is required.' })
+    }
+    if (users.some((u, i) => i !== idx && normaliseEmail(u.email) === addr)) {
+      return res.status(409).json({ error: 'An account with that email already exists.' })
+    }
+    next.email = addr
+  }
+  if (role !== undefined) {
+    if (!isRole(role)) return res.status(400).json({ error: `Role must be one of: ${ROLES.join(', ')}` })
+    next.role = normaliseRole(role)
+  }
+  if (active !== undefined) next.active = Boolean(active)
+
+  /* An app with no admin cannot be repaired from inside it, so the
+     last one standing cannot be demoted or switched off — not even by
+     themselves. */
+  const admins = users.filter(u => normaliseRole(u.role) === 'admin' && u.active !== false)
+  const wasLastAdmin = admins.length === 1 && admins[0].id === next.id
+  if (wasLastAdmin && (normaliseRole(next.role) !== 'admin' || next.active === false)) {
+    return res.status(409).json({
+      error: 'This is the only admin account. Give someone else admin access first.',
+    })
+  }
+
+  users[idx] = next
+  await commitUsers(users)
+  res.json(publicUser(next))
+}))
+
+app.delete('/api/users/:id', wrap(async (req, res) => {
+  const users = await getUsers()
+  const target = users.find(u => u.id === req.params.id)
+  if (!target) return res.status(404).json({ error: 'No such account.' })
+  const admins = users.filter(u => normaliseRole(u.role) === 'admin' && u.active !== false)
+  if (admins.length === 1 && admins[0].id === target.id) {
+    return res.status(409).json({
+      error: 'This is the only admin account. Give someone else admin access first.',
+    })
+  }
+  if (req.session?.uid === target.id) {
+    return res.status(409).json({ error: 'You cannot delete the account you are signed in with.' })
+  }
+  await commitUsers(users.filter(u => u.id !== target.id))
+  res.json({ deleted: 1 })
+}))
+
+/* Setting someone else's password is an admin job; changing your own
+   needs the current one, so a walk-up to an unlocked screen cannot
+   quietly take the account over. */
+app.post('/api/users/:id/password', wrap(async (req, res) => {
+  const { currentPassword, password } = req.body || {}
+  const users = await getUsers()
+  const idx = users.findIndex(u => u.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'No such account.' })
+
+  const self = req.session?.uid === users[idx].id
+  const isAdmin = normaliseRole(req.session?.role) === 'admin'
+  if (!self && !isAdmin) return res.status(403).json({ error: 'That area is limited to admin accounts.' })
+  if (self && !verifyPassword(currentPassword, users[idx].passwordHash)) {
+    return res.status(401).json({ error: 'Your current password is not right.' })
+  }
+  const problem = passwordProblem(password)
+  if (problem) return res.status(400).json({ error: problem })
+
+  users[idx] = { ...users[idx], passwordHash: hashPassword(password) }
+  await commitUsers(users)
+  res.json({ ok: true })
+}))
 
 const ALLOWED_FRAME_ANCESTORS = process.env.ALLOWED_FRAME_ANCESTORS
   || "'self' https://crania-schools.com https://www.crania-schools.com"
