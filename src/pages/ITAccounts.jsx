@@ -75,12 +75,12 @@ function useItAccounts() {
     })
   }, [])
 
-  return { data, loading, status, mutate }
+  return { data, loading, status, mutate, refresh }
 }
 
 // ---------- ITAccounts page ----------
 export default function ITAccounts() {
-  const { data, loading, status, mutate } = useItAccounts()
+  const { data, loading, status, mutate, refresh } = useItAccounts()
   const [query, setQuery] = useState('')
   const [catFilter, setCatFilter] = useState('all')
   const [showAllPw, setShowAllPw] = useState(false)
