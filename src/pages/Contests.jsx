@@ -876,14 +876,18 @@ function ContestsPage({ onNavigate }) {
            belongs under the gear rather than on the bar beside Undo. It
            closes the panel on the way: the chooser is a fixed popover at a
            lower z-index and would otherwise open behind it. */
-        settingsExtra={close => (
-          <button title="Choose which columns are shown"
-            onClick={e => {
-              const rect = e.currentTarget.getBoundingClientRect()
-              close()
-              setPop({ kind: 'cols', rect })
-            }}><Eye size={13} /> Columns</button>
-        )}
+        settingsExtra={
+          <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => mutate(d => {
+              const n = { ...d.hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              d.hiddenCols = n
+            })}
+            onAll={() => mutate(d => { d.hiddenCols = {} })}
+            onNone={() => mutate(d => {
+              d.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+            })} />
+        }
       />
 
       {fetchStatus === 'offline' && (

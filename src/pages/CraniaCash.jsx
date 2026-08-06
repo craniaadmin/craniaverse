@@ -19,9 +19,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, Eye, Plus, Trash2, Pencil, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
-import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
+import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import { TRIGGER_FIELDS, triggerLabel } from '../data/autoCash'
-import PageActions from '../components/PageActions'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const COLS = [
@@ -578,12 +578,10 @@ function CashList({ onSelect, onNavigate, hist, award }) {
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const [bulkAmount, setBulkAmount] = useState('')
   const [bulkReason, setBulkReason] = useState('')
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   const setPrefs = useCallback((mut) => {
     setColPrefs(prev => {
@@ -738,12 +736,6 @@ function CashList({ onSelect, onNavigate, hist, award }) {
     URL.revokeObjectURL(a.href)
   }
 
-  useEffect(() => {
-    if (!pop) return
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    window.addEventListener('mousedown', onDown)
-    return () => window.removeEventListener('mousedown', onDown)
-  }, [pop])
 
   const arrow = k => (sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null)
 
@@ -761,14 +753,18 @@ function CashList({ onSelect, onNavigate, hist, award }) {
         onRestored={refresh}
         /* Columns closes the panel on the way: the chooser is a fixed
            popover at a lower z-index and would otherwise open behind it. */
-        settingsExtra={close => (
-          <button title="Choose which columns are shown"
-            onClick={e => {
-              const rect = e.currentTarget.getBoundingClientRect()
-              close()
-              setPop({ kind: 'cols', rect })
-            }}><Eye size={13} /> Columns</button>
-        )}
+        settingsExtra={
+          <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => setPrefs(p => {
+              const n = { ...p.hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              p.hiddenCols = n
+            })}
+            onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+            onNone={() => setPrefs(p => {
+              p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+            })} />
+        }
       />
 
       <div className="metrics">
@@ -955,19 +951,6 @@ function CashList({ onSelect, onNavigate, hist, award }) {
       <div className="tcount">
         Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
       </div>
-
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
-          onToggle={(k, on) => setPrefs(p => {
-            const n = { ...p.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            p.hiddenCols = n
-          })}
-          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
-          onNone={() => setPrefs(p => {
-            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
-      )}
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[

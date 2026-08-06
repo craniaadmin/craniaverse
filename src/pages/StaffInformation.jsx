@@ -13,8 +13,8 @@ import {
   Eye, UserPlus, Pencil, Copy, Trash2,
 } from 'lucide-react'
 import { useStore } from '../data/store'
-import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
-import PageActions from '../components/PageActions'
+import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 
 const COLS = [
   { k: 'staffId',   l: 'Staff ID' },
@@ -498,10 +498,8 @@ function StaffList({
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   const setPrefs = useCallback((mut) => {
     setColPrefs(prev => {
@@ -609,12 +607,6 @@ function StaffList({
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
-  useEffect(() => {
-    if (!pop) return
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    const id = setTimeout(() => document.addEventListener('mousedown', onDown), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', onDown) }
-  }, [pop])
 
   const exportCsv = (rows) => {
     const esc = (v) => {
@@ -648,18 +640,18 @@ function StaffList({
         backupBase="staff"
         backupHint="Snapshots of every staff record, saved to the database (last 14 kept)."
         onRestored={refreshStaff}
-        settingsExtra={close => (
-          <>
-            {/* Closes the panel on the way: the column chooser is a fixed
-                popover underneath it, so it would open invisible. */}
-            <button title="Choose which columns are shown"
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                close()
-                setPop({ kind: 'cols', rect })
-              }}><Eye size={13} /> Columns</button>
-          </>
-        )}
+        settingsExtra={
+          <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => setPrefs(p => {
+              const n = { ...p.hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              p.hiddenCols = n
+            })}
+            onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+            onNone={() => setPrefs(p => {
+              p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+            })} />
+        }
       >
         <button className="sf-add" title="Add a new staff member" onClick={onAdd}>
           <UserPlus size={13} /> Add Staff
@@ -828,19 +820,6 @@ function StaffList({
       <div className="tcount">
         Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
       </div>
-
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
-          onToggle={(k, on) => setPrefs(p => {
-            const n = { ...p.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            p.hiddenCols = n
-          })}
-          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
-          onNone={() => setPrefs(p => {
-            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
-      )}
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[

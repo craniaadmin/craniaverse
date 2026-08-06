@@ -16,8 +16,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Eye, Pencil } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions from '../components/PageActions'
-import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
+import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import useActionHistory from '../data/useActionHistory'
 
 /* Column order follows the registration form itself: who submitted it,
@@ -257,12 +257,10 @@ export default function Registrations({ onNavigate }) {
   const [sort, setSort] = useState({ key: 'date', dir: -1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const [editing, setEditing] = useState(null)   // { sub, child }
   const [hover, setHover] = useState({ fam: null, kid: null })
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   /* Undo/redo. The edit dialog is the only thing on this page that writes,
      and it writes straight to the API rather than through a piece of state
@@ -428,12 +426,6 @@ export default function Registrations({ onNavigate }) {
   const allRowIds = visible.flatMap(s => s.children.map(c => c.id))
   const allSel = allRowIds.length > 0 && allRowIds.every(id => selected.has(id))
 
-  useEffect(() => {
-    if (!pop) return undefined
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    const id = setTimeout(() => document.addEventListener('mousedown', onDown), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', onDown) }
-  }, [pop])
 
   const hideCol = (k) => {
     if (k === LOCKED_COL) return
@@ -566,14 +558,18 @@ export default function Registrations({ onNavigate }) {
            stays on the bar — checking what the public sees is part of
            working this page. The chooser is a fixed popover at a lower
            z-index than the panel, so the panel closes on the way. */
-        settingsExtra={close => (
-          <button title="Choose which columns are shown"
-            onClick={e => {
-              const rect = e.currentTarget.getBoundingClientRect()
-              close()
-              setPop({ kind: 'cols', rect })
-            }}><Eye size={13} /> Columns</button>
-        )}
+        settingsExtra={
+          <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => setPrefs(p => {
+              const n = { ...p.hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              p.hiddenCols = n
+            })}
+            onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+            onNone={() => setPrefs(p => {
+              p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+            })} />
+        }
       >
         <button title="Open the public registration form"
           onClick={() => window.open(`${import.meta.env?.VITE_API_URL || window.location.origin}/register`, '_blank')}>
@@ -674,19 +670,6 @@ export default function Registrations({ onNavigate }) {
         {totalRows === 1 ? '' : 's'}
         {visible.length !== submissions.length ? ` of ${submissions.length}` : ''}
       </div>
-
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
-          onToggle={(k, on) => setPrefs(p => {
-            const n = { ...p.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            p.hiddenCols = n
-          })}
-          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
-          onNone={() => setPrefs(p => {
-            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
-      )}
 
       {editing && (
         <EditRegistration sub={editing.sub} child={editing.child}

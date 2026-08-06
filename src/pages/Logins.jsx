@@ -16,8 +16,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Eye, Copy, Check, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
 import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } from '../data/loginUtils'
-import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
-import PageActions from '../components/PageActions'
+import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -234,11 +234,9 @@ export default function Logins({ onNavigate }) {
   const [sort, setSort] = useState({ key: 'name', dir: 1 })
   const [selected, setSelected] = useState(() => new Set())
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
-  const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
   const [editing, setEditing] = useState(null)
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   /* Undo/redo. A login lives on the registration in the shared store and
      there is no bulk setter for it, so this records the action rather than
@@ -420,12 +418,6 @@ export default function Logins({ onNavigate }) {
     URL.revokeObjectURL(a.href)
   }
 
-  useEffect(() => {
-    if (!pop) return
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    window.addEventListener('mousedown', onDown)
-    return () => window.removeEventListener('mousedown', onDown)
-  }, [pop])
 
   const arrow = k => (sort.key === k ? <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span> : null)
 
@@ -446,16 +438,18 @@ export default function Logins({ onNavigate }) {
            belongs under the gear rather than on the bar beside Undo. It
            closes the panel on the way: the chooser is a fixed popover at a
            lower z-index and would otherwise open behind it. */
-        settingsExtra={close => (
-          <>
-            <button title="Choose which columns are shown"
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                close()
-                setPop({ kind: 'cols', rect })
-              }}><Eye size={13} /> Columns</button>
-          </>
-        )}
+        settingsExtra={
+          <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => setPrefs(p => {
+              const n = { ...p.hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              p.hiddenCols = n
+            })}
+            onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+            onNone={() => setPrefs(p => {
+              p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+            })} />
+        }
       />
 
       {fetchStatus === 'offline' && (
@@ -614,19 +608,6 @@ export default function Logins({ onNavigate }) {
       <div className="tcount">
         Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
       </div>
-
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
-          onToggle={(k, on) => setPrefs(p => {
-            const n = { ...p.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            p.hiddenCols = n
-          })}
-          onAll={() => setPrefs(p => { p.hiddenCols = {} })}
-          onNone={() => setPrefs(p => {
-            p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
-      )}
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[
