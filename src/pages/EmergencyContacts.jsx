@@ -577,7 +577,11 @@ export default function EmergencyContacts({ onNavigate }) {
           { label: 'Status', value: r => (r.missing ? 'Missing' : 'On file') },
         ]}
         csvRows={() => visible}
-        settingsExtra={<EmergencyBackups />}
+        backupBase="customers"
+        backupHint={'Emergency contacts are held on the registrations, so these are the same '
+          + 'snapshots the Customers page takes — restoring one replaces every registration '
+          + '(last 14 kept).'}
+        onRestored={refresh}
       >
         <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
