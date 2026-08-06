@@ -164,8 +164,42 @@ async function main() {
     }
   }
 
+  /* Old snapshots each hold a full copy of the registrations table, so
+     the students are still in the database — and a restore would bring
+     them straight back. Strip them out rather than deleting the
+     snapshots, which would take everyone else's history with them.
+
+     Two shapes to handle: customers_backups stores the registration
+     objects directly, snapshots stores the PocketBase rows that wrap
+     them. */
+  let snapsTouched = 0, copiesRemoved = 0
+  for (const coll of ['customers_backups', 'snapshots']) {
+    let rows = []
+    try { rows = await pb().collection(coll).getFullList({ batch: 500 }) }
+    catch { continue }   // collection may not exist on older installs
+    for (const row of rows) {
+      if (coll === 'snapshots' && row.source !== 'registrations') continue
+      if (!Array.isArray(row.payload)) continue
+      const before = row.payload.length
+      const kept = row.payload.filter(item => {
+        const id = String(item?.recordId ?? item?.id ?? '')
+        return !targetIds.has(id)
+      })
+      if (kept.length === before) continue
+      await pb().collection(coll).update(row.id, { payload: kept })
+      snapsTouched++
+      copiesRemoved += before - kept.length
+    }
+  }
+
   console.log(`\nDeleted ${regsGone} registration(s) and ${commentsGone} comment row(s).`)
-  console.log('No backup was taken, as asked — these are not recoverable.\n')
+  if (snapsTouched) {
+    console.log(`Removed ${copiesRemoved} copy/copies from ${snapsTouched} existing backup(s), `
+      + 'so a restore cannot bring them back.')
+  } else {
+    console.log('No existing backup contained them.')
+  }
+  console.log('No new backup was taken, as asked — these are not recoverable.\n')
   console.log('Now restart the API so it stops serving them from memory:')
   console.log('  pm2 restart craniaverse-api\n')
 }
