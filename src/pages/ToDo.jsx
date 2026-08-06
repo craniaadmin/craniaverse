@@ -192,10 +192,9 @@ const CSS = `
 .tdroot .filters .clearf{background:none;border:none;color:var(--dark-blue);text-decoration:underline;font-size:13px;padding:6px 4px;cursor:pointer;}
 
 .tdroot .board{display:flex;flex-direction:column;gap:20px;max-width:860px;margin:0 auto;}
-/* The lists are a centred 860px column rather than the full page width,
-   so the count follows that column. Right-aligned to the page it sat well
-   out past the right edge of the cards, lined up with nothing. */
-.tdroot .pgcount{max-width:860px;margin:0 auto;padding:10px 4px 2px;}
+/* The count is a child of the board, so it inherits the column's width;
+   it only needs its gap trimmed to sit close under the last card. */
+.tdroot .board .pgcount{padding:0 4px;margin-top:-8px;}
 .tdroot .list{background:#fff;border-radius:12px 12px 0 0;padding:14px 16px;box-shadow:var(--tshadow);display:flex;flex-direction:column;border-bottom:3px solid var(--dark-blue);border-left:3px solid var(--light-blue);border-right:3px solid var(--light-brown);}
 .tdroot .list-head{display:flex;align-items:center;gap:8px;margin:-14px -19px 12px;padding:10px 16px;font-weight:700;font-size:16px;border-radius:12px 12px 0 0;border-bottom:2px solid #cfcabb;}
 .tdroot .list-head .name{flex:1;word-break:break-word;cursor:text;}
