@@ -24,7 +24,7 @@ const BLANK = () => ({
 })
 
 export default function Payments() {
-  const { invoices, payments, loading, status, addPayment, updatePayment, deletePayment } = useFinance()
+  const { invoices, payments, loading, status, refresh, addPayment, updatePayment, deletePayment } = useFinance()
   const [query, setQuery] = useState('')
   const [methodFilter, setMethodFilter] = useState('all')
   const [modal, setModal] = useState(null) // null | 'new' | { edit: id }
