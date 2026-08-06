@@ -22,37 +22,6 @@ export const TABLECHROME_CSS = `
 .tc-menu button.danger{color:#C0392B}
 `
 
-/* Anchored under the button that opened it, and nudged left if that would
-   put it off the right edge. */
-export const ColsPop = React.forwardRef(function ColsPop(
-  { rect, cols, hiddenCols, lockedKey, onToggle, onAll, onNone }, ref,
-) {
-  const style = {
-    top: Math.min(rect.bottom + 6, window.innerHeight - 380),
-    left: Math.max(8, Math.min(rect.left, window.innerWidth - 210)),
-  }
-  return (
-    <div className="tc-pop" ref={ref} style={style}>
-      <div className="h">Show Columns</div>
-      {cols.map(c => {
-        const locked = c.k === lockedKey
-        return (
-          <label key={c.k} className={locked ? 'locked' : ''}
-            title={locked ? 'This column names the row, so it always shows' : ''}>
-            <input type="checkbox" disabled={locked} checked={locked || !hiddenCols[c.k]}
-              onChange={e => onToggle(c.k, e.target.checked)} />
-            {c.l}
-          </label>
-        )
-      })}
-      <div className="row">
-        <button type="button" onClick={onAll}>Show All</button>
-        <button type="button" onClick={onNone}>Hide All</button>
-      </div>
-    </div>
-  )
-})
-
 export function CtxMenu({ x, y, items, onClose }) {
   const ref = useRef(null)
   useEffect(() => {
