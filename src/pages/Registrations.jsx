@@ -187,6 +187,46 @@ const CSS = TABLECHROME_CSS + PAGEACTIONS_CSS + `
 .rg .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 .rg .offline{background:#fffbf0;border:1px solid #f4d67a;color:#8a6a00;padding:8px 12px;
     border-radius:8px;margin-bottom:12px;font-size:13px}
+.rg .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;cursor:pointer;
+    display:inline-flex;vertical-align:middle;transition:color .15s}
+.rg .rowbtn:hover{color:var(--teal)}
+.rg tbody td.actcell{background:transparent;text-align:center;white-space:nowrap}
+
+/* ── edit dialog ── */
+.rgov{position:fixed;inset:0;background:rgba(46,37,22,.35);z-index:400;
+    display:flex;align-items:flex-start;justify-content:center;padding:28px 20px;overflow:auto}
+.rgmodal{background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(46,37,22,.3);
+    padding:20px 22px 22px;width:100%;max-width:680px;color:#2E2516}
+.rgmodal h2{margin:0 0 3px;font-size:17px}
+.rgmodal .who{font-size:12.5px;color:#6B6455;margin-bottom:14px}
+.rgmodal .egroup{font-size:12px;font-weight:700;color:#5FA09E;text-transform:uppercase;
+    letter-spacing:.4px;border-bottom:1px solid #E7EBE7;padding-bottom:6px;margin:16px 0 11px}
+.rgmodal .egrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.rgmodal .ef{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rgmodal .ef.wide{grid-column:span 2}
+.rgmodal .ef span{font-size:11px;font-weight:700;color:#6B6455;text-transform:uppercase;letter-spacing:.3px}
+.rgmodal .ef input{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid #D5D0C4;
+    border-radius:8px;font:inherit;font-size:13px;background:#fff;color:#2E2516}
+.rgmodal .ef input:focus{outline:none;border-color:#5FA09E}
+.rgmodal .ef input[type=checkbox]{width:16px;height:16px;accent-color:#5FA09E;padding:0}
+.rgmodal .eprog{border:1px solid #E7EBE7;border-radius:10px;padding:12px 13px;margin-bottom:10px;background:#FBFCFC}
+.rgmodal .edrop{margin-top:9px;background:none;border:1px solid #E7EBE7;border-radius:7px;
+    padding:5px 11px;font:inherit;font-size:11.5px;font-weight:600;color:#C0392B;cursor:pointer}
+.rgmodal .edrop:hover{border-color:#C0392B}
+.rgmodal .eadd{background:none;border:1px dashed #D5D0C4;border-radius:8px;padding:7px 13px;
+    font:inherit;font-size:12px;font-weight:600;color:#6B6455;cursor:pointer}
+.rgmodal .eadd:hover{border-color:#5FA09E;color:#5FA09E}
+.rgmodal .enote{font-size:11.5px;color:#6B6455;font-style:italic;background:#F4F7F8;
+    border-radius:8px;padding:8px 11px;margin-top:10px}
+.rgmodal .eerr{background:#fdecea;border:1px solid #f5b5b0;color:#8a1c15;border-radius:8px;
+    padding:8px 12px;font-size:12.5px;margin-top:12px}
+.rgmodal .eacts{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.rgmodal .eacts button{border-radius:8px;padding:9px 16px;font:inherit;font-size:13px;
+    font-weight:700;cursor:pointer;border:none}
+.rgmodal .eacts .go{background:#5FA09E;color:#fff}
+.rgmodal .eacts .go:disabled{background:#cbd1d6;cursor:default}
+.rgmodal .eacts .cancel{background:#F1F3F4;border:1px solid #D5D0C4;color:#2E2516}
+@media (max-width:560px){.rgmodal .egrid{grid-template-columns:1fr}.rgmodal .ef.wide{grid-column:span 1}}
 `
 
 export default function Registrations({ onNavigate }) {
@@ -670,13 +710,6 @@ function EditRegistration({ sub, child, onClose, onSaved }) {
     }
   }
 
-  const F = ({ label, value, onChange, type = 'text', wide }) => (
-    <label className={'ef' + (wide ? ' wide' : '')}>
-      <span>{label}</span>
-      <input type={type} value={value || ''} onChange={e => onChange(e.target.value)} />
-    </label>
-  )
-
   return (
     <div className="rgov" onMouseDown={onClose}>
       <div className="rgmodal" onMouseDown={e => e.stopPropagation()}>
@@ -685,44 +718,44 @@ function EditRegistration({ sub, child, onClose, onSaved }) {
 
         <div className="egroup">Child</div>
         <div className="egrid">
-          <F label="First name" value={student.firstName} onChange={v => setStudent(s => ({ ...s, firstName: v }))} />
-          <F label="Last name" value={student.lastName} onChange={v => setStudent(s => ({ ...s, lastName: v }))} />
-          <F label="Date of birth" type="date" value={student.dob} onChange={v => setStudent(s => ({ ...s, dob: v }))} />
-          <F label="Grade" value={student.grade} onChange={v => setStudent(s => ({ ...s, grade: v }))} />
-          <F label="School" value={student.school} onChange={v => setStudent(s => ({ ...s, school: v }))} wide />
-          <F label="Allergies / medical" value={student.medical} onChange={v => setStudent(s => ({ ...s, medical: v }))} wide />
+          <EField label="First name" value={student.firstName} onChange={v => setStudent(s => ({ ...s, firstName: v }))} />
+          <EField label="Last name" value={student.lastName} onChange={v => setStudent(s => ({ ...s, lastName: v }))} />
+          <EField label="Date of birth" type="date" value={student.dob} onChange={v => setStudent(s => ({ ...s, dob: v }))} />
+          <EField label="Grade" value={student.grade} onChange={v => setStudent(s => ({ ...s, grade: v }))} />
+          <EField label="School" value={student.school} onChange={v => setStudent(s => ({ ...s, school: v }))} wide />
+          <EField label="Allergies / medical" value={student.medical} onChange={v => setStudent(s => ({ ...s, medical: v }))} wide />
         </div>
 
         <div className="egroup">Guardian 1</div>
         <div className="egrid">
-          <F label="First name" value={g1['First Name']} onChange={v => setG1(o => ({ ...o, 'First Name': v }))} />
-          <F label="Last name" value={g1['Last Name']} onChange={v => setG1(o => ({ ...o, 'Last Name': v }))} />
-          <F label="Relationship" value={g1['Relationship']} onChange={v => setG1(o => ({ ...o, Relationship: v }))} />
-          <F label="Phone" value={g1['Phone']} onChange={v => setG1(o => ({ ...o, Phone: v }))} />
-          <F label="Email" value={g1['Email']} onChange={v => setG1(o => ({ ...o, Email: v }))} wide />
+          <EField label="First name" value={g1['First Name']} onChange={v => setG1(o => ({ ...o, 'First Name': v }))} />
+          <EField label="Last name" value={g1['Last Name']} onChange={v => setG1(o => ({ ...o, 'Last Name': v }))} />
+          <EField label="Relationship" value={g1['Relationship']} onChange={v => setG1(o => ({ ...o, Relationship: v }))} />
+          <EField label="Phone" value={g1['Phone']} onChange={v => setG1(o => ({ ...o, Phone: v }))} />
+          <EField label="Email" value={g1['Email']} onChange={v => setG1(o => ({ ...o, Email: v }))} wide />
         </div>
 
         <div className="egroup">Guardian 2</div>
         <div className="egrid">
-          <F label="First name" value={g2['First Name']} onChange={v => setG2(o => ({ ...o, 'First Name': v }))} />
-          <F label="Last name" value={g2['Last Name']} onChange={v => setG2(o => ({ ...o, 'Last Name': v }))} />
-          <F label="Relationship" value={g2['Relationship']} onChange={v => setG2(o => ({ ...o, Relationship: v }))} />
-          <F label="Phone" value={g2['Phone']} onChange={v => setG2(o => ({ ...o, Phone: v }))} />
-          <F label="Email" value={g2['Email']} onChange={v => setG2(o => ({ ...o, Email: v }))} wide />
+          <EField label="First name" value={g2['First Name']} onChange={v => setG2(o => ({ ...o, 'First Name': v }))} />
+          <EField label="Last name" value={g2['Last Name']} onChange={v => setG2(o => ({ ...o, 'Last Name': v }))} />
+          <EField label="Relationship" value={g2['Relationship']} onChange={v => setG2(o => ({ ...o, Relationship: v }))} />
+          <EField label="Phone" value={g2['Phone']} onChange={v => setG2(o => ({ ...o, Phone: v }))} />
+          <EField label="Email" value={g2['Email']} onChange={v => setG2(o => ({ ...o, Email: v }))} wide />
         </div>
 
         <div className="egroup">Emergency contact</div>
         <div className="egrid">
-          <F label="First name" value={em['First Name']} onChange={v => setEm(o => ({ ...o, 'First Name': v }))} />
-          <F label="Last name" value={em['Last Name']} onChange={v => setEm(o => ({ ...o, 'Last Name': v }))} />
-          <F label="Relationship" value={em['Relationship']} onChange={v => setEm(o => ({ ...o, Relationship: v }))} />
-          <F label="Phone" value={em['Phone']} onChange={v => setEm(o => ({ ...o, Phone: v }))} />
+          <EField label="First name" value={em['First Name']} onChange={v => setEm(o => ({ ...o, 'First Name': v }))} />
+          <EField label="Last name" value={em['Last Name']} onChange={v => setEm(o => ({ ...o, 'Last Name': v }))} />
+          <EField label="Relationship" value={em['Relationship']} onChange={v => setEm(o => ({ ...o, Relationship: v }))} />
+          <EField label="Phone" value={em['Phone']} onChange={v => setEm(o => ({ ...o, Phone: v }))} />
         </div>
 
         <div className="egroup">Submission</div>
         <div className="egrid">
-          <F label="Source" value={meta.source} onChange={v => setMeta(o => ({ ...o, source: v }))} />
-          <F label="Notes" value={meta.notes} onChange={v => setMeta(o => ({ ...o, notes: v }))} wide />
+          <EField label="Source" value={meta.source} onChange={v => setMeta(o => ({ ...o, source: v }))} />
+          <EField label="Notes" value={meta.notes} onChange={v => setMeta(o => ({ ...o, notes: v }))} wide />
         </div>
 
         {/* Guardian and emergency details belong to the household, so
@@ -740,12 +773,12 @@ function EditRegistration({ sub, child, onClose, onSaved }) {
         {programs.map((p, i) => (
           <div className="eprog" key={i}>
             <div className="egrid">
-              <F label="Program" value={p.title} onChange={v => setP(i, 'title', v)} wide />
-              <F label="Year" value={p.year} onChange={v => setP(i, 'year', v)} />
-              <F label="Location" value={p.location} onChange={v => setP(i, 'location', v)} />
-              <F label="Day" value={p.day} onChange={v => setP(i, 'day', v)} />
-              <F label="Time" value={p.time} onChange={v => setP(i, 'time', v)} />
-              <F label="Fee" type="number" value={p.fee} onChange={v => setP(i, 'fee', v === '' ? '' : Number(v))} />
+              <EField label="Program" value={p.title} onChange={v => setP(i, 'title', v)} wide />
+              <EField label="Year" value={p.year} onChange={v => setP(i, 'year', v)} />
+              <EField label="Location" value={p.location} onChange={v => setP(i, 'location', v)} />
+              <EField label="Day" value={p.day} onChange={v => setP(i, 'day', v)} />
+              <EField label="Time" value={p.time} onChange={v => setP(i, 'time', v)} />
+              <EField label="Fee" type="number" value={p.fee} onChange={v => setP(i, 'fee', v === '' ? '' : Number(v))} />
               <label className="ef">
                 <span>Active</span>
                 <input type="checkbox" checked={p.active !== false}
