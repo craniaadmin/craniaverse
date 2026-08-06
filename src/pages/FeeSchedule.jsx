@@ -347,15 +347,52 @@ export default function FeeSchedule() {
 
       <div className="fs-head">
         <h2 className="fs-title">Tuition Schedule</h2>
-        <div className="fs-head-actions">
-          <button className="fs-btn-outline" onClick={emailParent} disabled={!selectedReg}>
-            <Mail size={15} /> Email To Parent
-          </button>
-          <button className="fs-btn-outline" onClick={downloadPdf} disabled={pdfBusy}>
-            <Download size={15} /> {pdfBusy ? 'Generating…' : 'Download PDF'}
-          </button>
-        </div>
       </div>
+
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName={selectedReg && programKey
+          ? `crania-tuition-${(selectedReg.displayName || 'student').replace(/[^\w]+/g, '-')}-${yearCfg.label}`
+          : undefined}
+        csvColumns={[
+          { key: 'student', label: 'Student' },
+          { key: 'program', label: 'Program' },
+          { key: 'year', label: 'Year' },
+          { key: 'line', label: 'Line' },
+          { key: 'type', label: 'Type' },
+          { key: 'amount', label: 'Amount' },
+        ]}
+        csvRows={() => {
+          const ctx = {
+            student: selectedReg?.displayName || '',
+            program: programKey || '',
+            year: yearCfg.label,
+          }
+          const calYear = calYearFn(yearCfg.startCalYear)
+          const rows = schedule.installments.map(i => ({
+            ...ctx,
+            line: `${MONTH_LONG[i.month]} ${calYear(i.month)}`,
+            type: i.kind === 'skip' ? 'Not billed' : i.kind === 'prorated' ? 'Prorated' : 'Full',
+            amount: i.kind === 'skip' ? 0 : i.amount,
+          }))
+          rows.push({ ...ctx, line: 'Scheduled weeks', type: 'Summary', amount: schedule.scheduledWeeks })
+          rows.push({ ...ctx, line: 'Tuition', type: 'Summary', amount: schedule.tuition })
+          rows.push({ ...ctx, line: 'Registration fee', type: 'Summary', amount: schedule.regFee })
+          rows.push({ ...ctx, line: 'Material fee', type: 'Summary', amount: schedule.matFee })
+          rows.push({ ...ctx, line: 'Total', type: 'Summary', amount: schedule.total })
+          return rows
+        }}
+        backupCollection="registrations"
+        backupHint="Snapshots of the registrations these tuition figures are saved on (last 14 kept)."
+        onRestored={loadRegs}
+      >
+        <button onClick={emailParent} disabled={!selectedReg} title="Email this schedule to the parent on file">
+          <Mail size={13} /> Email To Parent
+        </button>
+        <button onClick={downloadPdf} disabled={pdfBusy} title="Download this schedule as a PDF">
+          <Download size={13} /> {pdfBusy ? 'Generating…' : 'Download PDF'}
+        </button>
+      </PageActions>
 
       <div className="fs-pickers">
         <StudentPicker regs={regs} value={studentId} onChange={setStudentId} />
