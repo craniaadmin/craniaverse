@@ -30,11 +30,37 @@ const BLANK_INV = () => ({
 const STATUS_ORDER = ['sent', 'overdue', 'partial', 'paid', 'draft', 'void']
 
 export default function Invoices() {
-  const { invoices, payments, loading, status, refresh, addInvoice, updateInvoice, deleteInvoice } = useFinance()
+  const {
+    data, invoices, payments, loading, status, refresh,
+    updateData, addInvoice, updateInvoice, deleteInvoice,
+  } = useFinance()
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [modal, setModal] = useState(null) // null | 'new' | { edit: id }
   const [form, setForm] = useState(BLANK_INV())
+
+  /* Undo/redo over the finance payload as a whole — see
+     src/data/useHistory.js. Snapshots suit this page: it already loads and
+     saves one blob, so putting an earlier one back is the same write any
+     other edit makes, and it restores the invoice numbering counter and
+     the payments a delete detached along with the invoices themselves.
+
+     Every hook has to be called before the `if (loading)` return below. A
+     hook that only runs once the data has arrived is a "rendered more
+     hooks than during the previous render" crash on the second render,
+     and the page dies on open. Keep them all up here.
+
+     Disabled while loading, so arriving data is not itself recorded as a
+     change — otherwise Undo is armed the moment the page opens and takes
+     you back to an empty ledger. */
+  const applyPayload = useCallback((snap) => {
+    updateData(d => {
+      d.invoices = snap.invoices || []
+      d.payments = snap.payments || []
+      d.meta = { ...(snap.meta || {}) }
+    })
+  }, [updateData])
+  const hist = useHistory(data, applyPayload, { label: 'invoice change', enabled: !loading })
 
   const decorated = useMemo(() => invoices.map(inv => ({
     ...inv,
