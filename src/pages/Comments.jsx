@@ -370,7 +370,7 @@ export default function Comments({ onNavigate }) {
 }
 
 // ---------- Register: one class-group card ----------
-function ClassGroup({ program, rows, onNavigate, updateRow }) {
+function ClassGroup({ program, rows, onNavigate, editCell }) {
   return (
     <div style={{ background: '#fff', borderRadius: 10, boxShadow: 'var(--brand-shadow)', overflow: 'hidden' }}>
       <div style={{
