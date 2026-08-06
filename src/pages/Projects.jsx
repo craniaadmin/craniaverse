@@ -370,7 +370,6 @@ export default function Projects() {
     const handler = (e) => {
       if (colsOpen && colsPopRef.current && !colsPopRef.current.contains(e.target)
           && colsBtnRef.current && !colsBtnRef.current.contains(e.target)) setColsOpen(false)
-      if (settingsOpen && settingsRef.current && !settingsRef.current.contains(e.target)) setSettingsOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
