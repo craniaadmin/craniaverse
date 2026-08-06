@@ -10,9 +10,11 @@
 // addCashEntry() remains the single write path, so the log and the balance
 // can never disagree.
 //
-// The rules editor now lives behind the settings gear rather than a tab of
-// its own: rules are configuration, which is what the gear holds everywhere
-// else in the app.
+// The rules editor is a collapsible section of the page, between the metric
+// tiles and the table. It sat behind the settings gear for a while, but a
+// 340px popover could not hold a reason, an amount and a trigger per rule
+// without stacking them; and the quick-apply buttons in the bulk bar are
+// built from these rules, so they belong on the same page as their effect.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, Eye, Plus, Trash2, Pencil, ExternalLink } from 'lucide-react'
