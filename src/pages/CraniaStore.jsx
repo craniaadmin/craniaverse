@@ -378,6 +378,17 @@ export default function CraniaStore() {
           backupCollection="craniaStore"
           backupHint="Snapshots of every store item and its stock-change log (last 14 kept)."
           onRestored={refresh}
+          settingsExtra={
+            <ColumnsMenu cols={COLUMNS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+              onToggle={(k, on) => {
+                const n = { ...hiddenCols }
+                if (on) delete n[k]; else n[k] = true
+                setHiddenCols(n)
+              }}
+              onAll={() => setHiddenCols({})}
+              onNone={() => setHiddenCols(
+                Object.fromEntries(COLUMNS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true])))} />
+          }
         >
           <div style={{ display: 'flex', gap: 8 }}>
             <button
