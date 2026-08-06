@@ -290,6 +290,16 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .sf .frow input:focus{outline:none;border-color:var(--teal)}
 .sf .frow .ro{background:var(--pill);color:var(--muted)}
 .sf .frow input.highlight{background:var(--yellow);border-color:#d4d27a;font-weight:700}
+
+/* The repeating-row editors — education, keys, references — share the
+   field styling so a cell inside a table and a field beside a label do
+   not look like two different kinds of input. */
+.sf .cellinput{width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid var(--field);
+    border-radius:7px;font:inherit;font-size:12.5px;background:#fff;color:var(--dark-brown)}
+.sf .cellinput:focus{outline:none;border-color:var(--teal)}
+.sf .addrow{background:none;border:1px dashed var(--field);border-radius:7px;padding:5px 11px;
+    font:inherit;font-size:11.5px;font-weight:600;color:var(--muted);cursor:pointer;margin-top:6px}
+.sf .addrow:hover{border-color:var(--teal);color:var(--teal);background:#fff}
 `
 
 // ── Small editable building blocks ────────────────────────────────────────
@@ -328,8 +338,8 @@ function RowsEditor({ columns, rows, onChange, addLabel = '+ Add row' }) {
   return (
     <div>
       <div style={{
-        display: 'grid', gridTemplateColumns: grid, gap: 4, fontSize: 10, fontWeight: 700,
-        color: 'var(--ink-soft)', textDecoration: 'underline', marginBottom: 4,
+        display: 'grid', gridTemplateColumns: grid, gap: 4, fontSize: 10.5, fontWeight: 700, color: 'var(--muted)', letterSpacing: '.3px',
+        textTransform: 'uppercase', marginBottom: 5,
       }}>
         {columns.map(c => <div key={c.key}>{c.label}</div>)}
         <div></div>
@@ -347,8 +357,7 @@ function RowsEditor({ columns, rows, onChange, addLabel = '+ Add row' }) {
               ) : (
                 <input type={c.type === 'date' ? 'date' : 'text'} value={row[c.key] || ''}
                   onChange={e => setCell(i, c.key, e.target.value)} placeholder={c.placeholder || ''}
-                  style={{ width: '100%', border: '1px solid var(--line)', borderRadius: 4, padding: '4px 6px',
-                    fontSize: 12, fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                  className="cellinput" />
               )}
             </div>
           ))}
@@ -359,8 +368,7 @@ function RowsEditor({ columns, rows, onChange, addLabel = '+ Add row' }) {
         </div>
       ))}
       <button onClick={add}
-        style={{ background: 'none', border: '1px dashed var(--line)', borderRadius: 4, padding: '4px 10px',
-          fontSize: 11, color: 'var(--ink-soft)', cursor: 'pointer', marginTop: 4 }}>
+        className="addrow">
         {addLabel}
       </button>
     </div>
@@ -376,7 +384,8 @@ function AvailabilityEditor({ value, onChange }) {
     <div>
       <div style={{
         display: 'grid', gridTemplateColumns: '90px 1fr 1fr', gap: 4,
-        fontSize: 10, fontWeight: 700, color: 'var(--ink-soft)', textDecoration: 'underline', marginBottom: 4,
+        fontSize: 10.5, fontWeight: 700, color: 'var(--muted)', letterSpacing: '.3px',
+        textTransform: 'uppercase', marginBottom: 5,
       }}>
         <div></div><div>From</div><div>To</div>
       </div>
@@ -384,9 +393,9 @@ function AvailabilityEditor({ value, onChange }) {
         <div key={day} style={{ display: 'grid', gridTemplateColumns: '90px 1fr 1fr', gap: 4, marginBottom: 4 }}>
           <div style={{ fontSize: 12, color: 'var(--ink)' }}>{day}</div>
           <input type="time" value={(v[day] && v[day].from) || ''} onChange={e => set(day, 'from', e.target.value)}
-            style={{ border: '1px solid var(--line)', borderRadius: 4, padding: '4px 6px', fontSize: 12, fontFamily: 'inherit' }} />
+            className="cellinput" />
           <input type="time" value={(v[day] && v[day].to) || ''} onChange={e => set(day, 'to', e.target.value)}
-            style={{ border: '1px solid var(--line)', borderRadius: 4, padding: '4px 6px', fontSize: 12, fontFamily: 'inherit' }} />
+            className="cellinput" />
         </div>
       ))}
     </div>
@@ -415,7 +424,8 @@ function DocumentsEditor({ value, onChange }) {
     <div>
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 90px', gap: 4,
-        fontSize: 10, fontWeight: 700, color: 'var(--ink-soft)', textDecoration: 'underline', marginBottom: 6,
+        fontSize: 10.5, fontWeight: 700, color: 'var(--muted)', letterSpacing: '.3px',
+        textTransform: 'uppercase', marginBottom: 6,
       }}>
         <div></div><div style={{ textAlign: 'center' }}>In Dropbox</div>
       </div>
@@ -932,7 +942,7 @@ function StaffDetail({ staffId, onBack, onDelete }) {
           because each one drifted by however tall its own contents
           happened to be. Sections are ordered across the row, so the
           things you read together sit together. */}
-      <div className="detailgrid">
+      <div className="panels">
         <Section title="Staff Name">
           <TextField label="First Name" value={local.firstName} onChange={v => setField('firstName', v)} />
           <TextField label="Middle Name" value={local.middleName} onChange={v => setField('middleName', v)} />
@@ -989,7 +999,7 @@ function StaffDetail({ staffId, onBack, onDelete }) {
           <TextField label="Other" value={local.otherConcerns} onChange={v => setField('otherConcerns', v)} />
         </Section>
 
-        <Section title="Documents Required" count={`${DOCUMENTS.length - missingDocs(local)}/${DOCUMENTS.length}`}>
+        <Section title="Documents Required" count={`${DOCUMENTS.length - missingDocs(local)}/${DOCUMENTS.length}`} countShort={missingDocs(local) > 0}>
           <DocumentsEditor value={local.documents} onChange={v => setField('documents', v)} />
         </Section>
 
