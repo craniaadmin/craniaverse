@@ -30,8 +30,9 @@ const BLANK_FIELD = () => ({
 const BLANK_FORM = { title: '', description: '', fields: [] }
 
 // ------------------------------ FORMS LIST ------------------------------
-function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations }) {
+function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations, onOpenStaff }) {
   const registerUrl = `${API_BASE || window.location.origin}/register`
+  const staffUrl = `${API_BASE || window.location.origin}/staff-form`
   const [copied, setCopied] = useState(null)
   const copy = async (url, key) => {
     try {
@@ -716,7 +717,7 @@ function BoothSignupsView({ onBack }) {
    Forms. As its own nav entry it needs somewhere to start, so it asks
    which form you mean — including the two built-in ones, whose
    submissions live elsewhere. */
-function PickForm({ forms, onPick, onBooth, onRegistrations }) {
+function PickForm({ forms, onPick, onBooth, onRegistrations, onStaff }) {
   const Row = ({ title, blurb, onClick }) => (
     <button onClick={onClick} style={{
       display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center',
@@ -738,6 +739,8 @@ function PickForm({ forms, onPick, onBooth, onRegistrations }) {
       </div>
       <Row title="Registration Form" blurb="Enrolments from the public registration form"
         onClick={onRegistrations} />
+      <Row title="Staff Form" blurb="New staff details — these become records on the Staff page"
+        onClick={onStaff} />
       <Row title="Booth Sign-Up" blurb="Free assessments, open house RSVPs and agenda orders"
         onClick={onBooth} />
       {forms.length === 0 ? (
@@ -949,7 +952,8 @@ export default function Forms({ onNavigate, initialView = 'list' }) {
       <PickForm forms={forms}
         onPick={(id) => setView({ mode: 'subs', id })}
         onBooth={() => setView({ mode: 'booth' })}
-        onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])} />
+        onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])}
+        onStaff={() => onNavigate && onNavigate(['staff', 'Staff'])} />
     )
   }
   if (view.mode === 'templates') {
@@ -970,6 +974,7 @@ export default function Forms({ onNavigate, initialView = 'list' }) {
       boothUrl={boothUrl}
       onOpenBooth={() => setView({ mode: 'booth' })}
       onOpenRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])}
+      onOpenStaff={() => onNavigate && onNavigate(['staff', 'Staff'])}
     />
   )
 }
