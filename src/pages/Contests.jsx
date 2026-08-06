@@ -991,7 +991,6 @@ function ContestsPage({ onNavigate }) {
             {blankProgramRows === 1 ? ' it' : ' them'} under Programs.
           </>
         )} />
-      </div>
 
 
       {rowCtx && (
