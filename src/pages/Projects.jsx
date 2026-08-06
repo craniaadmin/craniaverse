@@ -561,15 +561,19 @@ export default function Projects() {
         csvRows={csvRows}
         backupCollection="projects"
         backupHint="Snapshots of every card on the board, archived ones included (last 14 kept)."
-        /* Board settings sit in the panel itself rather than behind a
-           button that opened a second floating layer over it. */
+        /* A row beside Export CSV that opens the two daily times beneath
+           it, rather than a button that threw a second floating layer
+           over the panel it was sitting in. */
         settingsExtra={
-          <BoardSettings
-            state={state}
-            mutate={mutate}
-            onResetNow={resetDailyNow}
-            onClearGoalsNow={clearGoalsNow}
-          />
+          <PanelDisclosure label="Schedule Tasks"
+            title="Daily Tasks and Today's Goals reset times">
+            <BoardSettings
+              state={state}
+              mutate={mutate}
+              onResetNow={resetDailyNow}
+              onClearGoalsNow={clearGoalsNow}
+            />
+          </PanelDisclosure>
         }
       />
 
