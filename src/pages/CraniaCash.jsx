@@ -516,7 +516,7 @@ function StudentCashDetail({ record, onBack, onNavigate, award }) {
 
 // ─── List ──────────────────────────────────────────────────────────────────
 function CashList({ onSelect, onNavigate, hist, award }) {
-  const { records, rules } = useStore()
+  const { records, rules, refresh } = useStore()
   const [search, setSearch] = useState('')
   const [negativeOnly, setNegativeOnly] = useState(false)
   const [withLogOnly, setWithLogOnly] = useState(false)
