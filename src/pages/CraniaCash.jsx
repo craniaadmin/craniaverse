@@ -285,7 +285,7 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + PAGEACTIONS_CSS + `
 `
 
 // ─── Rules editor (now a card in the settings panel) ───────────────────────
-function RulesEditor() {
+function RulesEditor({ pushHist }) {
   const { rules, updateRules } = useStore()
   const [draft, setDraft] = useState(rules)
   const [dirty, setDirty] = useState(false)
