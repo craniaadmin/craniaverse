@@ -581,10 +581,19 @@ export default function EmergencyContacts({ onNavigate }) {
           + 'snapshots the Customers page takes — restoring one replaces every registration '
           + '(last 14 kept).'}
         onRestored={refresh}
+        settingsExtra={
+          <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => setPrefs(p => {
+              const n = { ...p.hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              p.hiddenCols = n
+            })}
+            onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+            onNone={() => setPrefs(p => {
+              p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+            })} />
+        }
       >
-        <button title="Choose which columns are shown"
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
-        ><Eye size={13} /> Columns</button>
       </PageActions>
 
       {fetchStatus === 'offline' && (
