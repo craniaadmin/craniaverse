@@ -218,16 +218,37 @@ export function authRequired(req, res, next) {
   return next()
 }
 
-/* Runs after authRequired, so anything reaching it is signed in. The
-   403 says which level is needed and which one they have — being told
-   only "forbidden" leaves you unable to tell a permissions problem
-   from a broken page. */
-export function roleRequired(req, res, next) {
-  if (!req.path.startsWith('/api/')) return next()
-  if (isPublicApi(req.method, req.path)) return next()
-  const role = req.session?.role
-  if (!role) return next()
-  const verdict = permits(role, req.method, req.path)
-  if (verdict.ok) return next()
-  return res.status(403).json({ error: verdict.reason, role, needsRole: 'admin' })
+/* Runs after authRequired, so anything reaching it is signed in.
+   `findUser(uid)` returns the live account.
+
+   The level is read from the account on every request, never from the
+   cookie. The cookie is proof of who you are — that is what the
+   signature is for — but it is handed out for three hours, and a role
+   copied into it stays true for those three hours. Demoting someone,
+   or switching their account off, has to bite immediately: that is
+   usually the moment you most need it to.
+
+   The 403 names the level they have, because being told only
+   "forbidden" leaves you unable to tell a permissions problem from a
+   broken page. */
+export function makeRoleGate(findUser) {
+  return async function roleRequired(req, res, next) {
+    if (!req.path.startsWith('/api/')) return next()
+    if (isPublicApi(req.method, req.path)) return next()
+    const uid = req.session?.uid
+    if (!uid) return next()
+
+    let user
+    try { user = await findUser(uid) } catch (err) { return next(err) }
+    if (!user || user.active === false) {
+      res.setHeader('Set-Cookie', clearSessionCookie())
+      return res.status(401).json({ error: 'not authenticated' })
+    }
+
+    req.user = user
+    req.session.role = user.role
+    const verdict = permits(user.role, req.method, req.path)
+    if (verdict.ok) return next()
+    return res.status(403).json({ error: verdict.reason, role: user.role })
+  }
 }
