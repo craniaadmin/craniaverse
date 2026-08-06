@@ -918,6 +918,10 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
         csvName="crania-students-export"
         csvColumns={csvColumns}
         csvRows={csvRows}
+        backupBase="customers" backupConfirm={dialog.confirm}
+        backupHint={'Students are held on the registrations, so these are the same snapshots the '
+          + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
+        onRestored={refresh}
         settingsExtra={close => (
           <>
             {/* Closes the panel on the way: the column chooser is a fixed
