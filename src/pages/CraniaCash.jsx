@@ -930,9 +930,35 @@ function CashList({ onSelect, onNavigate, hist, award }) {
 
 // ─── Root ──────────────────────────────────────────────────────────────────
 export default function CraniaCash({ onNavigate }) {
-  const { records, status } = useStore()
+  const { records, status, addCashEntry } = useStore()
   const [detailId, setDetailId] = useState(null)
   const detailRecord = detailId ? records.find(r => r.id === detailId) : null
+
+  /* History lives here rather than on the list, because entries are added
+     from both views and the two have to share one stack. The bar itself is
+     on the list, so Ctrl+Z is off in the detail view: a step taken there
+     would be invisible, and a change to a balance that nothing on screen
+     reports is worse than no shortcut. */
+  const hist = useActionHistory({ enabled: !detailId })
+  const pushHist = hist.push
+
+  /* Undo does not erase a cash entry — the log is a ledger the server
+     appends to, and a balance that changed with nothing to show for it is
+     how a disputed total becomes unanswerable. It posts the opposite entry
+     instead, the way a correction is made in any book of account: the
+     balance returns to where it was and both movements stay on the record.
+     `who` may be one id or a list, so a bulk award is one step. */
+  const award = useCallback((who, { delta, reason }, label) => {
+    const ids = Array.isArray(who) ? who : [who]
+    if (!ids.length || !Number.isFinite(delta) || delta === 0) return
+    const post = (d, why) => { for (const id of ids) addCashEntry(id, { delta: d, reason: why }) }
+    post(delta, reason)
+    pushHist({
+      label: `${delta >= 0 ? '+' : ''}${delta} to ${label}${reason ? ` — ${reason}` : ''}`,
+      undo: () => post(-delta, `Reversed: ${reason}`),
+      redo: () => post(delta, reason),
+    })
+  }, [addCashEntry, pushHist])
 
   return (
     <div className="page cc" style={{ paddingBottom: 32 }}>
@@ -943,8 +969,9 @@ export default function CraniaCash({ onNavigate }) {
       )}
 
       {detailRecord
-        ? <StudentCashDetail record={detailRecord} onBack={() => setDetailId(null)} onNavigate={onNavigate} />
-        : <CashList onSelect={setDetailId} onNavigate={onNavigate} />}
+        ? <StudentCashDetail record={detailRecord} onBack={() => setDetailId(null)}
+            onNavigate={onNavigate} award={award} />
+        : <CashList onSelect={setDetailId} onNavigate={onNavigate} hist={hist} award={award} />}
     </div>
   )
 }
