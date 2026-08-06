@@ -306,7 +306,7 @@ function UsersModal({ me, onClose }) {
 
   return (
     <div className="acctov" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="acctmodal" onMouseDown={e => e.stopPropagation()}>
+      <div className="acctmodal wide" onMouseDown={e => e.stopPropagation()}>
         <h2><Users size={16} /> Accounts and access levels</h2>
         <div className="hint">
           Admin can do everything. Staff do day-to-day work but cannot delete records,
