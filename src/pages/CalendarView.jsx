@@ -1125,9 +1125,15 @@ export default function CalendarView({
           backupCollection={backupCollection}
           backupHint={`Snapshots of every ${title.toLowerCase()} event and calendar (last 14 kept).`}
           onRestored={refresh}
-        >
-          <button title="Save the whole year as a PNG image" onClick={exportYearImage}>{'🖼'} Year Image</button>
-        </PageActions>
+          /* Saving the year as an image is a once-a-term thing — it belongs
+             with Export CSV under the gear, not beside Undo. That leaves the
+             bar as Undo, Redo and the gear, which is what a page with no
+             frequent action of its own should look like. */
+          settingsExtra={close => (
+            <button title="Save the whole year as a PNG image"
+              onClick={() => { close(); exportYearImage() }}>{'🖼'} Year Image</button>
+          )}
+        />
 
         {/* Calendar chips bar — matches v22 calbar2 */}
         <div className="calbar2">
