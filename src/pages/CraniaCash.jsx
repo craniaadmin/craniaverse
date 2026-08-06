@@ -674,9 +674,13 @@ function CashList({ onSelect, onNavigate, hist, award }) {
      through the same addCashEntry path, so nothing bypasses the history. */
   const awardSelected = (delta, why) => {
     if (!Number.isFinite(delta) || delta === 0 || selectedRows.length === 0) return
-    for (const r of selectedRows) {
-      addCashEntry(r.id, { delta, reason: why || (delta > 0 ? 'Added' : 'Removed') })
-    }
+    const reason = why || (delta > 0 ? 'Added' : 'Removed')
+    const ids = selectedRows.map(r => r.id)
+    /* One undo step for the whole class, not one per child: it was one
+       action, and stepping back through thirty of them to reverse a
+       mis-click is not undo. */
+    award(ids, { delta, reason },
+      `${ids.length} student${ids.length === 1 ? '' : 's'}`)
     setBulkAmount(''); setBulkReason('')
   }
 
