@@ -738,37 +738,50 @@ function EditRegistration({ sub, child, onClose, onSaved }) {
 
   const save = async () => {
     setBusy(true); setErr('')
-    const base = import.meta.env?.VITE_API_URL || ''
-    const H = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
-    const calls = []
-    if (changed(student, {
+
+    /* Only the parts that actually changed are sent, and the same parts —
+       as they were before — are what Undo puts back. Sending all three
+       every time would rewrite the household for a spelling fix on a
+       child's name, and undoing it would then rewrite the household back
+       over whatever anyone else had corrected in the meantime. */
+    const wasStudent = {
       firstName: rec.student?.firstName || '', lastName: rec.student?.lastName || '',
       dob: rec.student?.dob || '', grade: rec.student?.grade || '',
       school: rec.student?.school || '', medical: rec.student?.medical || '',
-    })) {
-      calls.push(fetch(`${base}/api/registrations/${rec.id}/student`,
-        { method: 'PUT', headers: H, body: JSON.stringify(student) }))
+    }
+    const before = {}
+    const after = {}
+    if (changed(student, wasStudent)) {
+      before.student = wasStudent
+      after.student = student
     }
     if (changed(g1, cust.guardian1 || {}) || changed(g2, cust.guardian2 || {})
       || changed(em, cust.emergency || {}) || changed(meta, cust.meta || {})) {
-      calls.push(fetch(`${base}/api/registrations/${rec.id}/customer`, {
-        method: 'PUT', headers: H,
-        body: JSON.stringify({ guardian1: g1, guardian2: g2, emergency: em, meta }),
-      }))
+      before.customer = {
+        guardian1: cust.guardian1 || {}, guardian2: cust.guardian2 || {},
+        emergency: cust.emergency || {}, meta: cust.meta || {},
+      }
+      after.customer = { guardian1: g1, guardian2: g2, emergency: em, meta }
     }
     if (changed(programs, child.rawPrograms || [])) {
-      calls.push(fetch(`${base}/api/registrations/${rec.id}/programs`,
-        { method: 'PUT', headers: H, body: JSON.stringify(programs) }))
+      before.programs = child.rawPrograms || []
+      after.programs = programs
     }
-    if (!calls.length) { onClose(); return }
+
+    if (!Object.keys(after).length) { onClose(); return }
     try {
-      const results = await Promise.all(calls)
-      const bad = results.find(r => !r.ok)
-      if (bad) { setErr(`The server refused the change (HTTP ${bad.status}).`); setBusy(false); return }
-      await onSaved()
+      await putSections(rec.id, after)
+      await onSaved({
+        recordId: rec.id,
+        label: `Edit ${child.name || 'registration'} (${sub.ref})`,
+        before: JSON.parse(JSON.stringify(before)),
+        after: JSON.parse(JSON.stringify(after)),
+      })
       onClose()
-    } catch {
-      setErr('Could not reach the server. Nothing was saved.')
+    } catch (e) {
+      setErr(String(e?.message || '').startsWith('The server refused')
+        ? e.message
+        : 'Could not reach the server. Nothing was saved.')
       setBusy(false)
     }
   }
