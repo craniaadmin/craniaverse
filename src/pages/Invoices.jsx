@@ -257,6 +257,7 @@ export default function Invoices() {
           </tbody>
         </table>
       </div>
+      <RowCount shown={filtered.length} total={invoices.length} />
 
       {modal && (
         <InvoiceModal
