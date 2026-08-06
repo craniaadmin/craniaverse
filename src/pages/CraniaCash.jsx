@@ -258,29 +258,53 @@ const CSS = TABLECHROME_CSS + `
 .cc .logtable td.delta.up{color:var(--good)}
 .cc .logtable td.delta.down{color:#922b21}
 
-/* ── rules editor, inside the settings panel ── */
-.cc-rules .rwarn{background:#FBF3CE;border:1px solid #E8DCA0;color:#7a6417;border-radius:8px;
+/* ── rules editor, a section of the page ──
+   One card matching the metric tiles, collapsed to a single header row
+   until opened. With the page's full width a rule is one row — reason,
+   amount, trigger, remove — instead of the two stacked rows it needed to
+   fit the popover. */
+.cc .cc-rules{background:#fff;border-radius:12px;box-shadow:var(--shadow);
+    border-bottom:3px solid var(--yellow);margin-bottom:14px;overflow:hidden}
+.cc .cc-rules .rules-head{display:flex;align-items:center;gap:9px;width:100%;background:none;
+    border:none;padding:12px 16px;cursor:pointer;font:inherit;text-align:left;color:var(--dark-brown)}
+.cc .cc-rules .rules-head:hover{background:#FAFAF7}
+.cc .cc-rules .rules-head .chev{color:#9a948a;font-size:11px;width:10px}
+.cc .cc-rules .rules-head .t{font-size:13px;font-weight:700}
+.cc .cc-rules .rules-head .c{font-size:11.5px;color:#9a948a}
+.cc .cc-rules .rules-head .unsaved{margin-left:auto;font-size:11px;font-weight:700;color:#7a6417;
+    background:#FBF3CE;border:1px solid #E8DCA0;border-radius:999px;padding:2px 9px}
+.cc .cc-rules .rules-body{padding:2px 16px 14px;border-top:1px solid var(--line)}
+.cc .cc-rules .rules-hint{font-size:11.5px;color:var(--muted);line-height:1.5;margin:10px 0 9px;
+    max-width:70ch}
+.cc .cc-rules .rwarn{background:#FBF3CE;border:1px solid #E8DCA0;color:#7a6417;border-radius:8px;
     padding:8px 10px;font-size:11.5px;line-height:1.5;margin-bottom:9px}
-.cc-rules .rwarn .link{background:none;border:none;padding:0 0 0 3px;font:inherit;font-size:11.5px;
+.cc .cc-rules .rwarn .link{background:none;border:none;padding:0 0 0 3px;font:inherit;font-size:11.5px;
     font-weight:700;color:#7a6417;text-decoration:underline;cursor:pointer}
-.cc-rules .rblock{padding:7px 0;border-bottom:1px solid #F1F3F4}
-.cc-rules .rrow{display:flex;align-items:center;gap:7px;padding:3px 0}
-.cc-rules .rrow.trig{font-size:11px;color:#6B6455}
-.cc-rules .rrow.trig .w{font-weight:600;white-space:nowrap}
-.cc-rules .rrow.trig select{flex:1;min-width:0;padding:4px 6px;border:1px solid #D5D0C4;
-    border-radius:6px;font:inherit;font-size:11px;background:#fff;color:#2E2516}
-.cc-rules .rrow input{padding:6px 9px;border:1px solid var(--field);border-radius:7px;font:inherit;
-    font-size:12px;background:#fff;color:#2E2516}
-.cc-rules .rrow input.why{flex:1;min-width:0}
-.cc-rules .rrow input.amt{width:66px;text-align:right}
-.cc-rules .rrow .x{background:none;border:none;color:#c9c3b5;cursor:pointer;padding:2px;line-height:1}
-.cc-rules .rrow .x:hover{color:#C0392B}
-.cc-rules .foot{display:flex;gap:8px;margin-top:9px;border-top:1px solid #E7EBE7;padding-top:9px}
-.cc-rules .foot button{flex:1;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px;
+.cc .cc-rules .rempty{font-size:12px;color:var(--faint);padding:6px 0 2px}
+/* Header labels line up with the inputs below via the same track widths. */
+.cc .cc-rules .rhead,.cc .cc-rules .rblock{display:flex;align-items:center;gap:9px}
+.cc .cc-rules .rhead{font-size:10.5px;font-weight:700;color:#9a948a;text-transform:uppercase;
+    letter-spacing:.4px;padding:4px 0 6px;border-bottom:1px solid var(--line)}
+.cc .cc-rules .rhead .hwhy{flex:1;min-width:0}
+.cc .cc-rules .rhead .hamt{width:80px;text-align:right}
+.cc .cc-rules .rhead .htrig{width:calc(190px + 150px + 9px + 24px)}
+.cc .cc-rules .rblock{padding:7px 0;border-bottom:1px solid #F1F3F4;flex-wrap:wrap}
+.cc .cc-rules .rblock input,.cc .cc-rules .rblock select{padding:6px 9px;border:1px solid var(--field);
+    border-radius:7px;font:inherit;font-size:12px;background:#fff;color:#2E2516}
+.cc .cc-rules .rblock input.why{flex:1;min-width:160px}
+.cc .cc-rules .rblock input.amt{width:80px;text-align:right}
+.cc .cc-rules .rblock select.tfield{width:190px}
+.cc .cc-rules .rblock select.tvalue{width:150px}
+.cc .cc-rules .rblock select:disabled{background:#F7F6F2;color:#9a948a}
+.cc .cc-rules .rblock .x{background:none;border:none;color:#c9c3b5;cursor:pointer;padding:2px;
+    line-height:1;width:24px}
+.cc .cc-rules .rblock .x:hover{color:#C0392B}
+.cc .cc-rules .foot{display:flex;gap:8px;margin-top:11px}
+.cc .cc-rules .foot button{border-radius:8px;padding:7px 14px;font:inherit;font-size:12px;
     font-weight:600;cursor:pointer}
-.cc-rules .foot .add{background:#F1F3F4;border:1px solid #D5D0C4;color:#2E2516}
-.cc-rules .foot .save{background:#5FA09E;color:#fff;border:none}
-.cc-rules .foot .save:disabled{background:#cbd1d6;cursor:default}
+.cc .cc-rules .foot .add{background:#F1F3F4;border:1px solid #D5D0C4;color:#2E2516}
+.cc .cc-rules .foot .save{background:#5FA09E;color:#fff;border:none}
+.cc .cc-rules .foot .save:disabled{background:#cbd1d6;cursor:default}
 `
 
 // ─── Rules editor (now a card in the settings panel) ───────────────────────
