@@ -560,12 +560,26 @@ export default function Projects() {
         </div>
       )}
 
-      <div className="pj-toolbar">
-        <button title="Undo (Ctrl+Z)" disabled={undoLen === 0} onClick={undo}>↶ Undo</button>
-        <button title="Redo (Ctrl+Shift+Z)" disabled={redoLen === 0} onClick={redo}>↷</button>
-        <button style={{ marginLeft: 'auto' }} title="Settings" onClick={() => setSettingsOpen(v => !v)}>⚙</button>
-        <button onClick={exportCsv} title="Download all cards as a CSV file">⤓ Export CSV</button>
-      </div>
+      <PageActions
+        onUndo={undo} onRedo={redo}
+        undoLabel={undoLen ? 'last board change' : ''}
+        redoLabel={redoLen ? 'last undone change' : ''}
+        csvName="crania-projects-export"
+        csvColumns={CSV_COLUMNS}
+        csvRows={csvRows}
+        backupCollection="projects"
+        backupHint="Snapshots of every card on the board, archived ones included (last 14 kept)."
+        settingsExtra={
+          /* Daily reset, goal clearing and the board's own earlier backups
+             live in the board settings panel; the gear opens it rather than
+             leaving it stranded behind a button that no longer exists. */
+          <div className="bkp-card">
+            <div className="bkp-title">Board Settings</div>
+            <div className="bkp-hint">Daily reset time, goal clearing, and this board's earlier backups.</div>
+            <button className="bkp-btn" onClick={() => setSettingsOpen(true)}>Open</button>
+          </div>
+        }
+      />
 
       <div className="pj-toolbar">
         <input
