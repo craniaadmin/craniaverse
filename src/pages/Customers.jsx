@@ -1122,29 +1122,34 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     <div className="page cu" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
 
-      <div className="actions">
-        <button className="hbtn" disabled={!undoLabel || histBusy} style={{ marginRight: 'auto' }}
-          title={undoLabel ? `Undo: ${undoLabel}  (Ctrl+Z)` : 'Nothing to undo'}
-          onClick={onUndo}><Undo2 size={13} /> Undo</button>
-        <button className="hbtn" disabled={!redoLabel || histBusy}
-          title={redoLabel ? `Redo: ${redoLabel}  (Ctrl+Y)` : 'Nothing to redo'}
-          onClick={onRedo}><Redo2 size={13} /></button>
-        <button title="Choose which columns are shown"
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
-        ><Eye size={13} /> Columns</button>
-        <button title="Download every student as a CSV file" onClick={exportCsv}>
-          <Download size={13} /> Export CSV
+      <PageActions
+        onUndo={onUndo} onRedo={onRedo} undoLabel={undoLabel} redoLabel={redoLabel}
+        histBusy={histBusy} histNote={histNote}
+        csvName="crania-customers-export"
+        csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
+        csvRows={csvRows}
+        settingsExtra={close => (
+          <>
+            {/* Closes the panel on the way: the column chooser is a fixed
+                popover underneath it, so it would open invisible. */}
+            <button title="Choose which columns are shown"
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                close()
+                setPop({ kind: 'cols', rect })
+              }}><Eye size={13} /> Columns</button>
+            <BackupPanel base="customers" confirm={dialog.confirm}
+              hint={'Snapshots of every registration, saved to the database (last 14 kept). '
+                + 'Back up before an import or a bulk delete.'}
+              onRestored={async () => { await refresh(); close() }} />
+            <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
+          </>
+        )}
+      >
+        <button className="cu-add" title="Add a new family" onClick={onAdd}>
+          <UserPlus size={13} /> Add Family
         </button>
-        <button className="gearbtn" title="Backups and programme colours"
-          onClick={() => setSettingsOpen(true)}>⚙</button>
-      </div>
-
-      {histNote && <div className="histnote" role="status">{histNote}</div>}
-
-      {settingsOpen && (
-        <CustomersSettings onClose={() => setSettingsOpen(false)}
-          categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
-      )}
+      </PageActions>
 
       <div className="metrics">
         <div className="metric">
