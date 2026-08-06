@@ -960,15 +960,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
         csvRows={csvRows}
         backupCollection="todo"
         backupHint="Snapshots of every list, to-do and checklist (last 14 kept)."
-        settingsExtra={
-          /* Repeat/reset behaviour and this page's own earlier backups live
-             in its settings panel, which the gear now opens. */
-          <div className="bkp-card">
-            <div className="bkp-title">{view === 'checklists' ? 'Checklist Settings' : 'To-Do Settings'}</div>
-            <div className="bkp-hint">Repeat and reset behaviour, and this page's earlier backups.</div>
-            <button className="bkp-btn" onClick={() => setSettingsOpen(true)}>Open</button>
-          </div>
-        }
       />
 
       {view === 'todo' && <TodoView
