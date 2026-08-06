@@ -1,5 +1,6 @@
 node_modules/
 data.json
+comments.json
 .env
 
 # Runtime state for server/scripts/monitor-tunnels.js — tracks last

@@ -7,7 +7,8 @@
 // (matched by recordId) are updated instead of duplicated.
 //
 // Usage (from project root, with PocketBase already running):
-//   node server/scripts/pb-setup.js
+//   node server/scripts/pb-setup.js            # create collections only
+//   node server/scripts/pb-setup.js --import   # also load server/*.json
 //
 // Requires server/.env to have:
 //   PB_URL=http://127.0.0.1:8090
@@ -32,6 +33,8 @@ if (!PB_ADMIN_EMAIL || !PB_ADMIN_PASSWORD) {
   console.error('PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD must be set in server/.env')
   process.exit(1)
 }
+
+const IMPORT_DATA = process.argv.slice(2).includes('--import')
 
 const pb = new PocketBase(PB_URL)
 pb.autoCancellation(false)
