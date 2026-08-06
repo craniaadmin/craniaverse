@@ -485,23 +485,6 @@ function Section({ title, hint, count, countShort, span, children }) {
   )
 }
 
-// ── Settings ──────────────────────────────────────────────────────────────
-function StaffSettings({ onClose, onRestored }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
-    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
-  }, [onClose])
-  return (
-    <div className="sfsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
-      <BackupPanel base="staff"
-        hint="Snapshots of every staff record, saved to the database (last 14 kept)."
-        onRestored={async () => { await onRestored(); onClose() }} />
-    </div>
-  )
-}
-
 // ── Staff list ────────────────────────────────────────────────────────────
 function StaffList({
   onSelect, onAdd, onDuplicate, onDelete, onBulkDelete,
