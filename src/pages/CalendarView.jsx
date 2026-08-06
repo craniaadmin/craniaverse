@@ -332,7 +332,7 @@ function useCalendar(apiPath) {
     persist(d)
   }, [persist])
 
-  return { data, loading, status, mutate, undo, redo, undoLen, redoLen }
+  return { data, loading, status, mutate, undo, redo, undoLen, redoLen, refresh }
 }
 
 // ─── CSS ───
