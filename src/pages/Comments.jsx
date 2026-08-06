@@ -145,6 +145,27 @@ export default function Comments({ onNavigate }) {
         </div>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName={view === 'register' ? `crania-lesson-notes-${selectedDate}` : 'crania-lesson-notes'}
+        csvColumns={[
+          { key: 'student', label: 'Student' },
+          { key: 'program', label: 'Program' },
+          { key: 'lessonNo', label: 'Lesson #' },
+          { key: 'date', label: 'Date' },
+          ...COMMENT_FIELDS.map(f => ({ key: f.key, label: f.label })),
+        ]}
+        csvRows={() => (view === 'register' ? dayRows : visible).map(r => ({
+          student: r.studentName,
+          program: r.program || '',
+          lessonNo: r.row.lessonNo ?? '',
+          date: r.row.date || '',
+          ...Object.fromEntries(COMMENT_FIELDS.map(f => [f.key, r.row[f.key] || ''])),
+        }))}
+        backupCollection="comments"
+        backupHint="Snapshots of every lesson note and register mark (last 14 kept)."
+      />
+
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
