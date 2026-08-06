@@ -400,7 +400,7 @@ function RulesEditor({ pushHist }) {
 /* Backups and the rules editor, both of which live behind the gear. Rendered
    inside PageActions' settings popover, which owns the positioning and the
    click-outside-to-close that this used to do for itself. */
-function CashSettings() {
+function CashSettings({ pushHist }) {
   const { refresh } = useStore()
   return (
     <>
@@ -409,7 +409,7 @@ function CashSettings() {
           + 'snapshots the Customers page takes — restoring one replaces every registration '
           + '(last 14 kept).'}
         onRestored={refresh} />
-      <RulesEditor />
+      <RulesEditor pushHist={pushHist} />
     </>
   )
 }
