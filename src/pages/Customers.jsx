@@ -235,6 +235,19 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + PAGEACTIONS_CSS + `
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
 
+/* The list's own toolbar is gone — it is the shared bar now. This is the
+   detail view's row, which is a different set of controls (this student's
+   field history, and the two things you do to the student you are looking
+   at) and is not the page-level bar. */
+.cu .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.cu .actions button{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:6px 12px;
+    font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:5px}
+.cu .actions button:hover:not(:disabled){background:#f4f2ea}
+.cu .actions button:disabled{opacity:.4;cursor:default}
+.cu .actions button.danger{color:var(--danger);border-color:#eecfca}
+.cu .actions button.danger:hover{background:#fdf3f1}
+
 .cu .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:14px}
 .cu .metric{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);
     border-bottom:3px solid var(--teal);cursor:default}
