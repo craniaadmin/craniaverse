@@ -97,7 +97,12 @@ function Settings({ collection, hint, onRestored, onClose, onExport, canExport, 
             : 'Nothing on this page to export yet'}>
           <Download size={13} /> Export CSV
         </button>
-        {children}
+        {/* A page can pass a function instead of a node to get the closer.
+            Anything that opens something of its own — the column chooser
+            especially — has to shut this panel on the way, or it opens
+            underneath it: the chooser is a fixed-position popover at a
+            lower z-index than this one, so it would be there and invisible. */}
+        {typeof children === 'function' ? children(onClose) : children}
       </div>
       {collection && (
         <BackupPanel base={`snapshots/${collection}`} hint={hint}
