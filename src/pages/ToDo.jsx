@@ -952,8 +952,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
     <div className="page tdroot">
       <style>{CSS}</style>
 
-      <div className="page-head">
-      </div>
 
       {/* Undo row: undo / redo, then settings + export pushed right */}
       <div className="undorow">

@@ -102,8 +102,6 @@ export default function Accounting() {
 
   return (
     <PageShell>
-      <div className="page-head">
-      </div>
 
       {status === 'offline' && <OfflineBanner />}
 

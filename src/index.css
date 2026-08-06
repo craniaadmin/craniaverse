@@ -474,6 +474,13 @@ input, select, textarea { font-family: inherit; }
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px; margin-bottom: 8px;
 }
+/* The page name moved to the top bar, so most of these rows now hold
+   nothing but actions. space-between put a lone button where the title
+   used to be — hard against the left — so rows without a title keep
+   their controls on the right, where they have always appeared. Rows
+   that still have a heading are sub-views with a back button first and
+   are left alone. */
+.page-head:not(:has(.page-title)) { justify-content: flex-end; }
 .page-head .page-title { margin-bottom: 0; }
 .head-actions { display: flex; gap: 12px; align-items: center; }
 .icon-btn {
