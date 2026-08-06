@@ -113,6 +113,14 @@ function logPbError(label, err) {
     data:          err?.response?.data ?? err?.data,
     originalError: err?.originalError?.message,
   })
+  /* A token PocketBase rejects is worse than no token at all: authStore
+     can still consider it valid, so ensureAuth returns happily and every
+     later call fails the same way. Drop it here so the next request logs
+     in again instead of erroring until someone restarts the process. */
+  if (err?.status === 401 || err?.status === 403) {
+    try { pb().authStore.clear() } catch { /* client not built yet */ }
+    authPromise = null
+  }
 }
 
 async function ensureAuth() {
@@ -123,8 +131,16 @@ async function ensureAuth() {
   if (!email || !password) {
     throw new Error('PB_ADMIN_EMAIL / PB_ADMIN_PASSWORD must be set in server/.env')
   }
-  console.log(`[pb] authenticating as ${email} against ${client.baseURL}`)
+  /* authPromise exists only to stop concurrent requests each starting
+     their own login. It used to be left set after a successful one, so
+     when the token eventually expired this `if` saw the old resolved
+     promise, skipped the re-login, and awaited it — handing back the
+     expired token. From then on every database call failed with
+     PocketBase's own "requires superuser authorization" message, and the
+     only cure was restarting the API. Clear it once the login settles. */
   if (!authPromise) {
+    console.log(`[pb] authenticating as ${email} against ${client.baseURL}`)
+    client.authStore.clear()
     authPromise = client.collection('_superusers')
       .authWithPassword(email, password)
       .then((r) => {
@@ -132,10 +148,10 @@ async function ensureAuth() {
         return r
       })
       .catch((err) => {
-        authPromise = null
         logPbError('auth', err)
         throw err
       })
+      .finally(() => { authPromise = null })
   }
   await authPromise
 }
