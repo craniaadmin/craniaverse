@@ -169,9 +169,14 @@ export function useFinance() {
   return useMemo(() => ({
     data, loading, status, refresh,
     invoices: data.invoices, payments: data.payments, meta: data.meta,
+    /* The bulk setter, exposed alongside the wrappers. Undo needs to put a
+       whole payload back in one write — deleting an invoice also detaches
+       its payments, so restoring only the invoice list would leave the
+       money pointing at nothing. */
+    updateData,
     addInvoice, updateInvoice, deleteInvoice,
     addPayment, updatePayment, deletePayment,
-  }), [data, loading, status, refresh, addInvoice, updateInvoice, deleteInvoice, addPayment, updatePayment, deletePayment])
+  }), [data, loading, status, refresh, updateData, addInvoice, updateInvoice, deleteInvoice, addPayment, updatePayment, deletePayment])
 }
 
 let idCounter = 0
