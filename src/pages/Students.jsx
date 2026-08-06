@@ -752,7 +752,7 @@ function CommentsSection({ studentId, initialPrograms }) {
    are now passed to PageActions as settingsExtra, which owns the panel and
    its click-away. */
 
-function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, studentIds,
+function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onNavigate, studentIds,
   onUndo, onRedo, undoLabel, redoLabel, histBusy, histNote }) {
   const { records, programs, programsState, setProgramsState, refresh } = useStore()
   const dialog = useDialog()
