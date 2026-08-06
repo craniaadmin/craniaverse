@@ -18,7 +18,20 @@ import {
   DOW, DOW_ORD, norm, fmtTime, sessionsOf, statedLocationId,
   matchSessions, entrySlots,
 } from '../data/enrolment'
-import PageActions from '../components/PageActions'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
+
+/* Kept on this machine rather than the server: which columns a person
+   wants on a printed register is theirs, not the school's. */
+const CPREF_KEY = 'classlists-cols'
+function loadHiddenCols() {
+  try {
+    const v = JSON.parse(localStorage.getItem(CPREF_KEY) || '{}')
+    return v && typeof v === 'object' ? v : {}
+  } catch { return {} }
+}
+function saveHiddenCols(v) {
+  try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ }
+}
 
 /* Fallback only. The real list lives in programs_state and the Programs
    page lets it be renamed and added to, so `useLocName` below prefers
