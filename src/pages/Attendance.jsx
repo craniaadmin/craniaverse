@@ -73,12 +73,12 @@ export default function Attendance({ onNavigate }) {
     const what = field === 'attendance'
       ? (value ? (ATTEND_LABEL[String(value).toUpperCase()] || value) : 'unmarked')
       : (value || 'blank')
-    hist.push({
+    pushHist({
       label: `${r.studentName} — ${field === 'attendance' ? 'attendance' : 'uniform'} ${what}`,
       undo: () => updateRow(r.studentId, r.tabKey, r.rowIdx, field, before),
       redo: () => updateRow(r.studentId, r.tabKey, r.rowIdx, field, value),
     })
-  }, [updateRow, hist])
+  }, [updateRow, pushHist])
 
   const programs = useMemo(() => {
     const seen = new Set()
