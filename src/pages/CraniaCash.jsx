@@ -700,9 +700,14 @@ function CashList({ onSelect, onNavigate, hist, award }) {
         csvName="crania-cash"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => visible}
-        /* Columns joins the two cards that were already behind the gear.
-           It closes the panel on the way: the chooser is a fixed popover at
-           a lower z-index and would otherwise open behind it. */
+        backupBase="customers"
+        backupHint={'Balances and their history are held on the registrations, so these are the same '
+          + 'snapshots the Customers page takes — restoring one replaces every registration '
+          + '(last 14 kept).'}
+        onRestored={refresh}
+        /* Columns joins the rules editor already behind the gear. It closes
+           the panel on the way: the chooser is a fixed popover at a lower
+           z-index and would otherwise open behind it. */
         settingsExtra={close => (
           <>
             <button title="Choose which columns are shown"
@@ -711,7 +716,7 @@ function CashList({ onSelect, onNavigate, hist, award }) {
                 close()
                 setPop({ kind: 'cols', rect })
               }}><Eye size={13} /> Columns</button>
-            <CashSettings pushHist={hist.push} />
+            <RulesEditor pushHist={hist.push} />
           </>
         )}
       />
