@@ -983,15 +983,14 @@ function ContestsPage({ onNavigate }) {
           </table>
         )}
       </div>
-      <div className="tcount">
-        {blankProgramRows > 0 && (
-          <span className="tnote">
+      <RowCount shown={visible.length} total={allRows.length}
+        note={blankProgramRows > 0 && (
+          <>
             {blankProgramRows} contest {blankProgramRows === 1 ? 'program has' : 'programs have'} no
             name and {blankProgramRows === 1 ? 'is' : 'are'} not listed — fix or remove
             {blankProgramRows === 1 ? ' it' : ' them'} under Programs.
-          </span>
-        )}
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
+          </>
+        )} />
       </div>
 
 

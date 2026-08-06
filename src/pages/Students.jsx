@@ -21,7 +21,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Trash2, Undo2, Redo2, Eye, UserPlus, ExternalLink, Pencil, Copy } from 'lucide-react'
 import { useStore } from '../data/store'
 import { buildCategoryLookup, inkOn } from '../data/programCategories'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 import { awardsForRow, rowKeyOf, fieldCanTrigger } from '../data/autoCash'
 import {
@@ -1045,9 +1045,7 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
           </table>
         )}
       </div>
-      <div className="tcount">
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
-      </div>
+      <RowCount shown={visible.length} total={allRows.length} />
 
 
       {rowCtx && (

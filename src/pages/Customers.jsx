@@ -26,7 +26,7 @@ import {
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
 import { buildFamilyIndex, familyOf } from '../data/family'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 import { buildCategoryLookup, inkOn } from '../data/programCategories'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -1195,9 +1195,7 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           </table>
         )}
       </div>
-      <div className="tcount">
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
-      </div>
+      <RowCount shown={visible.length} total={allRows.length} />
 
 
       {rowCtx && (

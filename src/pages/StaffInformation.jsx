@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useStore } from '../data/store'
 import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 
 const COLS = [
   { k: 'staffId',   l: 'Staff ID' },
@@ -817,9 +817,7 @@ function StaffList({
           </table>
         )}
       </div>
-      <div className="tcount">
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
-      </div>
+      <RowCount shown={visible.length} total={allRows.length} />
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[

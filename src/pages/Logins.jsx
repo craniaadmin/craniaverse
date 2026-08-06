@@ -17,7 +17,7 @@ import { Eye, Copy, Check, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
 import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } from '../data/loginUtils'
 import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -605,9 +605,7 @@ export default function Logins({ onNavigate }) {
           </table>
         )}
       </div>
-      <div className="tcount">
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
-      </div>
+      <RowCount shown={visible.length} total={allRows.length} />
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[

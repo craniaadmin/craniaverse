@@ -21,7 +21,7 @@ import { ChevronLeft, Eye, Plus, Trash2, Pencil, ExternalLink } from 'lucide-rea
 import { useStore } from '../data/store'
 import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import { TRIGGER_FIELDS, triggerLabel } from '../data/autoCash'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const COLS = [
@@ -948,9 +948,7 @@ function CashList({ onSelect, onNavigate, hist, award }) {
           </table>
         )}
       </div>
-      <div className="tcount">
-        Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
-      </div>
+      <RowCount shown={visible.length} total={allRows.length} />
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[

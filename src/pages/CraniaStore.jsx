@@ -523,6 +523,7 @@ export default function CraniaStore() {
               </tbody>
             </table>
           </div>
+          <RowCount shown={filteredItems.length} total={data.items.length} />
         </>
       ) : (
         <LogView log={data.log} />
@@ -922,6 +923,7 @@ function LogView({ log }) {
           })}
         </tbody>
       </table>
+      <RowCount shown={filtered.length} total={log.length} />
     </div>
   )
 }
