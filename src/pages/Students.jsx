@@ -747,32 +747,14 @@ function CommentsSection({ studentId, initialPrograms }) {
 
 // ── Student list view ──────────────────────────────────────────────────────
 
-/* Same two cards as Customers: snapshots of the registrations students are
-   held on, and the programme-type colours both pages share. */
-function StudentsSettings({ onClose, categories, tintFor, onCatColor }) {
-  const ref = useRef(null)
-  const dialog = useDialog()
-  const { refresh } = useStore()
+/* The same two cards as Customers — snapshots of the registrations
+   students are held on, and the programme-type colours both pages share —
+   are now passed to PageActions as settingsExtra, which owns the panel and
+   its click-away. */
 
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
-    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
-  }, [onClose])
-
-  return (
-    <div className="stsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
-      <BackupPanel base="customers" confirm={dialog.confirm}
-        hint={'Students are held on the registrations, so these are the same snapshots the '
-          + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
-        onRestored={async () => { await refresh(); onClose() }} />
-      <CategoryColors categories={categories} tintFor={tintFor} onCatColor={onCatColor} />
-    </div>
-  )
-}
-
-function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, studentIds }) {
-  const { records, programs, programsState, setProgramsState } = useStore()
+function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, studentIds,
+  onUndo, onRedo, undoLabel, redoLabel, histBusy, histNote }) {
+  const { records, programs, programsState, setProgramsState, refresh } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
   const [medicalOnly, setMedicalOnly] = useState(false)
