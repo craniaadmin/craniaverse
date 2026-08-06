@@ -664,6 +664,90 @@ export async function restoreCustomersBackup(backupId) {
   return row.payload
 }
 
+// ---- generic backups -------------------------------------
+/* Every page wants the same three things behind its settings gear:
+   snapshot, list, restore. Doing that per page meant a new pair of
+   collections and a new set of routes each time, which is why most
+   pages never got one. These work over any collection by name, into a
+   single shared `snapshots` collection tagged with which one it came
+   from.
+
+   Allowed names are listed rather than taken from the request, so a
+   crafted call cannot read or overwrite something that was never meant
+   to be reachable this way — `accounts` in particular, which holds the
+   password hashes. */
+export const BACKUPABLE = new Set([
+  'registrations', 'staff', 'programs', 'programs_state', 'rules', 'comments',
+  'inventory', 'forms', 'formSubmissions', 'todo', 'staffBoard', 'finance',
+  'projects', 'itAccounts', 'calendar', 'stock', 'craniaStore', 'contests',
+  'marketingCalendar', 'surveys', 'surveySubmissions', 'campaigns', 'leads',
+  'contacts', 'boothSignups',
+])
+
+const MAX_SNAPSHOTS = 14
+
+function assertBackupable(collection) {
+  if (!BACKUPABLE.has(collection)) {
+    throw new Error(`"${collection}" cannot be backed up from here.`)
+  }
+}
+
+export async function listSnapshots(collection) {
+  assertBackupable(collection)
+  await ensureAuth()
+  const rows = await pb().collection('snapshots').getFullList({
+    filter: `source="${collection}"`,
+  })
+  rows.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  return rows.map(r => ({
+    id: r.id, label: r.label || '', created: r.created,
+    count: Array.isArray(r.payload) ? r.payload.length : 0,
+  }))
+}
+
+export async function createSnapshot(collection, label) {
+  assertBackupable(collection)
+  await ensureAuth()
+  const rows = await getFullList(collection)
+  await pb().collection('snapshots').create({
+    source: collection, label: label || '', payload: rows.map(r => stripMeta(r)),
+  })
+  const all = await pb().collection('snapshots').getFullList({ filter: `source="${collection}"` })
+  all.sort((a, b) => (b.created || '').localeCompare(a.created || ''))
+  for (const old of all.slice(MAX_SNAPSHOTS)) {
+    await pb().collection('snapshots').delete(old.id)
+  }
+  return { count: rows.length }
+}
+
+/* PocketBase's own row id, and its timestamps, belong to the row we are
+   replacing rather than to the data — carrying them into a restore
+   would try to recreate rows under ids that are already taken. */
+function stripMeta(row) {
+  const { id, collectionId, collectionName, created, updated, expand, ...rest } = row
+  return rest
+}
+
+export async function restoreSnapshot(collection, snapshotId) {
+  assertBackupable(collection)
+  await ensureAuth()
+  const row = await pb().collection('snapshots').getOne(snapshotId)
+  if (!row?.payload || !Array.isArray(row.payload)) throw new Error('Backup not found or empty')
+  if (row.source !== collection) {
+    throw new Error(`That backup is of "${row.source}", not "${collection}".`)
+  }
+  // Snapshot what is there now first — the only way back from the wrong one.
+  const current = await getFullList(collection)
+  await pb().collection('snapshots').create({
+    source: collection,
+    label: `Before restore — ${new Date().toLocaleString()}`,
+    payload: current.map(r => stripMeta(r)),
+  })
+  for (const existing of current) await pb().collection(collection).delete(existing.id)
+  for (const item of row.payload) await pb().collection(collection).create(item)
+  return row.payload
+}
+
 // ---- staff backups --------------------------------------
 // Same shape and same 14-deep retention as the customers ones above, over
 // the staff collection instead of the registrations.
