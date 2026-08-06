@@ -17,6 +17,7 @@
 import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useCommentsRows } from '../data/useCommentsRows'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 const COMMENT_FIELDS = [
   { key: 'lessonPlan',        label: 'Lesson Plan',          width: 180 },
