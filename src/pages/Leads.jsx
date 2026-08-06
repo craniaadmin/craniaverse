@@ -72,11 +72,11 @@ function useLeads() {
     })
   }, [])
 
-  return { leads, loading, status, mutate }
+  return { leads, loading, status, mutate, refresh }
 }
 
 export default function Leads({ onNavigate }) {
-  const { leads, loading, status, mutate } = useLeads()
+  const { leads, loading, status, mutate, refresh } = useLeads()
   const { refresh: refreshStore } = useStore()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
