@@ -76,6 +76,38 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
               <Star size={15} style={{ color: '#5FA09E', fill: '#5FA09E' }} />
+              Registration Form
+              <span style={{ background: '#5FA09E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, letterSpacing: '.4px', textTransform: 'uppercase' }}>Built-in</span>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <span>Guardians · children · programme enrolments · consent</span>
+              <span>·</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{registerUrl}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="icon-btn" title={copied === 'reg' ? 'Copied!' : 'Copy public link'} onClick={() => copy(registerUrl, 'reg')}>
+              <Copy size={16} />
+            </button>
+            <button className="icon-btn" title="Open public form" onClick={() => window.open(registerUrl, '_blank')}>
+              <ExternalLink size={16} />
+            </button>
+            <button className="icon-btn" title="View registrations" onClick={onOpenRegistrations}>
+              <Eye size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div style={{
+          background: '#f2fbfc',
+          border: '1px solid #d5ecef', borderRadius: 12,
+          padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr auto',
+          gap: 12, alignItems: 'center', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
+          marginBottom: 12,
+        }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Star size={15} style={{ color: '#5FA09E', fill: '#5FA09E' }} />
               Booth Sign-Up
               <span style={{ background: '#5FA09E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, letterSpacing: '.4px', textTransform: 'uppercase' }}>Built-in</span>
             </div>
