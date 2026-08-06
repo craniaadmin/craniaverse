@@ -273,6 +273,11 @@ export default function ITAccounts() {
           />
         ))}
       </div>
+      {/* Accounts, not categories — the categories are how they are grouped
+          on screen, but what you are counting is the accounts inside. */}
+      <RowCount
+        shown={visibleCats.reduce((n, c) => n + (filteredAccountsByCat[c.id] || []).length, 0)}
+        total={data.accounts.length} />
 
       {editing && (
         <AccountModal
