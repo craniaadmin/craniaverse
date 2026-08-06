@@ -19,6 +19,7 @@ import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } f
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useActionHistory from '../data/useActionHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
