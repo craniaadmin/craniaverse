@@ -106,7 +106,7 @@ function PasswordModal({ user, onClose }) {
     <div className="acctov" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="acctmodal narrow" onMouseDown={e => e.stopPropagation()}>
         <h2><KeyRound size={16} /> Change your password</h2>
-        <div className="hint">At least 10 characters. A few unrelated words works better than a short jumble.</div>
+        <div className="hint">At least 9 characters. A few unrelated words works better than a short jumble.</div>
         <label>Current password</label>
         <input type="password" value={current} onChange={e => setCurrent(e.target.value)} autoFocus />
         <label>New password</label>
