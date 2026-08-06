@@ -429,7 +429,7 @@ function StudentCashDetail({ record, onBack, onNavigate, award }) {
   const submit = () => {
     const d = Number(amount)
     if (!Number.isFinite(d) || d === 0) return
-    addCashEntry(record.id, { delta: d, reason: reason || (d > 0 ? 'Added' : 'Removed') })
+    award(record.id, { delta: d, reason: reason || (d > 0 ? 'Added' : 'Removed') }, studentName(record))
     setAmount(''); setReason('')
   }
 
