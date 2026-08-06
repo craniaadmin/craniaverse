@@ -47,7 +47,10 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
 .pgsettings .pgscard,
 .pgsettings > .bkp-card{background:none;border:none;box-shadow:none;border-radius:0;
   padding:12px 14px;margin:0}
-.pgsettings > * + *{border-top:1px solid #E7EBE7}
+/* The hairline joining the sections. Matches the specificity of the rule
+   above and comes after it, so it survives that border:none. */
+.pgsettings > .bkp-card,
+.pgsettings > .pgscard + .pgscard{border-top:1px solid #E7EBE7}
 /* One heading treatment behind the gear, so Backups does not announce
    itself in a different colour and size from Tools. */
 .pgsettings .pgshead,
