@@ -710,24 +710,15 @@ function ContestsPage({ onNavigate }) {
   }
 
   // ---- export ----
-  const exportCsv = () => {
-    const esc = (v) => {
-      const s = String(v ?? '')
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-    }
-    const head = ['Organisation', 'Contest', 'Reg. Deadline', 'Contest Date', 'Ordered', 'Status', 'Source']
-    const lines = [head.join(',')]
-    for (const r of allRows) {
-      lines.push([r.org, r.contest, r.regDeadline, r.contestDate, r.numOrdered, r.status,
-        r.fromProgram ? 'Program' : 'Manual'].map(esc).join(','))
-    }
-    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `crania-contests-export-${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
+  const CSV_COLUMNS = [
+    { key: 'org', label: 'Organisation' },
+    { key: 'contest', label: 'Contest' },
+    { key: 'regDeadline', label: 'Reg. Deadline' },
+    { key: 'contestDate', label: 'Contest Date' },
+    { key: 'numOrdered', label: 'Ordered' },
+    { key: 'status', label: 'Status' },
+    { label: 'Source', value: r => (r.fromProgram ? 'Program' : 'Manual') },
+  ]
 
   // ---- keyboard + popover dismissal ----
   useEffect(() => {
