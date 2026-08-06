@@ -136,7 +136,7 @@ function Settings({ collection, base, hint, confirm, onRestored, onClose, onExpo
 export default function PageActions({
   onUndo, onRedo, undoLabel, redoLabel, histBusy, histNote,
   csvName, csvColumns, csvRows,
-  backupCollection, backupHint, onRestored,
+  backupCollection, backupBase, backupHint, backupConfirm, onRestored,
   settingsExtra, children,
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
