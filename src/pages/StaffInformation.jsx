@@ -13,7 +13,6 @@ import {
   Eye, UserPlus, Pencil, Copy, Trash2,
 } from 'lucide-react'
 import { useStore } from '../data/store'
-import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
