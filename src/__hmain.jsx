@@ -176,7 +176,7 @@ class Boundary extends React.Component {
 
 const PAGES = {
   Attendance, Comments, Invoices, Logins, CraniaCash, Registrations,
-  Staff: StaffInformation, Keys, Contacts,
+  Staff: StaffInformation, Contacts,
 }
 
 const which = new URLSearchParams(location.search).get('page') || 'Attendance'
