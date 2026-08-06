@@ -108,7 +108,7 @@ function useUpcomingCalendar(days = 7) {
 // ---- Dashboard ----------------------------------------------
 
 export default function Dashboard({ onNavigate }) {
-  const { records, staff, programs, status: recStatus } = useStore()
+  const { records, staff, programs, status: recStatus, refresh: refreshStore } = useStore()
   const { invoices, payments } = useFinance()
   const todo = useTodo()
   const inventory = useInventory()
