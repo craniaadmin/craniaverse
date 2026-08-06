@@ -366,7 +366,7 @@ export default function Attendance({ onNavigate }) {
                       <td style={{ padding: '4px 8px', textAlign: 'center' }}>
                         <select
                           value={r.row.uniform || ''}
-                          onChange={e => updateRow(r.studentId, r.tabKey, r.rowIdx, 'uniform', e.target.value)}
+                          onChange={e => markRow(r, 'uniform', e.target.value)}
                           style={{
                             border: '1px solid #e2ded2', outline: 'none', cursor: 'pointer',
                             borderRadius: 6, padding: '4px 8px', fontSize: 12, fontFamily: 'inherit',
