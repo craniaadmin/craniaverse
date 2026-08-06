@@ -435,6 +435,7 @@ export default function Logins({ onNavigate }) {
       <style>{CSS}</style>
 
       <PageActions
+        {...hist}
         csvName="crania-logins"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => visible}
