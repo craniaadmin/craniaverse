@@ -1734,6 +1734,13 @@ async function start() {
   try {
     await migrateRegistrations()
     await seedIfEmpty()
+    /* Seed the first admin at boot rather than on the first request
+       that happens to need it. Waiting meant there was a window where
+       the API was up but no account existed, so set-account.js — the
+       tool for fixing a login you cannot use — reported that there was
+       nothing to fix. */
+    const seeded = await getUsers()
+    console.log(`[auth] ${seeded.length} account${seeded.length === 1 ? '' : 's'}`)
   } catch (err) {
     console.error('Startup migration failed:', err?.message || err)
     console.error('The server will still start, but PocketBase may not be reachable yet.')
