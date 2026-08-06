@@ -140,6 +140,7 @@ export default function Invoices() {
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName="crania-invoices"
         csvColumns={[
           { key: 'number', label: 'Invoice #' },
