@@ -211,8 +211,45 @@ export default function Dashboard({ onNavigate }) {
     return inventory.filter(i => (i.qty || 0) <= 5).sort((a, b) => (a.qty || 0) - (b.qty || 0)).slice(0, 4)
   }, [inventory])
 
+  /* The dashboard has no table to export, so the CSV is the numbers the
+     page is showing: one row per headline figure, then the registrations
+     trend the line chart is drawn from. */
+  const csvRows = () => {
+    const outstanding = invoices
+      .filter(inv => inv.status !== 'void')
+      .reduce((s, inv) => s + invoiceBalance(inv, payments).balance, 0)
+    const rows = [
+      { metric: 'Registrations', value: realRecords.length },
+      { metric: 'Customers (families)', value: customerCount },
+      { metric: 'Programs running', value: activePrograms.length },
+      { metric: 'Active staff', value: activeStaff.length },
+      { metric: 'Revenue this month', value: monthRevenue },
+      { metric: 'Monthly target', value: MONTHLY_TARGET },
+      { metric: '% of monthly target', value: monthPct },
+      { metric: 'Outstanding invoice balance', value: outstanding },
+      { metric: 'Invoices awaiting payment', value: invoices.filter(inv =>
+          inv.status !== 'void' && inv.status !== 'draft' && invoiceBalance(inv, payments).balance > 0).length },
+      { metric: 'Open tasks', value: (todo.items || []).filter(i => !i.done).length },
+      { metric: 'Low-stock items', value: inventory.filter(i => (i.qty || 0) <= 5).length },
+    ]
+    for (const b of regTrend) rows.push({ metric: `Registrations — ${b.month}`, value: b.Registrations })
+    return rows
+  }
+
   return (
     <div className="page">
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-dashboard"
+        csvColumns={[
+          { key: 'metric', label: 'Metric' },
+          { key: 'value', label: 'Value' },
+        ]}
+        csvRows={csvRows}
+        backupCollection="registrations"
+        backupHint="Snapshots of the registrations most of these figures are counted from (last 14 kept)."
+        onRestored={refreshStore}
+      />
 
       {recStatus === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00', padding: '8px 12px', borderRadius: 8, marginBottom: 14, fontSize: 13 }}>
