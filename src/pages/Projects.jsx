@@ -277,7 +277,6 @@ export default function Projects() {
   const dragCardId = useRef(null)
   const colsBtnRef = useRef(null)
   const colsPopRef = useRef(null)
-  const settingsRef = useRef(null)
 
   /* Daily tasks come back and goals clear on their own schedule — checked once
      the board has loaded, then every five minutes so a tab left open overnight
