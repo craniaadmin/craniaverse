@@ -192,6 +192,41 @@ export default function ITAccounts() {
         </div>
       )}
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-it-accounts"
+        csvColumns={[
+          { key: 'category', label: 'Category' },
+          { key: 'name', label: 'Account' },
+          { key: 'url', label: 'Website' },
+          { key: 'user', label: 'Username' },
+          { key: 'cost', label: 'Monthly Cost' },
+          { key: 'start', label: 'Start Date' },
+          { key: 'active', label: 'Active' },
+          { key: 'notes', label: 'Notes' },
+        ]}
+        csvRows={() => visibleCats.flatMap(cat =>
+          (filteredAccountsByCat[cat.id] || []).map(a => ({
+            category: cat.name || '',
+            name: a.name || '',
+            url: a.url || '',
+            user: a.user || '',
+            cost: a.cost === '' || a.cost == null ? '' : Number(a.cost),
+            start: a.start || '',
+            active: a.active === false ? 'No' : 'Yes',
+            notes: a.notes || '',
+          })))}
+        backupCollection="itAccounts"
+        backupHint="Snapshots of every IT account and category (last 14 kept)."
+        onRestored={refresh}
+      >
+        <button title={showAllPw ? 'Hide every password' : 'Reveal every password'}
+          onClick={() => setShowAllPw(v => !v)}>
+          {showAllPw ? 'Hide Passwords' : 'Show Passwords'}
+        </button>
+        <button title="Add a category" onClick={() => setAddingCat(true)}>+ Add Category</button>
+      </PageActions>
+
       <div className="ita-toolbar">
         <input
           className="ita-search"
@@ -207,10 +242,6 @@ export default function ITAccounts() {
         {(query || catFilter !== 'all') && (
           <button className="clear" onClick={() => { setQuery(''); setCatFilter('all') }}>Clear</button>
         )}
-        <button className="toggle" onClick={() => setShowAllPw(v => !v)}>
-          {showAllPw ? 'Hide Passwords' : 'Show Passwords'}
-        </button>
-        <button className="add-cat" onClick={() => setAddingCat(true)}>+ Add Category</button>
       </div>
 
       <div className="ita-board">
