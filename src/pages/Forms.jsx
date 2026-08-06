@@ -31,6 +31,7 @@ const BLANK_FORM = { title: '', description: '', fields: [] }
 
 // ------------------------------ FORMS LIST ------------------------------
 function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations }) {
+  const registerUrl = `${API_BASE || window.location.origin}/register`
   const [copied, setCopied] = useState(null)
   const copy = async (url, key) => {
     try {
@@ -59,9 +60,6 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
         backupCollection="forms"
         backupHint="Snapshots of every form definition (last 14 kept). Submissions are not included."
       >
-        <button className="icon-btn solid" title="New form" onClick={onNew}>
-          <Plus size={22} />
-        </button>
         <button title="Build a new form" onClick={onNew}><Plus size={13} /> New Form</button>
       </PageActions>
 
