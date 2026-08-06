@@ -9,7 +9,6 @@ import {
 } from 'lucide-react'
 import { useStore } from '../data/store'
 import { useFinance, money, invoiceBalance, invoiceStatus, formatDate } from '../data/finance'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
@@ -238,18 +237,6 @@ export default function Dashboard({ onNavigate }) {
 
   return (
     <div className="page">
-      <style>{PAGEACTIONS_CSS}</style>
-      <PageActions
-        csvName="crania-dashboard"
-        csvColumns={[
-          { key: 'metric', label: 'Metric' },
-          { key: 'value', label: 'Value' },
-        ]}
-        csvRows={csvRows}
-        backupCollection="registrations"
-        backupHint="Snapshots of the registrations most of these figures are counted from (last 14 kept)."
-        onRestored={refreshStore}
-      />
 
       {recStatus === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00', padding: '8px 12px', borderRadius: 8, marginBottom: 14, fontSize: 13 }}>
