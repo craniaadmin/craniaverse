@@ -27,13 +27,25 @@ import { sendRegistrationEmails, sendBoothSignupEmail } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
 import {
   authRequired,
+  roleRequired,
   checkPassword,
   makeSessionCookie,
   clearSessionCookie,
   readSession,
+  loginBlocked,
+  noteLoginFailure,
+  clearLoginFailures,
+  SESSION_HOURS,
 } from './auth.js'
+import { createChallenge, verifyChallenge } from './captcha.js'
+import {
+  ROLES, isRole, normaliseRole, normaliseEmail,
+  hashPassword, verifyPassword, passwordProblem,
+  makeUser, publicUser,
+} from './users.js'
 import {
   loadRegistrations, saveRegistrations,
+  loadUsers,         saveUsers,
   loadStaff,         saveStaff,
   loadPrograms,      savePrograms,
   loadProgramsState, saveProgramsState,
@@ -181,6 +193,52 @@ async function getRegistrations() {
 async function commitRegistrations(records) {
   cache.registrations = records
   await saveRegistrations(records)
+}
+
+/* Compared against when no account matches, so a wrong address costs
+   the same scrypt work as a wrong password and cannot be told apart by
+   how quickly the answer comes back. */
+const DUMMY_HASH = hashPassword(crypto.randomUUID())
+
+/* First run has no accounts, and an app nobody can sign in to is worse
+   than one with a shared password. The existing ADMIN_PASSWORD becomes
+   the first admin account so the upgrade does not lock anyone out;
+   from there, accounts are managed in the app. */
+async function getUsers() {
+  if (cache.users) return cache.users
+  let users = await loadUsers()
+  if (users.length === 0) {
+    const password = process.env.ADMIN_PASSWORD
+    if (!password) {
+      console.error('[auth] no users and no ADMIN_PASSWORD — nobody can sign in.')
+      cache.users = []
+      return cache.users
+    }
+    const email = normaliseEmail(process.env.ADMIN_EMAIL || 'admin@craniaverse.ca')
+    users = [{ ...makeUser({ email, name: 'Administrator', password, role: 'admin' }) }]
+    await saveUsers(users)
+    console.log(`[auth] seeded first admin account: ${email} (existing ADMIN_PASSWORD)`)
+  }
+  cache.users = users
+  return cache.users
+}
+
+async function commitUsers(users) {
+  cache.users = users
+  await saveUsers(users)
+}
+
+async function touchLastLogin(userId) {
+  try {
+    const users = await getUsers()
+    const idx = users.findIndex(u => u.id === userId)
+    if (idx === -1) return
+    users[idx] = { ...users[idx], lastLoginAt: new Date().toISOString() }
+    await commitUsers(users)
+  } catch (err) {
+    // A failed timestamp must never cost someone their login.
+    console.error('[auth] could not record last login', err?.message || err)
+  }
 }
 
 async function getStaff() {
@@ -337,6 +395,8 @@ async function seedIfEmpty() {
 }
 
 // ---- app ---------------------------------------------------
+const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+
 const app = express()
 // CORS with credentials on so the browser sends the session cookie
 // even when the admin runs on a different origin during dev.
@@ -486,8 +546,6 @@ app.use((req, res, next) => {
 
 // Wrap an async route handler so unhandled rejections become a 500
 // instead of crashing the process.
-const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
-
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
 // ---- test-runner feedback (public) ---------------------
