@@ -1204,7 +1204,10 @@ function TodoView({
         )})}
       </div>
 
-      <div className="td-footer">{footerText}</div>
+      {/* Just the count. This used to read "CraniaVerse · To-Do · Count=…",
+          repeating the app and the page name under a screen already showing
+          both in the top bar and the sidebar. */}
+      <RowCount shown={totalShown} total={(state.items || []).length} />
 
       {/* Context menu */}
       {ctxMenu && (
