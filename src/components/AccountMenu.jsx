@@ -352,6 +352,24 @@ function UsersModal({ me, onClose }) {
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [draft, setDraft] = useState({ email: '', name: '', password: '', role: 'staff' })
+  const [sort, setSort] = useState({ key: 'name', dir: 1 })
+
+  /* Level sorts by how much it can do rather than alphabetically — Admin,
+     Staff, Read-only is the order people think in, and A-R-S is not. */
+  const sorted = useMemo(() => {
+    const rank = { admin: 0, staff: 1, readonly: 2 }
+    const val = (u) => {
+      if (sort.key === 'role') return rank[u.role] ?? 9
+      if (sort.key === 'lastLoginAt') return u.lastLoginAt || ''   // never signed in sorts first
+      return String(u.name || u.email || '').toLowerCase()
+    }
+    return [...users].sort((a, b) => {
+      const av = val(a), bv = val(b)
+      if (av < bv) return -sort.dir
+      if (av > bv) return sort.dir
+      return String(a.email).localeCompare(String(b.email))
+    })
+  }, [users, sort])
 
   const load = useCallback(async () => {
     try {
