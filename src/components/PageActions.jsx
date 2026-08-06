@@ -125,8 +125,8 @@ function Settings({ collection, base, hint, confirm, onRestored, onClose, onExpo
             lower z-index than this one, so it would be there and invisible. */}
         {typeof children === 'function' ? children(onClose) : children}
       </div>
-      {collection && (
-        <BackupPanel base={`snapshots/${collection}`} hint={hint}
+      {backupBase && (
+        <BackupPanel base={backupBase} hint={hint} confirm={confirm}
           onRestored={async () => { if (onRestored) await onRestored(); onClose() }} />
       )}
     </div>
