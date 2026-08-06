@@ -98,7 +98,25 @@ module.exports = {
       args: '/c ngrok http 4000 --url=crania-signup.ngrok.app --log=stdout --log-format=logfmt --log-level=info',
       autorestart: true,
       min_uptime: 10000,
-      max_restarts: 10,
+      // See craniaverse-tunnel above for why this was raised from 10.
+      max_restarts: 200,
+      exp_backoff_restart_delay: 5000,
+    },
+    {
+      // Watches craniaverse-tunnel / craniaverse-signup-tunnel via `pm2
+      // jlist` and emails on down/recovery transitions (see
+      // server/scripts/monitor-tunnels.js for the full rationale). Kept
+      // separate from craniaverse-tests below because those smoke tests
+      // hit localhost:4000 directly and stay green even when the public
+      // tunnel is dead — that's exactly what happened on 2026-08-05.
+      //
+      // Requires server/.env:
+      //   TUNNEL_ALERT_EMAILS=info@crania-schools.com,anah.mirak@gmail.com
+      name: 'craniaverse-tunnel-monitor',
+      script: './server/scripts/monitor-tunnels.js',
+      cron_restart: '*/5 * * * *', // every 5 minutes
+      autorestart: false,
+      watch: false,
     },
   ],
 }
