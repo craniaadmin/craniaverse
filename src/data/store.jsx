@@ -323,6 +323,11 @@ export function StoreProvider({ children }) {
     status,
     rules,
     staff,
+    /* The Staff page has always asked for this by name to refresh after a
+       backup restore. It was never actually put on the value, so the call
+       silently did nothing and the list went on showing the data the
+       restore had just replaced. */
+    refreshStaff,
     updateStaffField,
     addStaff,
     deleteStaff,
