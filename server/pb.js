@@ -180,10 +180,23 @@ async function findByRecordId(collection, recordId) {
 }
 
 // ---- registrations ---------------------------------------
-// Returns the array of registration records exactly as they
-// used to live in data.json.
+/* Which record ids this process has seen in the database. The API keeps
+   the whole registrations table in memory and writes all of it back on
+   every save, so a row deleted straight in PocketBase — by
+   delete-families.js, wipe-registrations.js, or the admin UI — was
+   still in the cached array and got recreated by the next save. The
+   smoke test posts a registration every fifteen minutes, so deletions
+   rarely survived the hour.
+
+   Knowing what we last saw lets a save tell the two cases apart: a
+   record the database has never had is new and should be created, while
+   one we knew about and the database no longer has was deleted
+   deliberately and must stay deleted. */
+let knownRegistrationIds = null
+
 export async function loadRegistrations() {
   const rows = await getFullList('registrations')
+  knownRegistrationIds = new Set(rows.map(r => String(r.recordId)))
   return rows.map(r => r.payload || {})
 }
 
@@ -193,6 +206,26 @@ export async function saveRegistrations(records) {
   await ensureAuth()
   const existing = await getFullList('registrations')
   const byRecordId = new Map(existing.map(r => [r.recordId, r]))
+
+  /* Anything we have seen before that the database no longer holds was
+     removed out from under us. Writing it back would undo someone's
+     deletion, so drop it from this save and from the caller's array. */
+  const removedElsewhere = []
+  if (knownRegistrationIds) {
+    for (let i = records.length - 1; i >= 0; i--) {
+      const id = String(records[i].id)
+      if (!byRecordId.has(id) && knownRegistrationIds.has(id)) {
+        removedElsewhere.push(id)
+        records.splice(i, 1)
+      }
+    }
+  }
+  if (removedElsewhere.length) {
+    console.warn(`[pb] ${removedElsewhere.length} registration(s) were deleted directly in the `
+      + 'database; not recreating them: ' + removedElsewhere.slice(0, 10).join(', ')
+      + (removedElsewhere.length > 10 ? ' …' : ''))
+  }
+
   const incomingIds = new Set(records.map(r => String(r.id)))
 
   for (const rec of records) {
