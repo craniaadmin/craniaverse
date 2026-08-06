@@ -503,6 +503,7 @@ export default function CraniaStore() {
                     onEdit={() => setEditing({ mode: 'edit', item: it })}
                     onDelete={() => deleteItem(it.id)}
                     onBump={(delta) => bumpQty(it.id, delta)}
+                    cols={visibleCols}
                   />
                 ))}
               </tbody>
