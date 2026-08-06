@@ -623,17 +623,6 @@ export default function Projects() {
         </div>
       )}
 
-      {settingsOpen && (
-        <ProjectSettingsPopover
-          ref={settingsRef}
-          onClose={() => setSettingsOpen(false)}
-          state={state}
-          setState={setState}
-          mutate={mutate}
-          onResetNow={resetDailyNow}
-          onClearGoalsNow={clearGoalsNow}
-        />
-      )}
 
       {archiveMode ? (
         <div className="pj-archive">
