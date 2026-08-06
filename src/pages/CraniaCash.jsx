@@ -21,6 +21,7 @@ import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import { TRIGGER_FIELDS, triggerLabel } from '../data/autoCash'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useActionHistory from '../data/useActionHistory'
 
 const COLS = [
   { k: 'studentId',  l: 'Student ID' },
