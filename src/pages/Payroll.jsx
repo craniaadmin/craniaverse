@@ -429,7 +429,7 @@ function T4Modal({ member, ytd, onClose }) {
 
 // ── Main component ─────────────────────────────────────────────────────────
 export default function Payroll() {
-  const { staff } = useStore()
+  const { staff, refresh: refreshStore } = useStore()
 
   const [periodType,  setPeriodType]  = useState('Bi-weekly')
   const [periodStart, setPeriodStart] = useState(todayStr())
