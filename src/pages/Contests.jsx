@@ -13,8 +13,9 @@
 // that page is mounted, so this page has to carry its own.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Pencil, Copy, Trash2, Undo2, Redo2, Eye, Download } from 'lucide-react'
+import { Pencil, Copy, Trash2, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
