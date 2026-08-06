@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Plus, X, Edit2, Trash2, Search } from 'lucide-react'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -117,11 +118,15 @@ export default function Marketing() {
     )
   }
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(campaigns, next => mutate(() => next), { label: 'campaign change' })
+
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName="crania-campaigns"
         csvColumns={[
           { key: 'name', label: 'Campaign' },

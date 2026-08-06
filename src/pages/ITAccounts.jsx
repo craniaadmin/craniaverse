@@ -10,6 +10,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -182,6 +183,9 @@ export default function ITAccounts() {
     )
   }
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(data, next => mutate(() => next), { label: 'account change' })
+
   return (
     <div className="page">
 
@@ -194,6 +198,7 @@ export default function ITAccounts() {
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName="crania-it-accounts"
         csvColumns={[
           { key: 'category', label: 'Category' },

@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Plus, Edit2, Trash2, Search, Phone, Mail, Globe } from 'lucide-react'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -106,11 +107,15 @@ export default function Contacts() {
     )
   }
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change' })
+
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName="crania-contacts"
         csvColumns={[
           { key: 'name', label: 'Name' },

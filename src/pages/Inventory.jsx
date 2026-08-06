@@ -14,6 +14,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Plus, Minus, Edit2, Trash2, Search, X, Eye } from 'lucide-react'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -316,11 +317,15 @@ export default function Inventory() {
     )
   }
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(data, next => mutate(() => next), { label: 'inventory change' })
+
   return (
     <div className="page">
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName={view === 'log' ? 'crania-inventory-log' : 'crania-inventory'}
         csvColumns={view === 'log' ? LOG_CSV_COLUMNS : ITEM_CSV_COLUMNS}
         csvRows={csvRows}

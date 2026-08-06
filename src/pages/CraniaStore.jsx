@@ -18,6 +18,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Plus, Minus, Edit2, Trash2, Search } from 'lucide-react'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -286,12 +287,16 @@ export default function CraniaStore() {
     )
   }
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(data, next => mutate(() => next), { label: 'store change' })
+
   return (
     <div className="page">
 
       <style>{PAGEACTIONS_CSS}</style>
       {view === 'inventory' ? (
         <PageActions
+        {...hist}
           csvName="crania-store-inventory"
           csvColumns={[
             { key: 'num', label: 'Item #' },

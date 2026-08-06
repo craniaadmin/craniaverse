@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Plus, X, GripVertical, Trash2 } from 'lucide-react'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useHistory from '../data/useHistory'
 
 // Trello-style board: lists (columns) of cards (tasks).
 // Persisted on the API as a single JSON document at /api/staff-board.
@@ -121,6 +122,9 @@ export default function StaffHub() {
     update({ ...board, lists })
   }
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(board, update, { label: 'board change' })
+
   return (
     <div className="page" style={{ paddingBottom: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
@@ -134,6 +138,7 @@ export default function StaffHub() {
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
         csvName="crania-staff-board"
         csvColumns={[
           { key: 'list', label: 'List' },
