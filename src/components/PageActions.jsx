@@ -32,7 +32,28 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
 .pgacts .histnote{position:absolute;top:100%;left:0;margin-top:4px;z-index:5;
   background:#E4EFF3;border:1px solid #A6E2F9;border-radius:9px;padding:6px 11px;
   font-size:12.5px;font-weight:600;color:#2E2516;white-space:nowrap}
-.pgsettings{position:absolute;right:0;top:100%;z-index:240;width:340px;margin-top:4px}
+.pgsettings{position:absolute;right:0;top:100%;z-index:240;width:340px;margin-top:4px;
+  display:flex;flex-direction:column;gap:10px}
+/* Matches the backup card below it so the popover reads as one thing. */
+.pgscard{background:#fff;border:1px solid #E7EBE7;border-radius:11px;
+  box-shadow:0 6px 20px rgba(46,37,22,.16);padding:12px 13px}
+.pgshead{font-size:11px;font-weight:700;color:#6B6455;text-transform:uppercase;
+  letter-spacing:.4px;margin-bottom:9px}
+/* Full-width rows rather than a row of pills — a menu, not a toolbar. */
+.pgsettings .pgsitem{display:flex;align-items:center;gap:8px;width:100%;
+  background:#fff;border:1px solid #D5D0C4;border-radius:8px;padding:8px 11px;
+  font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
+  text-align:left;margin-bottom:7px}
+.pgsettings .pgsitem:last-child{margin-bottom:0}
+.pgsettings .pgsitem:hover:not(:disabled){background:#F1F3F4;border-color:#5FA09E}
+.pgsettings .pgsitem:disabled{opacity:.45;cursor:default}
+/* Anything a page drops in as settingsExtra gets the same treatment, so
+   a page does not have to know this component's class names. */
+.pgsettings .pgscard > button:not(.pgsitem){display:flex;align-items:center;gap:8px;
+  width:100%;background:#fff;border:1px solid #D5D0C4;border-radius:8px;padding:8px 11px;
+  font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
+  text-align:left;margin-bottom:7px}
+.pgsettings .pgscard > button:not(.pgsitem):hover{background:#F1F3F4;border-color:#5FA09E}
 `
 
 /* Turns rows of plain objects into a CSV the way a spreadsheet expects
