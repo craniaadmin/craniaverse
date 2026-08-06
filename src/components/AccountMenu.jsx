@@ -63,35 +63,71 @@ export const ACCOUNT_CSS = `
 .acctmodal .acts .go{background:#5FA09E;color:#fff}
 .acctmodal .acts .go:disabled{background:#cbd1d6;cursor:default}
 .acctmodal .acts .cancel{background:#F1F3F4;border:1px solid #D5D0C4;color:#2E2516}
-/* One card per account rather than a row in a table. Everything here is
-   editable, which a four-column table could not hold at this width — the
-   actions cell was nowrap, so "active" was pushed past the edge of the
-   modal and you had to scroll sideways to find it. */
-.acctmodal.wide{max-width:860px}
-.acctusers{display:flex;flex-direction:column;gap:10px}
-.acctuser{border:1px solid #E7EBE7;border-radius:10px;padding:11px 12px;background:#fff}
-.acctuser.off{background:#FAFAF7}
-.acctuser.off .r1,.acctuser.off .r2 select{opacity:.6}
-.acctuser .r1{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.acctuser .r2{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
-.acctuser .r2 select{width:auto;min-width:118px;padding:5px 8px;font-size:12.5px}
-.acctmodal .acctuser .lbl{display:block;font-size:10.5px;font-weight:700;color:#6B6455;
-  text-transform:uppercase;letter-spacing:.4px;margin:0 0 4px}
-/* The toggle is a label too, so undo the block/uppercase treatment the
-   modal gives every other label. */
-.acctmodal .acctuser label.tog{display:inline-flex;align-items:center;gap:6px;margin:0;
-  font-size:12.5px;font-weight:600;color:#2E2516;text-transform:none;letter-spacing:0;
+/* A table, with the level carrying the colour so who-can-do-what reads at
+   a glance rather than by reading every row. Everything stays editable in
+   place; the widths are fixed so the columns line up down the table. */
+.acctmodal.wide{max-width:1000px}
+.accttable{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;
+  border:1px solid #E7EBE7;border-radius:10px;overflow:hidden}
+.accttable th{background:#EEF3F6;text-align:left;font-size:10.5px;font-weight:700;
+  color:#6B6455;text-transform:uppercase;letter-spacing:.4px;padding:9px 10px;
+  border-bottom:1px solid #E7EBE7;white-space:nowrap}
+.accttable th.sortable{cursor:pointer;user-select:none}
+.accttable th.sortable:hover{background:#E2EBF0;color:#2E2516}
+.accttable th .arw{color:#5FA09E;margin-left:4px}
+.accttable td{padding:7px 10px;border-bottom:1px solid #F1F3F4;vertical-align:middle}
+.accttable tr:last-child td{border-bottom:none}
+.accttable tbody tr:nth-child(even){background:#FAFBFC}
+.accttable tbody tr.off{background:#F7F6F2}
+.accttable tbody tr.off td:not(.actcell){opacity:.55}
+.accttable tbody tr.me{box-shadow:inset 3px 0 0 #5FA09E}
+/* Inputs sit in the cell rather than on top of it — a border on every one
+   turns the table into a grid of boxes. They pick up an outline on focus. */
+.acctmodal .accttable input[type=text],
+.acctmodal .accttable input[type=email]{width:100%;box-sizing:border-box;padding:5px 7px;
+  border:1px solid transparent;border-radius:6px;background:transparent;font:inherit;
+  font-size:12.5px;color:#2E2516}
+.acctmodal .accttable input[type=text]:hover,
+.acctmodal .accttable input[type=email]:hover{border-color:#D5D0C4;background:#fff}
+.acctmodal .accttable input[type=text]:focus,
+.acctmodal .accttable input[type=email]:focus{border-color:#5FA09E;background:#fff;outline:none}
+/* The level select is tinted by the level it holds, so admin rows stand
+   out from read-only ones without a legend. */
+.acctmodal .accttable select.lvl{width:auto;min-width:104px;padding:4px 7px;font-size:12px;
+  font-weight:700;border-radius:999px;border:1px solid transparent;cursor:pointer}
+.accttable select.lvl.admin{background:#5FA09E;color:#fff}
+.accttable select.lvl.staff{background:#A6E2F9;color:#1c4a5a}
+.accttable select.lvl.readonly{background:#EEF1F4;color:#6B6455;border-color:#D5D0C4}
+.acctmodal .accttable label.tog{display:inline-flex;align-items:center;gap:6px;margin:0;
+  font-size:12px;font-weight:600;color:#2E2516;text-transform:none;letter-spacing:0;
   white-space:nowrap;cursor:pointer}
-.acctuser label.tog input{width:14px;height:14px;margin:0;accent-color:#5FA09E}
-.acctuser .meta{margin-left:auto;font-size:11px;color:#9A948A;text-align:right}
-.acctuser .linkbtn{background:none;border:none;color:#5FA09E;font:inherit;font-size:12px;
-  font-weight:700;cursor:pointer;padding:0;text-decoration:underline;white-space:nowrap}
-.acctuser .linkbtn:hover{color:#4c8987}
-.acctuser .pwrow{display:flex;gap:8px;align-items:center;margin-top:10px;
-  border-top:1px dashed #E7EBE7;padding-top:10px}
-.acctuser .pwrow button{border:none;border-radius:8px;padding:8px 14px;font:inherit;
+.accttable label.tog input{width:14px;height:14px;margin:0;accent-color:#5FA09E}
+.accttable td.actcell{text-align:right;white-space:nowrap}
+.accttable .linkbtn{background:none;border:none;color:#5FA09E;font:inherit;font-size:11.5px;
+  font-weight:700;cursor:pointer;padding:2px 4px;text-decoration:underline;white-space:nowrap}
+.accttable .linkbtn:hover{color:#4c8987}
+.accttable .when{font-size:11.5px;color:#6B6455;white-space:nowrap}
+/* The password and delete-confirm rows span the table so they read as
+   belonging to the row above rather than as another account. */
+.accttable tr.subrow td{background:#F1F7F8;border-bottom:1px solid #E7EBE7}
+.accttable .pwrow{display:flex;gap:8px;align-items:center}
+.acctmodal .accttable .pwrow input{flex:1;border:1px solid #D5D0C4;background:#fff;
+  border-radius:7px;padding:7px 9px}
+.accttable .pwrow button.go{border:none;border-radius:8px;padding:7px 14px;font:inherit;
   font-size:12.5px;font-weight:700;cursor:pointer;background:#5FA09E;color:#fff;white-space:nowrap}
-.acctuser .pwrow button:disabled{background:#cbd1d6;cursor:default}
+.accttable .pwrow button.go:disabled{background:#cbd1d6;cursor:default}
+.accttable .peek{background:#F1F3F4;border:1px solid #D5D0C4;border-radius:7px;padding:6px 9px;
+  font:inherit;font-size:11.5px;font-weight:700;color:#2E2516;cursor:pointer;white-space:nowrap}
+.accttable .peek:hover{border-color:#5FA09E}
+.accttable .delrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.accttable .delrow .q{font-size:12.5px;color:#8a1c15;font-weight:600}
+.accttable .delrow .danger{background:#C0392B;color:#fff;border:none;border-radius:8px;
+  padding:7px 14px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.accttable .delrow .danger:disabled{background:#dda9a3;cursor:default}
+.accttable .delrow .keep{background:#fff;border:1px solid #D5D0C4;border-radius:8px;
+  padding:7px 14px;font:inherit;font-size:12.5px;font-weight:700;color:#2E2516;cursor:pointer}
+.acctmodal .delrow input{width:170px;border:1px solid #D5D0C4;border-radius:7px;padding:6px 9px;
+  font-size:12.5px}
 .acctmodal .iconbtn{background:none;border:none;cursor:pointer;color:#9A948A;padding:2px 4px}
 .acctmodal .iconbtn:hover{color:#C0392B}
 .acctmodal .addrow{border-top:1px solid #E7EBE7;margin-top:14px;padding-top:6px}
