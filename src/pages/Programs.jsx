@@ -1646,26 +1646,31 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
     setSelected(new Set())
   }
 
-  const exportCsv = () => {
-    const header = ['Program ID', 'Program Code', 'Program', 'Active', 'Subject', 'Category', 'Year',
-      'Grade', 'Location', 'Day', 'Start', 'End', 'Platform', 'Duration (min)', '# Of Lessons', 'Per',
-      'Cost', 'Cost Per', 'Rate/Hr', 'Total Hrs', 'Capacity', 'Enrolled', 'Instructor']
-    const body = allRows.map(r => [r.number, r.code, r.name, r.active ? 'Active' : 'Inactive', r.subject,
-      r.category, r.year, r.age, r.locName,
-      r.day == null ? '' : (DOW.find(d => d.n === r.day) || {}).l || '',
-      r.slot?.start || '', r.slot?.end || '', r.platform, r.duration, r.sessions, r.period,
-      r.cost, r.costUnit, r.rate, r.hours, r.capacity, r.enrolled, r.instructor])
-    const csv = [header, ...body].map(row => row.map(c => {
-      const s = c == null ? '' : String(c)
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-    }).join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = 'crania-programs.csv'
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
+  const CSV_COLUMNS = [
+    { key: 'number', label: 'Program ID' },
+    { key: 'code', label: 'Program Code' },
+    { key: 'name', label: 'Program' },
+    { label: 'Active', value: r => (r.active ? 'Active' : 'Inactive') },
+    { key: 'subject', label: 'Subject' },
+    { key: 'category', label: 'Category' },
+    { key: 'year', label: 'Year' },
+    { key: 'age', label: 'Grade' },
+    { key: 'locName', label: 'Location' },
+    { label: 'Day', value: r => (r.day == null ? '' : (DOW.find(d => d.n === r.day) || {}).l || '') },
+    { label: 'Start', value: r => r.slot?.start || '' },
+    { label: 'End', value: r => r.slot?.end || '' },
+    { key: 'platform', label: 'Platform' },
+    { key: 'duration', label: 'Duration (min)' },
+    { key: 'sessions', label: '# Of Lessons' },
+    { key: 'period', label: 'Per' },
+    { key: 'cost', label: 'Cost' },
+    { key: 'costUnit', label: 'Cost Per' },
+    { key: 'rate', label: 'Rate/Hr' },
+    { key: 'hours', label: 'Total Hrs' },
+    { key: 'capacity', label: 'Capacity' },
+    { key: 'enrolled', label: 'Enrolled' },
+    { key: 'instructor', label: 'Instructor' },
+  ]
 
   /* Create Schedule — draws what is on screen as a weekly grid PNG. */
   const createScheduleImage = () => {
