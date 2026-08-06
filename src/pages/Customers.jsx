@@ -241,12 +241,6 @@ const CSS = BACKUP_CSS + CATCOLORS_CSS + PAGEACTIONS_CSS + `
 .cu .metric.clickable:hover{outline:2px solid var(--light-blue);outline-offset:1px}
 .cu .metric.on{outline:2px solid var(--teal);outline-offset:1px}
 .cu .metric.mstu{border-bottom-color:var(--yellow)}
-.cu .actions .hbtn:disabled{opacity:.4;cursor:default}
-.cu .histnote{margin:0 0 10px;padding:7px 12px;border-radius:8px;background:#FBF3CE;
-    border:1px solid #E8DCA0;color:#7a6417;font-size:12px;font-weight:600}
-.cu .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
-.cusettings{position:absolute;right:34px;z-index:240;width:330px;display:flex;flex-direction:column;gap:10px;
-    margin-top:4px}
 
 .cu .metric.mpend{border-bottom-color:#7a6417}
 .cu .metric.mowed{border-bottom-color:#8a6a00}
