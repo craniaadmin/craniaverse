@@ -1102,6 +1102,10 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         csvName="crania-customers-export"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={csvRows}
+        backupBase="customers" backupConfirm={dialog.confirm}
+        backupHint={'Snapshots of every registration, saved to the database (last 14 kept). '
+          + 'Back up before an import or a bulk delete.'}
+        onRestored={refresh}
         settingsExtra={close => (
           <>
             {/* Closes the panel on the way: the column chooser is a fixed
@@ -1112,10 +1116,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
                 close()
                 setPop({ kind: 'cols', rect })
               }}><Eye size={13} /> Columns</button>
-            <BackupPanel base="customers" confirm={dialog.confirm}
-              hint={'Snapshots of every registration, saved to the database (last 14 kept). '
-                + 'Back up before an import or a bulk delete.'}
-              onRestored={async () => { await refresh(); close() }} />
             <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
           </>
         )}
