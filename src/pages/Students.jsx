@@ -872,14 +872,13 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
   const allSel = visible.length > 0 && visible.every(r => selected.has(r.id))
   const selectedRows = useMemo(() => visible.filter(r => selected.has(r.id)), [visible, selected])
 
+  /* Handed up whole rather than deleted one at a time here, so the page can
+     put the lot on the undo stack as one step: it was one action, and
+     stepping back through thirty of them to reverse a mis-click is not
+     undo. */
   const bulkDelete = async () => {
-    const n = selectedRows.length
-    const ok = await dialog.confirm(
-      `Delete ${n} student${n === 1 ? '' : 's'}? This also removes their linked customer and guardian information, and cannot be undone.`,
-      { title: 'Delete Selected' })
-    if (!ok) return
-    for (const r of selectedRows) await onDelete(r.record, { silent: true })
-    setSelected(new Set())
+    const ok = await onBulkDelete(selectedRows.map(r => r.record))
+    if (ok) setSelected(new Set())
   }
 
   /* Every student, not just the shown ones, and School as well — it is not
