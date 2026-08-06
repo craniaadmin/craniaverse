@@ -558,28 +558,32 @@ function MetricTile({ label, value, hint, color, onClick }) {
 }
 
 // ---------- Row ----------
-function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump }) {
+function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump, cols }) {
   const s = statusOf(item)
   const price = Number(item.price) || calcPrice(item.cost, item.tax)
   const shelf = (Number(item.qty) || 0) * price
   const bg = stripe ? '#fafaf7' : '#fff'
-  return (
-    <tr style={{ background: bg, borderTop: '1px solid #f0ede3' }}>
-      <Td mono>{item.num}</Td>
-      <Td strong onClick={onEdit} style={{ cursor: 'pointer' }}>{item.name}</Td>
-      <Td>
+  const cells = {
+    num: <Td key="num" mono>{item.num}</Td>,
+    name: <Td key="name" strong onClick={onEdit} style={{ cursor: 'pointer' }}>{item.name}</Td>,
+    category: (
+      <Td key="category">
         <span style={{ background: catColor || '#eee', color: textOn(catColor || '#eee'),
                        borderRadius: 5, padding: '2px 8px', fontSize: 12, fontWeight: 600 }}>
           {item.category || '—'}
         </span>
       </Td>
-      <Td>
+    ),
+    sub: (
+      <Td key="sub">
         {item.sub ? (
           <span style={{ background: subColor || '#f4f2ea', color: textOn(subColor || '#f4f2ea'),
                          borderRadius: 5, padding: '2px 8px', fontSize: 12 }}>{item.sub}</span>
         ) : <span style={{ color: 'var(--muted)' }}>—</span>}
       </Td>
-      <Td align="center">
+    ),
+    img: (
+      <Td key="img" align="center">
         {item.img ? (
           <img src={item.img} alt="" style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 4,
                                               border: '1px solid #eee', verticalAlign: 'middle' }} />
@@ -587,7 +591,9 @@ function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump })
           <span style={{ color: 'var(--muted)', fontSize: 11 }}>—</span>
         )}
       </Td>
-      <Td align="right">
+    ),
+    qty: (
+      <Td key="qty" align="right">
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
           <button onClick={() => onBump(-1)} style={btnMini} title="−1"><Minus size={12} /></button>
           <span style={{
@@ -597,17 +603,24 @@ function ItemRow({ item, stripe, catColor, subColor, onEdit, onDelete, onBump })
           <button onClick={() => onBump(+1)} style={btnMini} title="+1"><Plus size={12} /></button>
         </div>
       </Td>
-      <Td align="right" muted>{item.reorder || 0}</Td>
-      <Td align="right" muted>{money(item.cost)}</Td>
-      <Td align="right" muted>{Number(item.tax) || 0}%</Td>
-      <Td align="right" strong>{money(price)}</Td>
-      <Td align="right" strong>{money(shelf)}</Td>
-      <Td muted>{item.location || '—'}</Td>
-      <Td align="center"><StatusPill status={s} /></Td>
-      <Td align="center">
+    ),
+    reorder: <Td key="reorder" align="right" muted>{item.reorder || 0}</Td>,
+    cost: <Td key="cost" align="right" muted>{money(item.cost)}</Td>,
+    tax: <Td key="tax" align="right" muted>{Number(item.tax) || 0}%</Td>,
+    price: <Td key="price" align="right" strong>{money(price)}</Td>,
+    value: <Td key="value" align="right" strong>{money(shelf)}</Td>,
+    location: <Td key="location" muted>{item.location || '—'}</Td>,
+    status: <Td key="status" align="center"><StatusPill status={s} /></Td>,
+    actions: (
+      <Td key="actions" align="center">
         <button onClick={onEdit} title="Edit" style={iconBtn}><Edit2 size={13} /></button>
         <button onClick={onDelete} title="Delete" style={iconBtn}><Trash2 size={13} /></button>
       </Td>
+    ),
+  }
+  return (
+    <tr style={{ background: bg, borderTop: '1px solid #f0ede3' }}>
+      {cols.map(c => cells[c.k])}
     </tr>
   )
 }
