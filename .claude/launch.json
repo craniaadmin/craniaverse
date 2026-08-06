@@ -18,21 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "navpreview",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "vite",
-        "--config",
-        "vite.navpreview.config.js",
-        "--port",
-        "5229",
-        "--strictPort",
-        "--host",
-        "127.0.0.1"
-      ],
-      "port": 5229
     }
   ]
 }
