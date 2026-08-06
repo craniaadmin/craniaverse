@@ -166,10 +166,10 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + PAGEACTIONS_CSS + `
 .sf .toggle{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);
     font-weight:600;cursor:pointer;user-select:none}
 .sf .toggle input{width:14px;height:14px;accent-color:var(--teal);cursor:pointer;margin:0}
-.sf .addbtn{margin-left:auto;background:var(--teal);color:#fff;border:none;border-radius:8px;
-    padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
-    display:inline-flex;align-items:center;gap:6px}
-.sf .addbtn:hover{background:#4f8b89}
+/* Add Staff moved into the shared bar, where it keeps its teal fill so it
+   still reads as the one thing on the bar that creates something. */
+.pgacts .sf-add{background:var(--card-teal,#5FA09E);color:#fff;border:none}
+.pgacts .sf-add:hover:not(:disabled){background:#4f8b89}
 
 .sf .bulkbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
     background:#E4EFF3;border:1px solid var(--light-blue);border-radius:10px;
