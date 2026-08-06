@@ -241,6 +241,16 @@ export default function Logins({ onNavigate }) {
   const dragCol = useRef(null)
   const popRef = useRef(null)
 
+  /* Undo/redo. A login lives on the registration in the shared store and
+     there is no bulk setter for it, so this records the action rather than
+     a snapshot of the table: replacing every registration to take back one
+     password would discard whatever anyone else changed in between. */
+  const hist = useActionHistory()
+  const pushHist = hist.push
+  // The login as it stands now, not as it was when this render ran.
+  const recordsRef = useRef(records)
+  recordsRef.current = records
+
   const setPrefs = useCallback((mut) => {
     setColPrefs(prev => {
       const next = { hiddenCols: { ...prev.hiddenCols }, colOrder: [...prev.colOrder] }
