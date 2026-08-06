@@ -25,6 +25,44 @@ const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
 
 const DEFAULT_COL_ORDER = ['num', 'name', 'category', 'sub', 'sku', 'img', 'qty', 'reorder', 'cost', 'tax', 'price', 'value', 'location', 'status']
 
+/* The columns the stock table actually renders, in table order. One list
+   drives the headings, the cells and the chooser, so hiding a column can
+   not leave the headings a cell out of step with the body.
+
+   Note this is not DEFAULT_COL_ORDER above: that list carries an `sku`
+   entry the table has never rendered. Left alone rather than "fixed",
+   because it is what the server payload has been storing. */
+const COLUMNS = [
+  { k: 'num',      l: 'Item #' },
+  { k: 'name',     l: 'Name' },                                     // never hideable — it names the row
+  { k: 'category', l: 'Category' },
+  { k: 'sub',      l: 'Sub-Category' },
+  { k: 'img',      l: 'Image',        align: 'center' },
+  { k: 'qty',      l: 'On Hand',      align: 'right' },
+  { k: 'reorder',  l: 'Reorder',      align: 'right' },
+  { k: 'cost',     l: 'Cost',         align: 'right' },
+  { k: 'tax',      l: 'Tax %',        align: 'right' },
+  { k: 'price',    l: 'Store Price',  align: 'right' },
+  { k: 'value',    l: 'Shelf Value',  align: 'right' },
+  { k: 'location', l: 'Location' },
+  { k: 'status',   l: 'Status',       align: 'center' },
+  { k: 'actions',  l: 'Edit & Delete', align: 'center', blankHead: true },
+]
+const LOCKED_COL = 'name'
+
+/* On this machine rather than in the server payload: which columns you
+   want on screen is yours, not the store's. */
+const CPREF_KEY = 'craniastore-cols'
+function loadHiddenCols() {
+  try {
+    const v = JSON.parse(localStorage.getItem(CPREF_KEY) || '{}')
+    return v && typeof v === 'object' ? v : {}
+  } catch { return {} }
+}
+function saveHiddenCols(v) {
+  try { localStorage.setItem(CPREF_KEY, JSON.stringify(v)) } catch { /* ignore */ }
+}
+
 const uid = () => 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 
 const money = (n) => {
