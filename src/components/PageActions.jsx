@@ -32,13 +32,24 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
 .pgacts .histnote{position:absolute;top:100%;left:0;margin-top:4px;z-index:5;
   background:#E4EFF3;border:1px solid #A6E2F9;border-radius:9px;padding:6px 11px;
   font-size:12.5px;font-weight:600;color:#2E2516;white-space:nowrap}
+/* The gear opens one rectangle, not a stack of cards. The container owns
+   the border, radius and shadow; Tools and Backups are flat sections
+   inside it — same width, divided by a hairline, joined into one shape. */
 .pgsettings{position:absolute;right:0;top:100%;z-index:240;width:340px;margin-top:4px;
-  display:flex;flex-direction:column;gap:10px}
-/* Matches the backup card below it so the popover reads as one thing. */
-.pgscard{background:#fff;border:1px solid #E7EBE7;border-radius:11px;
-  box-shadow:0 6px 20px rgba(46,37,22,.16);padding:12px 13px}
-.pgshead{font-size:11px;font-weight:700;color:#6B6455;text-transform:uppercase;
-  letter-spacing:.4px;margin-bottom:9px}
+  background:#fff;border:1px solid #E7EBE7;border-radius:12px;
+  box-shadow:0 8px 24px rgba(46,37,22,.18)}
+/* Sections carry no card of their own. Leaving them transparent means the
+   container's rounded corners show through without needing to clip, which
+   would trap anything inside that wants to overflow. */
+.pgsettings .pgscard,
+.pgsettings > .bkp-card{background:none;border:none;box-shadow:none;border-radius:0;
+  padding:12px 14px;margin:0}
+.pgsettings > * + *{border-top:1px solid #E7EBE7}
+/* One heading treatment behind the gear, so Backups does not announce
+   itself in a different colour and size from Tools. */
+.pgsettings .pgshead,
+.pgsettings .bkp-title{font-size:11.5px;font-weight:700;color:#5FA09E;
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
 /* Full-width rows rather than a row of pills — a menu, not a toolbar. */
 .pgsettings .pgsitem{display:flex;align-items:center;gap:8px;width:100%;
   background:#fff;border:1px solid #D5D0C4;border-radius:8px;padding:8px 11px;
