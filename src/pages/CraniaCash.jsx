@@ -794,6 +794,11 @@ function CashList({ onSelect, onNavigate, hist, award }) {
         </div>
       </div>
 
+      {/* Between the tiles and the table: the quick-apply buttons in the
+          bulk bar below are made of these rules, so they sit on the same
+          page rather than behind the gear. */}
+      <RulesEditor pushHist={hist.push} />
+
       <div className="filters">
         <input type="search" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search name, student ID or reason…" autoComplete="off" />
