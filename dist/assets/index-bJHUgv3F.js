@@ -439,8 +439,11 @@ A 404 means the API predates this route: pm2 restart craniaverse-api`:"")));retu
     align-items:center;justify-content:center}
 .pgacts .icon-btn:hover{background:#4c8987}
 .pgacts .icon-btn svg{width:15px;height:15px}
-/* Tab groups (Attendance, Comments) moved in whole; keep them tight. */
-.pgacts > div{display:inline-flex;align-items:center;gap:6px}
+/* Tab groups (Attendance, Comments) moved in whole; keep them tight. The
+   settings popover and the history note are div children of the bar too,
+   and this selector outranks their own — without the exclusion it lays the
+   popover's sections out in a row instead of stacking them. */
+.pgacts > div:not(.pgsettings):not(.histnote){display:inline-flex;align-items:center;gap:6px}
 .pgacts .histnote{position:absolute;top:100%;left:0;margin-top:4px;z-index:5;
   background:#E4EFF3;border:1px solid #A6E2F9;border-radius:9px;padding:6px 11px;
   font-size:12.5px;font-weight:600;color:#2E2516;white-space:nowrap}
@@ -456,7 +459,10 @@ A 404 means the API predates this route: pm2 restart craniaverse-api`:"")));retu
 .pgsettings .pgscard,
 .pgsettings > .bkp-card{background:none;border:none;box-shadow:none;border-radius:0;
   padding:12px 14px;margin:0}
-.pgsettings > * + *{border-top:1px solid #E7EBE7}
+/* The hairline joining the sections. Matches the specificity of the rule
+   above and comes after it, so it survives that border:none. */
+.pgsettings > .bkp-card,
+.pgsettings > .pgscard + .pgscard{border-top:1px solid #E7EBE7}
 /* One heading treatment behind the gear, so Backups does not announce
    itself in a different colour and size from Tools. */
 .pgsettings .pgshead,
