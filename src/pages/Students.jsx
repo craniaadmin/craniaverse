@@ -921,19 +921,21 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
         backupHint={'Students are held on the registrations, so these are the same snapshots the '
           + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
         onRestored={refresh}
-        settingsExtra={close => (
+        settingsExtra={
           <>
-            {/* Closes the panel on the way: the column chooser is a fixed
-                popover underneath it, so it would open invisible. */}
-            <button title="Choose which columns are shown"
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                close()
-                setPop({ kind: 'cols', rect })
-              }}><Eye size={13} /> Columns</button>
+            <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+              onToggle={(k, on) => setPrefs(p => {
+                const n = { ...p.hiddenCols }
+                if (on) delete n[k]; else n[k] = true
+                p.hiddenCols = n
+              })}
+              onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+              onNone={() => setPrefs(p => {
+                p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+              })} />
             <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
           </>
-        )}
+        }
       >
         <button className="st-add" title="Add a new student" onClick={onAdd}>
           <UserPlus size={13} /> Add Student
