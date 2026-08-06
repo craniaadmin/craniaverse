@@ -468,7 +468,7 @@ function colLabel(r, key) {
   return v
 }
 
-const CSS = `
+const CSS = PAGEACTIONS_CSS + `
 .pg{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
