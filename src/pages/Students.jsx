@@ -778,15 +778,10 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
   const onSort = (k) => setSort(s => s.key === k ? { key: k, dir: -s.dir } : { key: k, dir: 1 })
 
   /* Same lookup the Customers page uses, so a class is the same colour on
-     both and a recolour in either settings panel shows up on both. */
+     both. Read-only here — the colours are set on the Programs page, next
+     to where the categories are named and ordered. */
   const { progFor, categoryOf, tintFor, catColors } =
     useMemo(() => buildCategoryLookup(programs, programsState), [programs, programsState])
-
-  const usedCategories = useMemo(() => categoriesInUse(records, categoryOf), [records, categoryOf])
-
-  const setCatColor = useCallback((cat, color) => {
-    setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
-  }, [setProgramsState])
 
   const allRows = useMemo(() => records.filter(r => r.id !== 'seed').map(r => ({
     id: r.id, record: r,
