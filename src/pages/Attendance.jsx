@@ -419,7 +419,7 @@ function ClassGroup({ program, rows, onNavigate, markRow }) {
               <span style={{ fontSize: 12, color: 'var(--muted)' }}>Lesson {r.row.lessonNo}</span>
               <select
                 value={r.row.uniform || ''}
-                onChange={e => updateRow(r.studentId, r.tabKey, r.rowIdx, 'uniform', e.target.value)}
+                onChange={e => markRow(r, 'uniform', e.target.value)}
                 style={{
                   border: '1px solid #e2ded2', outline: 'none', cursor: 'pointer',
                   borderRadius: 6, padding: '5px 8px', fontSize: 12, fontFamily: 'inherit',
