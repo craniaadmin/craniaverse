@@ -71,7 +71,7 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
 .pgsettings .pgscard > button:not(.pgsitem){display:flex;align-items:center;gap:8px;
   width:100%;background:#fff;border:1px solid #D5D0C4;border-radius:8px;padding:8px 11px;
   font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
-  text-align:left;margin-bottom:7px}
+  text-align:left;margin-bottom:7px;line-height:1.25}
 .pgsettings .pgscard > button:not(.pgsitem):hover{background:#F1F3F4;border-color:#5FA09E}
 /* What an expanding menu row reveals: indented under the row it belongs
    to, and scrollable, so a page with thirty columns cannot push the
