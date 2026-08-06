@@ -269,6 +269,20 @@ function UsersModal({ me, onClose }) {
     setUsers(us => us.map(u => (u.id === id ? body : u)))
   }
 
+  /* Admin setting someone else's password: the server does not ask for
+     the current one in that case, only for your own. Returns whether it
+     stuck, so the row can clear and close its field. */
+  const setPassword = async (id, password) => {
+    setErr(''); setNote('')
+    const res = await send(`/api/users/${id}/password`, {
+      method: 'POST', body: JSON.stringify({ password }),
+    })
+    const body = await res.json().catch(() => ({}))
+    if (!res.ok) { setErr(body.error || 'Could not set that password.'); return false }
+    setNote('Password changed. Tell them what you set — it cannot be read back.')
+    return true
+  }
+
   const remove = async (u) => {
     setErr(''); setNote('')
     const res = await send(`/api/users/${u.id}`, { method: 'DELETE' })
