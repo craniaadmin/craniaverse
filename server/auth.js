@@ -1,22 +1,28 @@
 // ============================================================
 // Session auth for the admin API.
 // ------------------------------------------------------------
-// Model: a single shared ADMIN_PASSWORD. On successful login the
-// server sets an httpOnly cookie holding a base64 JSON payload +
-// an HMAC-SHA256 signature (SESSION_SECRET). The authRequired
-// middleware verifies that cookie on every non-public /api/*
-// request. Public form submissions and the public form-definition
-// GET are on an allowlist so the booth kiosk, registration form,
-// and shared custom forms keep working without a session.
+// Each person has their own account (see users.js). On successful
+// login the server sets an httpOnly cookie holding a base64 JSON
+// payload + an HMAC-SHA256 signature (SESSION_SECRET), carrying who
+// they are and what level they have. The authRequired middleware
+// verifies that cookie on every non-public /api/* request, and
+// roleRequired then checks the level against the route.
+//
+// Sessions last 3 hours. The browser is told when it expires so it
+// can warn first and save anything outstanding, but the server does
+// not take the client's word for it — the expiry is inside the
+// signed payload.
 //
 // Required env (server/.env):
-//   ADMIN_PASSWORD   — the shared admin password
+//   ADMIN_PASSWORD   — password for the seeded first admin account
 //   SESSION_SECRET   — random 32+ char string used to sign cookies
 // ============================================================
 import crypto from 'crypto'
+import { permits } from './users.js'
 
 const COOKIE_NAME = 'crv_session'
-const SESSION_DAYS = 7
+export const SESSION_HOURS = 3
+const SESSION_MS = SESSION_HOURS * 60 * 60 * 1000
 
 const b64url = (buf) =>
   Buffer.from(buf).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
