@@ -220,6 +220,29 @@ export async function saveRegistrations(records) {
 }
 
 // ---- staff -----------------------------------------------
+// ---- users (accounts + privilege levels) ----------------
+export async function loadUsers() {
+  const rows = await getFullList('users')
+  return rows.map(r => r.payload || {})
+}
+
+export async function saveUsers(users) {
+  await ensureAuth()
+  const existing = await getFullList('users')
+  const byRecordId = new Map(existing.map(r => [r.recordId, r]))
+  const incomingIds = new Set(users.map(u => String(u.id)))
+  for (const user of users) {
+    const recordId = String(user.id)
+    const data = { recordId, payload: { ...user } }
+    const found = byRecordId.get(recordId)
+    if (found) await pb().collection('users').update(found.id, data)
+    else await pb().collection('users').create(data)
+  }
+  for (const row of existing) {
+    if (!incomingIds.has(row.recordId)) await pb().collection('users').delete(row.id)
+  }
+}
+
 export async function loadStaff() {
   const rows = await getFullList('staff')
   return rows.map(r => r.payload || {})

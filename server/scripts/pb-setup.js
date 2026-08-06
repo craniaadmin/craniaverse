@@ -48,6 +48,14 @@ const collectionSpecs = [
     indexes: ['CREATE UNIQUE INDEX `idx_registrations_recordId` ON `registrations` (`recordId`)'],
   },
   {
+    name: 'users',
+    fields: [
+      { name: 'recordId', type: 'text', required: true,  presentable: true },
+      { name: 'payload',  type: 'json', required: false, maxSize: 1048576 },
+    ],
+    indexes: ['CREATE UNIQUE INDEX `idx_users_recordId` ON `users` (`recordId`)'],
+  },
+  {
     name: 'staff',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },
