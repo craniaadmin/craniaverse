@@ -151,6 +151,12 @@ export default function Leads({ onNavigate }) {
 
   const metrics = STATUSES.reduce((acc, s) => ({ ...acc, [s]: leads.filter(l => l.status === s).length }), {})
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js.
+  // Has to stay above the `loading` return below: a hook that only runs on
+  // some renders makes React throw "rendered more hooks than during the
+  // previous render" on the render where it first appears.
+  const hist = useHistory(leads, next => mutate(() => next), { label: 'lead change' })
+
   if (loading) {
     return (
       <div className="page">
@@ -158,9 +164,6 @@ export default function Leads({ onNavigate }) {
       </div>
     )
   }
-
-  // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(leads, next => mutate(() => next), { label: 'lead change' })
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
