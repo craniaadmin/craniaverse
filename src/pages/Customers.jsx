@@ -26,9 +26,8 @@ import {
 } from '../data/fees'
 import { entrySlots } from '../data/enrolment'
 import { buildFamilyIndex, familyOf } from '../data/family'
-import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import PageActions, { ColumnsMenu } from '../components/PageActions'
-import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
+import { buildCategoryLookup, inkOn } from '../data/programCategories'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
@@ -229,7 +228,7 @@ function classesOf(record) {
   return out
 }
 
-const CSS = CATCOLORS_CSS + `
+const CSS = `
 .cu{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
@@ -653,7 +652,7 @@ function CtxMenu({ x, y, items, onClose }) {
    in the detail view, where they happen. */
 function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, onDeleteFamily,
   onNavigate, familyIds, familyIndex, onUndo, onRedo, histBusy, histNote, undoLabel, redoLabel }) {
-  const { records, programs, programsState, setProgramsState, refresh } = useStore()
+  const { records, programs, programsState, refresh } = useStore()
   const dialog = useDialog()
   const [search, setSearch] = useState('')
   const [showInactive, setShowInactive] = useState(false)
