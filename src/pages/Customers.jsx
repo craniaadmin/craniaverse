@@ -653,36 +653,10 @@ function CtxMenu({ x, y, items, onClose }) {
   )
 }
 
-/* Colour swatch picker, matching the one on the Programs page so the two
-   read as the same control. */
-/* Settings for this page: snapshots of the registrations table, and the
-   colours the programme pills are tinted with.
-
-   The backup half follows the pattern already used by To Do, Checklists,
-   Calendar, Projects and Programs — list, back up now, restore — against
-   /api/customers/*. Restoring writes a "Before restore" snapshot first, so
-   picking the wrong one is recoverable. */
-function CustomersSettings({ onClose, categories, tintFor, onCatColor }) {
-  const ref = useRef(null)
-  const dialog = useDialog()
-  const { refresh } = useStore()
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
-    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
-  }, [onClose])
-
-  return (
-    <div className="cusettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
-      <BackupPanel base="customers" confirm={dialog.confirm}
-        hint="Snapshots of every registration, saved to the database (last 14 kept). Back up before an import or a bulk delete."
-        onRestored={async () => { await refresh(); onClose() }} />
-
-      <CategoryColors categories={categories} tintFor={tintFor} onCatColor={onCatColor} />
-    </div>
-  )
-}
+/* What used to be this page's own settings popover — snapshots of the
+   registrations table, and the colours the programme pills are tinted
+   with — is now passed to PageActions as settingsExtra, which owns the
+   panel and its click-away. Both cards are still there, unchanged. */
 
 // ─── Customer list view ────────────────────────────────────────────────────
 
