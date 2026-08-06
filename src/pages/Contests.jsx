@@ -1003,16 +1003,6 @@ function ContestsPage({ onNavigate }) {
       </div>
 
       {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} hiddenCols={hiddenCols}
-          onToggle={(k, on) => mutate(d => {
-            const n = { ...d.hiddenCols }
-            if (on) delete n[k]; else n[k] = true
-            d.hiddenCols = n
-          })}
-          onAll={() => mutate(d => { d.hiddenCols = {} })}
-          onNone={() => mutate(d => {
-            d.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
-          })} />
       )}
 
       {rowCtx && (
