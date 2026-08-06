@@ -2048,17 +2048,6 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
           onClear={() => setFilterSel(pop.fk, [])} />
       )}
 
-      {pop && pop.kind === 'cols' && (
-        <ColsPop ref={popRef} rect={pop.rect} colOrder={colOrder} hiddenCols={hiddenCols}
-          onToggle={(k, on) => setHiddenCols(h => {
-            const n = { ...h }
-            if (on) delete n[k]; else n[k] = true
-            return n
-          })}
-          onAll={() => setHiddenCols({})}
-          onNone={() => setHiddenCols(Object.fromEntries(COLS.filter(c => c.l && c.k !== 'name').map(c => [c.k, true])))} />
-      )}
-
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={(() => {
           const p = programs.find(x => x.id === rowCtx.row.progId)
