@@ -73,6 +73,11 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
   font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
   text-align:left;margin-bottom:7px;line-height:1.25}
 .pgsettings .pgscard > button:not(.pgsitem):hover{background:#F1F3F4;border-color:#5FA09E}
+/* The count line under a list. Right-aligned and quiet — it is a fact to
+   check, not something to read on the way past. */
+.pgcount{color:#9A948A;font-size:12px;padding:10px 2px 2px;text-align:right}
+.pgcount .note{float:left;color:#8a6a00;font-weight:600;text-align:left;max-width:75%}
+
 /* What an expanding menu row reveals: indented under the row it belongs
    to, and scrollable, so a page with thirty columns cannot push the
    backups section off the bottom of the screen. */
