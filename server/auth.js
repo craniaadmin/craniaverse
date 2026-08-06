@@ -196,6 +196,9 @@ const PUBLIC_MATCHERS = [
   // Test-runner status: names + error strings only, no credentials.
   // Public so the scheduled Claude agent can poll without a stored password.
   (m, p) => m === 'GET'  && p === '/api/tests/last-run',
+  // The login screen has to be able to draw its CAPTCHA before anyone
+  // has a session — that is the whole point of it.
+  (m, p) => m === 'GET'  && p === '/api/captcha',
 ]
 
 export function isPublicApi(method, pathname) {
