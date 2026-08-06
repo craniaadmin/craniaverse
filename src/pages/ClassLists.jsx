@@ -580,26 +580,36 @@ export default function ClassLists({ onNavigate }) {
    measures its own students and the columns land somewhere different in
    every block. The "Says" column is always present, so a class with a
    schedule mismatch lines up with the ones without. */
-const COLS = ['20%', '64px', '16%', '26%', '13%', '78px', '120px', '44px']
+/* The roster columns, in table order. Driving the colgroup, the headings
+   and the cells from one list keeps them in step — hiding a column by
+   deleting a <td> in three places is how a table ends up with its headings
+   one cell out of line with its body. */
+export const COLUMNS = [
+  { k: 'student', l: 'Student',          w: '20%' },   // never hideable — it names the row
+  { k: 'grade',   l: 'Grade',            w: '64px' },
+  { k: 'school',  l: 'School',           w: '16%' },
+  { k: 'contact', l: 'Guardian Contact', w: '26%' },
+  { k: 'says',    l: 'Says',             w: '13%' },
+  { k: 'year',    l: 'Year',             w: '78px' },
+  { k: 'status',  l: 'Status',           w: '120px', align: 'center' },
+  { k: 'open',    l: 'Open in Students', w: '44px',  align: 'center', blankHead: true },
+]
+export const LOCKED_COL = 'student'
 
 const CELL = {
   padding: '6px 12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
 }
 
-function Roster({ rows, onNavigate, showSchedule = false }) {
+function Roster({ rows, onNavigate, showSchedule = false, hiddenCols = {} }) {
+  const cols = COLUMNS.filter(c => c.k === LOCKED_COL || !hiddenCols[c.k])
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, tableLayout: 'fixed' }}>
-      <colgroup>{COLS.map((w, i) => <col key={i} style={{ width: w }} />)}</colgroup>
+      <colgroup>{cols.map(c => <col key={c.k} style={{ width: c.w }} />)}</colgroup>
       <thead>
         <tr style={{ textAlign: 'left' }}>
-          <Th>Student</Th>
-          <Th>Grade</Th>
-          <Th>School</Th>
-          <Th>Guardian Contact</Th>
-          <Th>Says</Th>
-          <Th>Year</Th>
-          <Th align="center">Status</Th>
-          <Th></Th>
+          {cols.map(c => (
+            <Th key={c.k} align={c.align || 'left'}>{c.blankHead ? '' : c.l}</Th>
+          ))}
         </tr>
       </thead>
       <tbody>
@@ -609,9 +619,15 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
           const style = statusStyle(entry.status)
           const name = `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim()
           const contactLine = [contact.name, contact.phone, contact.email].filter(Boolean).join(' · ')
-          return (
-            <tr key={r.id + i} style={{ borderTop: '1px solid #f0ede3', background: i % 2 ? '#fafaf7' : '#fff', height: 34 }}>
-              <td style={{ ...CELL, fontWeight: 600 }} title={name}>
+          /* What the registration says about place as well as time. When no
+             site could be read, show the raw platform text rather than
+             nothing — that string is the reason the row is here. */
+          const raw = String(entry.platform || entry.location || '').trim()
+          const place = row.wantLocName || (raw && `“${raw}”`) || ''
+
+          const cells = {
+            student: (
+              <td key="student" style={{ ...CELL, fontWeight: 600 }} title={name}>
                 {name || '—'}
                 {/* Booked for more slots than we could place them in — they
                     belong here, but a second register is missing them. */}
@@ -622,39 +638,45 @@ function Roster({ rows, onNavigate, showSchedule = false }) {
                   </span>
                 )}
               </td>
-              <td style={CELL}>{r.student?.grade || '—'}</td>
-              <td style={CELL} title={r.student?.school || ''}>{r.student?.school || '—'}</td>
-              <td style={{ ...CELL, color: 'var(--ink-soft)' }} title={contactLine}>
+            ),
+            grade: <td key="grade" style={CELL}>{r.student?.grade || '—'}</td>,
+            school: (
+              <td key="school" style={CELL} title={r.student?.school || ''}>{r.student?.school || '—'}</td>
+            ),
+            contact: (
+              <td key="contact" style={{ ...CELL, color: 'var(--ink-soft)' }} title={contactLine}>
                 {contactLine || '—'}
               </td>
-              {/* Shows what the registration says about place as well as time.
-                  When no site could be read, show the raw platform text rather
-                  than nothing — that string is the reason the row is here. */}
-              {(() => {
-                const raw = String(entry.platform || entry.location || '').trim()
-                const place = row.wantLocName || (raw && `“${raw}”`) || ''
-                return (
-                  <td style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }}
-                    title={[entry.schedule, raw].filter(Boolean).join(' · ')}>
-                    {entry.schedule || (showSchedule ? 'no schedule set' : '—')}
-                    {place ? ` · ${place}` : ''}
-                  </td>
-                )
-              })()}
-              <td style={CELL}>{entry.year || '—'}</td>
-              <td style={{ ...CELL, textAlign: 'center' }}>
+            ),
+            says: (
+              <td key="says" style={{ ...CELL, color: showSchedule ? '#8a6a00' : 'var(--muted)' }}
+                title={[entry.schedule, raw].filter(Boolean).join(' · ')}>
+                {entry.schedule || (showSchedule ? 'no schedule set' : '—')}
+                {place ? ` · ${place}` : ''}
+              </td>
+            ),
+            year: <td key="year" style={CELL}>{entry.year || '—'}</td>,
+            status: (
+              <td key="status" style={{ ...CELL, textAlign: 'center' }}>
                 <span style={{
                   background: style.bg, color: style.fg, borderRadius: 999, padding: '3px 10px',
                   fontSize: 11, fontWeight: 700, letterSpacing: '.3px', textTransform: 'uppercase',
                 }}>{entry.status || 'Active'}</span>
               </td>
-              <td style={{ padding: '6px 4px', textAlign: 'center' }}>
+            ),
+            open: (
+              <td key="open" style={{ padding: '6px 4px', textAlign: 'center' }}>
                 <button
                   onClick={() => onNavigate && onNavigate('Students', r.id)}
                   title="View in Students"
                   style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--brand-dark-blue)', padding: 2, display: 'inline-flex' }}
                 ><ExternalLink size={13} /></button>
               </td>
+            ),
+          }
+          return (
+            <tr key={r.id + i} style={{ borderTop: '1px solid #f0ede3', background: i % 2 ? '#fafaf7' : '#fff', height: 34 }}>
+              {cols.map(c => cells[c.k])}
             </tr>
           )
         })}
