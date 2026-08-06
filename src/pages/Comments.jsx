@@ -180,6 +180,9 @@ export default function Comments({ onNavigate }) {
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
+        {...hist}
+        onUndo={() => { endBurst(); hist.onUndo() }}
+        onRedo={() => { endBurst(); hist.onRedo() }}
         csvName={view === 'register' ? `crania-lesson-notes-${selectedDate}` : 'crania-lesson-notes'}
         csvColumns={[
           { key: 'student', label: 'Student' },
