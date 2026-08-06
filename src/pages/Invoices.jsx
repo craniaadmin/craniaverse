@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Plus, X, Edit2, Trash2, Search } from 'lucide-react'
 import {
   useFinance, money, todayISO, formatDate,
