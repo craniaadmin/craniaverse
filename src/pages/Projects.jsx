@@ -480,35 +480,30 @@ export default function Projects() {
     setEditing(null)
   }
 
+  const CSV_COLUMNS = [
+    { label: 'Column', value: c => colName(c.col) || c.col },
+    { key: 'project', label: 'Project' },
+    { key: 'task', label: 'Task / Note' },
+    { key: 'who', label: 'Assigned To' },
+    { label: 'Tags', value: c => (c.tags || []).join(', ') },
+    { key: 'due', label: 'Due Date' },
+    { label: 'Repeat Days', value: c => daysLabel(c.days) },
+    { label: 'Goals', value: c => (c.goals || []).map(g => `${g.done ? '[x]' : '[ ]'} ${g.text || ''}`).join(' | ') },
+    { label: 'Comments', value: c => (c.comments || []).map(x => `${x.date || ''} ${x.author || ''}: ${x.text || ''}`).join(' | ') },
+    { label: 'Archived', value: c => (c.archived ? 'Yes' : 'No') },
+    { label: 'Archived At', value: c => (c.archivedAt ? fmtDateTime(c.archivedAt) : '') },
+  ]
+
   /* Archived cards are included and sorted last, so the export is the whole
-     board rather than only what is on screen. */
-  const exportCsv = () => {
-    const esc = (v) => { const s = String(v ?? ''); return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g, '""') + '"' : s }
-    const header = ['Column', 'Project', 'Task / Note', 'Assigned To', 'Tags', 'Due Date',
-      'Repeat Days', 'Goals', 'Comments', 'Archived', 'Archived At']
-    const rows = [header.join(',')]
+     board rather than only what is on screen — deliberately, because the
+     board's own filter is a find-as-you-type box, not a saved view. */
+  const csvRows = () => {
     const pos = id => {
       const i = state.colOrder.indexOf(id)
       return i < 0 ? 99 : i
     }
-    const sorted = [...state.cards].sort((a, b) =>
+    return [...state.cards].sort((a, b) =>
       (a.archived ? 1 : 0) - (b.archived ? 1 : 0) || pos(a.col) - pos(b.col))
-    for (const c of sorted) {
-      const commStr = (c.comments || []).map(x => `${x.date || ''} ${x.author || ''}: ${x.text || ''}`).join(' | ')
-      const goalStr = (c.goals || []).map(g => `${g.done ? '[x]' : '[ ]'} ${g.text || ''}`).join(' | ')
-      rows.push([
-        esc(colName(c.col) || c.col), esc(c.project), esc(c.task), esc(c.who),
-        esc((c.tags || []).join(', ')), esc(c.due), esc(daysLabel(c.days)),
-        esc(goalStr), esc(commStr),
-        esc(c.archived ? 'Yes' : 'No'), esc(c.archivedAt ? fmtDateTime(c.archivedAt) : ''),
-      ].join(','))
-    }
-    const blob = new Blob(['﻿' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `crania-projects-export-${isoLocal(new Date())}.csv`
-    a.click()
-    URL.revokeObjectURL(a.href)
   }
 
   /* Pull every repeating card back to Daily Tasks now, without waiting for the
