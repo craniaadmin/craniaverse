@@ -365,7 +365,6 @@ function InvoiceModal({ form, setForm, onClose, onSave, formTotal, isEdit }) {
           </table>
         </div>
       </div>
-      <RowCount shown={filtered.length} total={invoices.length} />
 
       <div style={{ marginTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         <Field label="Status">
