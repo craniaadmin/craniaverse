@@ -928,10 +928,6 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onBulkDelete, onN
                 close()
                 setPop({ kind: 'cols', rect })
               }}><Eye size={13} /> Columns</button>
-            <BackupPanel base="customers" confirm={dialog.confirm}
-              hint={'Students are held on the registrations, so these are the same snapshots the '
-                + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
-              onRestored={async () => { await refresh(); close() }} />
             <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
           </>
         )}
