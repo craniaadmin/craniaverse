@@ -569,15 +569,15 @@ export default function Projects() {
         csvRows={csvRows}
         backupCollection="projects"
         backupHint="Snapshots of every card on the board, archived ones included (last 14 kept)."
+        /* Board settings sit in the panel itself rather than behind a
+           button that opened a second floating layer over it. */
         settingsExtra={
-          /* Daily reset, goal clearing and the board's own earlier backups
-             live in the board settings panel; the gear opens it rather than
-             leaving it stranded behind a button that no longer exists. */
-          <div className="bkp-card">
-            <div className="bkp-title">Board Settings</div>
-            <div className="bkp-hint">Daily reset time, goal clearing, and this board's earlier backups.</div>
-            <button className="bkp-btn" onClick={() => setSettingsOpen(true)}>Open</button>
-          </div>
+          <BoardSettings
+            state={state}
+            mutate={mutate}
+            onResetNow={resetDailyNow}
+            onClearGoalsNow={clearGoalsNow}
+          />
         }
       />
 
@@ -1088,70 +1088,17 @@ function CardModal({ mode, initial, col, onClose, onSave, onDelete }) {
   )
 }
 
-// ---------- Project settings popover ----------
-const ProjectSettingsPopover = forwardRef(function ProjectSettingsPopover(
-  { onClose, state, setState, mutate, onResetNow, onClearGoalsNow }, ref) {
-  const [backups, setBackups] = useState(null)
-  const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState('')
-
-  const loadBackups = useCallback(async () => {
-    try {
-      const r = await fetch(`${API_BASE}/api/projects/backups`, { headers: HEADERS })
-      if (r.ok) setBackups(await r.json())
-    } catch {}
-  }, [])
-
-  useEffect(() => { loadBackups() }, [loadBackups])
-
-  const backUp = async () => {
-    setBusy(true); setMsg('')
-    try {
-      const label = new Date().toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-      const r = await fetch(`${API_BASE}/api/projects/backup`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', ...HEADERS },
-        body: JSON.stringify({ label }),
-      })
-      if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      setMsg('Backed up!')
-      loadBackups()
-    } catch (e) { setMsg('Backup failed: ' + e.message) }
-    finally { setBusy(false) }
-  }
-
-  const restore = async (id) => {
-    if (!confirm('Restore this backup? Current data will be replaced.')) return
-    setBusy(true); setMsg('')
-    try {
-      const r = await fetch(`${API_BASE}/api/projects/restore/${id}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', ...HEADERS },
-      })
-      if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      const j = await r.json()
-      setState({
-        cards:          Array.isArray(j.cards) ? j.cards : [],
-        colOrder:       Array.isArray(j.colOrder) && j.colOrder.length ? j.colOrder : COLUMNS.map(c => c.id),
-        updatedAt:      j.updatedAt || null,
-        resetTime:      j.resetTime || '08:00',
-        clearGoalsTime: j.clearGoalsTime || '00:00',
-        lastReset:      j.lastReset, lastResetAt: j.lastResetAt,
-        lastBackup:     j.lastBackup, lastBackupAt: j.lastBackupAt,
-        clearGoals:     !!j.clearGoals,
-        lastGoalsClear: j.lastGoalsClear, lastGoalsClearAt: j.lastGoalsClearAt,
-      })
-      setMsg('Restored!')
-    } catch (e) { setMsg('Restore failed: ' + e.message) }
-    finally { setBusy(false) }
-  }
-
+// ---------- Board settings, rendered inside the gear panel ----------
+/* This was a floating popover opened by a button inside the settings
+   panel — a second layer stacked on the panel, which already carried a
+   Backups section of its own, so the board offered two sets of backups.
+   The ones here are gone; the shared panel below covers them. What is
+   left, the two daily times, now renders in the panel itself rather than
+   sending you somewhere else to reach it. */
+function BoardSettings({ state, mutate, onResetNow, onClearGoalsNow }) {
   return (
-    <div className="pj-settings" ref={ref}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <div className="sp-card-title">Project Settings</div>
-        <button style={{ background: 'none', border: 'none', fontSize: 18, cursor: 'pointer', color: '#6b6455' }} onClick={onClose}>✕</button>
-      </div>
-
-      <div className="sp-card-title" style={{ fontSize: 12.5 }}>Daily Tasks</div>
+    <div className="pj-boardset">
+      <div className="sp-card-title">Daily Tasks</div>
       <div className="sp-hint">
         Cards with repeat days return to Daily Tasks at this time each day.
       </div>
@@ -1166,33 +1113,13 @@ const ProjectSettingsPopover = forwardRef(function ProjectSettingsPopover(
         </div>
       )}
 
-      <div className="sp-card-title" style={{ fontSize: 12.5, marginTop: 12 }}>Today’s Goals</div>
+      <div className="sp-card-title" style={{ marginTop: 12 }}>Today’s Goals</div>
       <div className="sp-hint">Goals cards are cleared out at this time each day.</div>
       <div className="sp-btnrow">
         <input type="time" className="sp-time" value={state.clearGoalsTime || '00:00'}
           onChange={e => mutate(d => { d.clearGoalsTime = e.target.value || '00:00' })} />
         <button className="sp-btn" onClick={onClearGoalsNow}>Clear Now</button>
       </div>
-
-      <div className="sp-card-title" style={{ fontSize: 12.5, marginTop: 12 }}>Backups</div>
-      <div className="sp-hint">Keep up to 14 snapshots. Restore replaces current data.</div>
-      <div className="sp-btnrow">
-        <button className="sp-btn" disabled={busy} onClick={backUp}>Back Up Now</button>
-      </div>
-
-      {msg && <div style={{ fontSize: 12, color: msg.startsWith('Backup') || msg.startsWith('Restored') ? '#20bab5' : '#c94040', marginTop: 6 }}>{msg}</div>}
-
-      {backups && backups.length > 0 && (
-        <div className="sp-restore-list">
-          {backups.map(b => (
-            <div key={b.id} className="sp-restore-row">
-              <span className="sp-rlabel">{b.label || new Date(b.created).toLocaleString()}</span>
-              <button className="sp-btn" disabled={busy} onClick={() => restore(b.id)}>Restore</button>
-            </div>
-          ))}
-        </div>
-      )}
-      {backups && backups.length === 0 && <div className="sp-hint" style={{ marginTop: 6 }}>No backups yet.</div>}
     </div>
   )
-})
+}
