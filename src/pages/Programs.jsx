@@ -5,6 +5,7 @@ import { useStore } from '../data/store'
    the store; only these view defaults are read from it. */
 import SEED from '../data/programsData.json'
 import { buildEnrolmentIndex, sessionKey } from '../data/enrolment'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
