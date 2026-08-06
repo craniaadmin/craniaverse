@@ -226,26 +226,8 @@ function CellEdit({ row, field, owners, onCommit, onCancel }) {
   )
 }
 
-function LoginsSettings({ onClose }) {
-  const ref = useRef(null)
-  const { refresh } = useStore()
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
-    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
-    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
-  }, [onClose])
-  return (
-    <div className="lgsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
-      <BackupPanel base="customers"
-        hint={'Logins are held on the registrations, so these are the same snapshots the '
-          + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
-        onRestored={async () => { await refresh(); onClose() }} />
-    </div>
-  )
-}
-
 export default function Logins({ onNavigate }) {
-  const { records, status: fetchStatus, updateStudentField } = useStore()
+  const { records, status: fetchStatus, updateStudentField, refresh } = useStore()
   const [search, setSearch] = useState('')
   const [dupsOnly, setDupsOnly] = useState(false)
   const [colFilters, setColFilters] = useState({})
