@@ -14,10 +14,11 @@
 // Assigned, Parent Communication, Teacher) minus Attendance and
 // Uniform, which live on the Attendance page. Every cell is directly
 // editable in place on both views.
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useCommentsRows } from '../data/useCommentsRows'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import useActionHistory from '../data/useActionHistory'
 
 const COMMENT_FIELDS = [
   { key: 'lessonPlan',        label: 'Lesson Plan',          width: 180 },
