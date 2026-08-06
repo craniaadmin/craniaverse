@@ -125,6 +125,7 @@ export function StoreProvider({ children }) {
   const setProgramsState = useCallback((updater) => {
     setProgramsStateData(prev => {
       const next = typeof updater === 'function' ? updater(prev) : updater
+      programsStateRef.current = next
       clearTimeout(programsStateSaveTimer.current)
       programsStateSaveTimer.current = setTimeout(() => {
         fetch(`${API_BASE}/api/programs-state`, {
