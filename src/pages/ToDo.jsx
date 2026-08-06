@@ -964,17 +964,25 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       <style>{CSS}</style>
 
 
-      {/* Undo row: undo / redo, then settings + export pushed right */}
-      <div className="undorow">
-        <button className="undobtn" title="Undo (Ctrl+Z)" disabled={undoLen === 0} onClick={undo}>↶ Undo</button>
-        <button className="undobtn" title="Redo (Ctrl+Shift+Z)" disabled={redoLen === 0} onClick={redo}>↷</button>
-        <button className="undobtn" style={{ marginLeft: 'auto' }} title="Settings" onClick={() => setSettingsOpen(true)}>⚙</button>
-        <button
-          className="undobtn"
-          onClick={exportCsv}
-          title={view === 'checklists' ? 'Download all checklists as a CSV file' : 'Download all to-do items as a CSV file'}
-        >⤓ Export CSV</button>
-      </div>
+      <PageActions
+        onUndo={undo} onRedo={redo}
+        undoLabel={undoLen ? 'last change' : ''}
+        redoLabel={redoLen ? 'last undone change' : ''}
+        csvName={view === 'checklists' ? 'crania-checklists' : 'crania-todo-export'}
+        csvColumns={view === 'checklists' ? CHECKLIST_CSV_COLUMNS : TODO_CSV_COLUMNS}
+        csvRows={csvRows}
+        backupCollection="todo"
+        backupHint="Snapshots of every list, to-do and checklist (last 14 kept)."
+        settingsExtra={
+          /* Repeat/reset behaviour and this page's own earlier backups live
+             in its settings panel, which the gear now opens. */
+          <div className="bkp-card">
+            <div className="bkp-title">{view === 'checklists' ? 'Checklist Settings' : 'To-Do Settings'}</div>
+            <div className="bkp-hint">Repeat and reset behaviour, and this page's earlier backups.</div>
+            <button className="bkp-btn" onClick={() => setSettingsOpen(true)}>Open</button>
+          </div>
+        }
+      />
 
       {view === 'todo' && <TodoView
         state={state}
