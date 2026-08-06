@@ -680,8 +680,3 @@ const pillStyle = {
   background: '#eefaff', color: 'var(--brand-dark-blue)', borderRadius: 999,
   padding: '2px 8px', fontSize: 11, fontWeight: 700,
 }
-
-const toolbarBtn = {
-  background: '#eef1f2', border: 'none', borderRadius: 8, padding: '7px 12px',
-  fontSize: 13, fontWeight: 600, cursor: 'pointer', color: 'var(--ink)', fontFamily: 'inherit',
-}
