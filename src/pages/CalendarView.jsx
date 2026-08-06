@@ -77,8 +77,10 @@ function minToTime(m) {
 }
 
 // ─── CSV export ───
+// Kept for the year-image/download plumbing below; the events CSV itself now
+// goes through PageActions' shared downloadCsv.
 const csvCell = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'
-function downloadCsv(filename, rows) {
+function unusedDownloadCsv(filename, rows) {
   const BOM = '﻿'
   const text = BOM + rows.map(r => r.map(csvCell).join(',')).join('\r\n')
   const blob = new Blob([text], { type: 'text/csv;charset=utf-8' })
