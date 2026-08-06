@@ -54,6 +54,7 @@ function Harness() {
   return (
     <div className="app">
       <main className="app-main" style={{ padding: 24, minHeight: 600 }}>
+        <style>{ACCOUNT_CSS}</style>
         <AccountMenu user={ME} onLogout={() => {}} />
       </main>
     </div>
