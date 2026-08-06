@@ -17,7 +17,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, Eye, Plus, Trash2, Pencil, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
-import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import { TRIGGER_FIELDS, triggerLabel } from '../data/autoCash'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
