@@ -125,6 +125,52 @@ export function downloadCsv(filename, columns, rows) {
   URL.revokeObjectURL(a.href)
 }
 
+/* A settings row that opens underneath itself, the way Restore does in
+   the backups section. Pages used to anchor a fixed-position popover to
+   the button instead, which sat at a lower z-index than the panel and so
+   had to close the panel on the way just to be visible — a second
+   floating layer, and a dance to get to it. This is one row and a list. */
+export function PanelDisclosure({ label, icon, title, children }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" className="pgsitem" title={title}
+        aria-expanded={open} onClick={() => setOpen(v => !v)}>
+        {icon}{label}{open ? ' ▾' : ''}
+      </button>
+      {open && <div className="pgsdrop">{children}</div>}
+    </>
+  )
+}
+
+/* The column chooser every list page carries. Takes the same shape the
+   old popover did — cols as {k,l}, a map of hidden keys, and a locked
+   key that always shows — so a page passes what it already had. */
+export function ColumnsMenu({ cols, hiddenCols = {}, lockedKey, onToggle, onAll, onNone }) {
+  return (
+    <PanelDisclosure label="Columns" icon={<Eye size={13} />}
+      title="Choose which columns are shown">
+      {cols.map(c => {
+        const locked = c.k === lockedKey
+        return (
+          <label key={c.k} className={locked ? 'locked' : ''}
+            title={locked ? 'This column names the row, so it always shows' : ''}>
+            <input type="checkbox" disabled={locked} checked={locked || !hiddenCols[c.k]}
+              onChange={e => onToggle(c.k, e.target.checked)} />
+            {c.l}
+          </label>
+        )
+      })}
+      {(onAll || onNone) && (
+        <div className="pgsdroprow">
+          {onAll && <button type="button" onClick={onAll}>Show All</button>}
+          {onNone && <button type="button" onClick={onNone}>Hide All</button>}
+        </div>
+      )}
+    </PanelDisclosure>
+  )
+}
+
 function Settings({ collection, base, hint, confirm, onRestored, onClose, onExport, canExport, children }) {
   const ref = useRef(null)
   /* A page either names a shared snapshots collection or its own older
