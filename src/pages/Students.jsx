@@ -763,7 +763,6 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const dragCol = useRef(null)
   const popRef = useRef(null)
 
@@ -968,7 +967,6 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
         <input type="search" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search students, logins or classes…" autoComplete="off" />
         {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
-        <button className="addbtn" onClick={onAdd}><UserPlus size={14} /> Add Student</button>
       </div>
 
       {selected.size > 0 && (
@@ -1346,11 +1344,46 @@ export default function Students(props) {
 }
 
 function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
-  const { records, select, addRegistration, deleteRegistration, updateCustomerField } = useStore()
+  const { records, select, addRegistration, deleteRegistration, restoreRegistration,
+    updateCustomerField } = useStore()
   const dialog = useDialog()
   const [detailId, setDetailId] = useState(null)
 
   const handleSelect = (id) => { select(id); setDetailId(id) }
+
+  /* Undo/redo for the list's own actions — adding, duplicating and deleting
+     whole students. The list had none: the bar it carried was Columns,
+     Export and a gear, and deleting a student said in as many words that it
+     could not be undone. It can. A delete is reversed by restoring the
+     record under its original id, so the student comes back as themselves
+     with their enrolments and fee history, not as a fresh copy.
+
+     Actions rather than a snapshot of the table: the records are large,
+     more than one person is usually in here, and replacing the whole table
+     to undo one delete would quietly discard everyone else's edits. Field
+     edits are not on this stack — they belong to the detail view, which has
+     its own. */
+  const hist = useActionHistory({ enabled: !detailId })
+  const pushHist = hist.push
+
+  // Undoing an add reads the record as it stands now, not as it was
+  // created — it may have been filled in since.
+  const recordsRef = useRef(records)
+  recordsRef.current = records
+
+  const historyForCreate = (id, label) => {
+    let snap = null
+    return {
+      label,
+      undo: async () => {
+        const live = recordsRef.current.find(r => r.id === id)
+        if (live) snap = JSON.parse(JSON.stringify(live))
+        await deleteRegistration(id)
+        setDetailId(d => (d === id ? null : d))
+      },
+      redo: async () => { if (snap) await restoreRegistration(snap) },
+    }
+  }
 
   /* Write the student's number onto the record, once. Stored beside the
      family reference on customer.meta so both survive a reload; nothing
