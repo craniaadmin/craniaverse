@@ -20,6 +20,12 @@ import ToDo from './pages/ToDo'
 import Customers from './pages/Customers'
 import Logins from './pages/Logins'
 import StaffInformation from './pages/StaffInformation'
+import Attendance from './pages/Attendance'
+import Comments from './pages/Comments'
+import Payroll from './pages/Payroll'
+import Receipts from './pages/Receipts'
+import Registrations from './pages/Registrations'
+import EmergencyContacts from './pages/EmergencyContacts'
 
 const mkContacts = n => Array.from({ length: n }, (_, i) => ({
   id: 'c' + i, name: 'Contact ' + i, category: i % 2 ? 'Vendor/Supplier' : 'Partner',
