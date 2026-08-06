@@ -261,53 +261,35 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
     background:var(--pill);color:var(--muted);border-radius:6px;padding:3px 9px}
 .sf .delbtn{background:#f3eded;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;
     color:var(--danger);font-weight:600;font-size:12px;font-family:inherit}
-/* Equal columns, and align-items:start so a short section stops where
-   its content stops instead of stretching. Every section begins at the
-   top of its row, which is what makes the headings line up. */
-.sf .detailgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
-    align-items:start;margin-top:16px}
-.sf .detailgrid .sect.span2{grid-column:span 2}
-@media (max-width:1250px){
-  .sf .detailgrid{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:860px){
-  .sf .detailgrid{grid-template-columns:1fr}
-  .sf .detailgrid .sect.span2{grid-column:span 1}
-}
+/* Same shape as the Students and Customers detail views: columns that
+   fit themselves to the width, headings as a small ruled caption rather
+   than a filled bar, and white bordered inputs. The teal bars and cards
+   this replaced turned a form into a wall of headings. */
+.sf .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:22px 26px;align-items:start;margin-top:4px}
+.sf .panels .wide{grid-column:span 2}
+@media (max-width:900px){.sf .panels .wide{grid-column:span 1}}
 
-.sf .sect{background:#fff;border-radius:11px;box-shadow:var(--shadow);
-    border:1px solid var(--line);overflow:hidden}
-/* Fixed height, so headings in the same row match to the pixel however
-   long or short the words are. */
-.sf .secthead{background:var(--teal);color:#fff;height:42px;display:flex;
-    align-items:center;justify-content:center;gap:8px;padding:0 14px}
-.sf .secthead .t{font-size:15px;font-weight:700;letter-spacing:.2px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sf .secthead .cnt{background:rgba(255,255,255,.22);border-radius:20px;
-    padding:1px 9px;font-size:11.5px;font-weight:700;flex:none}
-.sf .sectbody{padding:13px 14px 15px}
-.sf .secthint{font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:9px}
-.sf .emptynote{font-size:12px;color:var(--muted);font-style:italic;padding:2px 0}
+.sf .sec-h{font-size:13px;font-weight:700;color:var(--teal);margin:0 0 12px;
+    padding-bottom:7px;border-bottom:1px solid var(--line);text-transform:uppercase;
+    letter-spacing:.4px;display:flex;align-items:center;gap:8px}
+.sf .sec-h .cnt{margin-left:auto;background:var(--pill);color:var(--muted);
+    border-radius:20px;padding:1px 8px;font-size:11px;letter-spacing:0}
+.sf .sec-h .cnt.short{background:#FBF3CE;color:#7a6417}
+.sf .sechint{font-size:11.5px;color:var(--muted);font-style:italic;margin:-4px 0 9px}
+.sf .emptynote{font-size:12.5px;color:var(--muted);padding:2px 0}
 .sf .progpill{background:var(--pill);border-radius:7px;padding:7px 10px;margin-bottom:6px}
 .sf .progpill .t{font-weight:700;font-size:12.5px}
 .sf .progpill .s{color:var(--muted);font-size:11.5px;margin-top:1px}
 
-/* Fields inside a section: label column fixed so every label in the
-   page hangs off the same edge, and inputs that look like inputs
-   rather than flat grey blocks you cannot tell are editable. */
-.sf .sectbody .field-row{grid-template-columns:92px 1fr !important;
-    gap:9px;margin-bottom:8px;align-items:center}
-.sf .sectbody .field-row:last-child{margin-bottom:0}
-.sf .sectbody .field-row label{font-size:12px;color:var(--muted);font-weight:600}
-.sf .sectbody .field-val{background:#F7F9F9;border:1px solid var(--line);
-    border-radius:7px;padding:7px 10px;font-size:13px;min-height:34px}
-.sf .sectbody input.field-val:hover{border-color:#c7cfce}
-.sf .sectbody input.field-val:focus{outline:none;border-color:var(--teal);
-    background:#fff;box-shadow:0 0 0 3px rgba(95,160,158,.15)}
-.sf .sectbody .field-val.highlight{background:var(--yellow);border-color:#d4d27a;font-weight:700}
-/* Read-only values are not inputs and should not pretend to be. */
-.sf .sectbody div.field-val{background:transparent;border-color:transparent;
-    color:var(--muted);padding-left:2px}
+.sf .frow{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:center;margin-bottom:8px}
+.sf .frow label{text-align:right;font-size:12px;font-weight:600;color:var(--muted);line-height:1.2}
+.sf .frow input,.sf .frow .ro{width:100%;box-sizing:border-box;padding:7px 10px;
+    border:1px solid var(--field);border-radius:8px;font:inherit;font-size:13px;
+    background:#fff;color:var(--dark-brown)}
+.sf .frow input:focus{outline:none;border-color:var(--teal)}
+.sf .frow .ro{background:var(--pill);color:var(--muted)}
+.sf .frow input.highlight{background:var(--yellow);border-color:#d4d27a;font-weight:700}
 `
 
 // ── Small editable building blocks ────────────────────────────────────────
