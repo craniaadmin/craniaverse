@@ -236,7 +236,6 @@ export default function Logins({ onNavigate }) {
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const dragCol = useRef(null)
   const popRef = useRef(null)
