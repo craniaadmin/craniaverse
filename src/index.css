@@ -91,17 +91,31 @@ input, select, textarea { font-family: inherit; }
   color: #fff; font-size: 14px; font-weight: 700;
   border: 1px solid transparent;
   background: var(--brand-dark-brown);
-  transition: background .12s;
+  transition: background .12s, box-shadow .12s;
 }
-.sidebar-item:hover { background: #4a4030; }
+/* Was #4a4030, a shade off the resting colour — you could not tell what
+   the pointer was on. Lifted far enough to read as a change. */
+.sidebar-item:hover { background: #5c5140; }
+/* The selected item used to be teal (#5FA09E) on the brand yellow
+   (#E0DE85). Both are mid-tone, so that pairing came to roughly 2:1
+   contrast and the one item you most need to find was the hardest to
+   read. Same yellow, but the brand's dark brown on top — about 10:1 —
+   with a teal edge so it still reads as "selected" and not merely
+   "a different colour". */
 .sidebar-item.active {
   background: var(--brand-light-brown);
-  color: var(--brand-dark-blue);
-  border-color: var(--brand-light-brown);
+  color: var(--brand-dark-brown);
+  border-color: var(--card-teal-dark);
+  box-shadow: 0 1px 3px rgba(46, 37, 22, .22);
 }
+.sidebar-item.active:hover { background: #d5d370; }
+.sidebar-item:focus-visible {
+  outline: 2px solid var(--brand-dark-brown); outline-offset: 2px;
+}
+/* Barely visible against the light blue at 15% black. */
 .sidebar-divider {
-  border: none; border-top: 1px solid rgba(0, 0, 0, .15);
-  margin: 1px 4px;
+  border: none; border-top: 1px solid rgba(46, 37, 22, .28);
+  margin: 3px 4px;
 }
 
 /* Top bar (new — dark brown with pill submenu buttons) */
