@@ -883,24 +883,23 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
     setSelected(new Set())
   }
 
-  const exportCsv = () => {
-    const esc = (v) => {
-      const s = String(v ?? '')
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-    }
-    const head = ['Student ID', 'Name', 'Login', 'Grade', 'School', 'Medical', 'Crania Cash', 'Classes']
-    const lines = [head.join(',')]
-    for (const r of allRows) {
-      lines.push([r.studentId, r.name, r.login, r.grade, r.record.student?.school || '', r.medical, r.cash,
-        r.classList.join('; ')].map(esc).join(','))
-    }
-    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `crania-students-export-${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
+  /* Every student, not just the shown ones, and School as well — it is not
+     a column here but it is one of the first things asked of an export. */
+  const csvColumns = [
+    { key: 'studentId', label: 'Student ID' },
+    { key: 'name', label: 'Name' },
+    { key: 'login', label: 'Login' },
+    { key: 'grade', label: 'Grade' },
+    { key: 'school', label: 'School' },
+    { key: 'medical', label: 'Medical' },
+    { key: 'cash', label: 'Crania Cash' },
+    { key: 'classes', label: 'Classes' },
+  ]
+  const csvRows = () => allRows.map(r => ({
+    studentId: r.studentId, name: r.name, login: r.login, grade: r.grade,
+    school: r.record.student?.school || '', medical: r.medical, cash: r.cash,
+    classes: r.classList.join('; '),
+  }))
 
   useEffect(() => {
     if (!pop) return
