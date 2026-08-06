@@ -321,7 +321,11 @@ export default function CraniaStore() {
   }
 
   // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(data, next => mutate(() => next), { label: 'store change', enabled: !loading })
+  /* Object.assign onto the draft — mutate keeps the draft it made and
+     ignores the mutator's return value, so `() => next` dropped the
+     snapshot and Undo did nothing. */
+  const hist = useHistory(data, next => mutate(d => Object.assign(d, next)),
+    { label: 'store change', enabled: !loading })
 
   if (loading) {
     return (
