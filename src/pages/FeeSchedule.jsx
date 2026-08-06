@@ -129,12 +129,14 @@ export default function FeeSchedule() {
   // Async status
   const [pdfBusy, setPdfBusy] = useState(false)
 
-  useEffect(() => {
+  const loadRegs = useCallback(() => (
     fetch(`${API_BASE}/api/registrations`)
       .then(r => r.json()).then(d => setRegs(Array.isArray(d) ? d : []))
       .catch(err => console.error('Failed to load registrations:', err))
       .finally(() => setLoading(false))
-  }, [])
+  ), [])
+
+  useEffect(() => { loadRegs() }, [loadRegs])
 
   const selectedReg = regs.find(r => r.id === studentId)
 
