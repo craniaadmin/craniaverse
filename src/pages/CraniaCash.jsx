@@ -717,12 +717,21 @@ function CashList({ onSelect, onNavigate, hist, award }) {
         csvName="crania-cash"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => visible}
-        settingsExtra={<CashSettings pushHist={hist.push} />}
-      >
-        <button title="Choose which columns are shown"
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
-        ><Eye size={13} /> Columns</button>
-      </PageActions>
+        /* Columns joins the two cards that were already behind the gear.
+           It closes the panel on the way: the chooser is a fixed popover at
+           a lower z-index and would otherwise open behind it. */
+        settingsExtra={close => (
+          <>
+            <button title="Choose which columns are shown"
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                close()
+                setPop({ kind: 'cols', rect })
+              }}><Eye size={13} /> Columns</button>
+            <CashSettings pushHist={hist.push} />
+          </>
+        )}
+      />
 
       <div className="metrics">
         <div className="metric">
