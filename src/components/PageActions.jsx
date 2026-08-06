@@ -1,0 +1,113 @@
+// The action bar every page carries: Undo, Redo, whatever that page
+// adds of its own, then Export CSV and the settings gear — in that
+// order, so the same control is in the same place on every screen.
+//
+// Pages differ in what they can offer. A page with no history passes no
+// undo handler and the button is disabled with a tooltip saying so,
+// rather than being missing on some screens and present on others.
+import React, { useEffect, useRef, useState } from 'react'
+import { Undo2, Redo2, Download } from 'lucide-react'
+import BackupPanel, { BACKUP_CSS } from './BackupPanel'
+
+export const PAGEACTIONS_CSS = BACKUP_CSS + `
+.pgacts{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px;position:relative}
+.pgacts button{background:#fff;border:1px solid #e2ded2;color:#2E2516;padding:6px 12px;
+  font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;
+  display:inline-flex;align-items:center;gap:5px}
+.pgacts button:hover:not(:disabled){background:#f4f2ea}
+.pgacts button:disabled{opacity:.45;cursor:default}
+.pgacts .grow{flex:1}
+.pgacts .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
+.pgacts .histnote{position:absolute;top:100%;left:0;margin-top:4px;z-index:5;
+  background:#E4EFF3;border:1px solid #A6E2F9;border-radius:9px;padding:6px 11px;
+  font-size:12.5px;font-weight:600;color:#2E2516;white-space:nowrap}
+.pgsettings{position:absolute;right:0;top:100%;z-index:240;width:340px;margin-top:4px}
+`
+
+/* Turns rows of plain objects into a CSV the way a spreadsheet expects
+   it: quotes anything containing a comma, quote or newline, and CRLF
+   line endings so Excel does not run the whole file onto one line. */
+export function downloadCsv(filename, columns, rows) {
+  const esc = (v) => {
+    const s = v === null || v === undefined ? '' : String(v)
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+  }
+  const lines = [columns.map(c => esc(c.label ?? c.key)).join(',')]
+  for (const r of rows) {
+    lines.push(columns.map(c => esc(typeof c.value === 'function' ? c.value(r) : r[c.key])).join(','))
+  }
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
+function Settings({ collection, hint, onRestored, onClose, children }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
+    const id = setTimeout(() => document.addEventListener('mousedown', handler), 0)
+    return () => { clearTimeout(id); document.removeEventListener('mousedown', handler) }
+  }, [onClose])
+  return (
+    <div className="pgsettings" ref={ref} onMouseDown={e => e.stopPropagation()}>
+      {collection && (
+        <BackupPanel base={`snapshots/${collection}`} hint={hint}
+          onRestored={async () => { if (onRestored) await onRestored(); onClose() }} />
+      )}
+      {children}
+    </div>
+  )
+}
+
+export default function PageActions({
+  onUndo, onRedo, undoLabel, redoLabel, histBusy, histNote,
+  csvName, csvColumns, csvRows,
+  backupCollection, backupHint, onRestored,
+  settingsExtra, children,
+}) {
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const canExport = Boolean(csvName && csvColumns?.length)
+
+  return (
+    <div className="pgacts">
+      <button disabled={!onUndo || !undoLabel || histBusy}
+        title={undoLabel ? `Undo: ${undoLabel}  (Ctrl+Z)`
+          : onUndo ? 'Nothing to undo' : 'This page does not track changes yet'}
+        onClick={onUndo}><Undo2 size={13} /> Undo</button>
+
+      <button disabled={!onRedo || !redoLabel || histBusy}
+        title={redoLabel ? `Redo: ${redoLabel}  (Ctrl+Y)`
+          : onRedo ? 'Nothing to redo' : 'This page does not track changes yet'}
+        onClick={onRedo}><Redo2 size={13} /></button>
+
+      {/* Page-specific controls (Columns, filters, Add…) sit between the
+          history buttons and the pair that ends every bar. */}
+      {children}
+
+      <span className="grow" />
+
+      <button disabled={!canExport}
+        title={canExport ? 'Download what is on this page as a CSV file'
+          : 'Nothing on this page to export yet'}
+        onClick={() => canExport && downloadCsv(csvName, csvColumns,
+          typeof csvRows === 'function' ? csvRows() : (csvRows || []))}>
+        <Download size={13} /> Export CSV
+      </button>
+
+      <button className="gearbtn" title="Backups and settings"
+        onClick={() => setSettingsOpen(v => !v)}>⚙</button>
+
+      {settingsOpen && (
+        <Settings collection={backupCollection} hint={backupHint}
+          onRestored={onRestored} onClose={() => setSettingsOpen(false)}>
+          {settingsExtra}
+        </Settings>
+      )}
+
+      {histNote && <div className="histnote" role="status">{histNote}</div>}
+    </div>
+  )
+}
