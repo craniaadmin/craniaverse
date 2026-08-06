@@ -480,12 +480,9 @@ export default function CraniaStore() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: 'var(--brand-dark-blue)', color: '#fff', textAlign: 'left' }}>
-                  <Th>Item #</Th><Th>Name</Th><Th>Category</Th><Th>Sub-Category</Th>
-                  <Th align="center">Image</Th>
-                  <Th align="right">On Hand</Th><Th align="right">Reorder</Th>
-                  <Th align="right">Cost</Th><Th align="right">Tax %</Th><Th align="right">Store Price</Th>
-                  <Th align="right">Shelf Value</Th>
-                  <Th>Location</Th><Th align="center">Status</Th><Th></Th>
+                  {visibleCols.map(c => (
+                    <Th key={c.k} align={c.align || 'left'}>{c.blankHead ? '' : c.l}</Th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
