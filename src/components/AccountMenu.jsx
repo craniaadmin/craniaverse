@@ -63,14 +63,35 @@ export const ACCOUNT_CSS = `
 .acctmodal .acts .go{background:#5FA09E;color:#fff}
 .acctmodal .acts .go:disabled{background:#cbd1d6;cursor:default}
 .acctmodal .acts .cancel{background:#F1F3F4;border:1px solid #D5D0C4;color:#2E2516}
-.acctmodal table{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:12.5px}
-.acctmodal th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;
-  color:#6B6455;padding:0 8px}
-.acctmodal td{background:#F1F3F4;padding:7px 8px;vertical-align:middle}
-.acctmodal td:first-child{border-radius:6px 0 0 6px}
-.acctmodal td:last-child{border-radius:0 6px 6px 0;text-align:right;white-space:nowrap}
-.acctmodal tr.off td{opacity:.55}
-.acctmodal td select{padding:3px 6px;font-size:12px;width:auto}
+/* One card per account rather than a row in a table. Everything here is
+   editable, which a four-column table could not hold at this width — the
+   actions cell was nowrap, so "active" was pushed past the edge of the
+   modal and you had to scroll sideways to find it. */
+.acctmodal.wide{max-width:860px}
+.acctusers{display:flex;flex-direction:column;gap:10px}
+.acctuser{border:1px solid #E7EBE7;border-radius:10px;padding:11px 12px;background:#fff}
+.acctuser.off{background:#FAFAF7}
+.acctuser.off .r1,.acctuser.off .r2 select{opacity:.6}
+.acctuser .r1{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acctuser .r2{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+.acctuser .r2 select{width:auto;min-width:118px;padding:5px 8px;font-size:12.5px}
+.acctmodal .acctuser .lbl{display:block;font-size:10.5px;font-weight:700;color:#6B6455;
+  text-transform:uppercase;letter-spacing:.4px;margin:0 0 4px}
+/* The toggle is a label too, so undo the block/uppercase treatment the
+   modal gives every other label. */
+.acctmodal .acctuser label.tog{display:inline-flex;align-items:center;gap:6px;margin:0;
+  font-size:12.5px;font-weight:600;color:#2E2516;text-transform:none;letter-spacing:0;
+  white-space:nowrap;cursor:pointer}
+.acctuser label.tog input{width:14px;height:14px;margin:0;accent-color:#5FA09E}
+.acctuser .meta{margin-left:auto;font-size:11px;color:#9A948A;text-align:right}
+.acctuser .linkbtn{background:none;border:none;color:#5FA09E;font:inherit;font-size:12px;
+  font-weight:700;cursor:pointer;padding:0;text-decoration:underline;white-space:nowrap}
+.acctuser .linkbtn:hover{color:#4c8987}
+.acctuser .pwrow{display:flex;gap:8px;align-items:center;margin-top:10px;
+  border-top:1px dashed #E7EBE7;padding-top:10px}
+.acctuser .pwrow button{border:none;border-radius:8px;padding:8px 14px;font:inherit;
+  font-size:12.5px;font-weight:700;cursor:pointer;background:#5FA09E;color:#fff;white-space:nowrap}
+.acctuser .pwrow button:disabled{background:#cbd1d6;cursor:default}
 .acctmodal .iconbtn{background:none;border:none;cursor:pointer;color:#9A948A;padding:2px 4px}
 .acctmodal .iconbtn:hover{color:#C0392B}
 .acctmodal .addrow{border-top:1px solid #E7EBE7;margin-top:14px;padding-top:6px}
