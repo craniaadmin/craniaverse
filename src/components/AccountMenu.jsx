@@ -119,6 +119,17 @@ export const ACCOUNT_CSS = `
 .accttable .peek{background:#F1F3F4;border:1px solid #D5D0C4;border-radius:7px;padding:6px 9px;
   font:inherit;font-size:11.5px;font-weight:700;color:#2E2516;cursor:pointer;white-space:nowrap}
 .accttable .peek:hover{border-color:#5FA09E}
+/* Arming a level change, and the same shape for switching your own
+   account off. Teal to confirm someone else's change, red when the one
+   you are about to lock out is you. */
+.accttable .confirmrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.accttable .confirmrow .q{font-size:12.5px;color:#2E2516;font-weight:600}
+.accttable .confirmrow .q.warn{color:#8a1c15}
+.accttable .confirmrow button{border:none;border-radius:8px;padding:7px 14px;font:inherit;
+  font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.accttable .confirmrow .go{background:#5FA09E;color:#fff}
+.accttable .confirmrow .danger{background:#C0392B;color:#fff}
+.accttable .confirmrow .keep{background:#fff;border:1px solid #D5D0C4;color:#2E2516}
 .accttable .delrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .accttable .delrow .q{font-size:12.5px;color:#8a1c15;font-weight:600}
 .accttable .delrow .danger{background:#C0392B;color:#fff;border:none;border-radius:8px;
