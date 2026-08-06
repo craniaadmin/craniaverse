@@ -29,17 +29,13 @@ export const SECTIONS = [
 // is the default sub-page when the section is opened.
 export const SUBMENUS = {
   home:        ['Dashboard', 'Calendar', 'To-Do', 'Checklists', 'Projects'],
-  programs:    ['Programs', 'Class Lists', 'Contests', 'Assessments'],
-  customers:   ['Customers', 'Emergency Contacts'],
+  programs:    ['Programs', 'Class Lists', 'Contests'],
+  customers:   ['Customers'],
   students:    ['Students', 'Attendance', 'Comments', 'Crania Cash', 'Logins'],
   staff:       ['Staff', 'Schedules', 'Keys'],
-  operations:  ['Inventory', 'Crania Store', 'IT Accounts'],
-  financial:   ['Tuition Schedules', 'Invoices', 'Receipts'],
-  marketing:   ['Marketing', 'Calendar', 'Leads', 'Surveys'],
-  merchandise: ['Merchandise'],
-  contacts:    ['Contacts'],
+  operations:  ['Inventory', 'Crania Store'],
+  financial:   ['Invoices', 'Receipts', 'Payroll'],
   forms:       ['All Forms', 'Registrations', 'Submissions', 'Templates', 'Form Builder'],
-  dayschool:   ['Day School'],
 }
 
 // Legacy flat nav used by the old top-nav-dropdown component and
