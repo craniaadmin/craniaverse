@@ -1105,19 +1105,21 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
         backupHint={'Snapshots of every registration, saved to the database (last 14 kept). '
           + 'Back up before an import or a bulk delete.'}
         onRestored={refresh}
-        settingsExtra={close => (
+        settingsExtra={
           <>
-            {/* Closes the panel on the way: the column chooser is a fixed
-                popover underneath it, so it would open invisible. */}
-            <button title="Choose which columns are shown"
-              onClick={e => {
-                const rect = e.currentTarget.getBoundingClientRect()
-                close()
-                setPop({ kind: 'cols', rect })
-              }}><Eye size={13} /> Columns</button>
+            <ColumnsMenu cols={COLS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+              onToggle={(k, on) => setPrefs(p => {
+                const n = { ...p.hiddenCols }
+                if (on) delete n[k]; else n[k] = true
+                p.hiddenCols = n
+              })}
+              onAll={() => setPrefs(p => { p.hiddenCols = {} })}
+              onNone={() => setPrefs(p => {
+                p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
+              })} />
             <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
           </>
-        )}
+        }
       >
         <button className="cu-add" title="Add a new family" onClick={onAdd}>
           <UserPlus size={13} /> Add Family

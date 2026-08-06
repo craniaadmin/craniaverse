@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Pencil, Copy, Trash2, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions from '../components/PageActions'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -504,12 +504,10 @@ function ContestsPage({ onNavigate }) {
   const [sort, setSort] = useState({ key: '', dir: 1 })
   const [selected, setSelected] = useState(new Set())
   const [cellEdit, setCellEdit] = useState(null)   // { id, col }
-  const [pop, setPop] = useState(null)             // { kind:'cols', rect }
   const [rowCtx, setRowCtx] = useState(null)       // { x, y, row }
   const [editing, setEditing] = useState(null)     // { row }
   const [bulkOpen, setBulkOpen] = useState(false)
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   // ---- mutations ----
   const update = useCallback((row, key, val) => {
@@ -734,12 +732,6 @@ function ContestsPage({ onNavigate }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [doUndo, doRedo])
 
-  useEffect(() => {
-    if (!pop) return
-    const onDown = e => { if (popRef.current && !popRef.current.contains(e.target)) setPop(null) }
-    window.addEventListener('mousedown', onDown)
-    return () => window.removeEventListener('mousedown', onDown)
-  }, [pop])
 
   if (loading) {
     return (
@@ -1002,8 +994,6 @@ function ContestsPage({ onNavigate }) {
         Count={visible.length}{visible.length !== allRows.length ? ` of ${allRows.length}` : ''}
       </div>
 
-      {pop && pop.kind === 'cols' && (
-      )}
 
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[
@@ -1064,33 +1054,6 @@ function CellInput({ type, initial, onCommit, onCancel }) {
       }} />
   )
 }
-
-const ColsPop = React.forwardRef(function ColsPop({ rect, hiddenCols, onToggle, onAll, onNone }, ref) {
-  const style = {
-    top: Math.min(rect.bottom + 6, window.innerHeight - 320),
-    left: Math.max(8, Math.min(rect.left, window.innerWidth - 230)),
-  }
-  return (
-    <div className="ctpop" ref={ref} style={style}>
-      <div className="h">Show Columns</div>
-      {COLS.map(c => {
-        const locked = c.k === LOCKED_COL
-        return (
-          <label key={c.k} className={'ch' + (locked ? ' locked' : '')}
-            title={locked ? 'The contest name always stays visible' : undefined}>
-            <input type="checkbox" disabled={locked} checked={locked || !hiddenCols[c.k]}
-              onChange={e => onToggle(c.k, e.target.checked)} />
-            {c.l}
-          </label>
-        )
-      })}
-      <div className="allrow">
-        <button onClick={onAll}>Show All</button>
-        <button onClick={onNone}>Hide All</button>
-      </div>
-    </div>
-  )
-})
 
 function CtxMenu({ x, y, items, onClose }) {
   const ref = useRef(null)
