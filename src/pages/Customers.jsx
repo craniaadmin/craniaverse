@@ -720,15 +720,15 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
      Status is still carried, in the tooltip. */
   /* One lookup for the catalogue: which programme a free-text name means,
      what kind of programme it is, and what colour that kind is. Shared with
-     the Students page so a class looks the same on both. */
+     the Students page so a class looks the same on both.
+
+     Read-only here. The colours are set on the Programs page, which is
+     where the categories themselves are named and ordered — having a
+     second editor behind this page's gear meant the same colour could be
+     changed from three places, and none of them showed the category list
+     the way Programs does. */
   const { progFor, categoryOf, tintFor, catColors } =
     useMemo(() => buildCategoryLookup(programs, programsState), [programs, programsState])
-
-  const usedCategories = useMemo(() => categoriesInUse(records, categoryOf), [records, categoryOf])
-
-  const setCatColor = useCallback((cat, color) => {
-    setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
-  }, [setProgramsState])
 
   // { fam, kid } — kid null means the pointer is over something the whole
   // family shares, so the whole block lights up.
