@@ -107,7 +107,7 @@ class Boundary extends React.Component {
   }
 }
 
-const PAGES = { Contacts, Leads, Marketing, Invoices, Payments, Inventory, ITAccounts, CraniaStore, Contests, Keys, ToDo, Customers, Logins, StaffInformation }
+const PAGES = { Contacts, Leads, Marketing, Invoices, Payments, Inventory, ITAccounts, CraniaStore, Contests, Keys, ToDo, Customers, Logins, StaffInformation, Attendance, Comments, Payroll, Receipts, Registrations, EmergencyContacts }
 const which = new URLSearchParams(location.search).get('page') || 'Contacts'
 const Page = PAGES[which]
 createRoot(document.getElementById('root')).render(
