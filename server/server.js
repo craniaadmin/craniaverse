@@ -501,6 +501,33 @@ app.post('/api/session/extend', wrap(async (req, res) => {
 }))
 
 app.use(authRequired)
+
+/* Sits between the two gates on purpose: signed in, but ahead of the
+   admin-only rule on /api/users/*, because everyone has to be able to
+   change their own password. The route does its own checking. */
+/* Setting someone else's password is an admin job; changing your own
+   needs the current one, so a walk-up to an unlocked screen cannot
+   quietly take the account over. */
+app.post('/api/users/:id/password', wrap(async (req, res) => {
+  const { currentPassword, password } = req.body || {}
+  const users = await getUsers()
+  const idx = users.findIndex(u => u.id === req.params.id)
+  if (idx === -1) return res.status(404).json({ error: 'No such account.' })
+
+  const self = req.session?.uid === users[idx].id
+  const isAdmin = normaliseRole(req.session?.role) === 'admin'
+  if (!self && !isAdmin) return res.status(403).json({ error: 'That area is limited to admin accounts.' })
+  if (self && !verifyPassword(currentPassword, users[idx].passwordHash)) {
+    return res.status(401).json({ error: 'Your current password is not right.' })
+  }
+  const problem = passwordProblem(password)
+  if (problem) return res.status(400).json({ error: problem })
+
+  users[idx] = { ...users[idx], passwordHash: hashPassword(password) }
+  await commitUsers(users)
+  res.json({ ok: true })
+}))
+
 app.use(roleRequired)
 
 // ---- accounts -----------------------------------------------
@@ -586,28 +613,6 @@ app.delete('/api/users/:id', wrap(async (req, res) => {
   res.json({ deleted: 1 })
 }))
 
-/* Setting someone else's password is an admin job; changing your own
-   needs the current one, so a walk-up to an unlocked screen cannot
-   quietly take the account over. */
-app.post('/api/users/:id/password', wrap(async (req, res) => {
-  const { currentPassword, password } = req.body || {}
-  const users = await getUsers()
-  const idx = users.findIndex(u => u.id === req.params.id)
-  if (idx === -1) return res.status(404).json({ error: 'No such account.' })
-
-  const self = req.session?.uid === users[idx].id
-  const isAdmin = normaliseRole(req.session?.role) === 'admin'
-  if (!self && !isAdmin) return res.status(403).json({ error: 'That area is limited to admin accounts.' })
-  if (self && !verifyPassword(currentPassword, users[idx].passwordHash)) {
-    return res.status(401).json({ error: 'Your current password is not right.' })
-  }
-  const problem = passwordProblem(password)
-  if (problem) return res.status(400).json({ error: problem })
-
-  users[idx] = { ...users[idx], passwordHash: hashPassword(password) }
-  await commitUsers(users)
-  res.json({ ok: true })
-}))
 
 const ALLOWED_FRAME_ANCESTORS = process.env.ALLOWED_FRAME_ANCESTORS
   || "'self' https://crania-schools.com https://www.crania-schools.com"
