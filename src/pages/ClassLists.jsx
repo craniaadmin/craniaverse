@@ -358,18 +358,17 @@ export default function ClassLists({ onNavigate }) {
         backupCollection="registrations"
         backupHint="Snapshots of the registrations these rosters are built from (last 14 kept)."
         onRestored={refreshStore}
-        /* Opening or closing every card at once is something you do when
-           you arrive, not while you work — under the gear with Export CSV
-           rather than on the bar. Both close the panel, so you can see
-           what they did to the page behind it. */
-        settingsExtra={close => (
-          <>
-            <button title="Open every class card"
-              onClick={() => { close(); expandAll() }}>Expand all</button>
-            <button title="Close every class card"
-              onClick={() => { close(); collapseAll() }}>Collapse all</button>
-          </>
-        )}
+        settingsExtra={
+          <ColumnsMenu cols={COLUMNS} hiddenCols={hiddenCols} lockedKey={LOCKED_COL}
+            onToggle={(k, on) => {
+              const n = { ...hiddenCols }
+              if (on) delete n[k]; else n[k] = true
+              setHiddenCols(n)
+            }}
+            onAll={() => setHiddenCols({})}
+            onNone={() => setHiddenCols(
+              Object.fromEntries(COLUMNS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true])))} />
+        }
       />
 
       {fetchStatus === 'offline' && (
