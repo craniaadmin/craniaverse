@@ -18,7 +18,7 @@
 // that is per-browser anyway.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, Trash2, Copy, Undo2, Redo2, Eye, Download, UserPlus, ExternalLink } from 'lucide-react'
+import { ChevronLeft, Trash2, Copy, Undo2, Redo2, Eye, UserPlus, ExternalLink } from 'lucide-react'
 import { useStore } from '../data/store'
 import {
   engineForEntry, outstandingFor, money, syncEntryMoney, feeCalcFor, paymentStateOf,
@@ -28,6 +28,7 @@ import { entrySlots } from '../data/enrolment'
 import { buildFamilyIndex, familyOf } from '../data/family'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -746,7 +747,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     setProgramsState(prev => ({ ...(prev || {}), catColors: { ...((prev || {}).catColors || {}), [cat]: color } }))
   }, [setProgramsState])
 
-  const [settingsOpen, setSettingsOpen] = useState(false)
   // { fam, kid } — kid null means the pointer is over something the whole
   // family shares, so the whole block lights up.
   const [hover, setHover] = useState({ fam: null, kid: null })
@@ -1140,7 +1140,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
           Show inactive
         </label>
         {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
-        <button className="addbtn" onClick={onAdd}><UserPlus size={14} /> Add Family</button>
       </div>
 
       {selected.size > 0 && (
