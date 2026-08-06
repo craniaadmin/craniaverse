@@ -5,6 +5,7 @@
 // sat below the `loading` early return.
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { StoreProvider } from '../data/store.jsx'
 
 // Superset payload: whichever key a page reads, it gets an array.
 const FIXTURE = {
