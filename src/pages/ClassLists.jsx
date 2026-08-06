@@ -394,10 +394,6 @@ export default function ClassLists({ onNavigate }) {
             style={{ accentColor: 'var(--brand-dark-blue)' }} />
           Hide empty classes
         </label>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <button onClick={expandAll} style={toolbarBtn}>Expand all</button>
-          <button onClick={collapseAll} style={toolbarBtn}>Collapse all</button>
-        </div>
       </div>
 
       {/* Enrolments naming a program the catalogue does not have appear on no
