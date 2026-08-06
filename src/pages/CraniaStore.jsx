@@ -205,6 +205,9 @@ export default function CraniaStore() {
   const [subFilter, setSubFilter]     = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [editing, setEditing]  = useState(null)
+  const [hiddenCols, setHiddenColsState] = useState(loadHiddenCols)
+  const setHiddenCols = (next) => { setHiddenColsState(next); saveHiddenCols(next) }
+  const visibleCols = COLUMNS.filter(c => c.k === LOCKED_COL || !hiddenCols[c.k])
 
   const categories = useMemo(() => {
     const seen = new Set()
