@@ -333,6 +333,40 @@ export default function Inventory() {
         backupCollection="stock"
         backupHint="Snapshots of every stock item and its change log (last 14 kept)."
         onRestored={refresh}
+        /* Columns moves under the gear; the Log switch and Add Item stay on
+           the bar, because switching view and adding stock are what this
+           page is for. The tick list opens inline in the panel rather than
+           as a popover of its own — you usually change more than one, and a
+           menu is a better place for it than a second floating layer. */
+        settingsExtra={view === 'inventory' ? (
+          <>
+            <button title="Choose which columns are shown"
+              onClick={() => setColsOpen(v => !v)}>
+              <Eye size={14} /> Columns {colsOpen ? '▾' : '…'}
+            </button>
+            {colsOpen && (
+              <div style={{
+                borderTop: '1px solid #E7EBE7', marginTop: 3, paddingTop: 6,
+                maxHeight: 230, overflow: 'auto',
+              }}>
+                {data.colOrder.map(key => (
+                  <label key={key} style={{
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '5px 3px',
+                    fontSize: 12.5, cursor: 'pointer', fontWeight: 500,
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={!data.hiddenCols[key]}
+                      onChange={() => toggleColHidden(key)}
+                      style={{ accentColor: 'var(--logo-teal)', margin: 0 }}
+                    />
+                    {COLUMN_LABELS[key] || key}
+                  </label>
+                ))}
+              </div>
+            )}
+          </>
+        ) : null}
       >
         <button
           onClick={() => setView(v => v === 'log' ? 'inventory' : 'log')}
