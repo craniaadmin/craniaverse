@@ -110,10 +110,7 @@ export default function Marketing() {
     completed: campaigns.filter(c => c.status === 'Completed').length,
   }
 
-  // Undo/redo over the page's own data — see src/data/useHistory.js.
-  // Has to stay above the `loading` return below: a hook that only runs on
-  // some renders makes React throw "rendered more hooks than during the
-  // previous render" on the render where it first appears.
+  // Undo/redo over the page's own data — see src/data/useHistory.js
   const hist = useHistory(campaigns, next => mutate(() => next), { label: 'campaign change' })
 
   if (loading) {
@@ -123,6 +120,7 @@ export default function Marketing() {
       </div>
     )
   }
+
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>

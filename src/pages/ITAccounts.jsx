@@ -175,10 +175,7 @@ export default function ITAccounts() {
     })
   }
 
-  // Undo/redo over the page's own data — see src/data/useHistory.js.
-  // Has to stay above the `loading` return below: a hook that only runs on
-  // some renders makes React throw "rendered more hooks than during the
-  // previous render" on the render where it first appears.
+  // Undo/redo over the page's own data — see src/data/useHistory.js
   const hist = useHistory(data, next => mutate(() => next), { label: 'account change' })
 
   if (loading) {
@@ -188,6 +185,7 @@ export default function ITAccounts() {
       </div>
     )
   }
+
 
   return (
     <div className="page">
