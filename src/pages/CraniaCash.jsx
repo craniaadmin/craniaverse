@@ -526,7 +526,6 @@ function CashList({ onSelect, onNavigate }) {
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [bulkAmount, setBulkAmount] = useState('')
   const [bulkReason, setBulkReason] = useState('')
   const dragCol = useRef(null)
