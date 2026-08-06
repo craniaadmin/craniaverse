@@ -154,12 +154,12 @@ function useCraniaStore() {
     })
   }, [])
 
-  return { data, loading, status, mutate }
+  return { data, loading, status, mutate, refresh }
 }
 
 // ---------- Crania Store page ----------
 export default function CraniaStore() {
-  const { data, loading, status, mutate } = useCraniaStore()
+  const { data, loading, status, mutate, refresh } = useCraniaStore()
   const [view, setView]        = useState('inventory') // 'inventory' | 'log'
   const [query, setQuery]      = useState('')
   const [catFilter, setCatFilter]     = useState('all')
