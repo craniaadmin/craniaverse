@@ -1,11 +1,12 @@
 import { Bell, LogOut } from 'lucide-react'
 import { SUBMENUS } from '../data/mockData'
 import BrandMark from './BrandMark'
+import AccountMenu from './AccountMenu'
 
 // Top bar for the v7 mockup layout — logo + section-title + submenu
 // pills for the active sidebar section, plus the notification /
 // sign-out actions on the right.
-export default function TopNav({ section, sub, onSubSelect, onLogout }) {
+export default function TopNav({ section, sub, onSubSelect, onLogout, user }) {
   const subs = SUBMENUS[section] || []
   return (
     <header className="topbar-v7">
