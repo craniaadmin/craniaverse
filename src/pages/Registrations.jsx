@@ -14,7 +14,7 @@
 // the shared action bar.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Eye } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 import { useStore } from '../data/store'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
@@ -230,7 +230,7 @@ const CSS = TABLECHROME_CSS + PAGEACTIONS_CSS + `
 `
 
 export default function Registrations({ onNavigate }) {
-  const { records, status: fetchStatus } = useStore()
+  const { records, status: fetchStatus, refresh } = useStore()
   const [search, setSearch] = useState('')
   const [waitingOnly, setWaitingOnly] = useState(false)
   const [colFilters, setColFilters] = useState({})
@@ -239,6 +239,7 @@ export default function Registrations({ onNavigate }) {
   const [{ hiddenCols, colOrder }, setColPrefs] = useState(loadColPrefs)
   const [pop, setPop] = useState(null)
   const [rowCtx, setRowCtx] = useState(null)
+  const [editing, setEditing] = useState(null)   // { sub, child }
   const [hover, setHover] = useState({ fam: null, kid: null })
   const dragCol = useRef(null)
   const popRef = useRef(null)
@@ -463,6 +464,19 @@ export default function Registrations({ onNavigate }) {
             )
           }
         }
+        /* Only on the child's first row, and spanning the rest of them.
+           A hidden cell on the others would still be a cell, and the
+           rowSpan above already covers those rows — the table would end
+           up one column wider than its headers. */
+        if (!kidDone) {
+          tds.push(
+            <td key="act" className="actcell" rowSpan={child.programs.length}
+              onClick={e => e.stopPropagation()}>
+              <button className="rowbtn" title="Edit this registration"
+                onClick={() => setEditing({ sub: s, child })}><Pencil size={12} /></button>
+            </td>,
+          )
+        }
         famDone = true
         kidDone = true
         bodyRows.push(
@@ -472,6 +486,7 @@ export default function Registrations({ onNavigate }) {
               + (hover.kid === child.id ? 'kidhot' : '')}
             onMouseEnter={() => setHover({ fam: s.ref, kid: child.id })}
             onMouseLeave={() => setHover({ fam: null, kid: null })}
+            onDoubleClick={() => setEditing({ sub: s, child })}
             onContextMenu={e => { e.preventDefault(); setRowCtx({ x: e.clientX, y: e.clientY, child, sub: s }) }}>
             {tds}
           </tr>,
@@ -561,6 +576,7 @@ export default function Registrations({ onNavigate }) {
             <colgroup>
               <col style={{ width: 26 }} />
               {orderedCols.map(c => <col key={c.k} style={{ width: W[c.k] || 120 }} />)}
+              <col style={{ width: 34 }} />
             </colgroup>
             <thead>
               {/* Not `frow` — that name sets display:grid elsewhere and
@@ -577,6 +593,7 @@ export default function Registrations({ onNavigate }) {
                     </select>
                   </th>
                 ))}
+                <th />
               </tr>
               <tr>
                 <th className="selcol">
@@ -598,6 +615,7 @@ export default function Registrations({ onNavigate }) {
                     </span>
                   </th>
                 ))}
+                <th />
               </tr>
             </thead>
             <tbody>{bodyRows}</tbody>
@@ -623,8 +641,15 @@ export default function Registrations({ onNavigate }) {
           })} />
       )}
 
+      {editing && (
+        <EditRegistration sub={editing.sub} child={editing.child}
+          onClose={() => setEditing(null)}
+          onSaved={async () => { await refresh() }} />
+      )}
+
       {rowCtx && (
         <CtxMenu x={rowCtx.x} y={rowCtx.y} onClose={() => setRowCtx(null)} items={[
+          { label: 'Edit Registration', on: () => setEditing({ sub: rowCtx.sub, child: rowCtx.child }) },
           { label: 'Open in Customers', on: () => onNavigate && onNavigate('Customers', rowCtx.child.id) },
           { label: 'Open in Students', on: () => onNavigate && onNavigate('Students', rowCtx.child.id) },
         ]} />
