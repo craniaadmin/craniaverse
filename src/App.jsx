@@ -33,6 +33,7 @@ import Forms from './pages/Forms'
 import Registrations from './pages/Registrations'
 import Invoices from './pages/Invoices'
 import Receipts from './pages/Receipts'
+import Payroll from './pages/Payroll'
 import Projects from './pages/Projects'
 import ITAccounts from './pages/ITAccounts'
 import CraniaStore from './pages/CraniaStore'
@@ -42,7 +43,7 @@ import { StoreProvider } from './data/store'
 // Route table for the v7 layout. Key = `${section}:${sub}`. Missing
 // entries fall through to <Placeholder />.
 //
-// NOTE: Accounting, Payments, Payroll and Staff Hub pages exist in
+// NOTE: Accounting, Payments and Staff Hub pages exist in
 // src/pages/ but the client's v7 mockup omits them from the nav.
 // They are intentionally not wired here — restore by adding a route
 // key and importing the component if she asks for them back.
@@ -79,6 +80,7 @@ const ROUTES = {
   'financial:Tuition Schedules': () => <FeeSchedule />,
   'financial:Invoices':      () => <Invoices />,
   'financial:Receipts':      () => <Receipts />,
+  'financial:Payroll':       () => <Payroll />,
 
   'marketing:Marketing':     () => <Marketing />,
   'marketing:Leads':         (nav) => <Leads onNavigate={nav} />,
@@ -99,6 +101,9 @@ const ROUTES = {
 // so old Dashboard `onNavigate('To Do')` calls still work.
 const LEGACY_ALIAS = {
   'To Do':              ['home',     'To-Do'],
+  // Points at a page that is currently hidden from the nav. Nothing
+  // calls it today; following it would render the page with no matching
+  // submenu pill, so it goes back only when Tuition Schedules does.
   'Fee Schedules':      ['financial','Tuition Schedules'],
   'Staff Information':  ['staff',    'Staff'],
 }
