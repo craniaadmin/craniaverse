@@ -250,6 +250,8 @@ function AccountRow({ u, isMe, cols, onPatch, onRemove, onSetPassword }) {
   const [confirmDel, setConfirmDel] = useState(false)
   const [typed, setTyped] = useState('')
   const [delBusy, setDelBusy] = useState(false)
+  const [pendingRole, setPendingRole] = useState(null)
+  const [pendingOff, setPendingOff] = useState(false)
 
   /* Re-sync when the row is replaced by the server's copy, so a rejected
      edit snaps back to what is actually stored rather than sitting there
