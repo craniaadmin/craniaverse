@@ -682,7 +682,7 @@ export default function Registrations({ onNavigate }) {
       {editing && (
         <EditRegistration sub={editing.sub} child={editing.child}
           onClose={() => setEditing(null)}
-          onSaved={async () => { await refresh() }} />
+          onSaved={onEdited} />
       )}
 
       {rowCtx && (
