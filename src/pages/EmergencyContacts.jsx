@@ -269,20 +269,6 @@ function NameLink({ children, onClick, title }) {
   )
 }
 
-/* Emergency contacts are stored on the registrations, so the snapshots here
-   are the same ones the Customers page takes — same endpoint, same list.
-   Said plainly in the hint, so a restore from this page is not a surprise. */
-function EmergencyBackups() {
-  const { refresh } = useStore()
-  return (
-    <BackupPanel base="customers"
-      hint={'Emergency contacts are held on the registrations, so these are the same '
-        + 'snapshots the Customers page takes — restoring one replaces every registration '
-        + '(last 14 kept).'}
-      onRestored={refresh} />
-  )
-}
-
 function useEmergencyRows() {
   const { records } = useStore()
 
