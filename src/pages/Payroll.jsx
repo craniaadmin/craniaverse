@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useStore } from '../data/store'
 import craniaLogo from '../assets/crania-logo.png'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 
 // ── 2025 Canadian Payroll Tax Constants (Ontario) ──────────────────────────
 const TAX_YEAR = 2025
@@ -898,6 +898,7 @@ export default function Payroll() {
             </table>
           )}
         </div>
+        <RowCount shown={rows.length} total={staff.length} />
       </div>
 
       {/* Modals */}

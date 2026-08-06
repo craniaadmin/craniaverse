@@ -18,7 +18,7 @@ import {
   DOW, DOW_ORD, norm, fmtTime, sessionsOf, statedLocationId,
   matchSessions, entrySlots,
 } from '../data/enrolment'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 
 /* Kept on this machine rather than the server: which columns a person
    wants on a printed register is theirs, not the school's. */
@@ -583,6 +583,7 @@ export default function ClassLists({ onNavigate }) {
           ))}
         </div>
       )}
+      <RowCount shown={visible.length} total={classes.length} />
     </div>
   )
 }

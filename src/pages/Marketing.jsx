@@ -7,7 +7,7 @@
 // it going" list.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Plus, X, Edit2, Trash2, Search } from 'lucide-react'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -243,6 +243,7 @@ export default function Marketing() {
           </tbody>
         </table>
       </div>
+      <RowCount shown={visible.length} total={campaigns.length} />
 
       {editing && (
         <CampaignModal

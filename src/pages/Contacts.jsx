@@ -7,7 +7,7 @@
 // debounce, same pattern as Marketing/Leads.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Plus, Edit2, Trash2, Search, Phone, Mail, Globe } from 'lucide-react'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -236,6 +236,7 @@ export default function Contacts() {
           </tbody>
         </table>
       </div>
+      <RowCount shown={visible.length} total={contacts.length} />
 
       {editing && (
         <ContactModal

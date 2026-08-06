@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Plus, Edit2, Trash2, Search, UserPlus } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -296,6 +296,7 @@ export default function Leads({ onNavigate }) {
           </tbody>
         </table>
       </div>
+      <RowCount shown={visible.length} total={leads.length} />
 
       {editing && (
         <LeadModal

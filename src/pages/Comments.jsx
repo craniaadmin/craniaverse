@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useCommentsRows } from '../data/useCommentsRows'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const COMMENT_FIELDS = [
@@ -411,6 +411,7 @@ function ClassGroup({ program, rows, onNavigate, editCell }) {
           </tbody>
         </table>
       </div>
+      <RowCount shown={visible.length} total={dated.length} />
     </div>
   )
 }

@@ -9,7 +9,7 @@
 // password gate, cost/start-date UI polish, encryption of passwords.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''

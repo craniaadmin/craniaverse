@@ -5,7 +5,7 @@ import {
   PageShell, Loading, OfflineBanner, SummaryStrip,
   Th, Td, IconButton, Modal,
 } from '../components/FinanceUI'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 
 export default function Receipts() {
   const { invoices, payments, loading, status, refresh } = useFinance()
@@ -135,6 +135,7 @@ export default function Receipts() {
           </tbody>
         </table>
       </div>
+      <RowCount shown={filtered.length} total={payments.length} />
 
       {viewing && (
         <ReceiptPreview

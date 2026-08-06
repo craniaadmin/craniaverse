@@ -8,7 +8,7 @@ import {
   PageShell, Loading, OfflineBanner, SummaryStrip,
   Th, Td, IconButton, Modal, ModalFooter, Field,
 } from '../components/FinanceUI'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 
 const METHODS = ['Cash', 'E-Transfer', 'Cheque', 'Credit Card', 'Debit', 'Other']
 
@@ -225,6 +225,7 @@ export default function Payments() {
           </tbody>
         </table>
       </div>
+      <RowCount shown={filtered.length} total={payments.length} />
 
       {modal && (
         <PaymentModal
