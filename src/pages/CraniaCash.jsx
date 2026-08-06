@@ -288,6 +288,7 @@ function RulesEditor({ pushHist }) {
   const { rules, updateRules } = useStore()
   const [draft, setDraft] = useState(rules)
   const [dirty, setDirty] = useState(false)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => { if (!dirty) setDraft(rules) }, [rules, dirty])
 
