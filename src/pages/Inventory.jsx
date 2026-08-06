@@ -249,7 +249,6 @@ export default function Inventory() {
   }
 
   // ---- column visibility ----
-  const [colsOpen, setColsOpen] = useState(false)
   const toggleColHidden = (key) => {
     mutate(d => {
       d.hiddenCols = { ...d.hiddenCols }
