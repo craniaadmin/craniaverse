@@ -656,9 +656,6 @@ function StaffList({
                 close()
                 setPop({ kind: 'cols', rect })
               }}><Eye size={13} /> Columns</button>
-            <BackupPanel base="staff"
-              hint="Snapshots of every staff record, saved to the database (last 14 kept)."
-              onRestored={async () => { await refreshStaff(); close() }} />
           </>
         )}
       >
