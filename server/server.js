@@ -352,23 +352,94 @@ app.use(express.json({ limit: '25mb' }))
 // Public HTML routes (/register, /form/:id, /sign-up, ...) and the
 // public /api/* subset are allowlisted inside auth.js. Everything
 // else under /api/ requires a valid session cookie.
-app.post('/api/login', (req, res) => {
-  const { password } = req.body || {}
-  if (!checkPassword(password)) return res.status(401).json({ error: 'Wrong password' })
-  res.setHeader('Set-Cookie', makeSessionCookie())
-  res.json({ ok: true })
+app.get('/api/captcha', (_req, res) => {
+  const { token, svg } = createChallenge()
+  res.json({ token, svg })
 })
+
+const clientIp = (req) =>
+  String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || 'unknown'
+
+app.post('/api/login', wrap(async (req, res) => {
+  const { email, password, captchaToken, captchaAnswer } = req.body || {}
+  const addr = normaliseEmail(email)
+  const ip = clientIp(req)
+
+  const lockedFor = loginBlocked(addr, ip)
+  if (lockedFor) {
+    return res.status(429).json({
+      error: `Too many failed attempts. Try again in ${lockedFor} minute${lockedFor === 1 ? '' : 's'}.`,
+    })
+  }
+
+  /* Checked before the password so a wrong code costs an attempt and
+     tells you nothing about whether the password was right. */
+  const cap = verifyChallenge(captchaToken, captchaAnswer)
+  if (!cap.ok) {
+    return res.status(400).json({
+      error: cap.reason === 'expired'
+        ? 'That verification image expired. Here is a new one.'
+        : 'The verification code did not match.',
+      captcha: cap.reason,
+    })
+  }
+
+  const user = (await getUsers()).find(u => normaliseEmail(u.email) === addr)
+  /* One message for "no such account" and "wrong password": telling
+     them apart hands over a list of which addresses are real. The
+     password is still verified against a throwaway hash when the
+     account does not exist, so the reply does not come back faster. */
+  const ok = user && user.active !== false && verifyPassword(password, user.passwordHash)
+  if (!ok) {
+    if (!user) verifyPassword(password, DUMMY_HASH)
+    noteLoginFailure(addr, ip)
+    return res.status(401).json({ error: 'Wrong email or password.' })
+  }
+
+  clearLoginFailures(addr, ip)
+  const { cookie, expiresAt } = makeSessionCookie(user)
+  res.setHeader('Set-Cookie', cookie)
+  await touchLastLogin(user.id)
+  res.json({ ok: true, user: publicUser(user), expiresAt })
+}))
+
 app.post('/api/logout', (_req, res) => {
   res.setHeader('Set-Cookie', clearSessionCookie())
   res.json({ ok: true })
 })
-app.get('/api/me', (req, res) => {
+
+app.get('/api/me', wrap(async (req, res) => {
   const session = readSession(req)
   if (!session) return res.status(401).json({ authed: false })
-  res.json({ authed: true })
-})
+  const user = (await getUsers()).find(u => u.id === session.uid)
+  // Deactivated or deleted mid-session: the cookie is still signed and
+  // unexpired, but the account behind it is gone.
+  if (!user || user.active === false) {
+    res.setHeader('Set-Cookie', clearSessionCookie())
+    return res.status(401).json({ authed: false })
+  }
+  res.json({ authed: true, user: publicUser(user), expiresAt: session.exp })
+}))
+
+/* Extends the session without a fresh password. Reached from the
+   "Stay signed in" button on the expiry warning, so an afternoon of
+   work is not interrupted at a fixed three-hour mark regardless of
+   what someone is in the middle of. */
+app.post('/api/session/extend', wrap(async (req, res) => {
+  const session = readSession(req)
+  if (!session) return res.status(401).json({ error: 'not authenticated' })
+  const user = (await getUsers()).find(u => u.id === session.uid)
+  if (!user || user.active === false) {
+    res.setHeader('Set-Cookie', clearSessionCookie())
+    return res.status(401).json({ error: 'not authenticated' })
+  }
+  const { cookie, expiresAt } = makeSessionCookie(user)
+  res.setHeader('Set-Cookie', cookie)
+  res.json({ ok: true, expiresAt })
+}))
 
 app.use(authRequired)
+app.use(roleRequired)
 
 const ALLOWED_FRAME_ANCESTORS = process.env.ALLOWED_FRAME_ANCESTORS
   || "'self' https://crania-schools.com https://www.crania-schools.com"
