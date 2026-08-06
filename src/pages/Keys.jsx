@@ -17,7 +17,7 @@
 // draggable columns, and the shared action bar.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Eye, Plus, KeyRound } from 'lucide-react'
+import { Eye, Plus } from 'lucide-react'
 import { useStore } from '../data/store'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
