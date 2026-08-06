@@ -368,7 +368,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   const [filterText, setFilterText] = useState('')
   const [filterPri, setFilterPri] = useState('all')
   const [filterDue, setFilterDue] = useState('all')
-  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // Undo/redo
   const undoStack = useRef([])
