@@ -116,6 +116,46 @@ export default function Invoices() {
         </button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-invoices"
+        csvColumns={[
+          { key: 'number', label: 'Invoice #' },
+          { key: 'date', label: 'Date' },
+          { key: 'dueDate', label: 'Due Date' },
+          { key: 'customerName', label: 'Customer' },
+          { key: 'customerEmail', label: 'Customer Email' },
+          { key: 'studentName', label: 'Student' },
+          { key: 'program', label: 'Program' },
+          { key: 'total', label: 'Total' },
+          { key: 'paid', label: 'Paid' },
+          { key: 'balance', label: 'Balance' },
+          { key: 'status', label: 'Status' },
+          { key: 'notes', label: 'Notes' },
+        ]}
+        csvRows={() => filtered.map(inv => ({
+          number: inv.number || '',
+          date: inv.date || '',
+          dueDate: inv.dueDate || '',
+          customerName: inv.customerName || '',
+          customerEmail: inv.customerEmail || '',
+          studentName: inv.studentName || '',
+          program: inv.program || '',
+          total: inv._b.total,
+          paid: inv._b.applied,
+          balance: inv._b.balance,
+          status: STATUS_STYLE[inv._s]?.label || inv._s,
+          notes: inv.notes || '',
+        }))}
+        backupCollection="finance"
+        backupHint="Snapshots of every invoice and payment (last 14 kept)."
+        onRestored={refresh}
+      >
+        <button title="Create a new invoice" onClick={openNew}>
+          <Plus size={13} /> New Invoice
+        </button>
+      </PageActions>
+
       {status === 'offline' && <OfflineBanner />}
 
       <SummaryStrip
