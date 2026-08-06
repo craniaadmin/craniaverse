@@ -646,6 +646,9 @@ function StaffList({
         csvName="crania-staff"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => allRows}
+        backupBase="staff"
+        backupHint="Snapshots of every staff record, saved to the database (last 14 kept)."
+        onRestored={refreshStaff}
         settingsExtra={close => (
           <>
             {/* Closes the panel on the way: the column chooser is a fixed
