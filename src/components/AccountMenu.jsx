@@ -194,6 +194,17 @@ function PasswordModal({ user, onClose }) {
    for the current password when you change your own, which an admin
    acting on their own row cannot supply here — that is what the Change
    password item in the menu is for. */
+/* A sortable heading. Clicking the one already sorted flips direction. */
+function SortTh({ k, sort, onSort, children }) {
+  const on = sort.key === k
+  return (
+    <th className="sortable" onClick={() => onSort(s => ({ key: k, dir: s.key === k ? -s.dir : 1 }))}
+      title={`Sort by ${String(children).toLowerCase()}`}>
+      {children}{on && <span className="arw">{sort.dir > 0 ? '▲' : '▼'}</span>}
+    </th>
+  )
+}
+
 /* A password box that starts hidden with a Show beside it. Used for both
    setting someone's password and creating an account — a password typed
    in the clear is readable by whoever is standing behind you, and these
