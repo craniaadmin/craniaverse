@@ -415,8 +415,8 @@ function CashSettings({ pushHist }) {
 }
 
 // ─── Detail: one student's balance, quick actions and log ──────────────────
-function StudentCashDetail({ record, onBack, onNavigate }) {
-  const { rules, addCashEntry } = useStore()
+function StudentCashDetail({ record, onBack, onNavigate, award }) {
+  const { rules } = useStore()
   const [amount, setAmount] = useState('')
   const [reason, setReason] = useState('')
 
