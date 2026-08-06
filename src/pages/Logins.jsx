@@ -13,7 +13,7 @@
 // used for.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Eye, Download, Copy, Check, AlertTriangle } from 'lucide-react'
+import { Eye, Copy, Check, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
 import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } from '../data/loginUtils'
 import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
