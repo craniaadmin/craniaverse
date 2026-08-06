@@ -1120,19 +1120,28 @@ export default function CalendarView({
           </div>
         )}
 
-        {/* Actions row — matches v22: Undo Redo | Settings(pushed right) YearImage ExportCSV */}
-        <div className="actionsrow">
-          <button disabled={!undoLen} onClick={undo} title="Undo (Ctrl+Z)">{'↶'} Undo</button>
-          <button disabled={!redoLen} onClick={redo} title="Redo (Ctrl+Shift+Z)">{'↷'}</button>
-          <button className="settings-btn" title="Settings" onClick={e => { e.stopPropagation(); setSettingsOpen(o => !o) }}>{'⚙'}</button>
+        <PageActions
+          onUndo={undo} onRedo={redo}
+          undoLabel={undoLen ? 'last calendar change' : ''}
+          redoLabel={redoLen ? 'last undone change' : ''}
+          csvName={`crania-${backupCollection === 'calendar' ? 'calendar' : 'marketing-calendar'}-export`}
+          csvColumns={[
+            { key: 'calendar', label: 'Calendar' },
+            { key: 'title', label: 'Title' },
+            { key: 'date', label: 'Date' },
+            { key: 'allDay', label: 'All Day' },
+            { key: 'start', label: 'Start' },
+            { key: 'end', label: 'End' },
+            { key: 'repeats', label: 'Repeats' },
+            { key: 'notes', label: 'Notes' },
+          ]}
+          csvRows={csvRows}
+          backupCollection={backupCollection}
+          backupHint={`Snapshots of every ${title.toLowerCase()} event and calendar (last 14 kept).`}
+          onRestored={refresh}
+        >
           <button title="Save the whole year as a PNG image" onClick={exportYearImage}>{'🖼'} Year Image</button>
-          <button onClick={exportCSV} title="Download all events as a CSV file">{'⤓'} Export CSV</button>
-        </div>
-
-        {/* Settings popover */}
-        {settingsOpen && (
-          <CalSettingsPopover onClose={() => setSettingsOpen(false)} />
-        )}
+        </PageActions>
 
         {/* Calendar chips bar — matches v22 calbar2 */}
         <div className="calbar2">
