@@ -151,6 +151,9 @@ export default function Leads({ onNavigate }) {
 
   const metrics = STATUSES.reduce((acc, s) => ({ ...acc, [s]: leads.filter(l => l.status === s).length }), {})
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(leads, next => mutate(() => next), { label: 'lead change' })
+
   if (loading) {
     return (
       <div className="page">
@@ -159,8 +162,6 @@ export default function Leads({ onNavigate }) {
     )
   }
 
-  // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(leads, next => mutate(() => next), { label: 'lead change' })
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>

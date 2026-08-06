@@ -99,6 +99,9 @@ export default function Contacts() {
       (c.phone || '').toLowerCase().includes(q)
   }).sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }))
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js
+  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change' })
+
   if (loading) {
     return (
       <div className="page">
@@ -107,8 +110,6 @@ export default function Contacts() {
     )
   }
 
-  // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change' })
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
