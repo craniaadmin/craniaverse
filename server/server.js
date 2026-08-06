@@ -28,8 +28,7 @@ import { sendRegistrationEmails, sendBoothSignupEmail } from './email.js'
 import { generateFeeSchedulePdf } from './pdf-fee-schedule.js'
 import {
   authRequired,
-  roleRequired,
-  checkPassword,
+  makeRoleGate,
   makeSessionCookie,
   clearSessionCookie,
   readSession,
@@ -515,7 +514,9 @@ app.post('/api/users/:id/password', wrap(async (req, res) => {
   if (idx === -1) return res.status(404).json({ error: 'No such account.' })
 
   const self = req.session?.uid === users[idx].id
-  const isAdmin = normaliseRole(req.session?.role) === 'admin'
+  // Read from the account, not the cookie: see makeRoleGate.
+  const actor = users.find(u => u.id === req.session?.uid)
+  const isAdmin = actor?.active !== false && normaliseRole(actor?.role) === 'admin'
   if (!self && !isAdmin) return res.status(403).json({ error: 'That area is limited to admin accounts.' })
   if (self && !verifyPassword(currentPassword, users[idx].passwordHash)) {
     return res.status(401).json({ error: 'Your current password is not right.' })
@@ -528,7 +529,10 @@ app.post('/api/users/:id/password', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
-app.use(roleRequired)
+/* Looks the account up on every request so a change of level, or an
+   account switched off, applies at once rather than when the session
+   happens to run out. */
+app.use(makeRoleGate(async (uid) => (await getUsers()).find(u => u.id === uid)))
 
 // ---- accounts -----------------------------------------------
 // roleRequired already limits /api/users/* to admins, except the two

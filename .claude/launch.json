@@ -18,15 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "authapi",
-      "runtimeExecutable": "node",
-      "runtimeArgs": [
-        "__fakeapi.mjs",
-        "./server"
-      ],
-      "port": 4100
     }
   ]
 }

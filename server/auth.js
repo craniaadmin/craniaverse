@@ -107,15 +107,6 @@ export function readSession(req) {
   return verify(cookies[COOKIE_NAME])
 }
 
-export function checkPassword(input) {
-  const admin = process.env.ADMIN_PASSWORD || ''
-  if (!admin) return false
-  const a = Buffer.from(String(input || ''))
-  const b = Buffer.from(admin)
-  if (a.length !== b.length) return false
-  return crypto.timingSafeEqual(a, b)
-}
-
 // ---- login throttling ---------------------------------------
 /* The CAPTCHA raises the cost of a scripted guess; this caps how many
    guesses are possible at all. Counted per account and per source
