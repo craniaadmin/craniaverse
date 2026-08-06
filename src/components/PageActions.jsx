@@ -107,26 +107,26 @@ export default function PageActions({
           : onRedo ? 'Nothing to redo' : 'This page does not track changes yet'}
         onClick={onRedo}><Redo2 size={13} /></button>
 
-      {/* Page-specific controls (Columns, filters, Add…) sit between the
-          history buttons and the pair that ends every bar. */}
+      {/* Page-specific controls that are used often enough to earn a
+          place in the bar. The occasional ones go under the gear via
+          settingsExtra. */}
       {children}
 
       <span className="grow" />
 
-      <button disabled={!canExport}
-        title={canExport ? 'Download what is on this page as a CSV file'
-          : 'Nothing on this page to export yet'}
-        onClick={() => canExport && downloadCsv(csvName, csvColumns,
-          typeof csvRows === 'function' ? csvRows() : (csvRows || []))}>
-        <Download size={13} /> Export CSV
-      </button>
-
-      <button className="gearbtn" title="Backups and settings"
+      <button className="gearbtn" title="Export, backups and settings"
         onClick={() => setSettingsOpen(v => !v)}>⚙</button>
 
       {settingsOpen && (
         <Settings collection={backupCollection} hint={backupHint}
-          onRestored={onRestored} onClose={() => setSettingsOpen(false)}>
+          onRestored={onRestored} onClose={() => setSettingsOpen(false)}
+          canExport={canExport}
+          onExport={() => {
+            if (!canExport) return
+            downloadCsv(csvName, csvColumns,
+              typeof csvRows === 'function' ? csvRows() : (csvRows || []))
+            setSettingsOpen(false)
+          }}>
           {settingsExtra}
         </Settings>
       )}
