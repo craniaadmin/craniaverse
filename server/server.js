@@ -70,6 +70,7 @@ import {
   listProgramsBackups, createProgramsBackup, restoreProgramsBackup,
   listCustomersBackups, createCustomersBackup, restoreCustomersBackup,
   listStaffBackups,     createStaffBackup,     restoreStaffBackup,
+  listSnapshots,        createSnapshot,        restoreSnapshot,
   loadBoothSignups,  upsertBoothSignup, deleteBoothSignup,
   loadForms,         saveForms,
   loadSubmissions,   createSubmission,

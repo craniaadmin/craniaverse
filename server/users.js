@@ -115,6 +115,9 @@ const ADMIN_ONLY = [
   /^\/api\/[a-z-]+\/restore(\/|$)/,
   /^\/api\/registrations\/restore$/,
   /^\/api\/rules(\/|$)/,
+  // Generic snapshots carry an extra path segment for the collection,
+  // so the single-segment patterns above do not reach them.
+  /^\/api\/snapshots(\/|$)/,
 ]
 
 export function permits(role, method, pathname) {
