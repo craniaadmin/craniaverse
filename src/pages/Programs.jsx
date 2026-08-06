@@ -2166,31 +2166,15 @@ const FilterPop = React.forwardRef(function FilterPop(
   )
 })
 
-const ColsPop = React.forwardRef(function ColsPop(
-  { rect, colOrder, hiddenCols, onToggle, onAll, onNone }, ref) {
-  const style = { left: Math.min(rect.left, window.innerWidth - 210), top: rect.bottom + 6 }
-  /* Every column with a heading is listed, Program included. The template
-     leaves Program out, but its heading still carries a hide button — so
-     hiding it there is unrecoverable. */
-  const menuCols = colOrder.map(k => COL[k]).filter(c => c && c.l)
-  COLS.filter(c => c.l).forEach(c => { if (!menuCols.includes(c)) menuCols.push(c) })
-  return (
-    <div className="pgpop" ref={ref} style={style}>
-      <div className="h">Show Columns</div>
-      {menuCols.map(c => (
-        <label className="ch" key={c.k}>
-          <input type="checkbox" checked={!hiddenCols[c.k]}
-            onChange={e => onToggle(c.k, e.target.checked)} />
-          <span>{c.l}</span>
-        </label>
-      ))}
-      <div className="allrow">
-        <button type="button" onClick={onAll}>Select All</button>
-        <button type="button" onClick={onNone}>Clear All</button>
-      </div>
-    </div>
-  )
-})
+/* The columns the chooser lists, in the order the table shows them. Every
+   column with a heading is included, Program among them: the template
+   leaves Program out, but its heading still carries a hide button, so
+   hiding it there would otherwise be unrecoverable. */
+function menuColsFor(colOrder) {
+  const out = colOrder.map(k => COL[k]).filter(c => c && c.l)
+  COLS.filter(c => c.l).forEach(c => { if (!out.includes(c)) out.push(c) })
+  return out
+}
 
 /* ================= inline cell editor ================= */
 function CellEditor({ row, col, locations, programs, categories, teacherOptions, onCommit, onCancel }) {
