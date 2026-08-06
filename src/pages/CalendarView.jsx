@@ -566,8 +566,14 @@ const CSS = PAGEACTIONS_CSS + `
 `
 
 // ─── Main Component ───
-export default function CalendarView({ apiPath = '/api/calendar', title = 'Calendar' }) {
-  const { data, loading, status, mutate, undo, redo, undoLen, redoLen } = useCalendar(apiPath)
+/* `backupCollection` is a prop because the Marketing Calendar renders this
+   same component against its own PocketBase collection — the settings gear
+   used to be hardwired to /api/calendar, so backing up from the Marketing
+   Calendar snapshotted the operations calendar instead. */
+export default function CalendarView({
+  apiPath = '/api/calendar', title = 'Calendar', backupCollection = 'calendar',
+}) {
+  const { data, loading, status, mutate, undo, redo, undoLen, redoLen, refresh } = useCalendar(apiPath)
   const [view, setView] = useState('month') // month, week, day, year
   const [cur, setCur] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
   const [editingEvent, setEditingEvent] = useState(null)
