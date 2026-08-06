@@ -539,6 +539,49 @@ export default function Payroll() {
 
   return (
     <div className="page" style={{ paddingBottom: 48 }}>
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName={`crania-payroll-${periodStart || todayStr()}`}
+        csvColumns={[
+          { key: 'name', label: 'Employee' },
+          { key: 'role', label: 'Role' },
+          { key: 'rate', label: 'Rate/hr' },
+          { key: 'hours', label: 'Hours' },
+          { key: 'gross', label: 'Gross Pay' },
+          { key: 'cppEE', label: 'CPP (EE)' },
+          { key: 'eiEE', label: 'EI (EE)' },
+          { key: 'taxPP', label: 'Income Tax' },
+          { key: 'totalDed', label: 'Total Deductions' },
+          { key: 'netPay', label: 'Net Pay' },
+          { key: 'craRem', label: 'CRA Remittance' },
+          { key: 'empPaid', label: 'Employee Paid' },
+          { key: 'craPaid', label: 'CRA Paid' },
+          { key: 'periodType', label: 'Period Type' },
+          { key: 'periodStart', label: 'Period Start' },
+          { key: 'periodEnd', label: 'Period End' },
+        ]}
+        csvRows={() => rows.map(r => ({
+          name: r.name || '',
+          role: r.role || '',
+          rate: r.rate || 0,
+          hours: r.hours || 0,
+          gross: r.gross || 0,
+          cppEE: r.cppEE || 0,
+          eiEE: r.eiEE || 0,
+          taxPP: r.taxPP || 0,
+          totalDed: r.totalDed || 0,
+          netPay: r.netPay || 0,
+          craRem: r.craRem || 0,
+          empPaid: empPaidMap[r.id] || '',
+          craPaid: craPaidMap[r.id] || '',
+          periodType,
+          periodStart,
+          periodEnd: effectiveEnd,
+        }))}
+        backupCollection="finance"
+        backupHint="Snapshots of the finance records (last 14 kept). Processed pay runs are stored in this browser."
+        onRestored={refreshStore}
+      />
 
       {/* ── Pay period config ──────────────────────────────────────────── */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end', background: '#f8fafb', border: '1px solid var(--line)', borderRadius: 10, padding: '16px 20px', marginBottom: 24 }}>
