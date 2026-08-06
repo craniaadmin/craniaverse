@@ -170,6 +170,17 @@ const collectionSpecs = [
     indexes: [],
   },
   {
+    // One shared backup store for every page's settings gear, tagged
+    // with which collection each snapshot came from.
+    name: 'snapshots',
+    fields: [
+      { name: 'source',  type: 'text', required: true, presentable: true },
+      { name: 'label',   type: 'text', required: false },
+      { name: 'payload', type: 'json', required: false, maxSize: 20971520 },
+    ],
+    indexes: [],
+  },
+  {
     name: 'staff_backups',
     fields: [
       { name: 'label',   type: 'text', required: false },

@@ -1111,6 +1111,26 @@ app.put('/api/staff-board', wrap(async (req, res) => {
   res.json({ ok: true })
 }))
 
+/* Generic backup for any page's settings gear. BackupPanel points at
+   /api/snapshots/:collection and gets the same three operations
+   everywhere, instead of a bespoke pair of routes per page. Which
+   collections are reachable is fixed in pb.js, not taken from the URL. */
+app.get('/api/snapshots/:collection/backups', wrap(async (req, res) =>
+  res.json(await listSnapshots(req.params.collection))))
+
+app.post('/api/snapshots/:collection/backup', wrap(async (req, res) => {
+  const label = (req.body?.label || '').trim() || new Date().toLocaleString()
+  res.json({ ok: true, ...(await createSnapshot(req.params.collection, label)) })
+}))
+
+app.post('/api/snapshots/:collection/restore/:id', wrap(async (req, res) => {
+  const payload = await restoreSnapshot(req.params.collection, req.params.id)
+  // The API keeps every collection in memory; a restore behind its back
+  // would be written straight over on the next save.
+  for (const k of Object.keys(cache)) cache[k] = null
+  res.json({ ok: true, count: payload.length })
+}))
+
 app.get('/api/staff/backups', wrap(async (_req, res) => res.json(await listStaffBackups())))
 app.post('/api/staff/backup', wrap(async (req, res) => {
   const label = (req.body?.label || '').trim() || new Date().toLocaleString()
