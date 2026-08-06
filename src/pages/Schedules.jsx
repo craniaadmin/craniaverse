@@ -474,6 +474,11 @@ export default function Schedules() {
         />
       )}
 
+      {/* Classes on the timetable, after the location and search filters —
+          the grid itself only shows the current week or day, so this is the
+          filtered set rather than what is on screen at this moment. */}
+      <RowCount shown={filteredEntries.length} total={entries.length} />
+
       {editing && (
         <EntryForm
           entry={editing}
