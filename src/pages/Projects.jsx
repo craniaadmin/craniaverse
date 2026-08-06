@@ -6,7 +6,7 @@
 // go to PocketBase through /api/projects/backup instead.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import PageActions from '../components/PageActions'
+import PageActions, { PanelDisclosure } from '../components/PageActions'
 
 const PJ_CSS = `
 .pj-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0 8px;}
