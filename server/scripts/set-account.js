@@ -75,7 +75,7 @@ if (opts.list || argv.length === 0) {
     console.log(`  ${p.email.padEnd(32)} ${p.role.padEnd(9)} ${p.active ? '' : '(inactive) '}${p.name}`)
   }
   console.log('\nPass --who <email> with --email / --password / --name / --role to change one.\n')
-  process.exit(0)
+  return
 }
 
 // ---- pick the account ---------------------------------------
