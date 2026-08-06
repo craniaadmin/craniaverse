@@ -1203,12 +1203,15 @@ function TodoView({
             <button className="add-item" title="Add to-do" onClick={() => openItem(null, list.id)}>+</button>
           </div>
         )})}
-      </div>
 
-      {/* Just the count. This used to read "CraniaVerse · To-Do · Count=…",
-          repeating the app and the page name under a screen already showing
-          both in the top bar and the sidebar. */}
-      <RowCount shown={totalShown} total={(state.items || []).length} />
+        {/* Inside the board rather than after it, so its right edge is the
+            cards' right edge whatever width the board happens to be —
+            matching the board's max-width from outside broke the moment
+            the two numbers disagreed. The text itself is just the count:
+            it used to read "CraniaVerse · To-Do · Count=…", repeating the
+            app and page name under a screen already showing both. */}
+        <RowCount shown={totalShown} total={(state.items || []).length} />
+      </div>
 
       {/* Context menu */}
       {ctxMenu && (
