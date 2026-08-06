@@ -302,6 +302,81 @@ export default function CraniaStore() {
         </div>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      {view === 'inventory' ? (
+        <PageActions
+          csvName="crania-store-inventory"
+          csvColumns={[
+            { key: 'num', label: 'Item #' },
+            { key: 'name', label: 'Name' },
+            { key: 'category', label: 'Category' },
+            { key: 'sub', label: 'Sub-Category' },
+            { key: 'sku', label: 'SKU' },
+            { key: 'qty', label: 'On Hand' },
+            { key: 'reorder', label: 'Reorder Level' },
+            { key: 'cost', label: 'Cost' },
+            { key: 'tax', label: 'Tax %' },
+            { key: 'price', label: 'Store Price' },
+            { key: 'shelfValue', label: 'Shelf Value' },
+            { key: 'location', label: 'Location' },
+            { key: 'status', label: 'Status' },
+            { key: 'notes', label: 'Notes' },
+          ]}
+          csvRows={() => filteredItems.map(it => {
+            const price = Number(it.price) || calcPrice(it.cost, it.tax)
+            const s = statusOf(it)
+            return {
+              num: it.num || '',
+              name: it.name || '',
+              category: it.category || '',
+              sub: it.sub || '',
+              sku: it.sku || '',
+              qty: Number(it.qty) || 0,
+              reorder: Number(it.reorder) || 0,
+              cost: Number(it.cost) || 0,
+              tax: Number(it.tax) || 0,
+              price,
+              shelfValue: (Number(it.qty) || 0) * price,
+              location: it.location || '',
+              status: s === 'ok' ? 'In Stock' : s === 'low' ? 'Low Stock' : 'Out of Stock',
+              notes: it.notes || '',
+            }
+          })}
+          backupCollection="craniaStore"
+          backupHint="Snapshots of every store item and its stock-change log (last 14 kept)."
+          onRestored={refresh}
+        >
+          <button onClick={() => setEditing({ mode: 'new', item: null })} title="Add a store item">
+            <Plus size={13} /> Add Item
+          </button>
+        </PageActions>
+      ) : (
+        <PageActions
+          csvName="crania-store-log"
+          csvColumns={[
+            { key: 'ts', label: 'When' },
+            { key: 'itemName', label: 'Item' },
+            { key: 'delta', label: 'Change' },
+            { key: 'after', label: 'On Hand After' },
+            { key: 'user', label: 'Who' },
+            { key: 'note', label: 'Reason' },
+          ]}
+          csvRows={() => [...data.log]
+            .sort((a, b) => (b.ts || '').localeCompare(a.ts || ''))
+            .map(row => ({
+              ts: row.ts || '',
+              itemName: row.itemName || '',
+              delta: Number(row.delta) || 0,
+              after: row.after ?? 0,
+              user: row.user || '',
+              note: row.note || '',
+            }))}
+          backupCollection="craniaStore"
+          backupHint="Snapshots of every store item and its stock-change log (last 14 kept)."
+          onRestored={refresh}
+        />
+      )}
+
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
