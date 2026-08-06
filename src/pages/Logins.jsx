@@ -360,12 +360,31 @@ export default function Logins({ onNavigate }) {
   /* A blank string is stored rather than the key removed, and resolveLogin
      reads blank as "no override" — so clearing a field really does hand the
      student back to the generated value. */
-  const writeLogin = (recordId, patch) => {
+  const applyLogin = (recordId, patch) => {
     for (const [k, v] of Object.entries(patch)) updateStudentField(recordId, k, v)
     fetch(`${API_BASE}/api/registrations/${recordId}/student`, {
       method: 'PUT', headers: HEADERS, body: JSON.stringify(patch),
     }).catch(() => {})
+  }
+
+  /* Every change goes through here, so every change is on the undo stack —
+     including the ones made from the right-click menu. What is put back is
+     the stored override, not the value on screen: a blank means "follow the
+     name", and undo has to restore that rather than freezing the spelling
+     the name happened to have. */
+  const writeLogin = (recordId, patch, label) => {
+    const rec = recordsRef.current.find(r => r.id === recordId)
+    const before = Object.fromEntries(
+      Object.keys(patch).map(k => [k, rec?.student?.[k] ?? '']))
+    applyLogin(recordId, patch)
     setEditing(null)
+    if (label && JSON.stringify(before) !== JSON.stringify(patch)) {
+      pushHist({
+        label,
+        undo: () => applyLogin(recordId, before),
+        redo: () => applyLogin(recordId, patch),
+      })
+    }
   }
 
   /* Typing the generated value back in stores nothing, so the field goes on
