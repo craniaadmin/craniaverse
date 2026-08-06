@@ -353,15 +353,6 @@ export default function Inventory() {
                   ))}
                 </div>
               )}
-              <button
-                onClick={exportCsv}
-                title="Download the currently-filtered items as a CSV file"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  background: '#fff', border: '1px solid #e2ded2', color: 'var(--brand-dark-brown)',
-                  padding: '6px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, cursor: 'pointer',
-                }}
-              ><Download size={14} /> Export CSV</button>
             </>
           )}
           <button
@@ -375,6 +366,22 @@ export default function Inventory() {
           </button>
         </div>
       </div>
+
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName={view === 'log' ? 'crania-inventory-log' : 'crania-inventory'}
+        csvColumns={view === 'log' ? LOG_CSV_COLUMNS : ITEM_CSV_COLUMNS}
+        csvRows={csvRows}
+        backupCollection="stock"
+        backupHint="Snapshots of every stock item and its change log (last 14 kept)."
+        onRestored={refresh}
+      >
+        {view === 'inventory' && (
+          <button onClick={() => setEditing({ mode: 'new', item: null })} title="Add a stock item">
+            <Plus size={13} /> Add Item
+          </button>
+        )}
+      </PageActions>
 
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
