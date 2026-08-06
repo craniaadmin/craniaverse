@@ -54,6 +54,13 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
   font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
   text-align:left;margin-bottom:7px}
 .pgsettings .pgscard > button:not(.pgsitem):hover{background:#F1F3F4;border-color:#5FA09E}
+/* A page that keeps its own BackupPanel (rather than using
+   backupCollection) drops it in as settingsExtra, which lands inside the
+   Tools card. Flatten it there so it reads as another section of the same
+   card instead of a card sitting inside a card with two borders and two
+   shadows. */
+.pgsettings .pgscard .bkp-card{border:none;box-shadow:none;border-radius:0;
+  padding:10px 0 0;margin-top:3px;border-top:1px solid #E7EBE7}
 `
 
 /* Turns rows of plain objects into a CSV the way a spreadsheet expects
