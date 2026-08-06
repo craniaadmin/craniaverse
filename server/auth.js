@@ -107,6 +107,24 @@ export function readSession(req) {
   return verify(cookies[COOKIE_NAME])
 }
 
+/* The CAPTCHA is there to stop a remote script hammering the login. A
+   request that arrives on the loopback interface with no forwarding
+   header did not come through the tunnel — it came from a process on
+   this machine, which is already past every network control there is.
+   The smoke tests run there, and without this they cannot sign in at
+   all; the one that creates a registration kept succeeding on the
+   public POST and then failing to clean up, so a test record piled up
+   every fifteen minutes.
+
+   ngrok always sets x-forwarded-for, so tunnel traffic never matches
+   and still has to solve the image. The password and the lockout apply
+   either way. */
+export function captchaExempt(req) {
+  if (req.headers['x-forwarded-for']) return false
+  const ip = req.socket?.remoteAddress || req.ip || ''
+  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1'
+}
+
 // ---- login throttling ---------------------------------------
 /* The CAPTCHA raises the cost of a scripted guess; this caps how many
    guesses are possible at all. Counted per account and per source
