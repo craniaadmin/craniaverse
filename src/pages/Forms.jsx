@@ -30,7 +30,8 @@ const BLANK_FIELD = () => ({
 const BLANK_FORM = { title: '', description: '', fields: [] }
 
 // ------------------------------ FORMS LIST ------------------------------
-function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl }) {
+function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations }) {
+  const registerUrl = `${API_BASE || window.location.origin}/register`
   const [copied, setCopied] = useState(null)
   const copy = async (url, key) => {
     try {
@@ -59,9 +60,6 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
         backupCollection="forms"
         backupHint="Snapshots of every form definition (last 14 kept). Submissions are not included."
       >
-        <button className="icon-btn solid" title="New form" onClick={onNew}>
-          <Plus size={22} />
-        </button>
         <button title="Build a new form" onClick={onNew}><Plus size={13} /> New Form</button>
       </PageActions>
 
@@ -72,6 +70,38 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
           border: '1px solid #d5ecef', borderRadius: 12,
           padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr auto',
           gap: 12, alignItems: 'center', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
+        }}>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Star size={15} style={{ color: '#5FA09E', fill: '#5FA09E' }} />
+              Registration Form
+              <span style={{ background: '#5FA09E', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, letterSpacing: '.4px', textTransform: 'uppercase' }}>Built-in</span>
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <span>Guardians · children · programme enrolments · consent</span>
+              <span>·</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{registerUrl}</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button className="icon-btn" title={copied === 'reg' ? 'Copied!' : 'Copy public link'} onClick={() => copy(registerUrl, 'reg')}>
+              <Copy size={16} />
+            </button>
+            <button className="icon-btn" title="Open public form" onClick={() => window.open(registerUrl, '_blank')}>
+              <ExternalLink size={16} />
+            </button>
+            <button className="icon-btn" title="View registrations" onClick={onOpenRegistrations}>
+              <Eye size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div style={{
+          background: '#f2fbfc',
+          border: '1px solid #d5ecef', borderRadius: 12,
+          padding: '16px 18px', display: 'grid', gridTemplateColumns: '1fr auto',
+          gap: 12, alignItems: 'center', boxShadow: '0 1px 3px rgba(20,30,45,.06)',
+          marginBottom: 12,
         }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -650,10 +680,142 @@ function BoothSignupsView({ onBack }) {
   )
 }
 
-export default function Forms() {
+/* Submissions used to be reachable only by clicking a card on All
+   Forms. As its own nav entry it needs somewhere to start, so it asks
+   which form you mean — including the two built-in ones, whose
+   submissions live elsewhere. */
+function PickForm({ forms, onPick, onBooth, onRegistrations }) {
+  const Row = ({ title, blurb, onClick }) => (
+    <button onClick={onClick} style={{
+      display: 'grid', gridTemplateColumns: '1fr auto', gap: 12, alignItems: 'center',
+      width: '100%', textAlign: 'left', background: '#fff', border: '1px solid var(--line)',
+      borderRadius: 10, padding: '13px 16px', marginBottom: 8, cursor: 'pointer',
+      font: 'inherit', color: 'var(--ink)',
+    }}>
+      <span>
+        <span style={{ display: 'block', fontWeight: 700, fontSize: 14 }}>{title}</span>
+        <span style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{blurb}</span>
+      </span>
+      <span style={{ fontSize: 12, color: 'var(--muted)', whiteSpace: 'nowrap' }}>Open →</span>
+    </button>
+  )
+  return (
+    <div className="page">
+      <div style={{ fontSize: 13, color: 'var(--muted)', margin: '2px 0 14px' }}>
+        Choose a form to see what has been submitted to it.
+      </div>
+      <Row title="Registration Form" blurb="Enrolments from the public registration form"
+        onClick={onRegistrations} />
+      <Row title="Booth Sign-Up" blurb="Free assessments, open house RSVPs and agenda orders"
+        onClick={onBooth} />
+      {forms.length === 0 ? (
+        <div style={{
+          background: '#fff', border: '1px solid var(--line)', borderRadius: 10,
+          padding: '28px 20px', textAlign: 'center', color: 'var(--muted)', fontSize: 13,
+        }}>No custom forms yet — build one under Form Builder.</div>
+      ) : forms.map(f => (
+        <Row key={f.id} title={f.title || 'Untitled Form'}
+          blurb={f.description || `${(f.fields || []).length} field${(f.fields || []).length === 1 ? '' : 's'}`}
+          onClick={() => onPick(f.id)} />
+      ))}
+    </div>
+  )
+}
+
+/* Starting points for a new form. Picking one opens the builder with
+   the fields already laid out, which is the only thing "template" can
+   usefully mean here — they are not stored separately. */
+const TEMPLATES = [
+  {
+    title: 'Contact Enquiry',
+    description: 'A short form for questions from the website.',
+    fields: [
+      { label: 'Your name', type: 'text', required: true },
+      { label: 'Email', type: 'email', required: true },
+      { label: 'Phone', type: 'tel', required: false },
+      { label: 'How can we help?', type: 'textarea', required: true },
+    ],
+  },
+  {
+    title: 'Trial Class Request',
+    description: 'Collects the child and the class they want to try.',
+    fields: [
+      { label: "Child's name", type: 'text', required: true },
+      { label: 'Current grade', type: 'text', required: true },
+      { label: 'Program of interest', type: 'select', required: true,
+        options: ['Flex Math', 'Math Enrichment', 'TeknoKids', 'ArtsKids'] },
+      { label: 'Guardian email', type: 'email', required: true },
+      { label: 'Anything we should know?', type: 'textarea', required: false },
+    ],
+  },
+  {
+    title: 'Feedback',
+    description: 'A rating and a comment, for after a term or an event.',
+    fields: [
+      { label: 'Which program?', type: 'text', required: true },
+      { label: 'How did it go?', type: 'radio', required: true,
+        options: ['Very well', 'Well', 'Mixed', 'Not well'] },
+      { label: 'Comments', type: 'textarea', required: false },
+    ],
+  },
+]
+
+function Templates({ onUse }) {
+  return (
+    <div className="page">
+      <div style={{ fontSize: 13, color: 'var(--muted)', margin: '2px 0 14px' }}>
+        Start from one of these rather than an empty form. Everything stays editable.
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 14 }}>
+        {TEMPLATES.map(t => (
+          <div key={t.title} style={{
+            background: '#fff', border: '1px solid var(--line)', borderRadius: 12,
+            padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10,
+          }}>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 3 }}>{t.title}</div>
+              <div style={{ fontSize: 12.5, color: 'var(--muted)' }}>{t.description}</div>
+            </div>
+            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12, color: 'var(--ink-soft)' }}>
+              {t.fields.map(f => <li key={f.label}>{f.label}{f.required ? ' *' : ''}</li>)}
+            </ul>
+            <button className="btn light" style={{ marginTop: 'auto', alignSelf: 'flex-start' }}
+              onClick={() => onUse({
+                title: t.title,
+                description: t.description,
+                fields: t.fields.map((f, i) => ({
+                  ...BLANK_FIELD(), key: `f${i}`, label: f.label, type: f.type,
+                  required: !!f.required, options: f.options || [],
+                })),
+              })}>Use this template</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* `initialView` says which of the Forms sub-pages this instance is. The
+   nav splits All Forms, Registrations, Submissions, Templates and Form
+   Builder across five entries; each mounts this component in the
+   matching mode rather than duplicating the loading and saving across
+   five files. */
+export default function Forms({ onNavigate, initialView = 'list' }) {
   const [forms, setForms] = useState([])
   const [loading, setLoading] = useState(true)
-  const [view, setView] = useState({ mode: 'list' }) // list | new | edit(id) | subs(id)
+  const [view, setView] = useState(() => (
+    initialView === 'new' ? { mode: 'new' }
+      : initialView === 'submissions' ? { mode: 'picksubs' }
+        : initialView === 'templates' ? { mode: 'templates' }
+          : { mode: 'list' }
+  ))
+  // Following the nav to another Forms page remounts with a new prop.
+  useEffect(() => {
+    setView(initialView === 'new' ? { mode: 'new' }
+      : initialView === 'submissions' ? { mode: 'picksubs' }
+        : initialView === 'templates' ? { mode: 'templates' }
+          : { mode: 'list' })
+  }, [initialView])
 
   useEffect(() => {
     fetch(`${API_BASE}/api/forms`)
@@ -721,7 +883,7 @@ export default function Forms() {
   }
 
   if (view.mode === 'new') {
-    return <FormBuilder onSave={createForm} onCancel={() => setView({ mode: 'list' })} publicUrl={publicUrl} />
+    return <FormBuilder initial={view.tpl} onSave={createForm} onCancel={() => setView({ mode: initialView === 'new' ? 'new' : 'list' })} publicUrl={publicUrl} />
   }
   if (view.mode === 'edit') {
     const f = forms.find(x => x.id === view.id)
@@ -730,7 +892,7 @@ export default function Forms() {
       <FormBuilder
         initial={f}
         onSave={(draft) => updateForm(view.id, draft)}
-        onCancel={() => setView({ mode: 'list' })}
+        onCancel={() => setView({ mode: initialView === 'new' ? 'new' : 'list' })}
         publicUrl={publicUrl}
       />
     )
@@ -739,6 +901,27 @@ export default function Forms() {
     const f = forms.find(x => x.id === view.id)
     if (!f) { setView({ mode: 'list' }); return null }
     return <SubmissionsView form={f} onBack={() => setView({ mode: 'list' })} />
+  }
+  if (view.mode === 'picksubs') {
+    return <PickForm forms={forms} title="Submissions"
+      blurb="Choose a form to see what has been submitted to it."
+      onPick={(id) => setView({ mode: 'subs', id })}
+      onBooth={() => setView({ mode: 'booth' })}
+      onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])} />
+  }
+  if (view.mode === 'templates') {
+    return <Templates onUse={(tpl) => setView({ mode: 'new', tpl })} />
+  }
+  if (view.mode === 'picksubs') {
+    return (
+      <PickForm forms={forms}
+        onPick={(id) => setView({ mode: 'subs', id })}
+        onBooth={() => setView({ mode: 'booth' })}
+        onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])} />
+    )
+  }
+  if (view.mode === 'templates') {
+    return <Templates onUse={(tpl) => setView({ mode: 'new', tpl })} />
   }
   if (view.mode === 'booth') {
     return <BoothSignupsView onBack={() => setView({ mode: 'list' })} />
@@ -754,6 +937,7 @@ export default function Forms() {
       publicUrl={publicUrl}
       boothUrl={boothUrl}
       onOpenBooth={() => setView({ mode: 'booth' })}
+      onOpenRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])}
     />
   )
 }

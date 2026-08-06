@@ -34,7 +34,7 @@ export const SUBMENUS = {
   marketing:   ['Marketing', 'Calendar', 'Leads', 'Surveys'],
   merchandise: ['Merchandise'],
   contacts:    ['Contacts'],
-  forms:       ['All Forms', 'Submissions', 'Templates', 'Form Builder'],
+  forms:       ['All Forms', 'Registrations', 'Submissions', 'Templates', 'Form Builder'],
   dayschool:   ['Day School'],
 }
 
