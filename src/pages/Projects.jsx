@@ -5,7 +5,7 @@
 // The mockup's folder-backup is deliberately not carried over — backups
 // go to PocketBase through /api/projects/backup instead.
 
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PageActions from '../components/PageActions'
 
 const PJ_CSS = `
