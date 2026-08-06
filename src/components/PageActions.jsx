@@ -6,7 +6,7 @@
 // undo handler and the button is disabled with a tooltip saying so,
 // rather than being missing on some screens and present on others.
 import React, { useEffect, useRef, useState } from 'react'
-import { Undo2, Redo2, Download } from 'lucide-react'
+import { Undo2, Redo2, Download, Eye } from 'lucide-react'
 import BackupPanel, { BACKUP_CSS } from './BackupPanel'
 
 export const PAGEACTIONS_CSS = BACKUP_CSS + `
