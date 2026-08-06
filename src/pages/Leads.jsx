@@ -152,7 +152,6 @@ export default function Leads({ onNavigate }) {
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">Leads</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -161,7 +160,6 @@ export default function Leads({ onNavigate }) {
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
       <div className="page-head">
-        <h2 className="page-title">Leads</h2>
         <button className="icon-btn solid" title="New lead" onClick={() => setEditing({ mode: 'new' })}>
           <Plus size={22} />
         </button>

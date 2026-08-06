@@ -1137,7 +1137,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
   return (
     <div className="page cu" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Customers</h2>
 
       <div className="actions">
         <button className="hbtn" disabled={!undoLabel || histBusy} style={{ marginRight: 'auto' }}
@@ -1777,7 +1776,6 @@ function CustomerDetail({ recordId, onBack, onSelectRecord, onAddSibling, onDele
       <style>{CSS}</style>
 
       <button className="back" onClick={onBack}><ChevronLeft size={16} /> All Customers</button>
-      <h2 className="page-title">Customers</h2>
 
       <div className="actions">
         <button title="Undo (Ctrl+Z)" disabled={!undoLen} onClick={doUndo}><Undo2 size={13} /> Undo</button>

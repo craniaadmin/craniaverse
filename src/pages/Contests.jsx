@@ -753,7 +753,6 @@ function ContestsPage({ onNavigate }) {
     return (
       <div className="page ct">
         <style>{CSS}</style>
-        <h2 className="page-title">Contests</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -871,7 +870,6 @@ function ContestsPage({ onNavigate }) {
   return (
     <div className="page ct" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Contests</h2>
 
       <div className="actions">
         <button title="Undo (Ctrl+Z)" disabled={!undoLen} onClick={doUndo}><Undo2 size={13} /> Undo</button>

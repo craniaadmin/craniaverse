@@ -308,7 +308,6 @@ export default function Schedules() {
   return (
     <div className="page">
       <div className="page-head">
-        <h2 className="page-title">Schedules</h2>
         <div className="head-actions">
           <button className="btn ghost" onClick={() => setShowRooms(true)}>
             <Settings size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />

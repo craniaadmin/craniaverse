@@ -1864,7 +1864,6 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
   return (
     <div className="page pg" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Programs</h2>
 
       <div className="actions">
         <button title="Undo (Ctrl+Z)" disabled={!history.undo.length} onClick={doUndo}>↶ Undo</button>

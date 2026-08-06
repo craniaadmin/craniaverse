@@ -212,7 +212,6 @@ export default function Dashboard({ onNavigate }) {
 
   return (
     <div className="page">
-      <h2 className="page-title">Dashboard</h2>
 
       {recStatus === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00', padding: '8px 12px', borderRadius: 8, marginBottom: 14, fontSize: 13 }}>

@@ -118,7 +118,6 @@ export default function Payments() {
   return (
     <PageShell>
       <div className="page-head">
-        <h2 className="page-title">Payments</h2>
         <button className="icon-btn solid" title="Log payment" onClick={() => openNew()}>
           <Plus size={22} />
         </button>

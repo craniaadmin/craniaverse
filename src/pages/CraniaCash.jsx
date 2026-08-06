@@ -922,7 +922,6 @@ export default function CraniaCash({ onNavigate }) {
   return (
     <div className="page cc" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Crania Cash</h2>
 
       {status === 'offline' && (
         <div className="offline">Working offline — showing cached data.</div>

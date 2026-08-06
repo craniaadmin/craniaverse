@@ -417,7 +417,6 @@ export default function Logins({ onNavigate }) {
   return (
     <div className="page lg" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Logins</h2>
 
       <div className="actions">
         <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}

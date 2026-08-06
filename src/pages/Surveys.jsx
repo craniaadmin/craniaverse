@@ -101,7 +101,6 @@ function SurveysList({ surveys, respCounts, onNew, onTake, onEdit, onDelete, onO
   return (
     <div className="page">
       <div className="page-head">
-        <h2 className="page-title">Surveys</h2>
         <button className="icon-btn solid" title="New survey" onClick={onNew}>
           <Plus size={22} />
         </button>
@@ -671,7 +670,6 @@ export default function Surveys() {
   if (loading) {
     return (
       <div className="page">
-        <div className="page-head"><h2 className="page-title">Surveys</h2></div>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading surveys…</div>
       </div>
     )

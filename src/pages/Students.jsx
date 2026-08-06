@@ -930,7 +930,6 @@ function StudentList({ onSelect, onAdd, onDelete, onDuplicate, onNavigate, stude
   return (
     <div className="page st" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Students</h2>
 
       <div className="actions">
         <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}

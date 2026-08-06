@@ -121,8 +121,9 @@ export default function StaffHub() {
   return (
     <div className="page" style={{ paddingBottom: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <h2 className="page-title" style={{ marginRight: 'auto' }}>Staff Hub</h2>
-        <div style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
+        {/* Took over the marginRight:auto the page heading used to carry,
+            so the status and the add button stay over on the right. */}
+        <div style={{ marginLeft: 'auto', fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
           {status === 'loading' ? 'Loading…' : status === 'offline' ? 'Offline — changes local only' : 'Auto-saving'}
         </div>
         <button className="icon-btn solid" onClick={addList} title="Add list"><Plus size={20} /></button>

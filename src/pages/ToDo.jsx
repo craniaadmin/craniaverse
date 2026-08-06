@@ -943,7 +943,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
   if (loading) {
     return (
       <div className="page">
-        <div className="page-head"><h2 className="page-title">{pageTitle}</h2></div>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -954,7 +953,6 @@ export default function ToDo({ initialView = 'todo', onNavigate }) {
       <style>{CSS}</style>
 
       <div className="page-head">
-        <h2 className="page-title">{pageTitle}</h2>
       </div>
 
       {/* Undo row: undo / redo, then settings + export pushed right */}

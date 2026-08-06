@@ -333,7 +333,6 @@ export default function FeeSchedule() {
   if (loading) {
     return (
       <div className="page">
-        <div className="page-head"><h2 className="page-title">Tuition Schedule</h2></div>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )

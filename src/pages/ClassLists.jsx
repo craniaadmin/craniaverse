@@ -286,7 +286,6 @@ export default function ClassLists({ onNavigate }) {
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
       <div className="page-head">
-        <h2 className="page-title">Class Lists</h2>
       </div>
 
       {fetchStatus === 'offline' && (

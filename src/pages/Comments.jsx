@@ -122,7 +122,6 @@ export default function Comments({ onNavigate }) {
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">Comments</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -132,7 +131,6 @@ export default function Comments({ onNavigate }) {
     <div className="page" style={{ paddingBottom: 32 }}>
       <style>{COMMENT_CSS}</style>
       <div className="page-head">
-        <h2 className="page-title">Comments</h2>
         <div style={{ display: 'flex', gap: 6 }}>
           {[{ k: 'register', l: 'Register' }, { k: 'history', l: 'History' }].map(t => (
             <button key={t.k} onClick={() => setView(t.k)} style={{

@@ -16,7 +16,7 @@ export default function TopNav({ section, sub, onSubSelect, onLogout, user }) {
   return (
     <header className="topbar-v7">
       <div className="brandwrap">
-        <BrandMark height={30} />
+        <BrandMark height={34} />
       </div>
       {sub && <span className="title"><span className="sep">—</span>{sub}</span>}
       <div className="spacer" />

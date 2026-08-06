@@ -595,7 +595,6 @@ function StaffList({
   return (
     <div className="page sf" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
-      <h2 className="page-title">Staff Information</h2>
 
       <div className="actions">
         <button disabled={!undoLabel || histBusy} style={{ marginRight: 'auto' }}

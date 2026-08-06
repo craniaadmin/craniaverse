@@ -3,7 +3,6 @@
 export default function Placeholder({ title, section }) {
   return (
     <div className="page">
-      <h2 className="page-title" style={{ marginBottom: 6 }}>{title}</h2>
       {section && (
         <p style={{ color: '#8a8474', fontSize: 14, marginTop: 0, marginBottom: 22 }}>
           {section}

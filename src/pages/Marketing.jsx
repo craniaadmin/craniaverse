@@ -111,7 +111,6 @@ export default function Marketing() {
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">Marketing</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -120,7 +119,6 @@ export default function Marketing() {
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
       <div className="page-head">
-        <h2 className="page-title">Marketing</h2>
         <button className="icon-btn solid" title="New campaign" onClick={() => setEditing({ mode: 'new' })}>
           <Plus size={22} />
         </button>

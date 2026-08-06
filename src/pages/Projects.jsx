@@ -549,7 +549,6 @@ export default function Projects() {
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">Projects</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -558,7 +557,6 @@ export default function Projects() {
   return (
     <div className="page">
       <style>{PJ_CSS}</style>
-      <h2 className="page-title">Projects</h2>
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>

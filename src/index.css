@@ -107,7 +107,7 @@ input, select, textarea { font-family: inherit; }
 /* Top bar (new — dark brown with pill submenu buttons) */
 .topbar-v7 {
   display: flex; align-items: center; gap: 14px;
-  padding: 12px 20px;
+  padding: 10px 20px;
   background: var(--brand-dark-brown); color: #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
   position: sticky; top: 0; z-index: 40;
@@ -117,11 +117,11 @@ input, select, textarea { font-family: inherit; }
    well clipped the mark, and capping the height squashed it — the tile
    sizes to the logo now, not the other way round. */
 .topbar-v7 .brandwrap {
-  background: #fff; border-radius: 9px; padding: 5px 12px;
+  background: #fff; border-radius: 9px; padding: 4px 12px;
   display: inline-flex; align-items: center; flex: none;
 }
 .topbar-v7 .brandwrap img {
-  height: 30px; width: auto; display: block; object-fit: contain;
+  height: 34px; width: auto; display: block; object-fit: contain;
 }
 .topbar-v7 .title {
   font-weight: 700; font-size: 18px; color: #fff; white-space: nowrap;

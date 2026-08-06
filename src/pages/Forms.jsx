@@ -40,7 +40,6 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
   return (
     <div className="page">
       <div className="page-head">
-        <h2 className="page-title">Forms</h2>
         <button className="icon-btn solid" title="New form" onClick={onNew}>
           <Plus size={22} />
         </button>
@@ -696,7 +695,6 @@ export default function Forms() {
   if (loading) {
     return (
       <div className="page">
-        <div className="page-head"><h2 className="page-title">Forms</h2></div>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading forms…</div>
       </div>
     )

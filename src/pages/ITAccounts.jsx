@@ -176,7 +176,6 @@ export default function ITAccounts() {
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">IT Accounts</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -184,7 +183,6 @@ export default function ITAccounts() {
 
   return (
     <div className="page">
-      <h2 className="page-title">IT Accounts</h2>
 
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',

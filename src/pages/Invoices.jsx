@@ -110,7 +110,6 @@ export default function Invoices() {
   return (
     <PageShell>
       <div className="page-head">
-        <h2 className="page-title">Invoices</h2>
         <button className="icon-btn solid" title="New invoice" onClick={openNew}>
           <Plus size={22} />
         </button>

@@ -1096,7 +1096,6 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
     return (
       <div className="page">
         <style>{CSS}</style>
-        <h2 className="page-title">{title}</h2>
         <div style={{ padding: 40, textAlign: 'center', color: '#9a948a' }}>Loading...</div>
       </div>
     )
@@ -1108,7 +1107,6 @@ export default function CalendarView({ apiPath = '/api/calendar', title = 'Calen
     <div className="page">
       <style>{CSS}</style>
       <div className="calroot">
-        <h2 className="page-title">{title}</h2>
 
         {status === 'offline' && (
           <div className="offline-banner">

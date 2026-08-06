@@ -538,7 +538,6 @@ export default function Payroll() {
 
   return (
     <div className="page" style={{ paddingBottom: 48 }}>
-      <h2 className="page-title">Payroll</h2>
 
       {/* ── Pay period config ──────────────────────────────────────────── */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end', background: '#f8fafb', border: '1px solid var(--line)', borderRadius: 10, padding: '16px 20px', marginBottom: 24 }}>

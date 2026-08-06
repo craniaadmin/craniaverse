@@ -280,7 +280,6 @@ export default function Inventory() {
   if (loading) {
     return (
       <div className="page">
-        <h2 className="page-title">Inventory</h2>
         <div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div>
       </div>
     )
@@ -289,7 +288,6 @@ export default function Inventory() {
   return (
     <div className="page">
       <div className="page-head">
-        <h2 className="page-title">Inventory</h2>
         <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
           {view === 'inventory' && (
             <>

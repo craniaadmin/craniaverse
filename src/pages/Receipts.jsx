@@ -41,7 +41,6 @@ export default function Receipts() {
   return (
     <PageShell>
       <div className="page-head">
-        <h2 className="page-title">Receipts</h2>
       </div>
 
       {status === 'offline' && <OfflineBanner />}
