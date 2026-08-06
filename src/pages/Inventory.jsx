@@ -259,23 +259,53 @@ export default function Inventory() {
   const visibleCols = data.colOrder.filter(k => !data.hiddenCols[k])
 
   // ---- CSV export ----
-  const exportCsv = () => {
-    const header = ['Item #', 'Name', 'Category', 'Sub-Category', 'SKU', 'On Hand', 'Reorder', 'Unit Cost', 'Value', 'Location', 'Status']
-    const rows = filteredItems.map(it => {
-      const value = (Number(it.qty) || 0) * (Number(it.cost) || 0)
-      return [it.num, it.name, it.category, it.sub, it.sku, it.qty || 0, it.reorder || 0, it.cost || 0, value.toFixed(2), it.location, statusOf(it)]
-    })
-    const csv = [header, ...rows].map(row => row.map(cell => {
-      const str = cell == null ? '' : String(cell)
-      return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str
-    }).join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'crania-inventory.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+  const ITEM_CSV_COLUMNS = [
+    { key: 'num', label: 'Item #' },
+    { key: 'name', label: 'Name' },
+    { key: 'category', label: 'Category' },
+    { key: 'sub', label: 'Sub-Category' },
+    { key: 'sku', label: 'SKU' },
+    { key: 'qty', label: 'On Hand' },
+    { key: 'reorder', label: 'Reorder' },
+    { key: 'cost', label: 'Unit Cost' },
+    { key: 'value', label: 'Value' },
+    { key: 'location', label: 'Location' },
+    { key: 'status', label: 'Status' },
+  ]
+  const LOG_CSV_COLUMNS = [
+    { key: 'ts', label: 'When' },
+    { key: 'itemName', label: 'Item' },
+    { key: 'delta', label: 'Change' },
+    { key: 'after', label: 'On Hand After' },
+    { key: 'user', label: 'Who' },
+    { key: 'note', label: 'Reason' },
+  ]
+  const csvRows = () => {
+    if (view === 'log') {
+      return [...data.log]
+        .sort((a, b) => (b.ts || '').localeCompare(a.ts || ''))
+        .map(row => ({
+          ts: row.ts || '',
+          itemName: row.itemName || '',
+          delta: Number(row.delta) || 0,
+          after: row.after ?? 0,
+          user: row.user || '',
+          note: row.note || '',
+        }))
+    }
+    return filteredItems.map(it => ({
+      num: it.num || '',
+      name: it.name || '',
+      category: it.category || '',
+      sub: it.sub || '',
+      sku: it.sku || '',
+      qty: Number(it.qty) || 0,
+      reorder: Number(it.reorder) || 0,
+      cost: Number(it.cost) || 0,
+      value: ((Number(it.qty) || 0) * (Number(it.cost) || 0)).toFixed(2),
+      location: it.location || '',
+      status: statusOf(it),
+    }))
   }
 
   if (loading) {
