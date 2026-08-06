@@ -71,6 +71,20 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
   font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
   text-align:left;margin-bottom:7px}
 .pgsettings .pgscard > button:not(.pgsitem):hover{background:#F1F3F4;border-color:#5FA09E}
+/* What an expanding menu row reveals: indented under the row it belongs
+   to, and scrollable, so a page with thirty columns cannot push the
+   backups section off the bottom of the screen. */
+.pgsettings .pgsdrop{margin:-3px 0 7px;padding:7px 2px 0;border-top:1px solid #E7EBE7;
+  max-height:240px;overflow:auto}
+.pgsettings .pgsdrop label{display:flex;align-items:center;gap:8px;padding:5px 3px;
+  font-size:12.5px;font-weight:500;cursor:pointer;color:#2E2516}
+.pgsettings .pgsdrop label.locked{opacity:.5;cursor:default}
+.pgsettings .pgsdrop label input{width:13px;height:13px;accent-color:#5FA09E;margin:0;cursor:pointer}
+.pgsettings .pgsdroprow{display:flex;gap:8px;margin-top:8px;border-top:1px solid #E7EBE7;padding-top:8px}
+.pgsettings .pgsdroprow button{flex:1;width:auto;margin:0;background:#F1F3F4;border:1px solid #D5D0C4;
+  border-radius:7px;padding:5px 8px;font:inherit;font-size:11.5px;font-weight:600;color:#2E2516;
+  cursor:pointer;text-align:center;display:block}
+.pgsettings .pgsdroprow button:hover{border-color:#5FA09E}
 /* Anything a page drops into settingsExtra that styles itself as a card —
    Programs' "Earlier Backups", say — is flattened to line up with the
    tools above it rather than sitting there as a card within a card. */
