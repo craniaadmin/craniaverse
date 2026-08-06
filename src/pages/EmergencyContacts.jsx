@@ -19,7 +19,6 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildFamilyIndex } from '../data/family'
-import BackupPanel, { BACKUP_CSS } from '../components/BackupPanel'
 import { Phone, Mail, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
