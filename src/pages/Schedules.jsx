@@ -308,26 +308,50 @@ export default function Schedules() {
 
   return (
     <div className="page">
-      <div className="page-head">
-        <div className="head-actions">
-          <button className="btn ghost" onClick={() => setShowRooms(true)}>
-            <Settings size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />
-            Rooms
-          </button>
-          <button className="btn ghost" onClick={() => setShowLocs(true)}>
-            <Settings size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />
-            Locations
-          </button>
-          <button className="btn ghost" onClick={() => importFromPrograms()}>
-            <Download size={14} style={{ marginRight: 5, verticalAlign: '-2px' }} />
-            Import from Programs
-          </button>
-          <button className="btn" onClick={() => newEntry()}>
-            <Plus size={14} style={{ marginRight: 4, verticalAlign: '-2px' }} />
-            New Class
-          </button>
-        </div>
-      </div>
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-schedules"
+        csvColumns={[
+          { key: 'day', label: 'Day' },
+          { key: 'startTime', label: 'Start' },
+          { key: 'endTime', label: 'End' },
+          { key: 'title', label: 'Class' },
+          { key: 'teacher', label: 'Teacher' },
+          { key: 'location', label: 'Location' },
+          { key: 'room', label: 'Room' },
+          { key: 'notes', label: 'Notes' },
+        ]}
+        csvRows={() => filteredEntries
+          .filter(e => !focusLoc || e.locationId === focusLoc)
+          .slice()
+          .sort((a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day)
+            || String(a.startTime).localeCompare(String(b.startTime)))
+          .map(e => ({
+            day: DAYS_LONG[DAYS.indexOf(e.day)] || e.day || '',
+            startTime: e.startTime || '',
+            endTime: e.endTime || '',
+            title: e.title || '',
+            teacher: e.teacher || '',
+            location: locById[e.locationId]?.name || '',
+            room: roomById[e.roomId]?.name || '',
+            notes: e.notes || '',
+          }))}
+        backupCollection="programs"
+        backupHint="Snapshots of the Programs catalogue this timetable is imported from (last 14 kept)."
+      >
+        <button onClick={() => setShowRooms(true)} title="Manage rooms">
+          <Settings size={13} /> Rooms
+        </button>
+        <button onClick={() => setShowLocs(true)} title="Manage locations">
+          <Settings size={13} /> Locations
+        </button>
+        <button onClick={() => importFromPrograms()} title="Pull active offerings in from the Programs catalogue">
+          <Download size={13} /> Import from Programs
+        </button>
+        <button onClick={() => newEntry()} title="Add a class to the timetable">
+          <Plus size={13} /> New Class
+        </button>
+      </PageActions>
 
       {/* Location tabs — "All" + each location. Click one to focus, click again
           (or the All chip) to see them together. */}
