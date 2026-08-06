@@ -20,7 +20,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Eye, Plus } from 'lucide-react'
 import { useStore } from '../data/store'
 import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
-import PageActions from '../components/PageActions'
+import PageActions, { ColumnsMenu } from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const COLS = [
