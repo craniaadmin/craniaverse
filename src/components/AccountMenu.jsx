@@ -297,15 +297,33 @@ function AccountRow({ u, isMe, cols, onPatch, onRemove, onSetPassword }) {
             onBlur={() => commit('email', email, u.email)} />
         </td>
         <td>
-          <select className={'lvl ' + u.role} value={u.role} title={ROLE_BLURB[u.role]}
-            onChange={e => onPatch(u.id, { role: e.target.value })}>
+          {/* Picking a level arms the change; it is applied by the row
+              below. Demoting yourself takes away this screen, which is
+              exactly the change you cannot undo from here. */}
+          <select className={'lvl ' + (pendingRole || u.role)} value={pendingRole || u.role}
+            title={ROLE_BLURB[pendingRole || u.role]}
+            onChange={e => {
+              const v = e.target.value
+              setPwOpen(false); setConfirmDel(false); setPendingOff(false)
+              setPendingRole(v === u.role ? null : v)
+            }}>
             {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </td>
         <td>
           <label className="tog" title={u.active ? 'Switch this account off' : 'Switch this account on'}>
-            <input type="checkbox" checked={u.active}
-              onChange={e => onPatch(u.id, { active: e.target.checked })} />
+            <input type="checkbox" checked={pendingOff ? false : u.active}
+              onChange={e => {
+                /* Switching your own account off locks you out the same
+                   way a demotion does, so it asks too. Anyone else's is
+                   reversible from here, so it just happens. */
+                if (isMe && !e.target.checked) {
+                  setPwOpen(false); setConfirmDel(false); setPendingRole(null)
+                  setPendingOff(true)
+                  return
+                }
+                onPatch(u.id, { active: e.target.checked })
+              }} />
             Active
           </label>
         </td>
