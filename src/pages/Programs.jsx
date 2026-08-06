@@ -1880,22 +1880,35 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
         csvRows={() => rs}
         backupCollection="programs"
         backupHint="Snapshots of the whole programs catalogue (last 14 kept)."
-        settingsExtra={
-          /* The page's own programs_backups snapshots predate the shared
-             ones and restore in place without a reload, so they stay
-             reachable rather than being stranded. */
-          <div className="bkp-card">
-            <div className="bkp-title">Earlier Backups</div>
-            <div className="bkp-hint">Snapshots taken by this page before backups moved to the shared panel above.</div>
-            <button className="bkp-btn" onClick={() => setSettingsOpen(true)}>Open</button>
-          </div>
-        }
-      >
-        <button title="Draw the schedule currently on screen as an image"
-          onClick={createScheduleImage}>🖼 Create Schedule</button>
-        <button title="Choose which columns are shown"
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}>👁 Columns</button>
-      </PageActions>
+        /* Drawing the schedule and choosing columns are both occasional, so
+           they go under the gear beside Export CSV rather than sitting on
+           the bar as though they were reached as often as Undo. That leaves
+           the bar as Undo, Redo and the gear.
+
+           Both close the panel first — the column chooser because it is a
+           fixed popover at a lower z-index and would open behind, the
+           schedule image because you want to see what it drew. */
+        settingsExtra={close => (
+          <>
+            <button title="Draw the schedule currently on screen as an image"
+              onClick={() => { close(); createScheduleImage() }}>🖼 Create Schedule</button>
+            <button title="Choose which columns are shown"
+              onClick={e => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                close()
+                setPop({ kind: 'cols', rect })
+              }}>👁 Columns</button>
+            {/* The page's own programs_backups snapshots predate the shared
+                ones and restore in place without a reload, so they stay
+                reachable rather than being stranded. */}
+            <div className="bkp-card">
+              <div className="bkp-title">Earlier Backups</div>
+              <div className="bkp-hint">Snapshots taken by this page before backups moved to the shared panel above.</div>
+              <button className="bkp-btn" onClick={() => { close(); setSettingsOpen(true) }}>Open</button>
+            </div>
+          </>
+        )}
+      />
 
       <div className="metrics">
         <div className="metric">
