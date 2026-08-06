@@ -345,6 +345,48 @@ function AccountRow({ u, isMe, cols, onPatch, onRemove, onSetPassword }) {
         </td>
       </tr>
 
+      {pendingRole && (
+        <tr className="subrow">
+          <td colSpan={cols}>
+            <div className="confirmrow">
+              {isMe && u.role === 'admin' && pendingRole !== 'admin' ? (
+                <span className="q warn">
+                  This is your own account. Going from Admin to {ROLE_LABELS[pendingRole]} takes away
+                  this screen — you would need another admin, or someone at the server, to put it back.
+                </span>
+              ) : (
+                <span className="q">
+                  Change {u.name || u.email} from {ROLE_LABELS[u.role]} to {ROLE_LABELS[pendingRole]}?
+                </span>
+              )}
+              <button className={isMe && u.role === 'admin' && pendingRole !== 'admin' ? 'danger' : 'go'}
+                onClick={() => { onPatch(u.id, { role: pendingRole }); setPendingRole(null) }}>
+                {isMe && u.role === 'admin' && pendingRole !== 'admin'
+                  ? 'Yes, lower my own access' : 'Change level'}
+              </button>
+              <button className="keep" onClick={() => setPendingRole(null)}>Cancel</button>
+            </div>
+          </td>
+        </tr>
+      )}
+
+      {pendingOff && (
+        <tr className="subrow">
+          <td colSpan={cols}>
+            <div className="confirmrow">
+              <span className="q warn">
+                Switch off your own account? You would be signed out and could not sign back in.
+              </span>
+              <button className="danger"
+                onClick={() => { onPatch(u.id, { active: false }); setPendingOff(false) }}>
+                Yes, switch mine off
+              </button>
+              <button className="keep" onClick={() => setPendingOff(false)}>Cancel</button>
+            </div>
+          </td>
+        </tr>
+      )}
+
       {pwOpen && (
         <tr className="subrow">
           <td colSpan={cols}>
