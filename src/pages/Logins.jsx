@@ -394,11 +394,15 @@ export default function Logins({ onNavigate }) {
     const generated = field === 'username'
       ? row?.login.generatedUsername : row?.login.generatedPassword
     const store = value === generated ? '' : value
-    writeLogin(recordId, { [field === 'username' ? 'loginUsername' : 'loginPassword']: store })
+    writeLogin(recordId, { [field === 'username' ? 'loginUsername' : 'loginPassword']: store },
+      `Change ${field} for ${row?.name || 'this student'}`)
   }
 
-  const resetLogin = (recordId) =>
-    writeLogin(recordId, { loginUsername: '', loginPassword: '' })
+  const resetLogin = (recordId) => {
+    const row = allRows.find(r => r.id === recordId)
+    writeLogin(recordId, { loginUsername: '', loginPassword: '' },
+      `Reset login for ${row?.name || 'this student'}`)
+  }
 
   const exportCsv = (rows) => {
     const esc = (v) => {
