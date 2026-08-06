@@ -1,4 +1,4 @@
-import { Bell, LogOut } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import { SUBMENUS } from '../data/mockData'
 import BrandMark from './BrandMark'
 import AccountMenu from './AccountMenu'
