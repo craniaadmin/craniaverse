@@ -277,7 +277,6 @@ export default function Projects() {
   const [editing, setEditing] = useState(null)
   const hiddenCols = state.hiddenCols || {}
   const [colsOpen, setColsOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
   const [archiveMode, setArchiveMode] = useState(false)
   const [cardCtx, setCardCtx] = useState(null)   // { x, y, id }
   const dragCardId = useRef(null)
