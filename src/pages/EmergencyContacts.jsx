@@ -579,19 +579,24 @@ export default function EmergencyContacts({ onNavigate }) {
     <div className="page ec" style={{ paddingBottom: 32 }}>
       <style>{CSS}</style>
 
-      <div className="actions">
-        <button title="Choose which columns are shown" style={{ marginLeft: 'auto' }}
+      <PageActions
+        csvName="crania-emergency-contacts"
+        csvColumns={[
+          { key: 'contact', label: 'Emergency Contact' },
+          { key: 'relationship', label: 'Relationship' },
+          { key: 'phone', label: 'Phone' },
+          { key: 'email', label: 'Email' },
+          { key: 'customer', label: 'Customer' },
+          { key: 'studentNames', label: 'Students' },
+          { label: 'Status', value: r => (r.missing ? 'Missing' : 'On file') },
+        ]}
+        csvRows={() => visible}
+        settingsExtra={<EmergencyBackups />}
+      >
+        <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
         ><Eye size={13} /> Columns</button>
-        <button title="Download the contact list as a CSV file" onClick={() => exportCsv()}>
-          <Download size={13} /> Export CSV
-        </button>
-        <button className="gearbtn" title="Backups" onClick={() => setSettingsOpen(true)}>⚙</button>
-      </div>
-
-      {settingsOpen && (
-        <EmergencySettings onClose={() => setSettingsOpen(false)} />
-      )}
+      </PageActions>
 
       {fetchStatus === 'offline' && (
         <div className="offline">Working offline — showing cached data.</div>
