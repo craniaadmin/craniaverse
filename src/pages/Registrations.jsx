@@ -593,6 +593,19 @@ export default function Registrations({ onNavigate }) {
   )
 }
 
+/* Module level, not nested inside the dialog. A component defined during
+   render is a new type on every keystroke, so React unmounts the old
+   input and mounts a fresh one — the field loses focus after a single
+   character and the form becomes unusable. */
+function EField({ label, value, onChange, type = 'text', wide }) {
+  return (
+    <label className={'ef' + (wide ? ' wide' : '')}>
+      <span>{label}</span>
+      <input type={type} value={value ?? ''} onChange={e => onChange(e.target.value)} />
+    </label>
+  )
+}
+
 /* Editing a registration touches three separate stores on the record —
    the child, the household, and the enrolments — so the dialog collects
    all of it and writes whichever parts actually changed. Sending all
