@@ -86,15 +86,32 @@ const nameOf = (r) =>
 
 async function main() {
   const all = await loadRegistrations()
-  const hits = all.filter(r => wanted.has(studentIdOf(r)))
+  const hits = all.filter(r =>
+    wanted.has(studentIdOf(r)) || names.includes(nameOf(r).toLowerCase()))
   const found = new Set(hits.map(studentIdOf))
   const missing = [...wanted].filter(w => !found.has(w)).sort()
+  const foundNames = new Set(hits.map(r => nameOf(r).toLowerCase()))
+  const missingNames = names.filter(n => !foundNames.has(n))
 
   console.log(`\n${all.length} registrations in the database.`)
-  console.log(`Asked for ${wanted.size} student id(s); ${hits.length} matched.\n`)
+  console.log(`Asked for ${wanted.size} student id(s)`
+    + `${names.length ? ` and ${names.length} name(s)` : ''}; ${hits.length} matched.\n`)
 
   if (missing.length) {
     console.log(`Not found (already gone, or never existed): ${missing.join(', ')}\n`)
+  }
+  if (missingNames.length) {
+    console.log(`No record with that exact name: ${missingNames.join(', ')}`)
+    console.log('Names are matched in full. Check the spelling against the list below.\n')
+  }
+
+  /* A record with no student id cannot be reached by a range, so it is
+     easy to leave behind — which is how "Hobo Karimo" survived. */
+  const noId = all.filter(r => !studentIdOf(r) && !hits.includes(r))
+  if (noId.length) {
+    console.log(`${noId.length} record(s) have no student id and can only be reached by name:`)
+    for (const r of noId) console.log(`  --name "${nameOf(r)}"`)
+    console.log()
   }
   if (!hits.length) {
     console.log('Nothing to delete.\n')
