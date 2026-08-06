@@ -99,6 +99,12 @@ export default function Contacts() {
       (c.phone || '').toLowerCase().includes(q)
   }).sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }))
 
+  // Undo/redo over the page's own data — see src/data/useHistory.js.
+  // Has to stay above the `loading` return below: a hook that only runs on
+  // some renders makes React throw "rendered more hooks than during the
+  // previous render" on the render where it first appears.
+  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change' })
+
   if (loading) {
     return (
       <div className="page">
@@ -106,9 +112,6 @@ export default function Contacts() {
       </div>
     )
   }
-
-  // Undo/redo over the page's own data — see src/data/useHistory.js
-  const hist = useHistory(contacts, next => mutate(() => next), { label: 'contact change' })
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
