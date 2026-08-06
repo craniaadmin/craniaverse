@@ -241,11 +241,19 @@ export async function saveUsers(users) {
     const recordId = String(user.id)
     const data = { recordId, payload: { ...user } }
     const found = byRecordId.get(recordId)
-    if (found) await pb().collection('users').update(found.id, data)
-    else await pb().collection('users').create(data)
+    /* Wrapped so a rejected write says which field PocketBase objected
+       to. Unwrapped, this surfaced as "Failed to create record." with
+       no clue that the collection was the wrong one. */
+    try {
+      if (found) await pb().collection(ACCOUNTS).update(found.id, data)
+      else await pb().collection(ACCOUNTS).create(data)
+    } catch (err) {
+      logPbError(`save account ${recordId}`, err)
+      throw err
+    }
   }
   for (const row of existing) {
-    if (!incomingIds.has(row.recordId)) await pb().collection('users').delete(row.id)
+    if (!incomingIds.has(row.recordId)) await pb().collection(ACCOUNTS).delete(row.id)
   }
 }
 
