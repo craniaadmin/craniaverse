@@ -1410,7 +1410,7 @@ function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
   const handleAdd = async () => {
     try {
       const id = await addRegistration({ studentFirstName: 'New', studentLastName: 'Student', forceNew: true })
-      if (id) setDetailId(id)
+      if (id) { setDetailId(id); pushHist(historyForCreate(id, 'Add student')) }
     } catch (err) {
       dialog.alert('Could not add student', String(err.message || err))
     }
@@ -1420,11 +1420,20 @@ function StudentsPage({ onNavigate, initialRecordId, onConsumeInitialRecord }) {
     const name = `${record.student?.firstName || ''} ${record.student?.lastName || ''}`.trim() || 'this student'
     if (!opts.silent) {
       const ok = await dialog.confirm(
-        `Delete ${name}? This also removes their linked customer and guardian information, and cannot be undone.`)
+        `Delete ${name}? This also removes their linked customer and guardian information. You can undo this.`)
       if (!ok) return
     }
     try {
+      // Kept whole so Undo can put it back exactly, enrolments included.
+      const snapshot = JSON.parse(JSON.stringify(record))
       await deleteRegistration(record.id)
+      if (!opts.noHistory) {
+        pushHist({
+          label: `Delete ${name}`,
+          undo: () => restoreRegistration(snapshot),
+          redo: () => deleteRegistration(snapshot.id),
+        })
+      }
       if (detailId === record.id) setDetailId(null)
     } catch (err) {
       dialog.alert('Could not delete', String(err.message || err))
