@@ -316,7 +316,23 @@ function RulesEditor({ pushHist }) {
       return [...d, ...extra]
     })
   }
-  const save = () => { updateRules(draft.filter(r => r.reason.trim())); setDirty(false) }
+  /* The rules are one list with one setter, so this step is a snapshot:
+     Save Changes replaces the lot, and undo puts the lot back. A rule that
+     triggers automatically decides what marking a register is worth, so
+     getting one wrong and not being able to take it back is expensive. */
+  const save = () => {
+    const before = JSON.parse(JSON.stringify(rules))
+    const next = draft.filter(r => r.reason.trim())
+    updateRules(next)
+    setDirty(false)
+    if (pushHist && JSON.stringify(before) !== JSON.stringify(next)) {
+      pushHist({
+        label: 'Crania Cash rules',
+        undo: () => updateRules(before),
+        redo: () => updateRules(next),
+      })
+    }
+  }
 
   return (
     <div className="bkp-card cc-rules">
