@@ -78,6 +78,19 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
   border-radius:0;padding:10px 0 0;margin:3px 0 0;border-top:1px solid #E7EBE7}
 `
 
+/* The bar carries its own stylesheet. Pages used to concatenate
+   PAGEACTIONS_CSS into a <style> of their own, which was thirty-odd
+   chances to forget it and one more thing to keep in step whenever this
+   file changed; rendering <PageActions/> is now enough. It goes in <head>,
+   so a page's own <style> still lands later in the document and can
+   override anything here — Customers' "Add Family" colour, say. */
+if (typeof document !== 'undefined' && !document.getElementById('pageactions-css')) {
+  const styleEl = document.createElement('style')
+  styleEl.id = 'pageactions-css'
+  styleEl.textContent = PAGEACTIONS_CSS
+  document.head.appendChild(styleEl)
+}
+
 /* Turns rows of plain objects into a CSV the way a spreadsheet expects
    it: quotes anything containing a comma, quote or newline, and CRLF
    line endings so Excel does not run the whole file onto one line. */
