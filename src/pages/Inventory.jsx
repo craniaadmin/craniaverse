@@ -341,7 +341,7 @@ export default function Inventory() {
           <>
             <button title="Choose which columns are shown"
               onClick={() => setColsOpen(v => !v)}>
-              <Eye size={14} /> Columns {colsOpen ? '▾' : '…'}
+              <Eye size={14} /> Columns{colsOpen ? ' ▾' : ''}
             </button>
             {colsOpen && (
               <div style={{
