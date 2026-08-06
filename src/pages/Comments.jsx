@@ -405,7 +405,7 @@ function ClassGroup({ program, rows, onNavigate, editCell }) {
                 </td>
                 <td style={{ padding: '8px 12px', verticalAlign: 'top', textAlign: 'center', color: 'var(--ink-soft)' }}>{r.row.lessonNo}</td>
                 {COMMENT_FIELDS.map(f => (
-                  <CommentCell key={f.key} value={r.row[f.key]} onChange={v => updateRow(r.studentId, r.tabKey, r.rowIdx, f.key, v)} />
+                  <CommentCell key={f.key} value={r.row[f.key]} onChange={v => editCell(r, f.key, v)} />
                 ))}
               </tr>
             ))}
