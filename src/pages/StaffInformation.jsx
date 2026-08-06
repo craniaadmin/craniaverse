@@ -4,9 +4,9 @@
 // filter, a filter row under every heading, a select column with bulk
 // actions, row buttons and a right-click menu.
 //
-// The detail form keeps its three-column layout — it follows a paper form
-// and is easier to fill in that shape — but the chrome around it now
-// matches everything else.
+// The detail form follows the Students and Customers detail views:
+// columns that fit themselves to the width, ruled caption headings, and
+// white bordered inputs.
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -334,7 +334,10 @@ function RowsEditor({ columns, rows, onChange, addLabel = '+ Add row' }) {
   const setCell = (i, key, val) => onChange(rows.map((r, ri) => ri === i ? { ...r, [key]: val } : r))
   const remove = (i) => onChange(rows.filter((_, ri) => ri !== i))
   const add = () => onChange([...rows, columns.reduce((acc, c) => ({ ...acc, [c.key]: c.type === 'check' ? false : '' }), {})])
-  const grid = columns.map(c => c.width || '1fr').join(' ') + ' 24px'
+  /* minmax(0,…) rather than 1fr: a plain 1fr refuses to shrink below its
+     content, so the fixed date columns shoved the delete button out past
+     the edge of the section. */
+  const grid = columns.map(c => c.width || 'minmax(0,1fr)').join(' ') + ' 24px'
   return (
     <div>
       <div style={{
@@ -1020,7 +1023,7 @@ function StaffDetail({ staffId, onBack, onDelete }) {
           )}
         </Section>
 
-        <Section title="Education">
+        <Section title="Education" span={2}>
           <RowsEditor
             columns={[
               { key: 'degree', label: 'Degree' },
@@ -1034,7 +1037,7 @@ function StaffDetail({ staffId, onBack, onDelete }) {
           />
         </Section>
 
-        <Section title="Work Experience">
+        <Section title="Work Experience" span={2}>
           <RowsEditor
             columns={[
               { key: 'title', label: 'Title' },
@@ -1048,7 +1051,7 @@ function StaffDetail({ staffId, onBack, onDelete }) {
           />
         </Section>
 
-        <Section title="Teachables">
+        <Section title="Teachables" span={2}>
           <RowsEditor
             columns={[
               { key: 'subject', label: 'Subject' },
@@ -1062,7 +1065,7 @@ function StaffDetail({ staffId, onBack, onDelete }) {
           />
         </Section>
 
-        <Section title="Keys">
+        <Section title="Keys" span={2}>
           <RowsEditor
             columns={[
               { key: 'description', label: 'Description' },
