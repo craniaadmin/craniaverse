@@ -175,19 +175,6 @@ function sortItems(arr) {
   }).map(x => x[0])
 }
 
-// ---------- CSV export ----------
-const csvCell = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'
-function downloadCsv(filename, rows) {
-  const BOM = '﻿'
-  const text = BOM + rows.map(r => r.map(csvCell).join(',')).join('\r\n')
-  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' })
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
-  a.download = filename
-  document.body.appendChild(a); a.click(); a.remove()
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000)
-}
-
 // ---------- CSS ----------
 const CSS = PAGEACTIONS_CSS + `
 .tdroot{--pill:#F1F3F4;--dark-blue:#5FA09E;--light-blue:#A6E2F9;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--card:#FFFFFF;--tshadow:0 1px 3px rgba(46,37,22,.15);

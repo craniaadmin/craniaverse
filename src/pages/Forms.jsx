@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Plus, X, Edit2, Copy, Eye, ExternalLink, ChevronLeft, Trash2, GripVertical, Star, Download, RefreshCw } from 'lucide-react'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
