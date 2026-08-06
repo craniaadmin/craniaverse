@@ -4,7 +4,7 @@
 import React, { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import AccountMenu from './components/AccountMenu'
+import AccountMenu, { ACCOUNT_CSS } from './components/AccountMenu'
 
 const ME = {
   id: 'u1', email: 'anah.mirak@gmail.com', name: 'Claude Code', role: 'admin',
