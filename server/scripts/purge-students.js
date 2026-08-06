@@ -12,10 +12,17 @@
 //   node server/scripts/purge-students.js S0005-S0021           # dry run
 //   node server/scripts/purge-students.js S0005-S0021 --apply
 //   node server/scripts/purge-students.js S0005 S0009 S0014
+//   node server/scripts/purge-students.js --name "Hobo Karimo"
 //
 // Ranges and individual ids can be mixed. Ids that do not exist are
 // reported rather than silently ignored, so a typo in a range does not
-// quietly delete the wrong set.
+// quietly delete the wrong set. --name matches the full name exactly
+// (ignoring case) and is how you reach a record that never got a
+// student id. Any record without one is listed in the dry run.
+//
+// Old backups are scrubbed too. Deleting the live row while leaving the
+// student sitting inside fourteen snapshots is not deletion — the data
+// is still in the database and one restore brings them back.
 //
 // Restart the API afterwards so it stops serving them from memory:
 //   pm2 restart craniaverse-api
