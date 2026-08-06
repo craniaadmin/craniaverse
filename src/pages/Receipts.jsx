@@ -5,9 +5,10 @@ import {
   PageShell, Loading, OfflineBanner, SummaryStrip,
   Th, Td, IconButton, Modal,
 } from '../components/FinanceUI'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 export default function Receipts() {
-  const { invoices, payments, loading, status } = useFinance()
+  const { invoices, payments, loading, status, refresh } = useFinance()
   const [query, setQuery] = useState('')
   const [viewing, setViewing] = useState(null) // payment being previewed
 
