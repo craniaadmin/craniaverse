@@ -220,15 +220,21 @@ export async function saveRegistrations(records) {
 }
 
 // ---- staff -----------------------------------------------
-// ---- users (accounts + privilege levels) ----------------
+// ---- accounts (sign-in + privilege levels) ---------------
+/* Named `accounts`, not `users`: PocketBase ships its own built-in
+   `users` auth collection. Setup reused that one instead of making
+   ours, and every write then failed against a schema expecting an
+   email and a password rather than our recordId/payload pair. */
+const ACCOUNTS = 'accounts'
+
 export async function loadUsers() {
-  const rows = await getFullList('users')
+  const rows = await getFullList(ACCOUNTS)
   return rows.map(r => r.payload || {})
 }
 
 export async function saveUsers(users) {
   await ensureAuth()
-  const existing = await getFullList('users')
+  const existing = await getFullList(ACCOUNTS)
   const byRecordId = new Map(existing.map(r => [r.recordId, r]))
   const incomingIds = new Set(users.map(u => String(u.id)))
   for (const user of users) {
