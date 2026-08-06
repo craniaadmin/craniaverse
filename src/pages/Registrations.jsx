@@ -18,6 +18,7 @@ import { Eye, Pencil } from 'lucide-react'
 import { useStore } from '../data/store'
 import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
+import useActionHistory from '../data/useActionHistory'
 
 /* Column order follows the registration form itself: who submitted it,
    then each guardian, then the child, then what they enrolled in. */
