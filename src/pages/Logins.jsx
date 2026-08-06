@@ -451,10 +451,6 @@ export default function Logins({ onNavigate }) {
                 close()
                 setPop({ kind: 'cols', rect })
               }}><Eye size={13} /> Columns</button>
-            <BackupPanel base="customers"
-              hint={'Logins are held on the registrations, so these are the same snapshots the '
-                + 'Customers page takes — restoring one replaces every registration (last 14 kept).'}
-              onRestored={async () => { await refresh(); close() }} />
           </>
         )}
       />
