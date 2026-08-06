@@ -231,7 +231,7 @@ function UsersModal({ me, onClose }) {
               <label>Password</label>
               <input type="text" value={draft.password}
                 onChange={e => setDraft(d => ({ ...d, password: e.target.value }))}
-                placeholder="at least 10 characters" />
+                placeholder="at least 9 characters" />
             </div>
             <div>
               <label>Level</label>
