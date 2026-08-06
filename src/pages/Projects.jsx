@@ -6,8 +6,9 @@
 // go to PocketBase through /api/projects/backup instead.
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
-const PJ_CSS = `
+const PJ_CSS = PAGEACTIONS_CSS + `
 .pj-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0 8px;}
 .pj-toolbar+.pj-toolbar{padding-top:0;}
 .pj-toolbar button{background:#fff;border:1px solid #e2ded2;color:var(--brand-dark-brown);padding:5px 11px;font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;}
