@@ -562,10 +562,19 @@ export default function Registrations({ onNavigate }) {
         csvRows={csvRows}
         backupCollection="registrations"
         backupHint="Snapshots of every registration submitted through the public form (last 14 kept)."
+        /* Columns is a set-once thing and goes under the gear. Open Form
+           stays on the bar — checking what the public sees is part of
+           working this page. The chooser is a fixed popover at a lower
+           z-index than the panel, so the panel closes on the way. */
+        settingsExtra={close => (
+          <button title="Choose which columns are shown"
+            onClick={e => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              close()
+              setPop({ kind: 'cols', rect })
+            }}><Eye size={13} /> Columns</button>
+        )}
       >
-        <button title="Choose which columns are shown"
-          onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
-        ><Eye size={13} /> Columns</button>
         <button title="Open the public registration form"
           onClick={() => window.open(`${import.meta.env?.VITE_API_URL || window.location.origin}/register`, '_blank')}>
           Open Form
