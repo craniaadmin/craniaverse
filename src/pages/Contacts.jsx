@@ -114,6 +114,38 @@ export default function Contacts() {
         </button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-contacts"
+        csvColumns={[
+          { key: 'name', label: 'Name' },
+          { key: 'category', label: 'Category' },
+          { key: 'contactPerson', label: 'Contact Person' },
+          { key: 'phone', label: 'Phone' },
+          { key: 'email', label: 'Email' },
+          { key: 'website', label: 'Website' },
+          { key: 'address', label: 'Address' },
+          { key: 'notes', label: 'Notes' },
+        ]}
+        csvRows={() => visible.map(c => ({
+          name: c.name || '',
+          category: c.category || 'Other',
+          contactPerson: c.contactPerson || '',
+          phone: c.phone || '',
+          email: c.email || '',
+          website: c.website || '',
+          address: c.address || '',
+          notes: c.notes || '',
+        }))}
+        backupCollection="contacts"
+        backupHint="Snapshots of the whole contact directory (last 14 kept)."
+        onRestored={refresh}
+      >
+        <button title="Add a new contact" onClick={() => setEditing({ mode: 'new' })}>
+          <Plus size={13} /> Add Contact
+        </button>
+      </PageActions>
+
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
