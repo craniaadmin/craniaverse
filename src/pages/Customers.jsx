@@ -940,29 +940,16 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
     setSelected(new Set())
   }
 
-  const exportCsv = () => {
-    const esc = (v) => {
-      const s = String(v ?? '')
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-    }
-    /* Every column, not just the shown ones — a spreadsheet is where you go
-       precisely for the fields you did not put on screen. One line per
-       student, since that is the grain the data actually has. */
-    const lines = [COLS.map(c => c.l).join(',')]
-    for (const r of allRows) {
-      lines.push(COLS.map(c => {
-        if (c.k === 'classes') return r.classList.join('; ')
-        if (c.k === 'fees' || c.k === 'paid' || c.k === 'balance') return r[c.k] > 0 ? r[c.k].toFixed(2) : ''
-        return r[c.k]
-      }).map(esc).join(','))
-    }
-    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `crania-customers-export-${new Date().toISOString().slice(0, 10)}.csv`
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }
+  /* Every column, not just the shown ones — a spreadsheet is where you go
+     precisely for the fields you did not put on screen. One line per
+     student, since that is the grain the data actually has. */
+  const csvRows = () => allRows.map(r => ({
+    ...r,
+    classes: r.classList.join('; '),
+    fees: r.fees > 0 ? r.fees.toFixed(2) : '',
+    paid: r.paid > 0 ? r.paid.toFixed(2) : '',
+    balance: r.balance > 0 ? r.balance.toFixed(2) : '',
+  }))
 
   useEffect(() => {
     if (!pop) return
