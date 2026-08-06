@@ -118,11 +118,6 @@ export default function Payments() {
 
   return (
     <PageShell>
-      <div className="page-head">
-        <button className="icon-btn solid" title="Log payment" onClick={() => openNew()}>
-          <Plus size={22} />
-        </button>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -151,6 +146,9 @@ export default function Payments() {
         backupHint="Snapshots of every invoice and payment (last 14 kept)."
         onRestored={refresh}
       >
+        <button className="icon-btn solid" title="Log payment" onClick={() => openNew()}>
+          <Plus size={22} />
+        </button>
         <button title="Log a payment" onClick={() => openNew()}>
           <Plus size={13} /> Log Payment
         </button>

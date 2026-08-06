@@ -131,19 +131,6 @@ export default function Comments({ onNavigate }) {
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
       <style>{COMMENT_CSS}</style>
-      <div className="page-head">
-        <div style={{ display: 'flex', gap: 6 }}>
-          {[{ k: 'register', l: 'Register' }, { k: 'history', l: 'History' }].map(t => (
-            <button key={t.k} onClick={() => setView(t.k)} style={{
-              border: `1.5px solid ${view === t.k ? 'var(--brand-dark-blue)' : '#e2ded2'}`,
-              background: view === t.k ? '#5FA09E18' : '#fff',
-              color: view === t.k ? 'var(--brand-dark-blue)' : 'var(--brand-dark-brown)',
-              borderRadius: 8, padding: '7px 16px', fontSize: 13,
-              fontWeight: 700, cursor: 'pointer',
-            }}>{t.l}</button>
-          ))}
-        </div>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -164,7 +151,19 @@ export default function Comments({ onNavigate }) {
         }))}
         backupCollection="comments"
         backupHint="Snapshots of every lesson note and register mark (last 14 kept)."
-      />
+      >
+        <div style={{ display: 'flex', gap: 6 }}>
+          {[{ k: 'register', l: 'Register' }, { k: 'history', l: 'History' }].map(t => (
+            <button key={t.k} onClick={() => setView(t.k)} style={{
+              border: `1.5px solid ${view === t.k ? 'var(--brand-dark-blue)' : '#e2ded2'}`,
+              background: view === t.k ? '#5FA09E18' : '#fff',
+              color: view === t.k ? 'var(--brand-dark-blue)' : 'var(--brand-dark-brown)',
+              borderRadius: 8, padding: '7px 16px', fontSize: 13,
+              fontWeight: 700, cursor: 'pointer',
+            }}>{t.l}</button>
+          ))}
+        </div>
+      </PageActions>
 
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',

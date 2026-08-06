@@ -40,11 +40,6 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
   }
   return (
     <div className="page">
-      <div className="page-head">
-        <button className="icon-btn solid" title="New form" onClick={onNew}>
-          <Plus size={22} />
-        </button>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -64,6 +59,9 @@ function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBo
         backupCollection="forms"
         backupHint="Snapshots of every form definition (last 14 kept). Submissions are not included."
       >
+        <button className="icon-btn solid" title="New form" onClick={onNew}>
+          <Plus size={22} />
+        </button>
         <button title="Build a new form" onClick={onNew}><Plus size={13} /> New Form</button>
       </PageActions>
 

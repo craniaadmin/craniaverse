@@ -18,6 +18,17 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
 .pgacts button:disabled{opacity:.45;cursor:default}
 .pgacts .grow{flex:1}
 .pgacts .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
+/* Pages used to carry a big round "+" in a row of its own above this
+   bar. Those rows are gone and the buttons moved in here, so bring them
+   down to the size of everything else rather than leaving a 42px circle
+   towering over 28px buttons. */
+.pgacts .icon-btn{width:auto;height:auto;border-radius:8px;padding:6px 10px;
+    background:var(--card-teal,#5FA09E);color:#fff;border:none;display:inline-flex;
+    align-items:center;justify-content:center}
+.pgacts .icon-btn:hover{background:#4c8987}
+.pgacts .icon-btn svg{width:15px;height:15px}
+/* Tab groups (Attendance, Comments) moved in whole; keep them tight. */
+.pgacts > div{display:inline-flex;align-items:center;gap:6px}
 .pgacts .histnote{position:absolute;top:100%;left:0;margin-top:4px;z-index:5;
   background:#E4EFF3;border:1px solid #A6E2F9;border-radius:9px;padding:6px 11px;
   font-size:12.5px;font-weight:600;color:#2E2516;white-space:nowrap}

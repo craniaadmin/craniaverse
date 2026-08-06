@@ -110,11 +110,6 @@ export default function Invoices() {
 
   return (
     <PageShell>
-      <div className="page-head">
-        <button className="icon-btn solid" title="New invoice" onClick={openNew}>
-          <Plus size={22} />
-        </button>
-      </div>
 
       <style>{PAGEACTIONS_CSS}</style>
       <PageActions
@@ -151,6 +146,9 @@ export default function Invoices() {
         backupHint="Snapshots of every invoice and payment (last 14 kept)."
         onRestored={refresh}
       >
+        <button className="icon-btn solid" title="New invoice" onClick={openNew}>
+          <Plus size={22} />
+        </button>
         <button title="Create a new invoice" onClick={openNew}>
           <Plus size={13} /> New Invoice
         </button>
