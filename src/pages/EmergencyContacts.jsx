@@ -346,7 +346,7 @@ function useEmergencyRows() {
 }
 
 export default function EmergencyContacts({ onNavigate }) {
-  const { status: fetchStatus } = useStore()
+  const { status: fetchStatus, refresh } = useStore()
   const { rows: allRows, familyCount, contactCount, studentsCovered, missingCount } = useEmergencyRows()
 
   const [search, setSearch] = useState('')
