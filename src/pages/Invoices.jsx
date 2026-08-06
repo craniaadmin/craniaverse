@@ -29,7 +29,7 @@ const BLANK_INV = () => ({
 const STATUS_ORDER = ['sent', 'overdue', 'partial', 'paid', 'draft', 'void']
 
 export default function Invoices() {
-  const { invoices, payments, loading, status, addInvoice, updateInvoice, deleteInvoice } = useFinance()
+  const { invoices, payments, loading, status, refresh, addInvoice, updateInvoice, deleteInvoice } = useFinance()
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [modal, setModal] = useState(null) // null | 'new' | { edit: id }
