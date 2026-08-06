@@ -19,7 +19,7 @@ import { ChevronLeft, Eye, Plus, Trash2, Pencil, ExternalLink } from 'lucide-rea
 import { useStore } from '../data/store'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import { TRIGGER_FIELDS, triggerLabel } from '../data/autoCash'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const COLS = [
@@ -94,7 +94,7 @@ function fmtTs(ts) {
 }
 const studentName = (r) => `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim()
 
-const CSS = TABLECHROME_CSS + PAGEACTIONS_CSS + `
+const CSS = TABLECHROME_CSS + `
 .cc{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;
     --dark-brown:#2E2516;--line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;
     --danger:#C0392B;--good:#2b7a2e;--shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}

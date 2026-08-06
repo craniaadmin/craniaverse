@@ -1,8 +1,11 @@
-/* THROWAWAY verification harness — deleted before the turn ends. */
+/* THROWAWAY verification harness — deleted before the turn ends.
+   Deliberately does NOT inject PAGEACTIONS_CSS: the component is supposed
+   to carry its own stylesheet now, so if this renders styled, the shared
+   template is genuinely self-contained. */
 import React, { useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import PageActions, { PAGEACTIONS_CSS } from './components/PageActions'
+import PageActions from './components/PageActions'
 
 const BACKUPS = [{
   id: 'b1', label: '2026-08-06, 11:45:29 a.m.', count: 1,
@@ -29,7 +32,6 @@ function Harness() {
   return (
     <div className="app">
       <main className="app-main" style={{ padding: 24, minHeight: 520 }}>
-        <style>{PAGEACTIONS_CSS}</style>
         <PageActions
           onUndo={() => {}} onRedo={() => {}} undoLabel="an edit" redoLabel="an edit"
           csvName="check" csvColumns={[{ key: 'a', label: 'A' }]} csvRows={[{ a: 1 }]}

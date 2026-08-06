@@ -7,7 +7,7 @@
 // scope editing, CSV export, and more.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Edit2, Trash2, Copy, Calendar, List, Palette } from 'lucide-react'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
@@ -323,7 +323,7 @@ function useCalendar(apiPath) {
 }
 
 // ─── CSS ───
-const CSS = PAGEACTIONS_CSS + `
+const CSS = `
 .calroot{--light-blue:#A6E2F9;--dark-blue:#5FA09E;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--shadow:0 1px 3px rgba(46,37,22,.15);
   color:var(--dark-brown);font-family:inherit;}
 

@@ -5,7 +5,7 @@ import {
   PageShell, Loading, OfflineBanner, SummaryStrip,
   Th, Td, IconButton, Modal,
 } from '../components/FinanceUI'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 export default function Receipts() {
   const { invoices, payments, loading, status, refresh } = useFinance()
@@ -41,7 +41,6 @@ export default function Receipts() {
 
   return (
     <PageShell>
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName="crania-receipts"
         csvColumns={[

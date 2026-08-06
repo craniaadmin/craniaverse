@@ -18,7 +18,7 @@ import {
   DOW, DOW_ORD, norm, fmtTime, sessionsOf, statedLocationId,
   matchSessions, entrySlots,
 } from '../data/enrolment'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 /* Fallback only. The real list lives in programs_state and the Programs
    page lets it be renamed and added to, so `useLocName` below prefers
@@ -321,7 +321,6 @@ export default function ClassLists({ onNavigate }) {
 
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName="crania-class-lists"
         csvColumns={[

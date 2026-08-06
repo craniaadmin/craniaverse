@@ -17,7 +17,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Plus, Minus, Edit2, Trash2, Search } from 'lucide-react'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -294,7 +294,6 @@ export default function CraniaStore() {
   return (
     <div className="page">
 
-      <style>{PAGEACTIONS_CSS}</style>
       {view === 'inventory' ? (
         <PageActions
         {...hist}

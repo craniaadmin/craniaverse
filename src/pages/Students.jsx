@@ -22,7 +22,7 @@ import { Trash2, Undo2, Redo2, Eye, UserPlus, ExternalLink, Pencil, Copy } from 
 import { useStore } from '../data/store'
 import CategoryColors, { CATCOLORS_CSS } from '../components/CategoryColors'
 import { buildCategoryLookup, usedCategories as categoriesInUse, inkOn } from '../data/programCategories'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 import { awardsForRow, rowKeyOf, fieldCanTrigger } from '../data/autoCash'
 import {
@@ -115,7 +115,7 @@ function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(
 const classesOf = (r) =>
   Array.from(new Set((r.programs || []).map(p => p.program).filter(Boolean)))
 
-const CSS = CATCOLORS_CSS + PAGEACTIONS_CSS + `
+const CSS = CATCOLORS_CSS + `
 .st{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}

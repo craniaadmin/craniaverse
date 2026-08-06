@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { ChevronDown, X, Mail, Download } from 'lucide-react'
  import { feeEngine, TOTAL_LESSONS, BILLED_MONTHS } from '../data/fees'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
@@ -349,7 +349,6 @@ export default function FeeSchedule() {
         <h2 className="fs-title">Tuition Schedule</h2>
       </div>
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName={selectedReg && programKey
           ? `crania-tuition-${(selectedReg.displayName || 'student').replace(/[^\w]+/g, '-')}-${yearCfg.label}`

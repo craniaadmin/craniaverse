@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import { useFinance, money, invoiceBalance, invoiceStatus, daysBetween, todayISO } from '../data/finance'
 import { PageShell, Loading, OfflineBanner, SummaryStrip, Th, Td } from '../components/FinanceUI'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -103,7 +103,6 @@ export default function Accounting() {
 
   return (
     <PageShell>
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName="crania-accounting-aging"
         csvColumns={[

@@ -9,7 +9,7 @@
 // responses per survey.
 import { useState, useEffect } from 'react'
 import { Plus, X, Edit2, Eye, ChevronLeft, Trash2, GripVertical, Check, Star, Download } from 'lucide-react'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
@@ -102,7 +102,6 @@ function SurveysList({ surveys, respCounts, onNew, onTake, onEdit, onDelete, onO
   return (
     <div className="page">
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName="crania-surveys"
         csvColumns={[

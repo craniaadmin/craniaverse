@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useStore } from '../data/store'
 import craniaLogo from '../assets/crania-logo.png'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 // ── 2025 Canadian Payroll Tax Constants (Ontario) ──────────────────────────
 const TAX_YEAR = 2025
@@ -539,7 +539,6 @@ export default function Payroll() {
 
   return (
     <div className="page" style={{ paddingBottom: 48 }}>
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName={`crania-payroll-${periodStart || todayStr()}`}
         csvColumns={[

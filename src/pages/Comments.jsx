@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useCommentsRows } from '../data/useCommentsRows'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const COMMENT_FIELDS = [
@@ -178,7 +178,6 @@ export default function Comments({ onNavigate }) {
     <div className="page" style={{ paddingBottom: 32 }}>
       <style>{COMMENT_CSS}</style>
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         {...hist}
         onUndo={() => { endBurst(); hist.onUndo() }}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
@@ -176,7 +176,7 @@ function sortItems(arr) {
 }
 
 // ---------- CSS ----------
-const CSS = PAGEACTIONS_CSS + `
+const CSS = `
 .tdroot{--pill:#F1F3F4;--dark-blue:#5FA09E;--light-blue:#A6E2F9;--light-brown:#E0DE85;--dark-brown:#2E2516;--bg:#F4F7F8;--card:#FFFFFF;--tshadow:0 1px 3px rgba(46,37,22,.15);
   color:var(--dark-brown);}
 

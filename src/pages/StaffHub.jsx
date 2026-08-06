@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Plus, X, GripVertical, Trash2 } from 'lucide-react'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 // Trello-style board: lists (columns) of cards (tasks).
@@ -136,7 +136,6 @@ export default function StaffHub() {
         <button className="icon-btn solid" onClick={addList} title="Add list"><Plus size={20} /></button>
       </div>
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         {...hist}
         csvName="crania-staff-board"

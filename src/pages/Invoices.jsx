@@ -8,7 +8,7 @@ import {
   PageShell, Loading, OfflineBanner, SummaryStrip,
   Th, Td, IconButton, StatusPill, Modal, ModalFooter, Field, FieldLabel,
 } from '../components/FinanceUI'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useHistory from '../data/useHistory'
 
 const BLANK_LINE = () => ({ id: genId('li'), desc: '', qty: 1, unitPrice: 0 })
@@ -138,7 +138,6 @@ export default function Invoices() {
   return (
     <PageShell>
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         {...hist}
         csvName="crania-invoices"

@@ -15,7 +15,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useCommentsRows } from '../data/useCommentsRows'
 import { ATTEND_STYLE, ATTEND_LABEL } from '../data/scheduleUtils'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const isoOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -157,7 +157,6 @@ export default function Attendance({ onNavigate }) {
   return (
     <div className="page" style={{ paddingBottom: 32 }}>
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         {...hist}
         csvName={view === 'register' ? `crania-register-${selectedDate}` : 'crania-attendance-history'}

@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Pencil, Copy, Trash2, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -124,7 +124,7 @@ const clone = (d) => ({
   colOrder: [...d.colOrder],
 })
 
-const CSS = PAGEACTIONS_CSS + `
+const CSS = `
 .ct{--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;--dark-brown:#2E2516;
     --line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;--danger:#C0392B;
     --shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}

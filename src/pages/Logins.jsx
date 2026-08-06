@@ -17,7 +17,7 @@ import { Eye, Copy, Check, AlertTriangle } from 'lucide-react'
 import { useStore } from '../data/store'
 import { resolveLogin, duplicateUsernames, usernameOwners, usernameAvailable } from '../data/loginUtils'
 import { ColsPop, CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 import useActionHistory from '../data/useActionHistory'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
@@ -52,7 +52,7 @@ function saveColPrefs(v) { try { localStorage.setItem(CPREF_KEY, JSON.stringify(
 
 const studentName = (r) => `${r.student?.firstName || ''} ${r.student?.lastName || ''}`.trim()
 
-const CSS = TABLECHROME_CSS + PAGEACTIONS_CSS + `
+const CSS = TABLECHROME_CSS + `
 .lg{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;
     --dark-brown:#2E2516;--line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;
     --danger:#C0392B;--good:#2b7a2e;--shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}

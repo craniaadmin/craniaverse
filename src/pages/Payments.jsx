@@ -8,7 +8,7 @@ import {
   PageShell, Loading, OfflineBanner, SummaryStrip,
   Th, Td, IconButton, Modal, ModalFooter, Field,
 } from '../components/FinanceUI'
-import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
+import PageActions from '../components/PageActions'
 
 const METHODS = ['Cash', 'E-Transfer', 'Cheque', 'Credit Card', 'Debit', 'Other']
 
@@ -119,7 +119,6 @@ export default function Payments() {
   return (
     <PageShell>
 
-      <style>{PAGEACTIONS_CSS}</style>
       <PageActions
         csvName="crania-payments"
         csvColumns={[
