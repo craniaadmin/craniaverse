@@ -30,6 +30,7 @@ import Leads from './pages/Leads'
 import Contacts from './pages/Contacts'
 import StaffInformation from './pages/StaffInformation'
 import Forms from './pages/Forms'
+import Registrations from './pages/Registrations'
 import Invoices from './pages/Invoices'
 import Receipts from './pages/Receipts'
 import Projects from './pages/Projects'
@@ -86,7 +87,11 @@ const ROUTES = {
 
   'contacts:Contacts':       () => <Contacts />,
 
-  'forms:All Forms':         () => <Forms />,
+  'forms:All Forms':         (nav) => <Forms onNavigate={nav} />,
+  'forms:Registrations':     (nav) => <Registrations onNavigate={nav} />,
+  'forms:Submissions':       (nav) => <Forms onNavigate={nav} initialView="submissions" />,
+  'forms:Templates':         (nav) => <Forms onNavigate={nav} initialView="templates" />,
+  'forms:Form Builder':      (nav) => <Forms onNavigate={nav} initialView="new" />,
 }
 
 // Reverse lookup: given a legacy page label (e.g. "To Do", "Fee

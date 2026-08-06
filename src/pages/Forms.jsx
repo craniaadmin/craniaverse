@@ -30,7 +30,7 @@ const BLANK_FIELD = () => ({
 const BLANK_FORM = { title: '', description: '', fields: [] }
 
 // ------------------------------ FORMS LIST ------------------------------
-function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl }) {
+function FormsList({ forms, onOpen, onEdit, onDelete, onNew, publicUrl, onOpenBooth, boothUrl, onOpenRegistrations }) {
   const [copied, setCopied] = useState(null)
   const copy = async (url, key) => {
     try {
@@ -650,10 +650,26 @@ function BoothSignupsView({ onBack }) {
   )
 }
 
-export default function Forms() {
+/*  is which of the Forms sub-pages this instance is: the
+   nav splits All Forms, Submissions, Templates and Form Builder across
+   four entries, and each mounts this component in the matching mode
+   rather than duplicating the loading and saving in four files. */
+export default function Forms({ onNavigate, initialView = 'list' }) {
   const [forms, setForms] = useState([])
   const [loading, setLoading] = useState(true)
-  const [view, setView] = useState({ mode: 'list' }) // list | new | edit(id) | subs(id)
+  const [view, setView] = useState(() => (
+    initialView === 'new' ? { mode: 'new' }
+      : initialView === 'submissions' ? { mode: 'picksubs' }
+        : initialView === 'templates' ? { mode: 'templates' }
+          : { mode: 'list' }
+  ))
+  // Following the nav to another Forms page remounts with a new prop.
+  useEffect(() => {
+    setView(initialView === 'new' ? { mode: 'new' }
+      : initialView === 'submissions' ? { mode: 'picksubs' }
+        : initialView === 'templates' ? { mode: 'templates' }
+          : { mode: 'list' })
+  }, [initialView])
 
   useEffect(() => {
     fetch(`${API_BASE}/api/forms`)
@@ -721,7 +737,7 @@ export default function Forms() {
   }
 
   if (view.mode === 'new') {
-    return <FormBuilder onSave={createForm} onCancel={() => setView({ mode: 'list' })} publicUrl={publicUrl} />
+    return <FormBuilder initial={view.tpl} onSave={createForm} onCancel={() => setView({ mode: initialView === 'new' ? 'new' : 'list' })} publicUrl={publicUrl} />
   }
   if (view.mode === 'edit') {
     const f = forms.find(x => x.id === view.id)
@@ -730,7 +746,7 @@ export default function Forms() {
       <FormBuilder
         initial={f}
         onSave={(draft) => updateForm(view.id, draft)}
-        onCancel={() => setView({ mode: 'list' })}
+        onCancel={() => setView({ mode: initialView === 'new' ? 'new' : 'list' })}
         publicUrl={publicUrl}
       />
     )
@@ -739,6 +755,27 @@ export default function Forms() {
     const f = forms.find(x => x.id === view.id)
     if (!f) { setView({ mode: 'list' }); return null }
     return <SubmissionsView form={f} onBack={() => setView({ mode: 'list' })} />
+  }
+  if (view.mode === 'picksubs') {
+    return <PickForm forms={forms} title="Submissions"
+      blurb="Choose a form to see what has been submitted to it."
+      onPick={(id) => setView({ mode: 'subs', id })}
+      onBooth={() => setView({ mode: 'booth' })}
+      onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])} />
+  }
+  if (view.mode === 'templates') {
+    return <Templates onUse={(tpl) => setView({ mode: 'new', tpl })} />
+  }
+  if (view.mode === 'picksubs') {
+    return (
+      <PickForm forms={forms}
+        onPick={(id) => setView({ mode: 'subs', id })}
+        onBooth={() => setView({ mode: 'booth' })}
+        onRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])} />
+    )
+  }
+  if (view.mode === 'templates') {
+    return <Templates onUse={(tpl) => setView({ mode: 'new', tpl })} />
   }
   if (view.mode === 'booth') {
     return <BoothSignupsView onBack={() => setView({ mode: 'list' })} />
@@ -754,6 +791,7 @@ export default function Forms() {
       publicUrl={publicUrl}
       boothUrl={boothUrl}
       onOpenBooth={() => setView({ mode: 'booth' })}
+      onOpenRegistrations={() => onNavigate && onNavigate(['forms', 'Registrations'])}
     />
   )
 }
