@@ -212,6 +212,22 @@ export function authRequired(req, res, next) {
   // load).
   if (!req.path.startsWith('/api/')) return next()
   if (isPublicApi(req.method, req.path)) return next()
-  if (readSession(req)) return next()
-  return res.status(401).json({ error: 'not authenticated' })
+  const session = readSession(req)
+  if (!session) return res.status(401).json({ error: 'not authenticated' })
+  req.session = session
+  return next()
+}
+
+/* Runs after authRequired, so anything reaching it is signed in. The
+   403 says which level is needed and which one they have — being told
+   only "forbidden" leaves you unable to tell a permissions problem
+   from a broken page. */
+export function roleRequired(req, res, next) {
+  if (!req.path.startsWith('/api/')) return next()
+  if (isPublicApi(req.method, req.path)) return next()
+  const role = req.session?.role
+  if (!role) return next()
+  const verdict = permits(role, req.method, req.path)
+  if (verdict.ok) return next()
+  return res.status(403).json({ error: verdict.reason, role, needsRole: 'admin' })
 }
