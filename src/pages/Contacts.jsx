@@ -64,11 +64,11 @@ function useContacts() {
     })
   }, [])
 
-  return { contacts, loading, status, mutate }
+  return { contacts, loading, status, mutate, refresh }
 }
 
 export default function Contacts() {
-  const { contacts, loading, status, mutate } = useContacts()
+  const { contacts, loading, status, mutate, refresh } = useContacts()
   const [search, setSearch] = useState('')
   const [catFilter, setCatFilter] = useState('all')
   const [editing, setEditing] = useState(null) // null | { mode:'new'|'edit', contact? }
