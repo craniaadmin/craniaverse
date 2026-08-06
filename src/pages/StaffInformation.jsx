@@ -135,21 +135,11 @@ function useConfirm() {
   return { confirm, node }
 }
 
-const CSS = BACKUP_CSS + TABLECHROME_CSS + `
+const CSS = BACKUP_CSS + TABLECHROME_CSS + PAGEACTIONS_CSS + `
 .sf{position:relative;--light-blue:#A6E2F9;--teal:#5FA09E;--pill:#F1F3F4;--yellow:#E0DE85;
     --dark-brown:#2E2516;--line:#E7EBE7;--field:#D5D0C4;--muted:#6B6455;--faint:#9A948A;
     --danger:#C0392B;--good:#2b7a2e;--shadow:0 1px 3px rgba(46,37,22,.15);color:var(--dark-brown)}
 
-.sf .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
-.sf .actions button{background:#fff;border:1px solid #e2ded2;color:var(--dark-brown);padding:6px 12px;
-    font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:inherit;
-    display:inline-flex;align-items:center;gap:5px}
-.sf .actions button:hover{background:#f4f2ea}
-.sf .actions button:disabled{opacity:.45;cursor:default}
-.sf .actions .gearbtn{font-size:14px;line-height:1;padding:6px 10px}
-.sfsettings{position:absolute;right:34px;z-index:240;width:340px;margin-top:4px}
-.sf .histnote{background:#E4EFF3;border:1px solid var(--light-blue);border-radius:9px;
-    padding:7px 12px;margin-bottom:10px;font-size:12.5px;font-weight:600;color:var(--dark-brown)}
 .sf .offline{background:#fffbf0;border:1px solid #f4d67a;color:#8a6a00;padding:8px 12px;
     border-radius:8px;margin-bottom:12px;font-size:13px}
 
