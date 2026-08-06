@@ -333,66 +333,92 @@ function RulesEditor({ pushHist }) {
     }
   }
 
+  const autoCount = draft.filter(r => r.when && r.when.field && r.when.value).length
+
+  /* On the page rather than behind the gear. It never fitted a 340px
+     popover: each rule needs a reason, an amount and a trigger, which had
+     to stack into two rows and still felt cramped. Out here one rule is
+     one row. Collapsed by default so the page still opens on the table —
+     rules are set once a term, but they are what the quick-apply buttons
+     in the bulk bar below are made of, so they belong in sight. */
   return (
-    <div className="bkp-card cc-rules">
-      <div className="bkp-title">Crania Cash Rules</div>
-      <div className="bkp-hint">
-        Every rule is a quick-apply button. Give one a trigger and it is also
-        applied by itself whenever a lesson is marked that way — on the
-        Attendance page and on a student's own page alike. Change the mark
-        later and the award follows.
-      </div>
-      {/* Nothing here fires by itself unless a rule says when to. Before
-          triggers existed the code awarded +1 for Present whether or not a
-          rule said so, so deleting the rule appeared to change nothing —
-          and then marking a register silently stopped paying. Say it. */}
-      {draft.length > 0 && !draft.some(r => r.when && r.when.field && r.when.value) && (
-        <div className="rwarn">
-          No rule applies automatically, so marking a register awards nothing.
-          Give a rule a trigger below, or
-          <button type="button" className="link" onClick={addStandard}>
-            add the standard attendance rules
-          </button>.
+    <section className="cc-rules">
+      <button type="button" className="rules-head" onClick={() => setOpen(v => !v)}
+        aria-expanded={open}>
+        <span className="chev">{open ? '▾' : '▸'}</span>
+        <span className="t">Crania Cash Rules</span>
+        <span className="c">
+          {draft.length} rule{draft.length === 1 ? '' : 's'}
+          {draft.length > 0 && ` · ${autoCount} automatic`}
+        </span>
+        {dirty && <span className="unsaved">Unsaved changes</span>}
+      </button>
+
+      {open && (
+        <div className="rules-body">
+          <div className="rules-hint">
+            Every rule is a quick-apply button. Give one a trigger and it is also
+            applied by itself whenever a lesson is marked that way — on the
+            Attendance page and on a student's own page alike. Change the mark
+            later and the award follows.
+          </div>
+          {/* Nothing here fires by itself unless a rule says when to. Before
+              triggers existed the code awarded +1 for Present whether or not a
+              rule said so, so deleting the rule appeared to change nothing —
+              and then marking a register silently stopped paying. Say it. */}
+          {draft.length > 0 && autoCount === 0 && (
+            <div className="rwarn">
+              No rule applies automatically, so marking a register awards nothing.
+              Give a rule a trigger below, or
+              <button type="button" className="link" onClick={addStandard}>
+                add the standard attendance rules
+              </button>.
+            </div>
+          )}
+          {draft.length === 0 && <div className="rempty">No rules yet.</div>}
+
+          {draft.length > 0 && (
+            <div className="rhead">
+              <span className="hwhy">Reason</span>
+              <span className="hamt">Amount</span>
+              <span className="htrig">Applies automatically when</span>
+            </div>
+          )}
+          {draft.map((r, i) => (
+            <div key={r.id || i} className="rblock">
+              <input className="why" value={r.reason} placeholder="e.g. Completed homework"
+                onChange={e => setRow(i, { reason: e.target.value })} />
+              <input className="amt" type="number" value={r.delta}
+                onChange={e => setRow(i, { delta: Number(e.target.value) || 0 })} />
+              <select className="tfield" value={r.when?.field || ''}
+                onChange={e => {
+                  const field = e.target.value
+                  const first = TRIGGER_FIELDS.find(f => f.key === field)
+                  setRow(i, { when: field ? { field, value: r.when?.value && first?.values.some(v => v.v === r.when.value) ? r.when.value : first.values[0].v } : null })
+                }}>
+                <option value="">Never — manual only</option>
+                {TRIGGER_FIELDS.map(f => <option key={f.key} value={f.key}>{f.label}</option>)}
+              </select>
+              <select className="tvalue" value={r.when?.value || ''} disabled={!r.when?.field}
+                onChange={e => setRow(i, { when: { field: r.when.field, value: e.target.value } })}>
+                {r.when?.field
+                  ? (TRIGGER_FIELDS.find(f => f.key === r.when.field)?.values || [])
+                    .map(v => <option key={v.v} value={v.v}>{v.label}</option>)
+                  : <option value="">—</option>}
+              </select>
+              <button type="button" className="x" title="Remove rule" onClick={() => remove(i)}>
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+
+          <div className="foot">
+            <button type="button" className="add" onClick={add}><Plus size={12} /> Add Rule</button>
+            <button type="button" className="save" disabled={!dirty} onClick={save}>Save Changes</button>
+          </div>
         </div>
       )}
-      {draft.length === 0 && <div className="bkp-meta">No rules yet.</div>}
-      {draft.map((r, i) => (
-        <div key={r.id || i} className="rblock">
-          <div className="rrow">
-            <input className="why" value={r.reason} placeholder="e.g. Completed homework"
-              onChange={e => setRow(i, { reason: e.target.value })} />
-            <input className="amt" type="number" value={r.delta}
-              onChange={e => setRow(i, { delta: Number(e.target.value) || 0 })} />
-            <button type="button" className="x" title="Remove rule" onClick={() => remove(i)}>
-              <Trash2 size={13} />
-            </button>
-          </div>
-          <div className="rrow trig">
-            <span className="w">Applies automatically when</span>
-            <select value={r.when?.field || ''}
-              onChange={e => {
-                const field = e.target.value
-                const first = TRIGGER_FIELDS.find(f => f.key === field)
-                setRow(i, { when: field ? { field, value: r.when?.value && first?.values.some(v => v.v === r.when.value) ? r.when.value : first.values[0].v } : null })
-              }}>
-              <option value="">Never — manual only</option>
-              {TRIGGER_FIELDS.map(f => <option key={f.key} value={f.key}>{f.label}</option>)}
-            </select>
-            {r.when?.field && (
-              <select value={r.when.value || ''}
-                onChange={e => setRow(i, { when: { field: r.when.field, value: e.target.value } })}>
-                {(TRIGGER_FIELDS.find(f => f.key === r.when.field)?.values || [])
-                  .map(v => <option key={v.v} value={v.v}>{v.label}</option>)}
-              </select>
-            )}
-          </div>
-        </div>
-      ))}
-      <div className="foot">
-        <button type="button" className="add" onClick={add}><Plus size={12} /> Add Rule</button>
-        <button type="button" className="save" disabled={!dirty} onClick={save}>Save Changes</button>
-      </div>
-    </div>
+    </section>
   )
 }
 
