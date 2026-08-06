@@ -48,12 +48,15 @@ const collectionSpecs = [
     indexes: ['CREATE UNIQUE INDEX `idx_registrations_recordId` ON `registrations` (`recordId`)'],
   },
   {
-    name: 'users',
+    // Not `users`: PocketBase ships a built-in `users` auth collection,
+    // and reusing it meant every write failed against a schema wanting
+    // an email and a password rather than our recordId/payload pair.
+    name: 'accounts',
     fields: [
       { name: 'recordId', type: 'text', required: true,  presentable: true },
       { name: 'payload',  type: 'json', required: false, maxSize: 1048576 },
     ],
-    indexes: ['CREATE UNIQUE INDEX `idx_users_recordId` ON `users` (`recordId`)'],
+    indexes: ['CREATE UNIQUE INDEX `idx_accounts_recordId` ON `accounts` (`recordId`)'],
   },
   {
     name: 'staff',
