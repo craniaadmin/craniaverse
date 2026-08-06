@@ -1082,7 +1082,6 @@ function CustomerList({ onSelect, onAdd, onAddSibling, onDuplicate, onDelete, on
               onNone={() => setPrefs(p => {
                 p.hiddenCols = Object.fromEntries(COLS.filter(c => c.k !== LOCKED_COL).map(c => [c.k, true]))
               })} />
-            <CategoryColors categories={usedCategories} tintFor={tintFor} onCatColor={setCatColor} />
           </>
         }
       >
