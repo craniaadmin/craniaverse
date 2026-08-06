@@ -222,6 +222,8 @@ export default function ClassLists({ onNavigate }) {
   const [category, setCategory] = useState('all')
   const [hideEmpty, setHideEmpty] = useState(true)
   const [expanded, setExpanded] = useState(() => new Set())
+  const [hiddenCols, setHiddenColsState] = useState(loadHiddenCols)
+  const setHiddenCols = (next) => { setHiddenColsState(next); saveHiddenCols(next) }
 
   const categories = useMemo(
     () => Array.from(new Set(classes.map((c) => c.program.category).filter(Boolean))).sort(),
