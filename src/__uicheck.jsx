@@ -77,7 +77,17 @@ window.fetch = async (input, init = {}) => {
   if (path === '/api/programs-state') return json({ catColors: { FLEX: '#A6E2F9' } })
   if (path === '/api/staff') return json(STAFF)
   if (path === '/api/rules') return json([])
-  if (path === '/api/comments') return json({})
+  if (path === '/api/comments') {
+    const TAB = '26_27|FLEX MATH'
+    const row = (n, date) => ({
+      lessonNo: n, day: 'Mon', date, attendance: 'P', uniform: 'Yes',
+      lessonPlan: 'x', homeworkCompleted: 'Yes', performance: 'Good',
+      behaviour: 'Good', homeworkAssigned: 'y', parentComm: 'note ' + n, teacher: 'Rob',
+    })
+    const out = {}
+    for (const r of REGS) out[r.id] = { [TAB]: [row(1, '2026-08-03'), row(2, '2026-07-27')] }
+    return json(out)
+  }
   if (path === '/api/calendar') return json({ calendars: [], events: [] })
   return json({}, 404)
 }
