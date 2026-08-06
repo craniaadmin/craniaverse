@@ -251,7 +251,6 @@ export default function Keys({ onNavigate }) {
   const [editing, setEditing] = useState(null)   // { rowId, field }
   const [adding, setAdding] = useState(false)
   const dragCol = useRef(null)
-  const popRef = useRef(null)
 
   /* Undo/redo. A key lives inside one staff record's `keys` array and the
      only setter is updateStaffField, which replaces that array — so the step
