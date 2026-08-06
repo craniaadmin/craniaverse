@@ -69,6 +69,51 @@ export default function Comments({ onNavigate }) {
   const [programFilter, setProgramFilter] = useState('all')
   const [showBlank, setShowBlank] = useState(false)
 
+  /* Undo/redo. Every hook on this page has to be called before the
+     `if (loading)` return below — a hook that only runs on the second
+     render is a "rendered more hooks than during the previous render"
+     crash, and the page dies on open. Keep them all up here. */
+  const hist = useActionHistory()
+  const pushHist = hist.push
+
+  // The note as it stands, read at the moment of the change rather than
+  // closed over from a render — two teachers can be writing at once.
+  const rowsRef = useRef(flatRows)
+  rowsRef.current = flatRows
+
+  /* Writing a note is typing, so a burst of keystrokes in one box is one
+     step. The stack entry is pushed on the first keystroke and its "after"
+     value is kept in a holder the closures read, so Undo is available
+     immediately and still lands on the whole word rather than the first
+     letter of it. */
+  const burst = useRef(null)
+  const endBurst = useCallback(() => {
+    if (burst.current) { clearTimeout(burst.current.timer); burst.current = null }
+  }, [])
+  useEffect(() => endBurst, [endBurst])
+
+  const editCell = useCallback((r, field, value) => {
+    const key = `${r.studentId}::${r.tabKey}::${r.rowIdx}::${field}`
+    updateRow(r.studentId, r.tabKey, r.rowIdx, field, value)
+
+    const open = burst.current
+    if (open && open.key === key) {
+      open.holder.to = value
+      clearTimeout(open.timer)
+      open.timer = setTimeout(() => { burst.current = null }, 700)
+      return
+    }
+
+    const live = rowsRef.current.find(x => x.studentId === r.studentId
+      && x.tabKey === r.tabKey && x.rowIdx === r.rowIdx) || r
+    const holder = { from: live.row?.[field] ?? '', to: value }
+    if (holder.from === value) return
+    const label = `${r.studentName} — ${(COMMENT_FIELDS.find(f => f.key === field) || {}).label || field}`
+    const write = (v) => { endBurst(); updateRow(r.studentId, r.tabKey, r.rowIdx, field, v) }
+    pushHist({ label, undo: () => write(holder.from), redo: () => write(holder.to) })
+    burst.current = { key, holder, timer: setTimeout(() => { burst.current = null }, 700) }
+  }, [updateRow, pushHist, endBurst])
+
   const programs = useMemo(() => {
     const seen = new Set()
     const out = []
