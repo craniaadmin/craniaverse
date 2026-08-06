@@ -479,9 +479,10 @@ function UsersModal({ me, onClose }) {
             </div>
             <div>
               <label>Password</label>
-              <input type="text" value={draft.password}
-                onChange={e => setDraft(d => ({ ...d, password: e.target.value }))}
-                placeholder="at least 9 characters" />
+              <div className="pwfield">
+                <PasswordBox value={draft.password} placeholder="at least 9 characters"
+                  onChange={v => setDraft(d => ({ ...d, password: v }))} />
+              </div>
             </div>
             <div>
               <label>Level</label>
