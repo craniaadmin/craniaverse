@@ -404,9 +404,14 @@ function saveDraft(){
     return;
   }
   if (state.staffId) {
+    /* The token comes back from the create above and is what lets an
+       autosave write into this record without being signed in. It is
+       only good for this one record. */
+    var headers = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' };
+    if (state.editToken) headers['x-edit-token'] = state.editToken;
     fetch(API_BASE + '/api/staff/' + encodeURIComponent(state.staffId), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
+      headers: headers,
       body: JSON.stringify(payload),
     }).then(r => r.ok ? setStatus('Saved') : setStatus('Save failed')).catch(() => setStatus('Save failed'));
   } else {
@@ -415,8 +420,11 @@ function saveDraft(){
       headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
       body: JSON.stringify(payload),
     }).then(r => r.json()).then(rec => {
-      if (rec && rec.id) { state.staffId = rec.id; setStatus('Saved'); }
-      else setStatus('Save failed');
+      if (rec && rec.id) {
+        state.staffId = rec.id;
+        if (rec.editToken) state.editToken = rec.editToken;
+        setStatus('Saved');
+      } else setStatus('Save failed');
     }).catch(() => setStatus('Save failed'));
   }
 }
