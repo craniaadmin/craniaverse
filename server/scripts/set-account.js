@@ -54,9 +54,15 @@ const opts = {
   list: has('list'),
 }
 
-const die = (msg) => { console.error(`\n${msg}\n`); process.exit(1) }
+/* Thrown rather than exiting on the spot: process.exit() while the
+   PocketBase client still holds a keep-alive socket makes libuv print
+   an assertion after the message, which looks like a crash on a script
+   whose whole job is to reassure you it did the right thing. */
+class Stop extends Error {}
+const die = (msg) => { throw new Stop(msg) }
 
-const users = await loadUsers()
+async function main() {
+  const users = await loadUsers()
 if (users.length === 0) {
   die('There are no accounts yet. Start the API once — it seeds the first\n'
     + 'admin from ADMIN_PASSWORD in server/.env — then run this again.')
