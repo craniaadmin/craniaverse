@@ -450,22 +450,20 @@ function AddressFields({ value, onChange }) {
   )
 }
 
-/* One section of the form. The heading is a fixed height whatever the
-   words in it, so headings sitting in the same grid row line up to the
-   pixel — the previous bars were as tall as their own text and drifted
-   apart. `span` widens a section that needs the room (the availability
-   table, the six-column references list). */
-function Section({ title, hint, count, span, children }) {
+/* One section of the form. The heading is a ruled caption of fixed
+   height, so headings sitting in the same grid row still line up — but
+   it reads as a label on the fields below rather than a coloured slab
+   competing with them. `span` widens a section that needs the room (the
+   availability table, the six-column references list). */
+function Section({ title, hint, count, countShort, span, children }) {
   return (
-    <section className={'sect' + (span === 2 ? ' span2' : '')}>
-      <div className="secthead">
-        <span className="t">{title}</span>
-        {count && <span className="cnt">{count}</span>}
+    <section className={span === 2 ? 'wide' : undefined}>
+      <div className="sec-h">
+        <span>{title}</span>
+        {count && <span className={'cnt' + (countShort ? ' short' : '')}>{count}</span>}
       </div>
-      <div className="sectbody">
-        {hint && <div className="secthint">{hint}</div>}
-        {children}
-      </div>
+      {hint && <div className="sechint">{hint}</div>}
+      {children}
     </section>
   )
 }
