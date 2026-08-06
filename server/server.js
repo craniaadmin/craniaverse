@@ -1146,11 +1146,32 @@ app.post('/api/staff/restore/:id', wrap(async (req, res) => {
 
 app.get('/api/staff', wrap(async (_req, res) => res.json(await getStaff())))
 
+/* Fields a public submitter must not be able to set on themselves. The
+   form does not offer them; this is so a hand-written request cannot
+   either. Pay and role are decided here, not by the applicant. */
+const STAFF_INTERNAL = ['role', 'ratePerHour', 'active', 'staffId', 'editTokenHash', 'documents', 'sin']
+
+const hashToken = (t) => crypto.createHash('sha256').update(String(t)).digest('hex')
+
 app.post('/api/staff', wrap(async (req, res) => {
   /* No name requirement: Add Staff creates the row and the form fills it
      in, the same way Add Family works. An id in the body is honoured, which
      is what makes undo of a delete a true restore rather than a re-add. */
-  const body = req.body || {}
+  const body = { ...(req.body || {}) }
+  const signedIn = Boolean(readSession(req))
+
+  /* Anyone can submit the staff form, the same way anyone can submit a
+     registration. What they cannot do is come back and edit a record
+     that is not the one they just created — so an unauthenticated
+     create mints a token, keeps only its hash, and hands the token
+     back. The autosave presents it on every later write. */
+  let editToken = null
+  if (!signedIn) {
+    for (const k of STAFF_INTERNAL) delete body[k]
+    delete body.id
+    editToken = crypto.randomBytes(24).toString('hex')
+  }
+
   const staff = await getStaff()
   const id = `staff-${Date.now().toString(36)}`
   const record = {
@@ -1161,17 +1182,33 @@ app.post('/api/staff', wrap(async (req, res) => {
     emergencyName: '', emergencyPhone: '',
     notes: [], active: true,
     ...body,
+    ...(editToken ? { editTokenHash: hashToken(editToken) } : null),
   }
   staff.push(record)
   await commitStaff(staff)
-  res.status(201).json(record)
+  res.status(201).json({ ...record, editTokenHash: undefined, ...(editToken ? { editToken } : null) })
 }))
 
 app.put('/api/staff/:id', wrap(async (req, res) => {
   const staff = await getStaff()
   const idx = staff.findIndex((s) => s.id === req.params.id)
   if (idx === -1) return res.status(404).json({ error: 'not found' })
-  staff[idx] = { ...staff[idx], ...req.body, id: staff[idx].id }
+
+  const body = { ...(req.body || {}) }
+  if (!readSession(req)) {
+    /* Public write: only into the record this submitter created, and
+       only the fields the form collects. Compared in constant time so
+       the response cannot be used to feel out a valid token. */
+    const given = String(req.headers['x-edit-token'] || '')
+    const held = staff[idx].editTokenHash
+    const a = Buffer.from(hashToken(given))
+    const b = Buffer.from(String(held || ''))
+    const ok = held && a.length === b.length && crypto.timingSafeEqual(a, b)
+    if (!ok) return res.status(401).json({ error: 'not authenticated' })
+    for (const k of STAFF_INTERNAL) delete body[k]
+  }
+
+  staff[idx] = { ...staff[idx], ...body, id: staff[idx].id }
   await commitStaff(staff)
   res.json({ ok: true })
 }))
