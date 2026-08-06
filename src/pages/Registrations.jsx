@@ -16,7 +16,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Eye, Pencil } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 import { CtxMenu, TABLECHROME_CSS } from '../components/TableChrome'
 import useActionHistory from '../data/useActionHistory'
 
@@ -185,7 +185,6 @@ const CSS = TABLECHROME_CSS + `
 .rg .tag.wait{background:#FBF3CE;color:#7a6417}
 .rg .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .rg .empty b{color:var(--dark-brown)}
-.rg .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 .rg .offline{background:#fffbf0;border:1px solid #f4d67a;color:#8a6a00;padding:8px 12px;
     border-radius:8px;margin-bottom:12px;font-size:13px}
 .rg .rowbtn{background:none;border:none;color:#c9c3b5;padding:0 2px;cursor:pointer;

@@ -207,7 +207,6 @@ const CSS = TABLECHROME_CSS + `
 .cc .bal.neg{background:#fadbd8;color:#922b21}
 .cc .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .cc .empty b{color:var(--dark-brown)}
-.cc .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 
 /* ── detail ── */
 .cc .back{background:none;border:none;color:var(--teal);font-weight:700;font-size:13px;

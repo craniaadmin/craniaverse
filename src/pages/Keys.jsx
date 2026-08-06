@@ -143,7 +143,6 @@ const CSS = TABLECHROME_CSS + `
 .ky .sigbox{width:13px;height:13px;margin:0;accent-color:var(--teal);cursor:pointer;vertical-align:middle}
 .ky .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .ky .empty b{color:var(--dark-brown)}
-.ky .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 
 /* ── inline edit ── */
 .ky td.editable:hover{outline:1px dashed #b9c6c5;outline-offset:-1px}

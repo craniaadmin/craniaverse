@@ -391,7 +391,6 @@ const CSS = `
 .cu .rowbtn.rb-del:hover{color:#c0392b}
 .cu .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .cu .empty b{color:var(--dark-brown)}
-.cu .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
 
 /* ---- detail view ---- */
 .cu .back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;

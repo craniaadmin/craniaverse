@@ -229,7 +229,6 @@ const CSS = TABLECHROME_CSS + `
 .sf .tag.off{background:#EAE7DF;color:var(--muted)}
 .sf .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .sf .empty b{color:var(--dark-brown)}
-.sf .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 
 .sfov{position:fixed;inset:0;background:rgba(46,37,22,.35);z-index:400;
     display:flex;align-items:center;justify-content:center;padding:20px}

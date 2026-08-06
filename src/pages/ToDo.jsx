@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import PageActions from '../components/PageActions'
+import PageActions, { RowCount } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 
@@ -267,9 +267,6 @@ const CSS = `
 .tdroot .ctxmenu button{background:none;border:none;color:var(--dark-brown);text-align:left;padding:8px 12px;border-radius:6px;font-weight:500;cursor:pointer;font:inherit;}
 .tdroot .ctxmenu button:hover{background:#f4f2ea;}
 .tdroot .ctxmenu button.ctx-danger{color:#c0392b;}
-
-/* footer */
-.tdroot .td-footer{text-align:center;font-size:12px;color:#9a948a;padding:16px 0 4px;}
 
 /* checklists view */
 .tdroot .cl-wrap{margin:0 auto;}

@@ -228,7 +228,6 @@ const CSS = `
 .st table.slist tbody td.col-classes{white-space:normal;height:auto;padding-top:3px;padding-bottom:3px}
 .st .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .st .empty b{color:var(--dark-brown)}
-.st .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
 
 /* ---- detail view ---- */
 .st .back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;

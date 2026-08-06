@@ -5,7 +5,7 @@ import { useStore } from '../data/store'
    the store; only these view defaults are read from it. */
 import SEED from '../data/programsData.json'
 import { buildEnrolmentIndex, sessionKey } from '../data/enrolment'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS = { 'ngrok-skip-browser-warning': 'true' }
@@ -621,7 +621,6 @@ const CSS = `
 .pg .rowbtn.rb-dup{font-size:13px}
 .pg .rowbtn.rb-pen:hover,.pg .rowbtn.rb-dup:hover{color:var(--teal)}
 .pg .rowbtn.rb-del:hover{color:#c0392b}
-.pg .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
 
 .pgpop{position:fixed;z-index:220;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
     box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;

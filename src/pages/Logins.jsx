@@ -154,7 +154,6 @@ const CSS = TABLECHROME_CSS + `
     color:#7a6417;border-radius:9px;padding:8px 12px;margin-bottom:10px;font-size:12.5px;font-weight:600}
 .lg .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .lg .empty b{color:var(--dark-brown)}
-.lg .tcount{text-align:right;font-size:11.5px;color:var(--muted);padding:7px 2px 0}
 
 /* ── inline edit ── */
 .lg td.editable:hover{outline:1px dashed #b9c6c5;outline-offset:-1px}

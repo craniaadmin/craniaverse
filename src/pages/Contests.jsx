@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Pencil, Copy, Trash2, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 
 const API_BASE = import.meta.env?.VITE_API_URL || ''
 const HEADERS  = { 'ngrok-skip-browser-warning': 'true' }
@@ -236,8 +236,6 @@ const CSS = `
 .ct .clearf{background:#fff;border:1px solid var(--field);border-radius:8px;padding:8px 12px;
     font-size:13px;color:var(--muted);font-weight:600;cursor:pointer;font-family:inherit}
 .ct .clearf:hover{background:#f1f5f4}
-.ct .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
-.ct .tcount .tnote{float:left;color:#8a6a00;font-weight:600}
 
 .ctpop{position:fixed;z-index:220;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
     box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;

@@ -21,7 +21,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { buildFamilyIndex } from '../data/family'
 import { Phone, Mail, Eye } from 'lucide-react'
 import { useStore } from '../data/store'
-import PageActions, { ColumnsMenu } from '../components/PageActions'
+import PageActions, { ColumnsMenu, RowCount } from '../components/PageActions'
 
 const COLS = [
   { k: 'contact',      l: 'Emergency Contact' },  // never hideable — it names the row
@@ -183,8 +183,6 @@ const CSS = `
 .ec button.nlink:hover{text-decoration:underline}
 .ec .empty{text-align:center;color:var(--muted);padding:60px 20px}
 .ec .empty b{color:var(--dark-brown)}
-.ec .tcount{color:var(--muted);font-size:12px;padding:10px 2px;text-align:right}
-.ec .tcount .tnote{float:left;color:#8a6a00;font-weight:600}
 
 .ecpop{position:fixed;z-index:220;background:#fff;border:1px solid #E7EBE7;border-radius:12px;
     box-shadow:0 8px 24px rgba(46,37,22,.22);padding:8px 12px 10px;min-width:190px;max-height:360px;
