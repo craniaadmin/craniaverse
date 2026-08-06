@@ -18,21 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "sfpreview",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "vite",
-        "--config",
-        "vite.sfpreview.config.js",
-        "--port",
-        "5227",
-        "--strictPort",
-        "--host",
-        "127.0.0.1"
-      ],
-      "port": 5227
     }
   ]
 }

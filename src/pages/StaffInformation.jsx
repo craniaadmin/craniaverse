@@ -28,11 +28,11 @@ const COLS = [
 ]
 const LOCKED_COL = 'name'
 
-const SEL_W = '4%'
-const ACT_W = '6%'
+const SEL_W = '5%'
+const ACT_W = '7%'
 const COL_W = {
-  staffId: '9%', name: '16%', role: '11%', phone: '10%',
-  email: '17%', startDate: '10%', tenure: '9%', status: '8%',
+  staffId: '9%', name: '15%', role: '10%', phone: '10%',
+  email: '14%', startDate: '10%', tenure: '12%', status: '8%',
 }
 
 const CPREF_KEY = 'staff-cols'
@@ -193,7 +193,7 @@ const CSS = BACKUP_CSS + TABLECHROME_CSS + `
 .sf .card{background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);
     border-left:3px solid var(--light-blue);border-right:3px solid var(--yellow);
     border-bottom:3px solid var(--teal);overflow-x:auto}
-.sf .card > table{width:100%;min-width:940px;table-layout:fixed;border-collapse:separate;
+.sf .card > table{width:100%;min-width:990px;table-layout:fixed;border-collapse:separate;
     border-spacing:5px 5px;background:#fff}
 .sf thead th{background:var(--teal);color:#fff;text-align:center;font-size:10.5px;font-weight:700;
     text-transform:uppercase;letter-spacing:.3px;padding:6px 4px;height:26px;white-space:nowrap;
