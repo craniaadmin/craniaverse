@@ -127,6 +127,23 @@ export function downloadCsv(filename, columns, rows) {
   URL.revokeObjectURL(a.href)
 }
 
+/* The count line at the foot of a list: how many rows are on screen, and
+   out of how many when a filter is hiding some.
+
+   Deliberately just the count. The page it sits on already has its name in
+   the top bar and the sidebar, so repeating "CraniaVerse · To-Do" here —
+   which is what this page used to do — tells you nothing you cannot see. */
+export function RowCount({ shown, total, note }) {
+  const n = Number(shown) || 0
+  const t = total == null ? n : (Number(total) || 0)
+  return (
+    <div className="pgcount">
+      {note && <span className="note">{note}</span>}
+      Count={n.toLocaleString()}{t !== n ? ` of ${t.toLocaleString()}` : ''}
+    </div>
+  )
+}
+
 /* A settings row that opens underneath itself, the way Restore does in
    the backups section. Pages used to anchor a fixed-position popover to
    the button instead, which sat at a lower z-index than the panel and so
