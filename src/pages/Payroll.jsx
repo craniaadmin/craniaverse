@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useStore } from '../data/store'
 import craniaLogo from '../assets/crania-logo.png'
+import PageActions, { PAGEACTIONS_CSS } from '../components/PageActions'
 
 // ── 2025 Canadian Payroll Tax Constants (Ontario) ──────────────────────────
 const TAX_YEAR = 2025
