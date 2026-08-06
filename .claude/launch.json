@@ -18,21 +18,6 @@
         "dev"
       ],
       "port": 5173
-    },
-    {
-      "name": "papreview",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "vite",
-        "--config",
-        "vite.papreview.config.js",
-        "--port",
-        "5240",
-        "--strictPort",
-        "--host",
-        "127.0.0.1"
-      ],
-      "port": 5240
     }
   ]
 }
