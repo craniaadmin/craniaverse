@@ -57,10 +57,12 @@ export const PAGEACTIONS_CSS = BACKUP_CSS + `
 .pgsettings .bkp-title{font-size:11.5px;font-weight:700;color:#5FA09E;
   text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
 /* Full-width rows rather than a row of pills — a menu, not a toolbar. */
+/* line-height is pinned so a row does not grow a pixel when its ▾ appears —
+   the disclosure glyph is taller than the label text. */
 .pgsettings .pgsitem{display:flex;align-items:center;gap:8px;width:100%;
   background:#fff;border:1px solid #D5D0C4;border-radius:8px;padding:8px 11px;
   font:inherit;font-size:12.5px;font-weight:600;color:#2E2516;cursor:pointer;
-  text-align:left;margin-bottom:7px}
+  text-align:left;margin-bottom:7px;line-height:1.25}
 .pgsettings .pgsitem:last-child{margin-bottom:0}
 .pgsettings .pgsitem:hover:not(:disabled){background:#F1F3F4;border-color:#5FA09E}
 .pgsettings .pgsitem:disabled{opacity:.45;cursor:default}
