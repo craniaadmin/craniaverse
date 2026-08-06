@@ -230,6 +230,25 @@ const CSS = TABLECHROME_CSS + PAGEACTIONS_CSS + `
 @media (max-width:560px){.rgmodal .egrid{grid-template-columns:1fr}.rgmodal .ef.wide{grid-column:span 1}}
 `
 
+/* The three stores a registration is spread across, written in whichever
+   combination changed. Shared by the dialog's Save and by Undo, so taking
+   a change back goes down the same path that made it — there is no second
+   write route to drift out of step with the first. */
+async function putSections(recordId, sections) {
+  const base = import.meta.env?.VITE_API_URL || ''
+  const H = { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' }
+  const calls = []
+  for (const [part, body] of Object.entries(sections)) {
+    if (!body) continue
+    calls.push(fetch(`${base}/api/registrations/${recordId}/${part}`,
+      { method: 'PUT', headers: H, body: JSON.stringify(body) }))
+  }
+  if (!calls.length) return
+  const results = await Promise.all(calls)
+  const bad = results.find(r => !r.ok)
+  if (bad) throw new Error(`The server refused the change (HTTP ${bad.status}).`)
+}
+
 export default function Registrations({ onNavigate }) {
   const { records, status: fetchStatus, refresh } = useStore()
   const [search, setSearch] = useState('')
