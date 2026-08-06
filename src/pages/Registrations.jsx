@@ -264,6 +264,23 @@ export default function Registrations({ onNavigate }) {
   const dragCol = useRef(null)
   const popRef = useRef(null)
 
+  /* Undo/redo. The edit dialog is the only thing on this page that writes,
+     and it writes straight to the API rather than through a piece of state
+     this page owns — so the step records the change itself: the sections
+     as they were, and the sections as they were saved. */
+  const hist = useActionHistory()
+  const pushHist = hist.push
+
+  const onEdited = useCallback(async (entry) => {
+    await refresh()
+    if (!entry) return
+    pushHist({
+      label: entry.label,
+      undo: async () => { await putSections(entry.recordId, entry.before); await refresh() },
+      redo: async () => { await putSections(entry.recordId, entry.after); await refresh() },
+    })
+  }, [refresh, pushHist])
+
   const setPrefs = useCallback((mut) => {
     setColPrefs(prev => {
       const next = { hiddenCols: { ...prev.hiddenCols }, colOrder: [...prev.colOrder] }
