@@ -40,13 +40,24 @@ const { pb, loadRegistrations } = await import('../pb.js')
 
 const argv = process.argv.slice(2)
 const apply = argv.includes('--apply')
-const idArgs = argv.filter(a => !a.startsWith('--'))
+
+/* --name takes the value after it, so it must not be mistaken for a
+   student id when collecting the positional arguments. */
+const names = []
+const idArgs = []
+for (let i = 0; i < argv.length; i++) {
+  if (argv[i] === '--name') { names.push(String(argv[++i] || '').trim().toLowerCase()); continue }
+  if (argv[i].startsWith('--')) continue
+  idArgs.push(argv[i])
+}
 
 const die = (msg) => { console.error(`\n${msg}\n`); process.exit(1) }
 
-if (!idArgs.length) {
-  die('Name at least one student, e.g.  node server/scripts/purge-students.js S0005-S0021')
+if (!idArgs.length && !names.length) {
+  die('Name at least one student, e.g.  node server/scripts/purge-students.js S0005-S0021\n'
+    + 'or, for someone with no student id:  --name "Hobo Karimo"')
 }
+if (names.some(n => !n)) die('--name needs a value, quoted if it contains a space.')
 
 // ---- work out which ids were asked for -----------------------
 const num = (s) => {
