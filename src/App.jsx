@@ -73,6 +73,7 @@ const ROUTES = {
 
   'staff:Staff':             () => <StaffInformation />,
   'staff:Schedules':         () => <Schedules />,
+  'staff:Keys':              (nav) => <Keys onNavigate={nav} />,
 
   'operations:Inventory':    () => <Inventory />,
   'operations:Crania Store': () => <CraniaStore />,
