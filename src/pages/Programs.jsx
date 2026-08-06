@@ -1898,14 +1898,6 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
                 close()
                 setPop({ kind: 'cols', rect })
               }}>👁 Columns</button>
-            {/* The page's own programs_backups snapshots predate the shared
-                ones and restore in place without a reload, so they stay
-                reachable rather than being stranded. */}
-            <div className="bkp-card">
-              <div className="bkp-title">Earlier Backups</div>
-              <div className="bkp-hint">Snapshots taken by this page before backups moved to the shared panel above.</div>
-              <button className="bkp-btn" onClick={() => { close(); setSettingsOpen(true) }}>Open</button>
-            </div>
           </>
         )}
       />
@@ -3156,85 +3148,6 @@ function CatSubjManager({ onClose, programs, setPrograms, viewState, setViewStat
           ))}
         </div>
         <button type="button" className="addtime" onClick={addCat}>+ Add Category</button>
-        <div className="macts">
-          <button onClick={onClose}>Done</button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ================= settings (backups) ================= */
-function SettingsModal({ onClose, setPrograms }) {
-  const dialog = useDialog()
-  const [backups, setBackups] = useState(null)
-  const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState('')
-
-  const load = useCallback(async () => {
-    try {
-      const r = await fetch(`${API_BASE}/api/programs/backups`, { headers: HEADERS })
-      if (r.ok) setBackups(await r.json())
-    } catch { /* offline is fine */ }
-  }, [])
-  useEffect(() => { load() }, [load])
-
-  const backUp = async () => {
-    setBusy(true); setMsg('')
-    try {
-      const label = new Date().toLocaleString(undefined,
-        { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-      const r = await fetch(`${API_BASE}/api/programs/backup`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', ...HEADERS },
-        body: JSON.stringify({ label }),
-      })
-      if (!r.ok) throw new Error('HTTP ' + r.status)
-      setMsg('Backed up.')
-      load()
-    } catch (e) { setMsg('Backup failed: ' + e.message) }
-    finally { setBusy(false) }
-  }
-  const restore = async (id) => {
-    if (!await dialog.confirm('Restore this backup? The current programs will be replaced.',
-      { title: 'Restore Backup', button: 'Restore' })) return
-    setBusy(true); setMsg('')
-    try {
-      const r = await fetch(`${API_BASE}/api/programs/restore/${id}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json', ...HEADERS },
-      })
-      if (!r.ok) throw new Error('HTTP ' + r.status)
-      const data = await r.json()
-      if (Array.isArray(data)) setPrograms(() => data)
-      setMsg('Restored.')
-    } catch (e) { setMsg('Restore failed: ' + e.message) }
-    finally { setBusy(false) }
-  }
-
-  return (
-    <div className="pgov" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="pgmodal sm" onClick={e => e.stopPropagation()}>
-        <h2>Settings</h2>
-        <div className="sblock">
-          <div className="slab">Back Up Now</div>
-          <div className="sdesc">Writes a snapshot of every program to the database. Up to 14 are kept.</div>
-          <button disabled={busy} onClick={backUp}>Back Up Now</button>
-        </div>
-        <div className="sblock">
-          <div className="slab">Restore From Backup</div>
-          <div className="sdesc">Replace the current programs with an earlier snapshot.</div>
-          {backups === null && <div className="sdesc">Loading…</div>}
-          {backups && !backups.length && <div className="sdesc">No backups yet.</div>}
-          {backups && backups.map(b => (
-            <div className="brow" key={b.id}>
-              <span>{b.label || new Date(b.created).toLocaleString()}</span>
-              <button disabled={busy} onClick={() => restore(b.id)}>Restore</button>
-            </div>
-          ))}
-        </div>
-        {msg && <div style={{
-          fontSize: 12, marginTop: 8,
-          color: /failed/i.test(msg) ? '#c0392b' : '#20bab5',
-        }}>{msg}</div>}
         <div className="macts">
           <button onClick={onClose}>Done</button>
         </div>
