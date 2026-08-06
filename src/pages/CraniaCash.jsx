@@ -713,10 +713,11 @@ function CashList({ onSelect, onNavigate, hist, award }) {
   return (
     <>
       <PageActions
+        {...hist}
         csvName="crania-cash"
         csvColumns={COLS.map(c => ({ key: c.k, label: c.l }))}
         csvRows={() => visible}
-        settingsExtra={<CashSettings />}
+        settingsExtra={<CashSettings pushHist={hist.push} />}
       >
         <button title="Choose which columns are shown"
           onClick={e => setPop({ kind: 'cols', rect: e.currentTarget.getBoundingClientRect() })}
