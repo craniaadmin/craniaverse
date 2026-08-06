@@ -1078,7 +1078,7 @@ function ProgramsPage({ initialProgramId, onConsumeInitialProgram }) {
   useEffect(() => {
     const onKey = e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
-        if (editing || bulkOpen || settingsOpen) return
+        if (editing || bulkOpen) return
         e.preventDefault()
         if (e.shiftKey) doRedo(); else doUndo()
       }
