@@ -417,12 +417,24 @@ function UsersModal({ me, onClose }) {
         {err && <div className="err">{err}</div>}
         {note && <div className="ok">{note}</div>}
 
-        <div className="acctusers">
-          {users.map(u => (
-            <AccountRow key={u.id} u={u} isMe={u.id === me.id}
-              onPatch={apply} onRemove={remove} onSetPassword={setPassword} />
-          ))}
-        </div>
+        <table className="accttable">
+          <thead>
+            <tr>
+              <SortTh k="name" sort={sort} onSort={setSort}>Name</SortTh>
+              <th>Email</th>
+              <SortTh k="role" sort={sort} onSort={setSort}>Level</SortTh>
+              <th>Status</th>
+              <SortTh k="lastLoginAt" sort={sort} onSort={setSort}>Last signed in</SortTh>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map(u => (
+              <AccountRow key={u.id} u={u} isMe={u.id === me.id} cols={6}
+                onPatch={apply} onRemove={remove} onSetPassword={setPassword} />
+            ))}
+          </tbody>
+        </table>
 
         <div className="addrow">
           <h2 style={{ fontSize: 14, marginTop: 8 }}>Add someone</h2>
