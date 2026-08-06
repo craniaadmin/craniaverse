@@ -166,6 +166,40 @@ export default function Leads({ onNavigate }) {
         </button>
       </div>
 
+      <style>{PAGEACTIONS_CSS}</style>
+      <PageActions
+        csvName="crania-leads"
+        csvColumns={[
+          { key: 'child', label: 'Child' },
+          { key: 'parentName', label: 'Parent/Guardian' },
+          { key: 'email', label: 'Email' },
+          { key: 'phone', label: 'Phone' },
+          { key: 'source', label: 'Source' },
+          { key: 'status', label: 'Status' },
+          { key: 'followUpDate', label: 'Follow-up Date' },
+          { key: 'createdAt', label: 'Created' },
+          { key: 'notes', label: 'Notes' },
+        ]}
+        csvRows={() => visible.map(l => ({
+          child: leadName(l) === '—' ? '' : leadName(l),
+          parentName: l.parentName || '',
+          email: l.email || '',
+          phone: l.phone || '',
+          source: l.source || '',
+          status: l.status || 'New',
+          followUpDate: l.followUpDate || '',
+          createdAt: (l.createdAt || '').slice(0, 10),
+          notes: l.notes || '',
+        }))}
+        backupCollection="leads"
+        backupHint="Snapshots of the whole leads pipeline (last 14 kept)."
+        onRestored={refresh}
+      >
+        <button title="Add a new lead" onClick={() => setEditing({ mode: 'new' })}>
+          <Plus size={13} /> Add Lead
+        </button>
+      </PageActions>
+
       {status === 'offline' && (
         <div style={{ background: '#fffbf0', border: '1px solid #f4d67a', color: '#8a6a00',
                       padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: 13 }}>
