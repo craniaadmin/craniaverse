@@ -702,7 +702,6 @@ function StaffList({
           Show inactive
         </label>
         {anyFilterActive && <button className="clearf" onClick={clearAllFilters}>Clear Filters</button>}
-        <button className="addbtn" onClick={onAdd}><UserPlus size={14} /> Add Staff</button>
       </div>
 
       {selected.size > 0 && (
